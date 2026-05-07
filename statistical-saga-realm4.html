@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather — Realm 4: Sampling</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh;overflow-x:hidden}
+#game-container{max-width:800px;margin:0 auto;padding:20px;min-height:100vh}
+.title-screen{text-align:center;padding:60px 20px;animation:fadeIn 1s ease}
+.title-screen h1{font-family:'Bangers',cursive;font-size:2.8em;color:var(--gold);text-shadow:2px 2px 8px rgba(240,192,64,.3);line-height:1.1;margin-bottom:8px}
+.title-screen h2{font-family:'Permanent Marker',cursive;font-size:1.5em;color:var(--odin-blue);margin-bottom:30px}
+.title-screen .subtitle{color:var(--text-dim);font-size:1.1em;margin-bottom:40px}
+.reino-badge{display:inline-block;background:linear-gradient(135deg,var(--odin-blue),var(--corvo-purple));padding:6px 20px;border-radius:20px;font-family:'Bangers',cursive;font-size:1em;color:#fff;margin-bottom:16px}
+.difficulty-select{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.diff-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Bangers',cursive;font-size:1.2em;padding:16px 32px;border-radius:12px;cursor:pointer;transition:all .3s;min-width:180px}
+.diff-btn:hover{border-color:var(--odin-blue);transform:translateY(-2px)}
+.diff-btn .diff-label{font-size:1.3em}
+.diff-btn .diff-desc{font-family:'Patrick Hand',cursive;font-size:.65em;color:var(--text-dim);margin-top:4px}
+.scene{animation:slideIn .5s ease;padding:10px 0}
+.dialogue-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative}
+.dialogue-box.odin{border-left:4px solid var(--odin-blue)}
+.dialogue-box.thor{border-left:4px solid var(--thor-red)}
+.dialogue-box.corvo{border-left:4px solid var(--corvo-purple)}
+.dialogue-box.narrator{border-left:4px solid var(--gold)}
+.char-name{font-family:'Bangers',cursive;font-size:1.1em;margin-bottom:6px}
+.char-name.odin{color:var(--odin-blue)}.char-name.thor{color:var(--thor-red)}.char-name.corvo{color:var(--corvo-purple)}.char-name.narrator{color:var(--gold)}
+.dialogue-text{line-height:1.5;font-size:1.05em}
+.dialogue-text em{color:var(--gold);font-style:normal;font-weight:bold}
+.challenge-box{background:var(--bg-panel);border:2px solid var(--gold);border-radius:12px;padding:24px;margin:20px 0;animation:pulse-border 2s ease infinite}
+@keyframes pulse-border{0%,100%{border-color:var(--gold);box-shadow:0 0 8px rgba(240,192,64,.15)}50%{border-color:#f0c040cc;box-shadow:0 0 16px rgba(240,192,64,.3)}}
+.challenge-title{font-family:'Bangers',cursive;font-size:1.4em;color:var(--gold);margin-bottom:12px;text-align:center}
+.challenge-question{margin-bottom:16px;line-height:1.5}
+.data-display{background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:'Courier New',monospace;font-size:1em;color:var(--odin-blue);text-align:center;letter-spacing:1px;line-height:1.6}
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.option-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Patrick Hand',cursive;font-size:1.05em;padding:14px 18px;border-radius:10px;cursor:pointer;text-align:left;transition:all .25s;line-height:1.4}
+.option-btn:hover:not(.disabled){border-color:var(--odin-blue);background:#1a2233}
+.option-btn.correct{border-color:var(--success);background:#0d2818;color:var(--success)}
+.option-btn.wrong{border-color:var(--thor-red);background:#2d1116;color:var(--thor-red)}
+.option-btn.disabled{cursor:default;opacity:.7}
+.num-input-group{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.num-input{background:var(--bg-dark);border:2px solid var(--border);color:var(--odin-blue);font-family:'Patrick Hand',cursive;font-size:1.2em;padding:10px 16px;border-radius:8px;width:160px;text-align:center;outline:none}
+.num-input:focus{border-color:var(--odin-blue)}
+.submit-btn{background:var(--odin-blue);color:var(--bg-dark);border:none;font-family:'Bangers',cursive;font-size:1.1em;padding:10px 24px;border-radius:8px;cursor:pointer;transition:all .2s}
+.submit-btn:hover{transform:scale(1.05)}
+.feedback-box{border-radius:10px;padding:16px 20px;margin:16px 0;animation:fadeIn .4s ease;line-height:1.5}
+.feedback-box.correct{background:#0d2818;border:1px solid var(--success);color:var(--success)}
+.feedback-box.wrong{background:#2d1116;border:1px solid var(--thor-red);color:var(--thor-red)}
+.xp-badge{display:inline-block;background:var(--gold);color:var(--bg-dark);font-family:'Bangers',cursive;padding:2px 10px;border-radius:6px;font-size:.9em;margin-left:6px}
+.xp-bar-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.xp-label{font-family:'Bangers',cursive;color:var(--gold);font-size:1em;white-space:nowrap}
+.xp-bar-bg{flex:1;height:14px;background:var(--bg-dark);border-radius:7px;overflow:hidden}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--odin-blue),var(--gold));border-radius:7px;transition:width .6s ease}
+.xp-count{font-family:'Bangers',cursive;color:var(--text);font-size:1em;min-width:60px;text-align:right}
+.continue-btn{display:block;margin:20px auto 0;background:transparent;border:2px solid var(--odin-blue);color:var(--odin-blue);font-family:'Bangers',cursive;font-size:1.15em;padding:12px 36px;border-radius:10px;cursor:pointer;transition:all .25s}
+.continue-btn:hover{background:var(--odin-blue);color:var(--bg-dark)}
+.result-screen{text-align:center;padding:40px 20px;animation:fadeIn .8s ease}
+.result-screen h2{font-family:'Bangers',cursive;font-size:2.2em;color:var(--gold);margin-bottom:8px}
+.result-rank{font-family:'Permanent Marker',cursive;font-size:1.5em;margin:16px 0}
+.result-stats{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:20px 0;text-align:left}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text-dim)}
+.stat-value{font-family:'Bangers',cursive;color:var(--odin-blue)}
+.hint-box{background:#1a1530;border:1px solid var(--corvo-purple);border-radius:10px;padding:14px 18px;margin:12px 0;font-size:.95em;color:var(--corvo-purple);animation:fadeIn .5s ease}
+.hint-box .hint-label{font-family:'Bangers',cursive;font-size:1em;margin-bottom:4px}
+/* ── VISUAL: Village map ── */
+.village-map{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+.village{background:var(--bg-card);border:2px solid var(--border);border-radius:10px;padding:12px 16px;text-align:center;min-width:100px;transition:all .3s}
+.village .v-name{font-family:'Bangers',cursive;font-size:1em;color:var(--gold);margin-bottom:4px}
+.village .v-pop{font-size:.9em;color:var(--text-dim)}
+.village.selected{border-color:var(--odin-blue);background:#1a2233}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.title-screen h1{font-size:2em}.title-screen h2{font-size:1.2em}.difficulty-select{flex-direction:column;align-items:center}#game-container{padding:12px}.challenge-box{padding:16px}.village{min-width:80px;padding:8px 10px}}
+
+/* ── ARMOR SYSTEM ── */
+.armor-panel{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.viking-mini{position:relative;width:120px;height:180px;flex-shrink:0}
+.vm-head{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:#d4a574;border:1.5px solid #b8956a;z-index:5}
+.vm-torso{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:44px;height:58px;background:#8b7355;border-radius:7px 7px 4px 4px;z-index:3}
+.vm-arm-l{position:absolute;top:59px;left:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-arm-r{position:absolute;top:59px;right:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-leg-l{position:absolute;top:111px;left:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-leg-r{position:absolute;top:111px;right:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-slot{position:absolute;opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1);transform:scale(.3)}
+.vm-slot.on{opacity:1;transform:scale(1)}
+.vm-helm{top:16px;left:50%;transform:translateX(-50%) scale(.3);z-index:8}.vm-helm.on{transform:translateX(-50%) scale(1)}
+.vm-mail{top:57px;left:50%;transform:translateX(-50%) scale(.3);z-index:4}.vm-mail.on{transform:translateX(-50%) scale(1)}
+.vm-cape{top:53px;left:50%;transform:translateX(-50%) scale(.3);z-index:1}.vm-cape.on{transform:translateX(-50%) scale(1)}
+.vm-left{top:66px;left:0;z-index:7}.vm-right{top:56px;right:0;z-index:7}
+.vm-boots{bottom:4px;left:50%;transform:translateX(-50%) scale(.3);z-index:7;display:flex;gap:10px}.vm-boots.on{transform:translateX(-50%) scale(1)}
+.gear-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.gp-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;font-size:.8em;color:var(--text-dim);transition:all .3s}
+.gp-row.earned{color:var(--success);font-weight:bold}
+.gp-row .gp-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .3s;flex-shrink:0}
+.gp-row.earned .gp-dot{background:var(--success);border-color:var(--success)}
+.vm-sparks{position:absolute;pointer-events:none;z-index:20}
+.vm-spark{position:absolute;border-radius:50%;animation:vmSp .6s ease-out forwards}
+@keyframes vmSp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+.vm-flash{animation:vmFl .4s ease}
+@keyframes vmFl{0%{filter:brightness(1)}30%{filter:brightness(1.8) drop-shadow(0 0 12px rgba(240,180,40,.6))}100%{filter:brightness(1)}}
+.result-viking{position:relative;width:160px;height:240px;margin:16px auto}
+.rv-head{position:absolute;top:36px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#d4a574;border:2px solid #b8956a;z-index:5}
+.rv-torso{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:56px;height:74px;background:#8b7355;border-radius:9px 9px 5px 5px;z-index:3}
+.rv-arm-l{position:absolute;top:77px;left:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-arm-r{position:absolute;top:77px;right:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-leg-l{position:absolute;top:144px;left:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-leg-r{position:absolute;top:144px;right:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-slot{position:absolute}
+.rv-helm{top:20px;left:50%;transform:translateX(-50%);z-index:8}
+.rv-mail{top:74px;left:50%;transform:translateX(-50%);z-index:4}
+.rv-cape{top:69px;left:50%;transform:translateX(-50%);z-index:1}
+.rv-left{top:86px;left:4px;z-index:7}.rv-right{top:72px;right:4px;z-index:7}
+.rv-boots{bottom:4px;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:14px}
+@media(max-width:600px){.armor-panel{flex-direction:column;align-items:center}.viking-mini{width:100px;height:160px}}
+</style>
+</head>
+<body>
+<div id="game-container"><div id="game-content"></div></div>
+<script>
+// ════════════════════════════════════════════════════
+// THE STATISTICAL SAGA OF ODINFATHER — REALM 4
+// SAMPLING
+// ═══════════════════════════════════════════════════
+
+const GAME = { difficulty:null, xp:0, maxXP:0, hits:0, total:0, currentScene:0, scenes:[] };
+const content = () => document.getElementById('game-content');
+
+function dialogue(char, text) {
+  const cls={odin:'odin',thor:'thor',muninn:'corvo',huginn:'corvo',narrator:'narrator'};
+  const names={odin:'Odinfather 🧙‍♂️',thor:'Thorment ⚡',muninn:'Muninn 🐦‍⬛',huginn:'Huginn 🐦',narrator:'📜 Narrator'};
+  return `<div class="dialogue-box ${cls[char]||'narrator'}"><div class="char-name ${cls[char]||'narrator'}">${names[char]||char}</div><div class="dialogue-text">${text}</div></div>`;
+}
+function hintBox(t){return `<div class="hint-box"><div class="hint-label">🐦‍⬛ Muninn's Hint</div>${t}</div>`;}
+function xpBar(){
+  const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;
+  return armorPanelHTML()+`<div class="xp-bar-container"><div class="xp-label">⚡ XP</div><div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${p}%"></div></div><div class="xp-count">${GAME.xp} / ${GAME.maxXP}</div></div>`;
+}
+function updateXPBar(){
+  const b=document.querySelector('.xp-bar-fill'),c=document.querySelector('.xp-count');
+  if(b&&c){const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;b.style.width=p+'%';c.textContent=`${GAME.xp} / ${GAME.maxXP}`;}
+}
+
+function showTitleScreen(){
+  content().innerHTML=`
+  <div class="title-screen">
+    <div class="reino-badge">REALM 4</div>
+    <h1>The Statistical Saga of Odinfather</h1>
+    <h2>Land of a Thousand Clans</h2>
+    <p class="subtitle">Those who cannot count all the warriors of Midgard must learn to choose the right ones.</p>
+    <div class="difficulty-select">
+      <button class="diff-btn" onclick="startGame('aprendiz')"><div class="diff-label">🛡️ Apprentice</div><div class="diff-desc">Undergraduate — with Muninn's hints</div></button>
+      <button class="diff-btn" onclick="startGame('mestre')"><div class="diff-label">⚔️ Master</div><div class="diff-desc">Graduate — no hints, extra challenges</div></button>
+    </div>
+  </div>`;
+}
+
+function startGame(diff){
+  GAME.difficulty=diff; GAME.xp=0; GAME.hits=0; GAME.total=0; GAME.currentScene=0;gearEarned=0;
+  buildScenes(); GAME.maxXP=countMaxXP(); renderScene();
+}
+
+// ════════════════════════════════════════════════════
+function buildScenes(){
+  GAME.scenes=[];
+
+  // ━━ SCENE 1: Arrival ━━
+  GAME.scenes.push({type:'narrative', html:()=>`
+    <div class="scene">
+      ${dialogue('narrator','After mastering probability in the Temple of the Norns, the young researcher descends to the plains of Midgard. A vast territory with hundreds of villages stretches to the horizon: it is the <em>Land of a Thousand Clans</em>.')}
+      ${dialogue('odin','Young one, imagine that you need to know the <em>average height of all the warriors of Midgard</em>. There are thousands scattered across hundreds of villages. You cannot measure everyone — that would be a <em>census</em>, and it would take years.')}
+      ${dialogue('odin','The solution? Select a <em>representative subset</em> — a <em>sample</em> — and use data from that sample to make inferences about the <em>entire population</em>.')}
+      ${dialogue('thor','Hahaha! What if the sample is garbage? If you only measure the warriors from my personal guard — the tallest in Midgard — you will think everyone is a giant!')}
+      ${dialogue('muninn','Thorment just described <em>selection bias</em>. Let us learn to avoid it.')}
+      <button class="continue-btn" onclick="nextScene()">Explore the Land of a Thousand Clans →</button>
+    </div>`});
+
+  // ━━ SCENE 2: Population vs Sample ━━
+  GAME.scenes.push({type:'narrative', html:()=>`
+    <div class="scene">
+      ${dialogue('odin','First, the fundamental concepts:')}
+      ${dialogue('odin','<em>Population</em> (N) — the COMPLETE set of all elements we care about. All the warriors of Midgard.')}
+      ${dialogue('odin','<em>Sample</em> (n) — a subset of the population, selected for study. The warriors we actually measure.')}
+      ${dialogue('muninn','The magic of statistics is that with a <em>well-selected</em> sample, we can estimate population parameters with good precision. But "well-selected" is key to everything.')}
+      ${dialogue('huginn','And how do we select well, Muninn?')}
+      ${dialogue('muninn','There are several methods. Let us learn them.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 3: Types of Sampling ━━
+  GAME.scenes.push({type:'narrative', html:()=>`
+    <div class="scene">
+      ${dialogue('odin','The main types of <em>probabilistic</em> sampling — where each element has a known chance of being selected:')}
+      ${dialogue('odin','<em>Simple Random</em> — every warrior in Midgard has the same probability of being chosen. Like drawing names from a helmet.')}
+      ${dialogue('odin','<em>Stratified</em> — we divide the population into homogeneous groups (strata) and draw within each. Example: separate warriors by clan and draw proportionally.')}
+      ${dialogue('odin','<em>Cluster Sampling</em> — we divide into natural groups (villages) and draw entire villages. Then we measure everyone within the drawn villages.')}
+      ${dialogue('thor','And my favorite: <em>convenience</em> sampling! Grab whoever is closest! Fast, easy... and BIASED!')}
+      ${dialogue('muninn','Convenience is <em>non-probabilistic</em> — it does not guarantee representativeness. Thorment loves it because it is easy to manipulate.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 4: CHALLENGE 1 — Identify type of sampling ━━
+  GAME.scenes.push({type:'challenge', html:()=>{
+    const hint = GAME.difficulty==='aprendiz' ? hintBox('In <em>stratified</em> sampling, we first divide the population into subgroups (strata) with similar characteristics, then draw within each stratum. This ensures all subgroups are represented.') : '';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 1: What Type of Sampling Is This?</div>
+        <div class="challenge-question">A researcher wants to study warrior satisfaction. He divides all warriors into 3 groups: <em>infantry</em>, <em>cavalry</em>, and <em>archers</em>. Then he randomly draws 50 warriors from each group.</div>
+        <div class="challenge-question">What type of sampling did he use?</div>
+        ${hint}
+        <div class="options-grid" id="q1-opts">
+          <button class="option-btn" onclick="checkQ(1,this,'a')">Simple Random</button>
+          <button class="option-btn" onclick="checkQ(1,this,'b')">Stratified</button>
+          <button class="option-btn" onclick="checkQ(1,this,'c')">Cluster</button>
+          <button class="option-btn" onclick="checkQ(1,this,'d')">Convenience</button>
+        </div>
+        <div id="q1-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 5: CHALLENGE 2 — Clusters ━━
+  GAME.scenes.push({type:'challenge', html:()=>{
+    const hint = GAME.difficulty==='aprendiz' ? hintBox('In <em>cluster</em> sampling, we draw entire groups (villages, schools, companies) and measure all elements within the drawn groups. Different from stratified, where we draw <em>individuals within each group</em>.') : '';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 2: Villages Drawn</div>
+        <div class="challenge-question">Midgard has 200 villages. A researcher randomly draws <em>20 villages</em> and measures the height of <em>all warriors</em> in those 20 villages.</div>
+        <div class="village-map">
+          <div class="village selected"><div class="v-name">Village 7</div><div class="v-pop">n=45</div></div>
+          <div class="village selected"><div class="v-name">Village 23</div><div class="v-pop">n=38</div></div>
+          <div class="village selected"><div class="v-name">Village 91</div><div class="v-pop">n=52</div></div>
+          <div class="village"><div class="v-name">Village 44</div><div class="v-pop">—</div></div>
+          <div class="village selected"><div class="v-name">Village 156</div><div class="v-pop">n=41</div></div>
+          <div class="village"><div class="v-name">Village 88</div><div class="v-pop">—</div></div>
+        </div>
+        <div class="challenge-question">What type of sampling was used?</div>
+        ${hint}
+        <div class="options-grid" id="q2-opts">
+          <button class="option-btn" onclick="checkQ(2,this,'a')">Stratified</button>
+          <button class="option-btn" onclick="checkQ(2,this,'b')">Simple Random</button>
+          <button class="option-btn" onclick="checkQ(2,this,'c')">Cluster</button>
+          <button class="option-btn" onclick="checkQ(2,this,'d')">Systematic</button>
+        </div>
+        <div id="q2-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 6: Narrative — Selection Bias ━━
+  GAME.scenes.push({type:'narrative', html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','Thorment approaches with a wicked smile. He has a plan to sabotage the research.')}
+      ${dialogue('thor','Hey, young researcher! I did my own research. I asked 30 warriors who were at the tavern in the central village if they were satisfied with my training. 90% said yes! Therefore, the warriors of Midgard LOVE my training!')}
+      ${dialogue('odin','Thorment made several serious errors here. Let us identify them.')}
+      <button class="continue-btn" onclick="nextScene()">Analyze →</button>
+    </div>`});
+
+  // ━━ SCENE 7: CHALLENGE 3 — Selection Bias ━━
+  GAME.scenes.push({type:'challenge', html:()=>{
+    const hint = GAME.difficulty==='aprendiz' ? hintBox('<em>Selection bias</em> occurs when the sample is not representative of the population. Asking only people at the tavern (non-random) in a single location (not diverse) creates a biased sample. Also, Thorment\'s presence may create <em>social desirability bias</em>.') : '';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 3: Thorment\'s Biases</div>
+        <div class="challenge-question">Thorment asked 30 warriors <em>at the tavern in the central village</em> if they like his training — and 90% said yes. What is the <em>main problem</em> with this research?</div>
+        ${hint}
+        <div class="options-grid" id="q3-opts">
+          <button class="option-btn" onclick="checkQ(3,this,'a')">The sample is too small (n=30 is insufficient for any conclusion)</button>
+          <button class="option-btn" onclick="checkQ(3,this,'b')">Selection bias — the sample is not random: warriors at a tavern in one village do not represent all of Midgard, and Thorment\'s presence may intimidate honest answers</button>
+          <button class="option-btn" onclick="checkQ(3,this,'c')">The problem is that 90% is too high — it should be 50%</button>
+          <button class="option-btn" onclick="checkQ(3,this,'d')">There is no problem — 30 is sufficient by the Central Limit Theorem</button>
+        </div>
+        <div id="q3-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 8: Narrative — Sample Size and Margin of Error ━━
+  GAME.scenes.push({type:'narrative', html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Now that we know <em>how</em> to select, we must know <em>how many</em> to select. The <em>sample size (n)</em> is directly linked to the precision of our estimates.')}
+      ${dialogue('muninn','Three crucial concepts here:')}
+      ${dialogue('muninn','<em>Margin of Error (E)</em> — the interval of uncertainty around the estimate. If the sample mean is 170 cm with margin of ±3, the true population mean probably lies between 167 and 173.')}
+      ${dialogue('muninn','<em>Confidence Level</em> — the probability that the interval truly contains the true parameter. Typically 95%.')}
+      ${dialogue('muninn','<em>Confidence Interval</em> = estimate ± margin of error. It is the range where we expect to find the true value.')}
+      ${dialogue('odin','Golden rule: the <em>larger</em> the sample, the <em>smaller</em> the margin of error. But the gains diminish — doubling n does not cut the margin in half.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 9: CHALLENGE 4 — Relationship between n and Margin of Error ━━
+  GAME.scenes.push({type:'challenge', html:()=>{
+    const hint = GAME.difficulty==='aprendiz' ? hintBox('The margin of error is proportional to 1/√n. When we increase n, the margin decreases — but by the square root, not linearly. To cut the margin in half, we need to quadruple n.') : '';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 4: The Price of Precision</div>
+        <div class="challenge-question">A survey with <em>n = 100</em> warriors has a margin of error of <em>±10 cm</em>. If the researcher wants to reduce the margin to <em>±5 cm</em> (half), what should the approximate sample size be?</div>
+        ${hint}
+        <div class="options-grid" id="q4-opts">
+          <button class="option-btn" onclick="checkQ(4,this,'a')">n = 200 (double)</button>
+          <button class="option-btn" onclick="checkQ(4,this,'b')">n = 400 (quadruple)</button>
+          <button class="option-btn" onclick="checkQ(4,this,'c')">n = 150 (increase 50%)</button>
+          <button class="option-btn" onclick="checkQ(4,this,'d')">n = 1,000 (multiply by 10)</button>
+        </div>
+        <div id="q4-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 10: Narrative — Confidence Interval ━━
+  GAME.scenes.push({type:'narrative', html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Let us deepen the <em>Confidence Interval (CI)</em>. When we say "95% CI = [167, 173]", we are saying:')}
+      ${dialogue('odin','"If we repeat this research many times, 95% of the intervals constructed will contain the true population parameter."')}
+      ${dialogue('thor','So there is a 5% chance of being wrong? HAHAHA!')}
+      ${dialogue('muninn','Be careful with interpretation, young one. The CI does <em>NOT</em> say there is a 95% chance the parameter is in that interval. The parameter is fixed — it either is or is not. What varies is the interval with each new sample.')}
+      ${dialogue('odin','This distinction is one of the most misunderstood in statistics. Let us test it!')}
+      <button class="continue-btn" onclick="nextScene()">Face It →</button>
+    </div>`});
+
+  // ━━ SCENE 11: CHALLENGE 5 — CI Interpretation ━━
+  GAME.scenes.push({type:'challenge', html:()=>{
+    const hint = GAME.difficulty==='aprendiz' ? hintBox('The 95% CI means the <em>method</em> is correct 95% of the time — not that this specific interval has a 95% chance of containing the true value. It is about confidence in the <em>procedure</em>, not the individual result.') : '';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 5: The Interpretation Trap</div>
+        <div class="challenge-question">A researcher calculates the average height of warriors and obtains a <em>95% CI = [167, 173] cm</em>. Which interpretation is <em>CORRECT</em>?</div>
+        ${hint}
+        <div class="options-grid" id="q5-opts">
+          <button class="option-btn" onclick="checkQ(5,this,'a')">There is a 95% probability that the population mean lies between 167 and 173</button>
+          <button class="option-btn" onclick="checkQ(5,this,'b')">If we repeat the study many times, 95% of the constructed intervals will contain the true population mean</button>
+          <button class="option-btn" onclick="checkQ(5,this,'c')">95% of warriors are between 167 and 173 cm tall</button>
+          <button class="option-btn" onclick="checkQ(5,this,'d')">The sample mean is 95% correct</button>
+        </div>
+        <div id="q5-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 12: Narrative — Sampling Error ━━
+  GAME.scenes.push({type:'narrative', html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','There is a concept that many confuse: <em>sampling error</em>. It is the natural difference between the sample statistic and the population parameter. Even with a perfect sample, there will always be some sampling error — it is inevitable.')}
+      ${dialogue('odin','What is NOT inevitable is <em>bias (systematic error)</em>. A poorly selected sample generates bias — and bias does not diminish with increased n. You could have n = 1 million and still be wrong if the selection is biased.')}
+      ${dialogue('thor','Wait... you mean that my tavern research, even with 1 million warriors in the tavern, would still be biased?')}
+      ${dialogue('odin','Exactly, Thorment. Bias is about the METHOD, not the size.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 13: CHALLENGE 6 — Sampling error vs bias ━━
+  GAME.scenes.push({type:'challenge', html:()=>{
+    const hint = GAME.difficulty==='aprendiz' ? hintBox('<em>Sampling error</em> = natural variation from using a sample instead of a census. Decreases with larger n. <em>Bias</em> = systematic error in the selection method. Does NOT decrease with larger n. Only corrected by changing the method.') : '';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 6: Error vs. Bias</div>
+        <div class="challenge-question">Which statement is <em>TRUE</em>?</div>
+        ${hint}
+        <div class="options-grid" id="q6-opts">
+          <button class="option-btn" onclick="checkQ(6,this,'a')">Increasing sample size eliminates both sampling error and bias</button>
+          <button class="option-btn" onclick="checkQ(6,this,'b')">Sampling error decreases with larger n, but bias is only corrected by changing the selection method</button>
+          <button class="option-btn" onclick="checkQ(6,this,'c')">Bias and sampling error are the same thing</button>
+          <button class="option-btn" onclick="checkQ(6,this,'d')">A random sample completely eliminates sampling error</button>
+        </div>
+        <div id="q6-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 14: CHALLENGE 7 — Practical scenario ━━
+  GAME.scenes.push({type:'challenge', html:()=>{
+    const hint = GAME.difficulty==='aprendiz' ? hintBox('Think of the problems: volunteers = self-selection (bias), online only = excludes those without internet, no stratification = may under-represent groups. The correct option ensures ALL subgroups are represented proportionally.') : '';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 7: The Best Sampling Plan</div>
+        <div class="challenge-question">Odinfather wants to research warrior satisfaction in Midgard. The population has 3 clans: <em>Bear (60%)</em>, <em>Wolf (30%)</em>, and <em>Raven (10%)</em>. Which sampling plan is <em>most appropriate</em>?</div>
+        ${hint}
+        <div class="options-grid" id="q7-opts">
+          <button class="option-btn" onclick="checkQ(7,this,'a')">Ask for volunteers from each clan</button>
+          <button class="option-btn" onclick="checkQ(7,this,'b')">Randomly draw 100 warriors from a complete list, regardless of clan</button>
+          <button class="option-btn" onclick="checkQ(7,this,'c')">Proportional stratified sampling: draw 60 from Bear, 30 from Wolf, and 10 from Raven</button>
+          <button class="option-btn" onclick="checkQ(7,this,'d')">Interview the first 100 who respond to an online form</button>
+        </div>
+        <div id="q7-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ MASTER CHALLENGE: Design Effect (DEFF) ━━
+  if(GAME.difficulty==='mestre'){
+    GAME.scenes.push({type:'narrative', html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        ${dialogue('thor','Time for a master challenge! Let us talk about something few know!')}
+        ${dialogue('odin','When we use cluster sampling instead of simple random, the precision can differ. The <em>Design Effect (DEFF)</em> measures how much variance changes because of the sampling method chosen.')}
+        ${dialogue('muninn','If DEFF > 1, cluster sampling is <em>less</em> efficient than simple random — we need more elements for the same precision. This occurs because individuals within the same cluster tend to be <em>more alike each other</em>.')}
+        <button class="continue-btn" onclick="nextScene()">Face It →</button>
+      </div>`});
+
+    GAME.scenes.push({type:'challenge', html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: Design Effect</div>
+          <div class="challenge-question">A simple random sampling study would need <em>n = 200</em>. However, the researcher used cluster sampling with <em>DEFF = 2.0</em>. What should the adjusted sample size be?</div>
+          <div class="data-display">n adjusted = n original × DEFF</div>
+          <div class="options-grid" id="q8-opts">
+            <button class="option-btn" onclick="checkQ(8,this,'a')">n = 200 (DEFF does not change n)</button>
+            <button class="option-btn" onclick="checkQ(8,this,'b')">n = 400</button>
+            <button class="option-btn" onclick="checkQ(8,this,'c')">n = 100 (divide by DEFF)</button>
+            <button class="option-btn" onclick="checkQ(8,this,'d')">n = 283 (multiply by √DEFF)</button>
+          </div>
+          <div id="q8-fb"></div>
+        </div>
+      </div>`});
+  }
+
+  // ━━ FINAL SCENE ━━
+  GAME.scenes.push({type:'narrative', html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','The young researcher gazes at the Land of a Thousand Clans from the top of a hill. Now he knows he does not need to measure all warriors — just choose the right ones, the right way.')}
+      ${dialogue('odin','You have conquered the <em>Land of a Thousand Clans</em>! Now you understand that a representative sample is worth more than a biased census, that margin of error depends on √n, and that bias is not solved with size — it is solved with method.')}
+      ${dialogue('thor','In <em>Realm 5</em>, hypothesis tests will test even your patience!')}
+      ${dialogue('huginn','Until then, statistical warrior!')}
+      <button class="continue-btn" onclick="showResults()">View Final Result ⚔️</button>
+    </div>`});
+}
+
+// ════════════════════════════════════════════════════
+// ANSWERS AND EXPLANATIONS
+// ════════════════════════════════════════════════════
+const ANSWERS={1:'b',2:'c',3:'b',4:'b',5:'b',6:'b',7:'c',8:'b'};
+const EXPLANATIONS={
+  1:{
+    correct:'✅ Perfect! He divided the population into strata (infantry, cavalry, archers) and drew within each. This is <em>stratified sampling</em> — it ensures representation of all subgroups.',
+    wrong:'❌ The answer is <em>Stratified</em>. He created strata (homogeneous subgroups) and drew within each. In simple random there is no prior division; in cluster sampling, entire groups would be drawn.',
+    charC:'odin',charW:'thor'
+  },
+  2:{
+    correct:'✅ Exactly! He drew <em>entire villages</em> (clusters) and measured everyone within them. This is <em>cluster sampling</em>. Different from stratified, where we would draw individuals within ALL villages.',
+    wrong:'❌ The answer is <em>Cluster Sampling</em>. Drawing entire groups (villages) and measuring everyone within them = clusters. In stratified, we would draw individuals within each village, not entire villages.',
+    charC:'muninn',charW:'thor'
+  },
+  3:{
+    correct:'✅ Absolutely right! <em>Selection bias</em>: non-random sample (only tavern-goers), from a single location (not diverse), and possible <em>social desirability bias</em> (who criticizes Thorment to his face?). Even if n=30 were adequate in some situations, the method invalidates everything.',
+    wrong:'❌ The main problem is <em>selection bias</em>: the sample is not random or representative. Warriors from a single tavern, with Thorment present, do not represent Midgard. Size does not save a bad method!',
+    charC:'odin',charW:'thor'
+  },
+  4:{
+    correct:'✅ Perfect! The margin of error is proportional to <em>1/√n</em>. To cut it in half, we must multiply n by 2² = 4. Thus, n = 100 × 4 = <em>400</em>. Precision is expensive!',
+    wrong:'❌ Since E ∝ 1/√n, to reduce the margin by half we must <em>quadruple</em> n: 100 × 4 = <em>400</em>. Doubling n would only reduce the margin by √2 ≈ 1.41.',
+    charC:'odin',charW:'thor'
+  },
+  5:{
+    correct:'✅ Excellent! The correct interpretation is <em>frequentist</em>: if we repeat the study many times, 95% of the constructed intervals will contain the true parameter. It is NOT "95% chance of being in this interval" — the parameter is fixed, what varies is the interval.',
+    wrong:'❌ The correct interpretation is: <em>if we repeat the study many times, 95% of CIs will contain the true value</em>. It is NOT "95% chance of being in this interval" — that would be Bayesian interpretation, not frequentist.',
+    charC:'muninn',charW:'thor'
+  },
+  6:{
+    correct:'✅ Correct! <em>Sampling error</em> is natural and decreases with larger n. <em>Bias</em> is systematic and is only corrected by changing the selection method. A giant yet biased sample remains biased!',
+    wrong:'❌ The correct answer: <em>sampling error decreases with n, bias is only corrected with method</em>. Increasing n reduces random error, but does not fix a flawed selection method.',
+    charC:'odin',charW:'thor'
+  },
+  7:{
+    correct:'✅ Perfect! <em>Proportional stratified sampling</em> ensures each clan is represented in the sample at the same proportion as in the population. Volunteers create self-selection, online forms exclude those without access, and simple random may under-represent the Raven clan (10%).',
+    wrong:'❌ The best option is <em>proportional stratified</em>: 60 from Bear, 30 from Wolf, 10 from Raven — maintaining population proportion. This ensures representativeness of all subgroups.',
+    charC:'odin',charW:'thor'
+  },
+  8:{
+    correct:'✅ Correct! n adjusted = n × DEFF = 200 × 2.0 = <em>400</em>. Since individuals within a cluster tend to be alike (high intraclass correlation), cluster sampling is less efficient and requires more elements for the same precision.',
+    wrong:'❌ n adjusted = n original × DEFF = 200 × 2.0 = <em>400</em>. DEFF > 1 indicates cluster sampling is less efficient — we need more elements to compensate for intracluster homogeneity.',
+    charC:'muninn',charW:'thor'
+  }
+};
+
+function checkQ(qNum,btn,answer){
+  const opts=document.querySelectorAll(`#q${qNum}-opts .option-btn`);
+  opts.forEach(b=>{b.classList.add('disabled');b.onclick=null;});
+  const fb=document.getElementById(`q${qNum}-fb`);
+  const correct=ANSWERS[qNum]; const exp=EXPLANATIONS[qNum];
+  GAME.total++;
+  if(answer===correct){
+    btn.classList.add('correct'); GAME.hits++; GAME.xp+=20; updateXPBar();earnGear();
+    fb.innerHTML=`<div class="feedback-box correct">${dialogue(exp.charC,exp.correct+' <span class="xp-badge">+20 XP</span>')}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  } else {
+    btn.classList.add('wrong');
+    const ci=['a','b','c','d'].indexOf(correct); if(opts[ci]) opts[ci].classList.add('correct');
+    fb.innerHTML=`<div class="feedback-box wrong">${dialogue(exp.charW,exp.wrong)}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }
+}
+
+function countMaxXP(){ return (GAME.difficulty==='mestre'?8:7)*20; }
+function renderScene(){
+  if(GAME.currentScene<GAME.scenes.length){content().innerHTML=GAME.scenes[GAME.currentScene].html();restoreGear();window.scrollTo({top:0,behavior:'smooth'});}
+}
+function nextScene(){GAME.currentScene++;renderScene();}
+
+function showResults(){
+  const pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  let rank,rc;
+  if(pct>=90){rank='🏆 Jarl of Sampling';rc='#f0c040';}
+  else if(pct>=70){rank='⚔️ Clan Surveyor';rc:'#58a6ff';}
+  else if(pct>=50){rank:'🛡️ Census Novice';rc:'#8b949e';}
+  else{rank:'⛓️ Lost Wanderer';rc:'#f85149';}
+  content().innerHTML=`
+  <div class="result-screen">
+    <div class="reino-badge">REALM 4 — COMPLETE</div>
+    <h2>Adventure Results</h2>
+    ${resultVikingHTML()}
+    <div class="result-rank" style="color:${rc}">${rank}</div>
+    <div class="result-stats">
+      <div class="stat-row"><span class="stat-label">Difficulty</span><span class="stat-value">${GAME.difficulty==='mestre'?'⚔️ Master':'🛡️ Apprentice'}</span></div>
+      <div class="stat-row"><span class="stat-label">Correct Challenges</span><span class="stat-value">${GAME.hits} / ${GAME.total}</span></div>
+      <div class="stat-row"><span class="stat-label">Accuracy</span><span class="stat-value">${pct}%</span></div>
+      <div class="stat-row"><span class="stat-label">XP Earned</span><span class="stat-value">${GAME.xp} / ${GAME.maxXP}</span></div>
+    </div>
+    ${dialogue('odin',pct>=70?'The Land of a Thousand Clans recognizes your wisdom! You know that a sample is worth as much as the method that created it. Onward!':'Return to the Land of a Thousand Clans and practice, young one. Remember: a good sample is not large — it is well-selected!')}
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+      <button class="continue-btn" onclick="showTitleScreen()">🔄 Play Again</button>
+    </div>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+var GEAR_ITEMS=[{"s":"boots","n":"Trail Boots","h":"<div style=\"display:flex;gap:14px\"><div style=\"width:24px;height:18px;background:#5a4028;border-radius:3px 3px 4px 7px;border:2px solid #7a5838\"></div><div style=\"width:24px;height:18px;background:#5a4028;border-radius:3px 3px 4px 7px;border:2px solid #7a5838\"></div></div>"},{"s":"mail","n":"Census Taker\'s Vest","h":"<div style=\"width:60px;height:72px;background:linear-gradient(180deg,#a08050,#806030);border-radius:7px 7px 4px 4px;border:2px solid #604820\"></div>"},{"s":"right","n":"Sampling Compass","h":"<div style=\"width:24px;height:24px;border-radius:50%;background:#e0d8c0;border:2px solid #a09060;position:relative;margin-top:6px\"><div style=\"width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;border-bottom:8px solid #c03030;position:absolute;top:3px;left:50%;transform:translateX(-50%)\"></div></div>"},{"s":"left","n":"Map of the Clans","h":"<div style=\"width:36px;height:32px;background:#e8d8b0;border-radius:3px;border:2px solid #c0a870;position:relative\"><div style=\"position:absolute;top:6px;left:5px;width:9px;height:9px;border:1.5px solid #8a7050;border-radius:50%;opacity:0.6\"></div><div style=\"position:absolute;top:12px;left:16px;width:12px;height:7px;border:1.5px solid #8a7050;border-radius:3px;opacity:0.6\"></div></div>"},{"s":"cape","n":"Cape of a Thousand Clans","h":"<div style=\"width:84px;height:110px;background:linear-gradient(180deg,#8a6020,#604010);border-radius:5px 5px 28px 28px;clip-path:polygon(16% 0%,84% 0%,100% 18%,92% 100%,50% 88%,8% 100%,0% 18%)\"></div>"},{"s":"helm","n":"Helm of the Jarl","h":"<div style=\"position:relative;width:54px;margin:0 auto\"><div style=\"width:54px;height:30px;background:linear-gradient(135deg,#c0a040,#a08020);border-radius:27px 27px 7px 7px;border:2px solid #806818;position:relative\"><div style=\"position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:5px;height:9px;background:#a08020;border-radius:2px\"></div><div style=\"position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:18px;height:5px;background:#c0a040;border-radius:3px\"></div></div></div>"}];
+var gearEarned=0;
+function armorPanelHTML(){
+  var rows='';
+  for(var i=0;i<GEAR_ITEMS.length;i++){rows+='<div class="gp-row'+(i<gearEarned?' earned':'')+'" id="gprow'+i+'"><span class="gp-dot"></span><span>'+GEAR_ITEMS[i].n+'</span></div>';}
+  var sl='<div class="vm-sparks" id="vmsparks"></div>';
+  sl+='<div class="vm-slot vm-cape" id="vmslot-cape"></div>';
+  sl+='<div class="vm-head"></div><div class="vm-arm-l"></div><div class="vm-arm-r"></div><div class="vm-torso"></div><div class="vm-leg-l"></div><div class="vm-leg-r"></div>';
+  sl+='<div class="vm-slot vm-boots" id="vmslot-boots"></div><div class="vm-slot vm-mail" id="vmslot-mail"></div>';
+  sl+='<div class="vm-slot vm-left" id="vmslot-left"></div><div class="vm-slot vm-right" id="vmslot-right"></div>';
+  sl+='<div class="vm-slot vm-helm" id="vmslot-helm"></div>';
+  return '<div class="armor-panel"><div class="viking-mini" id="vmini">'+sl+'</div><div class="gear-progress">'+rows+'</div></div>';
+}
+function restoreGear(){for(var i=0;i<gearEarned&&i<GEAR_ITEMS.length;i++){var g=GEAR_ITEMS[i],el=document.getElementById('vmslot-'+g.s);if(el){el.innerHTML=g.h;el.classList.add('on');}}}
+function earnGear(){
+  if(gearEarned>=GEAR_ITEMS.length)return;
+  var g=GEAR_ITEMS[gearEarned],el=document.getElementById('vmslot-'+g.s);
+  if(el){el.innerHTML=g.h;el.classList.add('on','vm-flash');setTimeout(function(){el.classList.remove('vm-flash')},500);spawnVMSparks(el);}
+  var row=document.getElementById('gprow'+gearEarned);if(row)row.classList.add('earned');
+  gearEarned++;
+}
+function spawnVMSparks(el){
+  var sc=document.getElementById('vmsparks');if(!sc||!el)return;
+  var r=el.getBoundingClientRect(),sr=document.getElementById('vmini').getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height/2;
+  var cols=['#f0c040','#f08030','#f0e080','#ff6040','#ffd060'];
+  for(var i=0;i<10;i++){var s=document.createElement('div');s.className='vm-spark';
+    var a=Math.random()*Math.PI*2,d=20+Math.random()*30;
+    s.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+cols[Math.floor(Math.random()*5)]+';--sx:'+(Math.cos(a)*d)+'px;--sy:'+(Math.sin(a)*d)+'px;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px';
+    sc.appendChild(s);setTimeout(function(x){x.remove()},700,s);}
+}
+function resultVikingHTML(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var ti=[];if(pct>=90)ti=GEAR_ITEMS;else if(pct>=70)ti=GEAR_ITEMS.slice(0,5);else if(pct>=50)ti=GEAR_ITEMS.slice(0,2);
+  var sm={boots:'rv-boots',mail:'rv-mail',right:'rv-right',left:'rv-left',cape:'rv-cape',helm:'rv-helm'};
+  var html='<div class="result-viking">';
+  html+='<div class="rv-slot rv-cape" id="rvs-cape"></div>';
+  html+='<div class="rv-head"></div><div class="rv-arm-l"></div><div class="rv-arm-r"></div><div class="rv-torso"></div><div class="rv-leg-l"></div><div class="rv-leg-r"></div>';
+  html+='<div class="rv-slot rv-boots" id="rvs-boots"></div><div class="rv-slot rv-mail" id="rvs-mail"></div>';
+  html+='<div class="rv-slot rv-left" id="rvs-left"></div><div class="rv-slot rv-right" id="rvs-right"></div>';
+  html+='<div class="rv-slot rv-helm" id="rvs-helm"></div></div>';
+  setTimeout(function(){ti.forEach(function(g){var e=document.getElementById('rvs-'+g.s);if(e)e.innerHTML=g.h;});},100);
+  return html;
+}
+
+showTitleScreen();
+</script>
+</body>
+</html>

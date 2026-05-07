@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh}
+.hub-container{max-width:900px;margin:0 auto;padding:30px 20px}
+
+/* ── HEADER ── */
+.hub-header{text-align:center;padding:40px 20px 30px;animation:fadeIn 1s ease}
+.hub-header h1{font-family:'Bangers',cursive;font-size:3em;color:var(--gold);text-shadow:2px 2px 12px rgba(240,192,64,.3);line-height:1.1;margin-bottom:8px}
+.hub-header h2{font-family:'Permanent Marker',cursive;font-size:1.3em;color:var(--odin-blue);margin-bottom:16px}
+.hub-header .hub-desc{color:var(--text-dim);font-size:1.05em;max-width:620px;margin:0 auto;line-height:1.5}
+
+/* ── CHARACTERS ── */
+.characters{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin:30px 0 10px}
+.char-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;text-align:center;min-width:130px;transition:transform .3s}
+.char-card:hover{transform:translateY(-3px)}
+.char-card .char-icon{font-size:2em;margin-bottom:6px}
+.char-card .char-label{font-family:'Bangers',cursive;font-size:1em}
+.char-card.odin .char-label{color:var(--odin-blue)}
+.char-card.thor .char-label{color:var(--thor-red)}
+.char-card.corvo .char-label{color:var(--corvo-purple)}
+.char-card .char-role{font-size:.8em;color:var(--text-dim)}
+
+/* ── REALM MAP ── */
+.realm-map{display:grid;grid-template-columns:1fr;gap:16px;margin:30px 0}
+.realm-card{background:var(--bg-card);border:2px solid var(--border);border-radius:14px;padding:22px 24px;display:flex;align-items:center;gap:20px;text-decoration:none;color:inherit;transition:all .3s;cursor:pointer;position:relative;overflow:hidden}
+.realm-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:4px 0 0 4px}
+.realm-card:hover{border-color:var(--odin-blue);transform:translateX(6px);box-shadow:0 4px 20px rgba(88,166,255,.1)}
+.realm-card .realm-number{font-family:'Bangers',cursive;font-size:2.2em;color:var(--gold);min-width:50px;text-align:center;line-height:1}
+.realm-card .realm-info{flex:1}
+.realm-card .realm-title{font-family:'Bangers',cursive;font-size:1.4em;color:var(--text);margin-bottom:4px}
+.realm-card .realm-setting{font-family:'Permanent Marker',cursive;font-size:.85em;color:var(--corvo-purple);margin-bottom:6px}
+.realm-card .realm-topics{font-size:.9em;color:var(--text-dim);line-height:1.4}
+.realm-card .realm-badge{font-family:'Bangers',cursive;font-size:.8em;padding:3px 10px;border-radius:12px;white-space:nowrap}
+.badge-aprendiz{background:rgba(88,166,255,.15);color:var(--odin-blue)}
+.badge-mestre{background:rgba(248,81,73,.15);color:var(--thor-red)}
+
+/* Colors per realm */
+.realm-card:nth-child(1)::before{background:var(--success)}
+.realm-card:nth-child(2)::before{background:var(--odin-blue)}
+.realm-card:nth-child(3)::before{background:var(--corvo-purple)}
+.realm-card:nth-child(4)::before{background:var(--gold)}
+.realm-card:nth-child(5)::before{background:var(--thor-red)}
+.realm-card:nth-child(6)::before{background:#f97316}
+.realm-card:nth-child(7)::before{background:#06b6d4}
+
+/* ── FOOTER ── */
+.hub-footer{text-align:center;margin-top:40px;padding:20px;border-top:1px solid var(--border);color:var(--text-dim);font-size:.9em}
+.hub-footer a{color:var(--odin-blue);text-decoration:none}
+.hub-footer a:hover{text-decoration:underline}
+.hub-footer .footer-credit{font-family:'Bangers',cursive;font-size:1em;color:var(--gold);margin-bottom:8px}
+
+/* ── STATS ── */
+.hub-stats{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin:20px 0 30px;padding:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.hub-stat{text-align:center}
+.hub-stat .stat-num{font-family:'Bangers',cursive;font-size:1.8em;color:var(--gold)}
+.hub-stat .stat-txt{font-size:.85em;color:var(--text-dim)}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media(max-width:600px){
+  .hub-header h1{font-size:2.2em}
+  .hub-header h2{font-size:1.1em}
+  .realm-card{padding:16px;gap:14px}
+  .realm-card .realm-number{font-size:1.6em;min-width:36px}
+  .realm-card .realm-title{font-size:1.15em}
+  .characters{gap:12px}
+  .char-card{min-width:100px;padding:10px 12px}
+  .hub-stats{gap:16px}
+}
+</style>
+</head>
+<body>
+<div class="hub-container">
+
+  <!-- HEADER -->
+  <div class="hub-header">
+    <h1>The Statistical Saga of Odinfather</h1>
+    <h2>The Wondrous Book of Statistical Recipes</h2>
+    <p class="hub-desc">A didactic RPG visual novel where statistics comes alive through Norse mythology. Choose a realm, face challenges, and master the fundamentals — from undergraduate to graduate level.</p>
+  </div>
+
+  <!-- CHARACTERS -->
+  <div class="characters">
+    <div class="char-card odin">
+      <div class="char-icon">&#x1F9D9;&#x200D;&#x2642;&#xFE0F;</div>
+      <div class="char-label">Odinfather</div>
+      <div class="char-role">The Wise Mentor</div>
+    </div>
+    <div class="char-card thor">
+      <div class="char-icon">&#x26A1;</div>
+      <div class="char-label">Thorment</div>
+      <div class="char-role">The Antagonist</div>
+    </div>
+    <div class="char-card corvo">
+      <div class="char-icon">&#x1F426;&#x200D;&#x2B1B;</div>
+      <div class="char-label">Muninn & Huginn</div>
+      <div class="char-role">Raven Helpers</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="hub-stats">
+    <div class="hub-stat"><div class="stat-num">7</div><div class="stat-txt">Realms</div></div>
+    <div class="hub-stat"><div class="stat-num">63</div><div class="stat-txt">Challenges (Master)</div></div>
+    <div class="hub-stat"><div class="stat-num">2</div><div class="stat-txt">Difficulty Modes</div></div>
+    <div class="hub-stat"><div class="stat-num">&infin;</div><div class="stat-txt">Replayability</div></div>
+  </div>
+
+  <!-- REALM MAP -->
+  <div class="realm-map">
+    <a class="realm-card" href="statistical-saga-realm1.html">
+      <div class="realm-number">1</div>
+      <div class="realm-info">
+        <div class="realm-title">Quantitative Research</div>
+        <div class="realm-setting">&#x1F4DC; Gates of Midgard</div>
+        <div class="realm-topics">Quanti vs Quali &middot; Variables (IV, DV) &middot; Scales of Measurement &middot; Hypotheses &middot; Validity and Reliability</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm2.html">
+      <div class="realm-number">2</div>
+      <div class="realm-info">
+        <div class="realm-title">Descriptive Statistics</div>
+        <div class="realm-setting">&#x1F3D4;&#xFE0F; Mountains of Jotunheim</div>
+        <div class="realm-topics">Mean &middot; Median &middot; Mode &middot; Outliers &middot; Variance and SD &middot; Empirical Rule 68-95-99.7</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 1&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm3.html">
+      <div class="realm-number">3</div>
+      <div class="realm-info">
+        <div class="realm-title">Probability</div>
+        <div class="realm-setting">&#x1F3DB;&#xFE0F; Temple of the Norns</div>
+        <div class="realm-topics">Sample Space &middot; Addition Rule &middot; Multiplication &middot; Conditional &middot; Mutually Exclusive vs Independent</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 1&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm4.html">
+      <div class="realm-number">4</div>
+      <div class="realm-info">
+        <div class="realm-title">Sampling</div>
+        <div class="realm-setting">&#x1F3D8;&#xFE0F; Land of a Thousand Clans</div>
+        <div class="realm-topics">Population vs Sample &middot; Random/Stratified/Cluster &middot; Bias &middot; Margin of Error &middot; CI</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 1&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm5.html">
+      <div class="realm-number">5</div>
+      <div class="realm-info">
+        <div class="realm-title">Hypothesis Testing</div>
+        <div class="realm-setting">&#x2696;&#xFE0F; Court of Asgard</div>
+        <div class="realm-topics">H&#8320; and H&#8321; &middot; p-value &middot; Type I/II Error &middot; Statistical vs Practical Significance &middot; Cohen's d</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm6.html">
+      <div class="realm-number">6</div>
+      <div class="realm-info">
+        <div class="realm-title">t-Test</div>
+        <div class="realm-setting">&#x1F5E1;&#xFE0F; Arena of Valhalla</div>
+        <div class="realm-topics">One-sample t &middot; Independent &middot; Paired &middot; Assumptions &middot; Levene/Welch &middot; APA Reporting</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm7.html">
+      <div class="realm-number">7</div>
+      <div class="realm-info">
+        <div class="realm-title">Equivalence Testing (TOST)</div>
+        <div class="realm-setting">&#x1F308; Bridge of Bifrost</div>
+        <div class="realm-topics">SESOI &middot; TOST (Two One-Sided Tests) &middot; 90% CI &middot; Paired vs Independent &middot; 4 Quadrants NHST&times;TOST</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="hub-footer">
+    <div class="footer-credit">Created by Dr. Leonardo Vils</div>
+    <p>Based on the e-book "The Wondrous Book of Statistical Recipes of Odinfather"</p>
+    <p style="margin-top:6px">&#x1F6E1;&#xFE0F; = Apprentice challenges &nbsp;|&nbsp; &#x1F3F4; = Master bonus challenges</p>
+    <p style="margin-top:12px"><a href="https://github.com" target="_blank">GitHub</a> &middot; MIT License &middot; 2026</p>
+  </div>
+
+</div>
+</body>
+</html>

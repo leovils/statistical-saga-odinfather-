@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather — Realm 6: t-Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh;overflow-x:hidden}
+#game-container{max-width:800px;margin:0 auto;padding:20px;min-height:100vh}
+.title-screen{text-align:center;padding:60px 20px;animation:fadeIn 1s ease}
+.title-screen h1{font-family:'Bangers',cursive;font-size:2.8em;color:var(--gold);text-shadow:2px 2px 8px rgba(240,192,64,.3);line-height:1.1;margin-bottom:8px}
+.title-screen h2{font-family:'Permanent Marker',cursive;font-size:1.5em;color:var(--odin-blue);margin-bottom:30px}
+.title-screen .subtitle{color:var(--text-dim);font-size:1.1em;margin-bottom:40px}
+.realm-badge{display:inline-block;background:linear-gradient(135deg,var(--odin-blue),var(--corvo-purple));padding:6px 20px;border-radius:20px;font-family:'Bangers',cursive;font-size:1em;color:#fff;margin-bottom:16px}
+.difficulty-select{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.diff-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Bangers',cursive;font-size:1.2em;padding:16px 32px;border-radius:12px;cursor:pointer;transition:all .3s;min-width:180px}
+.diff-btn:hover{border-color:var(--odin-blue);transform:translateY(-2px)}
+.diff-btn .diff-label{font-size:1.3em}.diff-btn .diff-desc{font-family:'Patrick Hand',cursive;font-size:.65em;color:var(--text-dim);margin-top:4px}
+.scene{animation:slideIn .5s ease;padding:10px 0}
+.dialogue-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative}
+.dialogue-box.odin{border-left:4px solid var(--odin-blue)}.dialogue-box.thor{border-left:4px solid var(--thor-red)}.dialogue-box.corvo{border-left:4px solid var(--corvo-purple)}.dialogue-box.narrator{border-left:4px solid var(--gold)}
+.char-name{font-family:'Bangers',cursive;font-size:1.1em;margin-bottom:6px}
+.char-name.odin{color:var(--odin-blue)}.char-name.thor{color:var(--thor-red)}.char-name.corvo{color:var(--corvo-purple)}.char-name.narrator{color:var(--gold)}
+.dialogue-text{line-height:1.5;font-size:1.05em}.dialogue-text em{color:var(--gold);font-style:normal;font-weight:bold}
+.challenge-box{background:var(--bg-panel);border:2px solid var(--gold);border-radius:12px;padding:24px;margin:20px 0;animation:pulse-border 2s ease infinite}
+@keyframes pulse-border{0%,100%{border-color:var(--gold);box-shadow:0 0 8px rgba(240,192,64,.15)}50%{border-color:#f0c040cc;box-shadow:0 0 16px rgba(240,192,64,.3)}}
+.challenge-title{font-family:'Bangers',cursive;font-size:1.4em;color:var(--gold);margin-bottom:12px;text-align:center}
+.challenge-question{margin-bottom:16px;line-height:1.5}
+.data-display{background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:'Courier New',monospace;font-size:1em;color:var(--odin-blue);text-align:center;letter-spacing:1px;line-height:1.6}
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.option-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Patrick Hand',cursive;font-size:1.05em;padding:14px 18px;border-radius:10px;cursor:pointer;text-align:left;transition:all .25s;line-height:1.4}
+.option-btn:hover:not(.disabled){border-color:var(--odin-blue);background:#1a2233}
+.option-btn.correct{border-color:var(--success);background:#0d2818;color:var(--success)}
+.option-btn.wrong{border-color:var(--thor-red);background:#2d1116;color:var(--thor-red)}
+.option-btn.disabled{cursor:default;opacity:.7}
+.feedback-box{border-radius:10px;padding:16px 20px;margin:16px 0;animation:fadeIn .4s ease;line-height:1.5}
+.feedback-box.correct{background:#0d2818;border:1px solid var(--success);color:var(--success)}
+.feedback-box.wrong{background:#2d1116;border:1px solid var(--thor-red);color:var(--thor-red)}
+.xp-badge{display:inline-block;background:var(--gold);color:var(--bg-dark);font-family:'Bangers',cursive;padding:2px 10px;border-radius:6px;font-size:.9em;margin-left:6px}
+.xp-bar-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.xp-label{font-family:'Bangers',cursive;color:var(--gold);font-size:1em;white-space:nowrap}
+.xp-bar-bg{flex:1;height:14px;background:var(--bg-dark);border-radius:7px;overflow:hidden}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--odin-blue),var(--gold));border-radius:7px;transition:width .6s ease}
+.xp-count{font-family:'Bangers',cursive;color:var(--text);font-size:1em;min-width:60px;text-align:right}
+.continue-btn{display:block;margin:20px auto 0;background:transparent;border:2px solid var(--odin-blue);color:var(--odin-blue);font-family:'Bangers',cursive;font-size:1.15em;padding:12px 36px;border-radius:10px;cursor:pointer;transition:all .25s}
+.continue-btn:hover{background:var(--odin-blue);color:var(--bg-dark)}
+.result-screen{text-align:center;padding:40px 20px;animation:fadeIn .8s ease}
+.result-screen h2{font-family:'Bangers',cursive;font-size:2.2em;color:var(--gold);margin-bottom:8px}
+.result-rank{font-family:'Permanent Marker',cursive;font-size:1.5em;margin:16px 0}
+.result-stats{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:20px 0;text-align:left}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text-dim)}.stat-value{font-family:'Bangers',cursive;color:var(--odin-blue)}
+.hint-box{background:#1a1530;border:1px solid var(--corvo-purple);border-radius:10px;padding:14px 18px;margin:12px 0;font-size:.95em;color:var(--corvo-purple);animation:fadeIn .5s ease}
+.hint-box .hint-label{font-family:'Bangers',cursive;font-size:1em;margin-bottom:4px}
+/* ── VISUAL: Arena ── */
+.arena-vs{display:flex;align-items:center;justify-content:center;gap:20px;margin:16px 0;flex-wrap:wrap}
+.arena-group{background:var(--bg-card);border:2px solid var(--border);border-radius:12px;padding:16px 20px;text-align:center;min-width:140px}
+.arena-group .g-name{font-family:'Bangers',cursive;font-size:1.1em;margin-bottom:6px}
+.arena-group.blue{border-color:var(--odin-blue)}.arena-group.blue .g-name{color:var(--odin-blue)}
+.arena-group.red{border-color:var(--thor-red)}.arena-group.red .g-name{color:var(--thor-red)}
+.arena-vs-text{font-family:'Bangers',cursive;font-size:1.6em;color:var(--gold)}
+.arena-group .g-stat{font-size:.95em;color:var(--text-dim);line-height:1.4}
+/* pressupostos checklist */
+.check-list{list-style:none;padding:0;margin:12px 0}
+.check-list li{padding:8px 12px;margin:4px 0;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:8px}
+.check-list li .check-icon{font-size:1.2em}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.title-screen h1{font-size:2em}.title-screen h2{font-size:1.2em}.difficulty-select{flex-direction:column;align-items:center}#game-container{padding:12px}.challenge-box{padding:16px}.arena-vs{gap:10px}.arena-group{min-width:110px;padding:12px}}
+
+/* ── ARMOR SYSTEM ── */
+.armor-panel{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.viking-mini{position:relative;width:120px;height:180px;flex-shrink:0}
+.vm-head{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:#d4a574;border:1.5px solid #b8956a;z-index:5}
+.vm-torso{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:44px;height:58px;background:#8b7355;border-radius:7px 7px 4px 4px;z-index:3}
+.vm-arm-l{position:absolute;top:59px;left:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-arm-r{position:absolute;top:59px;right:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-leg-l{position:absolute;top:111px;left:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-leg-r{position:absolute;top:111px;right:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-slot{position:absolute;opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1);transform:scale(.3)}
+.vm-slot.on{opacity:1;transform:scale(1)}
+.vm-helm{top:16px;left:50%;transform:translateX(-50%) scale(.3);z-index:8}.vm-helm.on{transform:translateX(-50%) scale(1)}
+.vm-mail{top:57px;left:50%;transform:translateX(-50%) scale(.3);z-index:4}.vm-mail.on{transform:translateX(-50%) scale(1)}
+.vm-cape{top:53px;left:50%;transform:translateX(-50%) scale(.3);z-index:1}.vm-cape.on{transform:translateX(-50%) scale(1)}
+.vm-left{top:66px;left:0;z-index:7}.vm-right{top:56px;right:0;z-index:7}
+.vm-boots{bottom:4px;left:50%;transform:translateX(-50%) scale(.3);z-index:7;display:flex;gap:10px}.vm-boots.on{transform:translateX(-50%) scale(1)}
+.gear-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.gp-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;font-size:.8em;color:var(--text-dim);transition:all .3s}
+.gp-row.earned{color:var(--success);font-weight:bold}
+.gp-row .gp-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .3s;flex-shrink:0}
+.gp-row.earned .gp-dot{background:var(--success);border-color:var(--success)}
+.vm-sparks{position:absolute;pointer-events:none;z-index:20}
+.vm-spark{position:absolute;border-radius:50%;animation:vmSp .6s ease-out forwards}
+@keyframes vmSp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+.vm-flash{animation:vmFl .4s ease}
+@keyframes vmFl{0%{filter:brightness(1)}30%{filter:brightness(1.8) drop-shadow(0 0 12px rgba(240,180,40,.6))}100%{filter:brightness(1)}}
+.result-viking{position:relative;width:160px;height:240px;margin:16px auto}
+.rv-head{position:absolute;top:36px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#d4a574;border:2px solid #b8956a;z-index:5}
+.rv-torso{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:56px;height:74px;background:#8b7355;border-radius:9px 9px 5px 5px;z-index:3}
+.rv-arm-l{position:absolute;top:77px;left:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-arm-r{position:absolute;top:77px;right:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-leg-l{position:absolute;top:144px;left:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-leg-r{position:absolute;top:144px;right:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-slot{position:absolute}
+.rv-helm{top:20px;left:50%;transform:translateX(-50%);z-index:8}
+.rv-mail{top:74px;left:50%;transform:translateX(-50%);z-index:4}
+.rv-cape{top:69px;left:50%;transform:translateX(-50%);z-index:1}
+.rv-left{top:86px;left:4px;z-index:7}.rv-right{top:72px;right:4px;z-index:7}
+.rv-boots{bottom:4px;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:14px}
+@media(max-width:600px){.armor-panel{flex-direction:column;align-items:center}.viking-mini{width:100px;height:160px}}
+</style>
+</head>
+<body>
+<div id="game-container"><div id="game-content"></div></div>
+<script>
+// ════════════════════════════════════════════════════
+// THE STATISTICAL SAGA OF ODINFATHER — REALM 6
+// t-TEST (INDEPENDENT AND PAIRED)
+// ════════════════════════════════════════════════════
+const GAME={difficulty:null,xp:0,maxXP:0,hits:0,total:0,currentScene:0,scenes:[]};
+const content=()=>document.getElementById('game-content');
+function dialogue(c,t){
+  const cls={odin:'odin',thor:'thor',muninn:'corvo',huginn:'corvo',narrator:'narrator'};
+  const nm={odin:'Odinfather 🧙‍♂️',thor:'Thorment ⚡',muninn:'Muninn 🐦‍⬛',huginn:'Huginn 🐦',narrator:'📜 Narrator'};
+  return `<div class="dialogue-box ${cls[c]||'narrator'}"><div class="char-name ${cls[c]||'narrator'}">${nm[c]||c}</div><div class="dialogue-text">${t}</div></div>`;
+}
+function hintBox(t){return `<div class="hint-box"><div class="hint-label">🐦‍⬛ Muninn's Hint</div>${t}</div>`;}
+function xpBar(){
+  const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;
+  return armorPanelHTML()+`<div class="xp-bar-container"><div class="xp-label">⚡ XP</div><div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${p}%"></div></div><div class="xp-count">${GAME.xp} / ${GAME.maxXP}</div></div>`;
+}
+function updateXPBar(){
+  const b=document.querySelector('.xp-bar-fill'),c=document.querySelector('.xp-count');
+  if(b&&c){const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;b.style.width=p+'%';c.textContent=`${GAME.xp} / ${GAME.maxXP}`;}
+}
+function showTitleScreen(){
+  content().innerHTML=`
+  <div class="title-screen">
+    <div class="realm-badge">REALM 6</div>
+    <h1>The Statistical Saga of Odinfather</h1>
+    <h2>The Realm of t-Test</h2>
+    <p class="subtitle">In the Arena of Valhalla, two groups face off — and only statistics decides who is truly different.</p>
+    <div class="difficulty-select">
+      <button class="diff-btn" onclick="startGame('aprendiz')"><div class="diff-label">🛡️ Apprentice</div><div class="diff-desc">Undergraduate — with Muninn's hints</div></button>
+      <button class="diff-btn" onclick="startGame('mestre')"><div class="diff-label">⚔️ Master</div><div class="diff-desc">Graduate — no hints, extra challenges</div></button>
+    </div>
+  </div>`;
+}
+function startGame(d){
+  GAME.difficulty=d;GAME.xp=0;GAME.hits=0;GAME.total=0;GAME.currentScene=0;gearEarned=0;
+  buildScenes();GAME.maxXP=countMaxXP();renderScene();
+}
+
+// ════════════════════════════════════════════════════
+function buildScenes(){
+  GAME.scenes=[];
+
+  // ━━ SCENE 1: The Arena of Valhalla ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('narrator','Leaving the Court of Asgard, the young researcher is brought to the <em>Arena of Valhalla</em> — the battleground where warriors clash to prove who is strongest. But here, victory is not decided by swords — it is decided by the <em>difference of means</em>.')}
+      ${dialogue('odin','Welcome to the <em>Realm of the t-Test</em>! Here you will learn to compare two groups and determine whether the difference between them is <em>real</em> or merely chance.')}
+      ${dialogue('thor','My warriors are OBVIOUSLY stronger than the others! No test needed!')}
+      ${dialogue('odin','That is exactly the arrogance that the t-test combats, Thorment. We use data, not guesses.')}
+      <button class="continue-btn" onclick="nextScene()">Enter the Arena →</button>
+    </div>`});
+
+  // ━━ SCENE 2: Types of t-Test ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('odin','The t-test compares means. There are three main variations:')}
+      ${dialogue('odin','<em>One-sample t-test</em> — compares the mean of one group to a known reference value. "Is the average strength of our warriors different from 100?"')}
+      ${dialogue('odin','<em>Independent t-test</em> — compares the means of <em>two different groups</em> (unrelated). "Bear Clan vs Wolf Clan warriors — who is stronger?"')}
+      ${dialogue('odin','<em>Paired t-test (dependent)</em> — compares measurements of the <em>same group</em> at two time points. "Warriors'' strength BEFORE and AFTER training."')}
+      ${dialogue('muninn','The choice of test depends on the <em>research design</em>. Two different groups = independent. Same group measured twice = paired.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 3: CHALLENGE 1 — Which t-test to use? ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Ask yourself: are these the <em>same</em> warriors measured twice (paired) or <em>different</em> groups (independent)? If it\'s the same warriors before and after → paired.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 1: Choose the Right Test</div>
+        <div class="challenge-question">A researcher measures the strength of <em>30 warriors</em> before and after an 8-week training program. He wants to know if there was improvement. Which test should he use?</div>
+        ${hint}
+        <div class="options-grid" id="q1-opts">
+          <button class="option-btn" onclick="checkQ(1,this,'a')">Independent t-test — these are two different time points</button>
+          <button class="option-btn" onclick="checkQ(1,this,'b')">Paired t-test — these are the same warriors measured before and after</button>
+          <button class="option-btn" onclick="checkQ(1,this,'c')">One-sample t-test — it is a single group</button>
+          <button class="option-btn" onclick="checkQ(1,this,'d')">ANOVA — because there is more than one condition</button>
+        </div>
+        <div id="q1-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 4: CHALLENGE 2 — Independent ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Two <em>different</em> groups of warriors (Clan A vs Clan B) = independent samples. There is no link between individuals of one group and the other.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 2: Bear Clan vs Wolf Clan</div>
+        <div class="challenge-question">A researcher recruits <em>25 warriors from the Bear Clan</em> and <em>25 from the Wolf Clan</em> and measures each one''s strength. Which test?</div>
+        <div class="arena-vs">
+          <div class="arena-group blue"><div class="g-name">Bear Clan</div><div class="g-stat">n = 25<br>x̄ = 85</div></div>
+          <div class="arena-vs-text">VS</div>
+          <div class="arena-group red"><div class="g-name">Wolf Clan</div><div class="g-stat">n = 25<br>x̄ = 79</div></div>
+        </div>
+        ${hint}
+        <div class="options-grid" id="q2-opts">
+          <button class="option-btn" onclick="checkQ(2,this,'a')">Paired t-test</button>
+          <button class="option-btn" onclick="checkQ(2,this,'b')">Independent t-test — these are two distinct groups of warriors</button>
+          <button class="option-btn" onclick="checkQ(2,this,'c')">One-sample t-test</button>
+          <button class="option-btn" onclick="checkQ(2,this,'d')">Chi-square</button>
+        </div>
+        <div id="q2-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 5: Assumptions ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Before running any t-test, we must verify the <em>assumptions</em>. Without them, the results can be invalid.')}
+      ${dialogue('muninn','The assumptions of the t-test are:')}
+      ${dialogue('muninn','1. <em>Continuous dependent variable</em> (interval or ratio).<br>2. <em>Independence of observations</em> (each warrior is measured independently).<br>3. <em>Normality</em> — the data should follow an approximately normal distribution (or n > 30 by CLT).<br>4. <em>Homogeneity of variance</em> (only for independent t-test) — the variances of the two groups should be similar. Checked by <em>Levene''s Test</em>.')}
+      ${dialogue('thor','What if the variances are different?')}
+      ${dialogue('odin','We use the <em>Welch</em> correction, which adjusts the degrees of freedom. Many software programs do this automatically.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 6: CHALLENGE 3 — Assumptions ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('The <em>Levene Test</em> assesses whether variances are equal (homogeneity). H₀ of Levene: variances are equal. If Levene is significant (p < 0.05), the variances are <em>different</em> and we should use Welch''s correction.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 3: The Guardian of Assumptions</div>
+        <div class="challenge-question">When running an independent t-test, <em>Levene''s Test</em> returns <em>p = 0.02</em>. What does this indicate?</div>
+        ${hint}
+        <div class="options-grid" id="q3-opts">
+          <button class="option-btn" onclick="checkQ(3,this,'a')">The variances are equal — we can proceed normally</button>
+          <button class="option-btn" onclick="checkQ(3,this,'b')">The variances are significantly different — we should use Welch''s correction (or report Welch''s t)</button>
+          <button class="option-btn" onclick="checkQ(3,this,'c')">The t-test cannot be used</button>
+          <button class="option-btn" onclick="checkQ(3,this,'d')">The data are not normally distributed</button>
+        </div>
+        <div id="q3-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 7: Narrative — Reading the output ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','Odinfather conjures in the air the output from a statistical software. The numbers glow like runes.')}
+      ${dialogue('odin','Let us learn to <em>read and interpret</em> the output of an independent t-test. The crucial elements are:')}
+      ${dialogue('odin','• The <em>t</em> value (the test statistic)<br>• The <em>degrees of freedom (df)</em><br>• The <em>p-value</em> (sig.)<br>• The <em>difference between means</em><br>• The <em>confidence interval</em> for the difference<br>• The <em>effect size (Cohen''s d)</em>')}
+      ${dialogue('muninn','Remember: <em>Cohen''s d</em> for the t-test: d = (M₁ − M₂) / DP_pooled. References: d = 0.20 (small), 0.50 (medium), 0.80 (large).')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 8: CHALLENGE 4 — Interpret t-test output ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Check: p < 0.05? If yes, the difference is significant. Then look at the CI of the difference: if it does not include zero, it confirms significance. Finally, Cohen''s d tells you the <em>size</em> of the effect.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 4: Read the Statistical Runes</div>
+        <div class="challenge-question">Output from the independent t-test (Bear Clan vs Wolf Clan):</div>
+        <div class="data-display">
+          t(48) = 2.45 &nbsp;|&nbsp; p = 0.018 &nbsp;|&nbsp; 95% CI of difference: [1.1 ; 10.9]<br>
+          Mean Bear = 85.0 &nbsp;|&nbsp; Mean Wolf = 79.0 &nbsp;|&nbsp; Cohen''s d = 0.69
+        </div>
+        <div class="challenge-question">What is the <em>most complete</em> interpretation?</div>
+        ${hint}
+        <div class="options-grid" id="q4-opts">
+          <button class="option-btn" onclick="checkQ(4,this,'a')">The Bear Clan is stronger because 85 > 79</button>
+          <button class="option-btn" onclick="checkQ(4,this,'b')">The difference of 6 points is statistically significant (p = 0.018), with a medium-large effect (d = 0.69). The CI indicates the true difference is between 1.1 and 10.9 points with 95% confidence</button>
+          <button class="option-btn" onclick="checkQ(4,this,'c')">The p-value is less than 0.05, so we can be certain the Bear Clan is superior</button>
+          <button class="option-btn" onclick="checkQ(4,this,'d')">Cohen''s d of 0.69 is not relevant — only the p-value matters</button>
+        </div>
+        <div id="q4-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 9: Paired t-test — narrative ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','Thorment enters the arena with 20 of his warriors. He wants to prove his training works.')}
+      ${dialogue('thor','I measured the strength of my 20 warriors BEFORE my brutal training. After 8 weeks, I measured again. Look at the difference!')}
+      ${dialogue('odin','This is the classic scenario of the <em>paired t-test</em>. The SAME individuals measured at two time points. The advantage? Each warrior serves as his own control, eliminating variability between individuals.')}
+      ${dialogue('muninn','In the paired t-test, we calculate the <em>difference</em> for each pair (after − before) and test whether the mean of those differences is significantly different from zero.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 10: CHALLENGE 5 — Paired: logic ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('In paired tests, H₀ says that the <em>mean of differences</em> (d̄) is zero — meaning no change occurred. If the mean difference is significantly ≠ 0, there is evidence of change.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 5: Thorment''s Training</div>
+        <div class="challenge-question">20 warriors were measured before and after training:</div>
+        <div class="data-display">
+          Before: x̄ = 72.5 &nbsp;|&nbsp; After: x̄ = 78.3<br>
+          Mean of differences (d̄) = 5.8 &nbsp;|&nbsp; SD of differences = 8.2<br>
+          t(19) = 3.16 &nbsp;|&nbsp; p = 0.005 &nbsp;|&nbsp; d = 0.71
+        </div>
+        <div class="challenge-question">What is the <em>H₀</em> of this test and what is the conclusion?</div>
+        ${hint}
+        <div class="options-grid" id="q5-opts">
+          <button class="option-btn" onclick="checkQ(5,this,'a')">H₀: μ_before = μ_after. Conclusion: fail to reject H₀, because the means are close</button>
+          <button class="option-btn" onclick="checkQ(5,this,'b')">H₀: Mean of differences = 0 (no change). Conclusion: reject H₀ (p = 0.005 < 0.05) — there is evidence of significant improvement with medium-large effect (d = 0.71)</button>
+          <button class="option-btn" onclick="checkQ(5,this,'c')">H₀: The training works. Conclusion: H₀ is confirmed</button>
+          <button class="option-btn" onclick="checkQ(5,this,'d')">Nothing can be concluded with n = 20</button>
+        </div>
+        <div id="q5-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 11: CHALLENGE 6 — Why paired and not independent? ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Paired is more <em>powerful</em> because it eliminates variability between subjects — each person is compared to themselves. Less "noise" = easier to detect the real difference.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 6: Why Paired?</div>
+        <div class="challenge-question">Why is using a <em>paired</em> t-test (before-after on the same warriors) generally more powerful than an <em>independent</em> t-test (comparing two different groups)?</div>
+        ${hint}
+        <div class="options-grid" id="q6-opts">
+          <button class="option-btn" onclick="checkQ(6,this,'a')">Because paired uses larger samples</button>
+          <button class="option-btn" onclick="checkQ(6,this,'b')">Because each subject serves as his own control, eliminating variability between individuals and increasing the test''s power</button>
+          <button class="option-btn" onclick="checkQ(6,this,'c')">Because paired tests do not require assumptions</button>
+          <button class="option-btn" onclick="checkQ(6,this,'d')">It is not more powerful — the two are equivalent</button>
+        </div>
+        <div id="q6-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 12: CHALLENGE 7 — Reporting results (APA) ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('APA format for t-test: <em>t(df) = value, p = value, d = value</em>. Include degrees of freedom, t value, significance, and effect size. Means and SDs of groups should also be reported.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 7: Report Like a Master</div>
+        <div class="challenge-question">Which report follows best practices (APA style) for the Bear Clan vs Wolf Clan independent t-test?</div>
+        ${hint}
+        <div class="options-grid" id="q7-opts">
+          <button class="option-btn" onclick="checkQ(7,this,'a')">The Bear Clan was better than the Wolf Clan (p < 0.05)</button>
+          <button class="option-btn" onclick="checkQ(7,this,'b')">The Bear Clan (M = 85, SD = 9.2) showed significantly greater strength than the Wolf Clan (M = 79, SD = 8.5), t(48) = 2.45, p = 0.018, d = 0.69, 95% CI [1.1; 10.9]</button>
+          <button class="option-btn" onclick="checkQ(7,this,'c')">t = 2.45, significant</button>
+          <button class="option-btn" onclick="checkQ(7,this,'d')">The Bear Clan mean is 85 and Wolf Clan is 79, a difference of 6 points</button>
+        </div>
+        <div id="q7-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ MASTER CHALLENGES ━━
+  if(GAME.difficulty==='mestre'){
+    // CHALLENGE 8: Non-parametric alternative
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: When t-Test Fails</div>
+          <div class="challenge-question">A researcher has n = 12 per group and the data severely violate normality (distribution highly skewed). What is the best alternative to the independent t-test?</div>
+          <div class="options-grid" id="q8-opts">
+            <button class="option-btn" onclick="checkQ(8,this,'a')">Use the t-test anyway — it is robust</button>
+            <button class="option-btn" onclick="checkQ(8,this,'b')">Mann-Whitney U test — non-parametric alternative to independent t-test, which compares ranks instead of means</button>
+            <button class="option-btn" onclick="checkQ(8,this,'c')">One-way ANOVA</button>
+            <button class="option-btn" onclick="checkQ(8,this,'d')">Chi-square</button>
+          </div>
+          <div id="q8-fb"></div>
+        </div>
+      </div>`});
+
+    // CHALLENGE 9: Degrees of freedom
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: Degrees of Freedom</div>
+          <div class="challenge-question">In an independent t-test with n₁ = 30 and n₂ = 25, how many <em>degrees of freedom</em> (df) will the test have (assuming equal variances)?</div>
+          <div class="data-display">df = n₁ + n₂ − 2</div>
+          <div class="options-grid" id="q9-opts">
+            <button class="option-btn" onclick="checkQ(9,this,'a')">df = 55</button>
+            <button class="option-btn" onclick="checkQ(9,this,'b')">df = 53</button>
+            <button class="option-btn" onclick="checkQ(9,this,'c')">df = 54</button>
+            <button class="option-btn" onclick="checkQ(9,this,'d')">df = 52</button>
+          </div>
+          <div id="q9-fb"></div>
+        </div>
+      </div>`});
+  }
+
+  // ━━ FINAL SCENE ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','The Arena of Valhalla quiets. The young researcher now knows how to judge whether differences between warriors are real or mere chance.')}
+      ${dialogue('odin','You have conquered the <em>Realm of the t-Test</em>! Now you can choose between independent and paired, verify assumptions, interpret full outputs, and report results with rigor.')}
+      ${dialogue('thor','My training worked, at least! d = 0.71!')}
+      ${dialogue('muninn','Yes, Thorment, but remember: statistical significance is not everything. We need replication, theoretical context, and practical relevance. Statistics is a tool, not an oracle.')}
+      ${dialogue('odin','In the next Realms, we will face ANOVA, correlation, and regression. The adventure continues!')}
+      <button class="continue-btn" onclick="showResults()">View Final Result ⚔️</button>
+    </div>`});
+}
+
+// ════════════════════════════════════════════════════
+const ANSWERS={1:'b',2:'b',3:'b',4:'b',5:'b',6:'b',7:'b',8:'b',9:'b'};
+const EXPLANATIONS={
+  1:{
+    correct:'✅ Perfect! The <em>same</em> 30 warriors measured before and after = paired data. Each warrior is his own control. The paired t-test analyzes intra-subject differences.',
+    wrong:'❌ The <em>same warriors</em> measured twice → <em>paired t-test</em>. Independent would be for two different groups of warriors.',
+    charC:'odin',charW:'thor'
+  },
+  2:{
+    correct:'✅ Correct! Two <em>distinct</em> groups (Bear vs Wolf) with no link between individuals = <em>independent t-test</em>. Each clan is a separate sample.',
+    wrong:'❌ Two distinct groups of warriors = <em>independent t-test</em>. Paired would only be if they were the same warriors in two conditions.',
+    charC:'odin',charW:'thor'
+  },
+  3:{
+    correct:'✅ Exactly! Levene''s Test with p = 0.02 < 0.05 → we reject H₀ of equal variances. The variances are <em>significantly different</em>. Solution: use <em>Welch''s t</em>, which adjusts degrees of freedom.',
+    wrong:'❌ Levene with p = 0.02 < 0.05 indicates <em>different</em> variances (we reject H₀ of homogeneity). We should use <em>Welch''s correction</em>. The t-test can still be used, just with the correction.',
+    charC:'muninn',charW:'thor'
+  },
+  4:{
+    correct:'✅ Excellent reporting! The difference is significant (p < 0.05), the effect is medium-large (d = 0.69 — between 0.50 and 0.80), and the CI shows the true difference lies between 1.1 and 10.9 with 95% confidence. That is the <em>complete</em> interpretation: p + effect size + CI.',
+    wrong:'❌ The complete interpretation includes: <em>significance</em> (p = 0.018), <em>effect size</em> (d = 0.69, medium-large), and <em>CI</em> ([1.1; 10.9]). Saying only "it is significant" or that "85 > 79" is insufficient.',
+    charC:'odin',charW:'thor'
+  },
+  5:{
+    correct:'✅ Perfect! In paired tests, H₀: μ_differences = 0 (no change). With p = 0.005, we reject H₀ — there is evidence of <em>significant</em> improvement. The d = 0.71 indicates medium-large effect. Thorment''s training apparently works!',
+    wrong:'❌ H₀ of paired: <em>mean of differences = 0</em>. With p = 0.005 < 0.05, we reject H₀. There was significant improvement with medium-large effect (d = 0.71).',
+    charC:'odin',charW:'thor'
+  },
+  6:{
+    correct:'✅ Correct! In paired tests, each subject is compared <em>to himself</em>. This removes variability between individuals (some stronger, others weaker) and isolates <em>within-subject</em> variability. Less noise = more power = easier to detect real differences.',
+    wrong:'❌ Paired is more powerful because it <em>eliminates variability between subjects</em>. Each warrior serves as his own control, reducing "noise" and facilitating detection of real effects.',
+    charC:'muninn',charW:'thor'
+  },
+  7:{
+    correct:'✅ Excellent! Complete reporting includes: means and SDs of each group, t with df, p-value, Cohen''s d, and CI. Format: <em>t(df) = value, p = value, d = value</em>. Never report just "significant" without the numbers!',
+    wrong:'❌ Complete APA reporting includes: <em>M and SD for each group, t(df), p, Cohen''s d, and CI</em>. Saying only "p < 0.05" or "it is significant" is not sufficient for readers to evaluate the result.',
+    charC:'muninn',charW:'thor'
+  },
+  8:{
+    correct:'✅ Correct! <em>Mann-Whitney U</em> is the non-parametric alternative to independent t-test. It compares <em>ranks</em> (positions) instead of means, does not require normality. For paired t-test, the alternative would be <em>Wilcoxon signed-rank</em>.',
+    wrong:'❌ With small n and strong normality violation, the alternative is <em>Mann-Whitney U</em> (non-parametric). It uses ranks instead of means. For paired, it would be Wilcoxon.',
+    charC:'odin',charW:'thor'
+  },
+  9:{
+    correct:'✅ Perfect! df = n₁ + n₂ − 2 = 30 + 25 − 2 = <em>53</em>. We lose 2 degrees of freedom because we estimate 2 means. With Welch, df is adjusted and usually not a whole number.',
+    wrong:'❌ df = n₁ + n₂ − 2 = 30 + 25 − 2 = <em>53</em>. We subtract 2 because we estimate one mean for each group.',
+    charC:'muninn',charW:'thor'
+  }
+};
+
+function checkQ(q,btn,ans){
+  const opts=document.querySelectorAll(`#q${q}-opts .option-btn`);
+  opts.forEach(b=>{b.classList.add('disabled');b.onclick=null;});
+  const fb=document.getElementById(`q${q}-fb`),cor=ANSWERS[q],exp=EXPLANATIONS[q];
+  GAME.total++;
+  if(ans===cor){
+    btn.classList.add('correct');GAME.hits++;GAME.xp+=20;updateXPBar();earnGear();
+    fb.innerHTML=`<div class="feedback-box correct">${dialogue(exp.charC,exp.correct+' <span class="xp-badge">+20 XP</span>')}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }else{
+    btn.classList.add('wrong');
+    const ci=['a','b','c','d'].indexOf(cor);if(opts[ci])opts[ci].classList.add('correct');
+    fb.innerHTML=`<div class="feedback-box wrong">${dialogue(exp.charW,exp.wrong)}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }
+}
+
+function countMaxXP(){return (GAME.difficulty==='mestre'?9:7)*20;}
+function renderScene(){if(GAME.currentScene<GAME.scenes.length){content().innerHTML=GAME.scenes[GAME.currentScene].html();restoreGear();window.scrollTo({top:0,behavior:'smooth'});}}
+function nextScene(){GAME.currentScene++;renderScene();}
+
+function showResults(){
+  const pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  let rank,rc;
+  if(pct>=90){rank='🏆 Guardian of Asgard';rc='#f0c040';}
+  else if(pct>=70){rank='⚔️ Data Warrior';rc='#58a6ff';}
+  else if(pct>=50){rank='🛡️ Statistical Squire';rc='#8b949e';}
+  else{rank:'⛓️ Thorment''s Captive';rc:'#f85149';}
+  content().innerHTML=`
+  <div class="result-screen">
+    <div class="realm-badge">REALM 6 — COMPLETE</div>
+    <h2>Adventure Results</h2>
+    ${resultVikingHTML()}
+    <div class="result-rank" style="color:${rc}">${rank}</div>
+    <div class="result-stats">
+      <div class="stat-row"><span class="stat-label">Difficulty</span><span class="stat-value">${GAME.difficulty==='mestre'?'⚔️ Master':'🛡️ Apprentice'}</span></div>
+      <div class="stat-row"><span class="stat-label">Correct Challenges</span><span class="stat-value">${GAME.hits} / ${GAME.total}</span></div>
+      <div class="stat-row"><span class="stat-label">Accuracy</span><span class="stat-value">${pct}%</span></div>
+      <div class="stat-row"><span class="stat-label">XP Earned</span><span class="stat-value">${GAME.xp} / ${GAME.maxXP}</span></div>
+    </div>
+    ${dialogue('odin',pct>=70
+      ?'The Arena of Valhalla salutes you! Mastering the t-test is mastering the comparison of two worlds. Onward to the next challenges!'
+      :'The arena demands more practice, young warrior. Return and face it again — each error is a step toward mastery!'
+    )}
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+      <button class="continue-btn" onclick="showTitleScreen()">🔄 Play Again</button>
+    </div>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+var GEAR_ITEMS=[{"s":"boots","n":"Battle Boots","h":"<div style=\"display:flex;gap:14px\"><div style=\"width:24px;height:18px;background:#3e2a18;border-radius:3px 3px 4px 7px;border:2px solid #5a3c22\"></div><div style=\"width:24px;height:18px;background:#3e2a18;border-radius:3px 3px 4px 7px;border:2px solid #5a3c22\"></div></div>"},{"s":"mail","n":"Chainmail","h":"<div style=\"width:60px;height:72px;background:repeating-linear-gradient(0deg,#999 0px,#bbb 2px,#999 4px);border-radius:7px 7px 4px 4px;border:2px solid #727272;overflow:hidden;position:relative\"><div style=\"position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0px,rgba(255,255,255,0.1) 2px,transparent 4px)\"></div></div>"},{"s":"right","n":"Sword of Asgard","h":"<div style=\"display:flex;flex-direction:column;align-items:center\"><div style=\"width:9px;height:5px;background:#d4a535;border-radius:50%\"></div><div style=\"width:5px;height:16px;background:#5c3d0e;border-radius:2px\"></div><div style=\"width:20px;height:4px;background:#8b6914;border-radius:2px\"></div><div style=\"width:7px;height:50px;background:linear-gradient(to right,#bbb,#e8e8e8,#bbb);border-radius:2px 2px 1px 1px\"></div></div>"},{"s":"left","n":"Viking Shield","h":"<div style=\"width:38px;height:44px;background:linear-gradient(135deg,#2c5fa1,#1a3f6f);border-radius:5px 5px 5px 20px;border:2.5px solid #d4a535;display:flex;align-items:center;justify-content:center\"><div style=\"width:12px;height:12px;background:radial-gradient(circle,#f0d060,#c0a030);border-radius:50%;border:1.5px solid #a08520\"></div></div>"},{"s":"cape","n":"Red Cape","h":"<div style=\"width:84px;height:110px;background:linear-gradient(180deg,#7b2d26,#5a1e18);border-radius:5px 5px 28px 28px;clip-path:polygon(16% 0%,84% 0%,100% 18%,92% 100%,50% 88%,8% 100%,0% 18%)\"></div>"},{"s":"helm","n":"Helm of Valhalla","h":"<div style=\"position:relative\"><div style=\"width:54px;height:30px;background:linear-gradient(135deg,#a8a8a8,#787878);border-radius:27px 27px 8px 8px;border:2px solid #606060;margin:0 auto;position:relative\"><div style=\"position:absolute;width:8px;height:22px;background:linear-gradient(to top,#c0a860,#f0e0b0);border-radius:4px 4px 2px 2px;top:-15px;left:4px;transform:rotate(-20deg)\"></div><div style=\"position:absolute;width:8px;height:22px;background:linear-gradient(to top,#c0a860,#f0e0b0);border-radius:4px 4px 2px 2px;top:-15px;right:4px;transform:rotate(20deg)\"></div><div style=\"position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:5px;height:10px;background:#808080;border-radius:2px\"></div></div></div>"}];
+var gearEarned=0;
+function armorPanelHTML(){
+  var rows='';
+  for(var i=0;i<GEAR_ITEMS.length;i++){rows+='<div class="gp-row'+(i<gearEarned?' earned':'')+'" id="gprow'+i+'"><span class="gp-dot"></span><span>'+GEAR_ITEMS[i].n+'</span></div>';}
+  var sl='<div class="vm-sparks" id="vmsparks"></div>';
+  sl+='<div class="vm-slot vm-cape" id="vmslot-cape"></div>';
+  sl+='<div class="vm-head"></div><div class="vm-arm-l"></div><div class="vm-arm-r"></div><div class="vm-torso"></div><div class="vm-leg-l"></div><div class="vm-leg-r"></div>';
+  sl+='<div class="vm-slot vm-boots" id="vmslot-boots"></div><div class="vm-slot vm-mail" id="vmslot-mail"></div>';
+  sl+='<div class="vm-slot vm-left" id="vmslot-left"></div><div class="vm-slot vm-right" id="vmslot-right"></div>';
+  sl+='<div class="vm-slot vm-helm" id="vmslot-helm"></div>';
+  return '<div class="armor-panel"><div class="viking-mini" id="vmini">'+sl+'</div><div class="gear-progress">'+rows+'</div></div>';
+}
+function restoreGear(){for(var i=0;i<gearEarned&&i<GEAR_ITEMS.length;i++){var g=GEAR_ITEMS[i],el=document.getElementById('vmslot-'+g.s);if(el){el.innerHTML=g.h;el.classList.add('on');}}}
+function earnGear(){
+  if(gearEarned>=GEAR_ITEMS.length)return;
+  var g=GEAR_ITEMS[gearEarned],el=document.getElementById('vmslot-'+g.s);
+  if(el){el.innerHTML=g.h;el.classList.add('on','vm-flash');setTimeout(function(){el.classList.remove('vm-flash')},500);spawnVMSparks(el);}
+  var row=document.getElementById('gprow'+gearEarned);if(row)row.classList.add('earned');
+  gearEarned++;
+}
+function spawnVMSparks(el){
+  var sc=document.getElementById('vmsparks');if(!sc||!el)return;
+  var r=el.getBoundingClientRect(),sr=document.getElementById('vmini').getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height/2;
+  var cols=['#f0c040','#f08030','#f0e080','#ff6040','#ffd060'];
+  for(var i=0;i<10;i++){var s=document.createElement('div');s.className='vm-spark';
+    var a=Math.random()*Math.PI*2,d=20+Math.random()*30;
+    s.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+cols[Math.floor(Math.random()*5)]+';--sx:'+(Math.cos(a)*d)+'px;--sy:'+(Math.sin(a)*d)+'px;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px';
+    sc.appendChild(s);setTimeout(function(x){x.remove()},700,s);}
+}
+function resultVikingHTML(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var ti=[];if(pct>=90)ti=GEAR_ITEMS;else if(pct>=70)ti=GEAR_ITEMS.slice(0,5);else if(pct>=50)ti=GEAR_ITEMS.slice(0,2);
+  var sm={boots:'rv-boots',mail:'rv-mail',right:'rv-right',left:'rv-left',cape:'rv-cape',helm:'rv-helm'};
+  var html='<div class="result-viking">';
+  html+='<div class="rv-slot rv-cape" id="rvs-cape"></div>';
+  html+='<div class="rv-head"></div><div class="rv-arm-l"></div><div class="rv-arm-r"></div><div class="rv-torso"></div><div class="rv-leg-l"></div><div class="rv-leg-r"></div>';
+  html+='<div class="rv-slot rv-boots" id="rvs-boots"></div><div class="rv-slot rv-mail" id="rvs-mail"></div>';
+  html+='<div class="rv-slot rv-left" id="rvs-left"></div><div class="rv-slot rv-right" id="rvs-right"></div>';
+  html+='<div class="rv-slot rv-helm" id="rvs-helm"></div></div>';
+  setTimeout(function(){ti.forEach(function(g){var e=document.getElementById('rvs-'+g.s);if(e)e.innerHTML=g.h;});},100);
+  return html;
+}
+
+showTitleScreen();
+</script>
+</body>
+</html>

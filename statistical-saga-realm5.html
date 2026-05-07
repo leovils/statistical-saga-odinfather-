@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather — Realm 5: Hypothesis Testing</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh;overflow-x:hidden}
+#game-container{max-width:800px;margin:0 auto;padding:20px;min-height:100vh}
+.title-screen{text-align:center;padding:60px 20px;animation:fadeIn 1s ease}
+.title-screen h1{font-family:'Bangers',cursive;font-size:2.8em;color:var(--gold);text-shadow:2px 2px 8px rgba(240,192,64,.3);line-height:1.1;margin-bottom:8px}
+.title-screen h2{font-family:'Permanent Marker',cursive;font-size:1.5em;color:var(--odin-blue);margin-bottom:30px}
+.title-screen .subtitle{color:var(--text-dim);font-size:1.1em;margin-bottom:40px}
+.reino-badge{display:inline-block;background:linear-gradient(135deg,var(--odin-blue),var(--corvo-purple));padding:6px 20px;border-radius:20px;font-family:'Bangers',cursive;font-size:1em;color:#fff;margin-bottom:16px}
+.difficulty-select{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.diff-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Bangers',cursive;font-size:1.2em;padding:16px 32px;border-radius:12px;cursor:pointer;transition:all .3s;min-width:180px}
+.diff-btn:hover{border-color:var(--odin-blue);transform:translateY(-2px)}
+.diff-btn .diff-label{font-size:1.3em}
+.diff-btn .diff-desc{font-family:'Patrick Hand',cursive;font-size:.65em;color:var(--text-dim);margin-top:4px}
+.scene{animation:slideIn .5s ease;padding:10px 0}
+.dialogue-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative}
+.dialogue-box.odin{border-left:4px solid var(--odin-blue)}.dialogue-box.thor{border-left:4px solid var(--thor-red)}.dialogue-box.corvo{border-left:4px solid var(--corvo-purple)}.dialogue-box.narrator{border-left:4px solid var(--gold)}
+.char-name{font-family:'Bangers',cursive;font-size:1.1em;margin-bottom:6px}
+.char-name.odin{color:var(--odin-blue)}.char-name.thor{color:var(--thor-red)}.char-name.corvo{color:var(--corvo-purple)}.char-name.narrator{color:var(--gold)}
+.dialogue-text{line-height:1.5;font-size:1.05em}
+.dialogue-text em{color:var(--gold);font-style:normal;font-weight:bold}
+.challenge-box{background:var(--bg-panel);border:2px solid var(--gold);border-radius:12px;padding:24px;margin:20px 0;animation:pulse-border 2s ease infinite}
+@keyframes pulse-border{0%,100%{border-color:var(--gold);box-shadow:0 0 8px rgba(240,192,64,.15)}50%{border-color:#f0c040cc;box-shadow:0 0 16px rgba(240,192,64,.3)}}
+.challenge-title{font-family:'Bangers',cursive;font-size:1.4em;color:var(--gold);margin-bottom:12px;text-align:center}
+.challenge-question{margin-bottom:16px;line-height:1.5}
+.data-display{background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:'Courier New',monospace;font-size:1em;color:var(--odin-blue);text-align:center;letter-spacing:1px;line-height:1.6}
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.option-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Patrick Hand',cursive;font-size:1.05em;padding:14px 18px;border-radius:10px;cursor:pointer;text-align:left;transition:all .25s;line-height:1.4}
+.option-btn:hover:not(.disabled){border-color:var(--odin-blue);background:#1a2233}
+.option-btn.correct{border-color:var(--success);background:#0d2818;color:var(--success)}
+.option-btn.wrong{border-color:var(--thor-red);background:#2d1116;color:var(--thor-red)}
+.option-btn.disabled{cursor:default;opacity:.7}
+.feedback-box{border-radius:10px;padding:16px 20px;margin:16px 0;animation:fadeIn .4s ease;line-height:1.5}
+.feedback-box.correct{background:#0d2818;border:1px solid var(--success);color:var(--success)}
+.feedback-box.wrong{background:#2d1116;border:1px solid var(--thor-red);color:var(--thor-red)}
+.xp-badge{display:inline-block;background:var(--gold);color:var(--bg-dark);font-family:'Bangers',cursive;padding:2px 10px;border-radius:6px;font-size:.9em;margin-left:6px}
+.xp-bar-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.xp-label{font-family:'Bangers',cursive;color:var(--gold);font-size:1em;white-space:nowrap}
+.xp-bar-bg{flex:1;height:14px;background:var(--bg-dark);border-radius:7px;overflow:hidden}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--odin-blue),var(--gold));border-radius:7px;transition:width .6s ease}
+.xp-count{font-family:'Bangers',cursive;color:var(--text);font-size:1em;min-width:60px;text-align:right}
+.continue-btn{display:block;margin:20px auto 0;background:transparent;border:2px solid var(--odin-blue);color:var(--odin-blue);font-family:'Bangers',cursive;font-size:1.15em;padding:12px 36px;border-radius:10px;cursor:pointer;transition:all .25s}
+.continue-btn:hover{background:var(--odin-blue);color:var(--bg-dark)}
+.result-screen{text-align:center;padding:40px 20px;animation:fadeIn .8s ease}
+.result-screen h2{font-family:'Bangers',cursive;font-size:2.2em;color:var(--gold);margin-bottom:8px}
+.result-rank{font-family:'Permanent Marker',cursive;font-size:1.5em;margin:16px 0}
+.result-stats{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:20px 0;text-align:left}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text-dim)}.stat-value{font-family:'Bangers',cursive;color:var(--odin-blue)}
+.hint-box{background:#1a1530;border:1px solid var(--corvo-purple);border-radius:10px;padding:14px 18px;margin:12px 0;font-size:.95em;color:var(--corvo-purple);animation:fadeIn .5s ease}
+.hint-box .hint-label{font-family:'Bangers',cursive;font-size:1em;margin-bottom:4px}
+/* ── VISUAL: Tribunal ── */
+.tribunal-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.95em}
+.tribunal-table th{background:var(--bg-dark);color:var(--gold);font-family:'Bangers',cursive;padding:10px 8px;border:1px solid var(--border);text-align:center}
+.tribunal-table td{background:var(--bg-card);padding:10px 8px;border:1px solid var(--border);text-align:center;line-height:1.4}
+.tribunal-table td.danger{color:var(--thor-red);font-weight:bold}
+.tribunal-table td.safe{color:var(--success)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.title-screen h1{font-size:2em}.title-screen h2{font-size:1.2em}.difficulty-select{flex-direction:column;align-items:center}#game-container{padding:12px}.challenge-box{padding:16px}.tribunal-table{font-size:.85em}}
+
+/* ── ARMOR SYSTEM ── */
+.armor-panel{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.viking-mini{position:relative;width:120px;height:180px;flex-shrink:0}
+.vm-head{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:#d4a574;border:1.5px solid #b8956a;z-index:5}
+.vm-torso{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:44px;height:58px;background:#8b7355;border-radius:7px 7px 4px 4px;z-index:3}
+.vm-arm-l{position:absolute;top:59px;left:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-arm-r{position:absolute;top:59px;right:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-leg-l{position:absolute;top:111px;left:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-leg-r{position:absolute;top:111px;right:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-slot{position:absolute;opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1);transform:scale(.3)}
+.vm-slot.on{opacity:1;transform:scale(1)}
+.vm-helm{top:16px;left:50%;transform:translateX(-50%) scale(.3);z-index:8}.vm-helm.on{transform:translateX(-50%) scale(1)}
+.vm-mail{top:57px;left:50%;transform:translateX(-50%) scale(.3);z-index:4}.vm-mail.on{transform:translateX(-50%) scale(1)}
+.vm-cape{top:53px;left:50%;transform:translateX(-50%) scale(.3);z-index:1}.vm-cape.on{transform:translateX(-50%) scale(1)}
+.vm-left{top:66px;left:0;z-index:7}.vm-right{top:56px;right:0;z-index:7}
+.vm-boots{bottom:4px;left:50%;transform:translateX(-50%) scale(.3);z-index:7;display:flex;gap:10px}.vm-boots.on{transform:translateX(-50%) scale(1)}
+.gear-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.gp-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;font-size:.8em;color:var(--text-dim);transition:all .3s}
+.gp-row.earned{color:var(--success);font-weight:bold}
+.gp-row .gp-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .3s;flex-shrink:0}
+.gp-row.earned .gp-dot{background:var(--success);border-color:var(--success)}
+.vm-sparks{position:absolute;pointer-events:none;z-index:20}
+.vm-spark{position:absolute;border-radius:50%;animation:vmSp .6s ease-out forwards}
+@keyframes vmSp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+.vm-flash{animation:vmFl .4s ease}
+@keyframes vmFl{0%{filter:brightness(1)}30%{filter:brightness(1.8) drop-shadow(0 0 12px rgba(240,180,40,.6))}100%{filter:brightness(1)}}
+.result-viking{position:relative;width:160px;height:240px;margin:16px auto}
+.rv-head{position:absolute;top:36px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#d4a574;border:2px solid #b8956a;z-index:5}
+.rv-torso{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:56px;height:74px;background:#8b7355;border-radius:9px 9px 5px 5px;z-index:3}
+.rv-arm-l{position:absolute;top:77px;left:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-arm-r{position:absolute;top:77px;right:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-leg-l{position:absolute;top:144px;left:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-leg-r{position:absolute;top:144px;right:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-slot{position:absolute}
+.rv-helm{top:20px;left:50%;transform:translateX(-50%);z-index:8}
+.rv-mail{top:74px;left:50%;transform:translateX(-50%);z-index:4}
+.rv-cape{top:69px;left:50%;transform:translateX(-50%);z-index:1}
+.rv-left{top:86px;left:4px;z-index:7}.rv-right{top:72px;right:4px;z-index:7}
+.rv-boots{bottom:4px;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:14px}
+@media(max-width:600px){.armor-panel{flex-direction:column;align-items:center}.viking-mini{width:100px;height:160px}}
+</style>
+</head>
+<body>
+<div id="game-container"><div id="game-content"></div></div>
+<script>
+// ════════════════════════════════════════════════════
+// THE STATISTICAL SAGA OF ODINFATHER — REALM 5
+// HYPOTHESIS TESTING
+// ════════════════════════════════════════════════════
+
+const GAME={difficulty:null,xp:0,maxXP:0,hits:0,total:0,currentScene:0,scenes:[]};
+const content=()=>document.getElementById('game-content');
+
+function dialogue(c,t){
+  const cls={odin:'odin',thor:'thor',muninn:'corvo',huginn:'corvo',narrator:'narrator'};
+  const nm={odin:'Odinfather 🧙‍♂️',thor:'Thorment ⚡',muninn:'Muninn 🐦‍⬛',huginn:'Huginn 🐦',narrator:'📜 Narrator'};
+  return `<div class="dialogue-box ${cls[c]||'narrator'}"><div class="char-name ${cls[c]||'narrator'}">${nm[c]||c}</div><div class="dialogue-text">${t}</div></div>`;
+}
+function hintBox(t){return `<div class="hint-box"><div class="hint-label">🐦‍⬛ Muninn's Hint</div>${t}</div>`;}
+function xpBar(){
+  const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;
+  return armorPanelHTML()+`<div class="xp-bar-container"><div class="xp-label">⚡ XP</div><div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${p}%"></div></div><div class="xp-count">${GAME.xp} / ${GAME.maxXP}</div></div>`;
+}
+function updateXPBar(){
+  const b=document.querySelector('.xp-bar-fill'),c=document.querySelector('.xp-count');
+  if(b&&c){const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;b.style.width=p+'%';c.textContent=`${GAME.xp} / ${GAME.maxXP}`;}
+}
+
+function showTitleScreen(){
+  content().innerHTML=`
+  <div class="title-screen">
+    <div class="reino-badge">REALM 5</div>
+    <h1>The Statistical Saga of Odinfather</h1>
+    <h2>Court of the Hypothesis Test</h2>
+    <p class="subtitle">In the Court of Asgard, every claim must be judged — and the null hypothesis is innocent until proven guilty.</p>
+    <div class="difficulty-select">
+      <button class="diff-btn" onclick="startGame('aprendiz')"><div class="diff-label">🛡️ Apprentice</div><div class="diff-desc">Undergraduate — with Muninn's hints</div></button>
+      <button class="diff-btn" onclick="startGame('mestre')"><div class="diff-label">⚔️ Master</div><div class="diff-desc">Graduate — no hints, extra challenges</div></button>
+    </div>
+  </div>`;
+}
+
+function startGame(d){
+  GAME.difficulty=d;GAME.xp=0;GAME.hits=0;GAME.total=0;GAME.currentScene=0;gearEarned=0;
+  buildScenes();GAME.maxXP=countMaxXP();renderScene();
+}
+
+// ════════════════════════════════════════════════════
+function buildScenes(){
+  GAME.scenes=[];
+
+  // ━━ SCENE 1: Court of Asgard ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('narrator','After mastering sampling in the Land of a Thousand Clans, the young researcher is summoned to the most feared place of all Nine Realms: the <em>Court of Asgard</em>. Here, every scientific claim is judged with rigor.')}
+      ${dialogue('odin','Welcome to the <em>Realm of Hypothesis Testing</em>, young one! This is the heart of inferential statistics. Here, looking at data alone is not enough — you must subject your conclusions to a <em>formal trial</em>.')}
+      ${dialogue('thor','And I am the prosecutor! My job is to show that your results are nothing but the work of CHANCE!')}
+      ${dialogue('odin','Actually, Thorment, that is exactly how it works. In hypothesis testing, we start with the assumption that <em>there is no effect</em> — and we try to prove otherwise with evidence.')}
+      <button class="continue-btn" onclick="nextScene()">Enter the Court →</button>
+    </div>`});
+
+  // ━━ SCENE 2: H0 and H1 ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('odin','Hypothesis testing begins with two opposite hypotheses:')}
+      ${dialogue('odin','<em>H₀ (Null Hypothesis)</em> — the "boring" hypothesis. It says there is NO effect, NO difference, NO relationship. It is the status quo. Example: "Thorment\'s training does NOT improve warrior strength."')}
+      ${dialogue('odin','<em>H₁ (Alternative Hypothesis)</em> — the hypothesis you want to prove. It says there IS an effect, IS a difference, IS a relationship. Example: "Thorment\'s training IMPROVES warrior strength."')}
+      ${dialogue('muninn','Think of it like a trial: H₀ is "innocent" (no effect). H₁ is "guilty" (there is an effect). The defendant is <em>innocent until proven guilty</em>. The burden of proof lies with the accuser.')}
+      ${dialogue('thor','Wait... I\'m the defendant?!')}
+      ${dialogue('odin','Every statistical test has a H₀. No exceptions.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 3: CHALLENGE 1 — Formulate H0 and H1 ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('H₀ always asserts <em>absence of effect</em> (equality, no difference). H₁ asserts <em>existence of effect</em>. H₀ for a means test is: μ₁ = μ₂ (no difference).'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 1: Formulate the Hypotheses</div>
+        <div class="challenge-question">A researcher wants to test if a <em>magical potion</em> increases warrior strength. He measures the strength of a group that took the potion and a control group. What is the correct formulation?</div>
+        ${hint}
+        <div class="options-grid" id="q1-opts">
+          <button class="option-btn" onclick="checkQ(1,this,'a')">H₀: The potion increases strength &nbsp;|&nbsp; H₁: The potion has no effect</button>
+          <button class="option-btn" onclick="checkQ(1,this,'b')">H₀: There is no difference in strength between groups &nbsp;|&nbsp; H₁: The potion increases strength</button>
+          <button class="option-btn" onclick="checkQ(1,this,'c')">H₀: Strength is greater than zero &nbsp;|&nbsp; H₁: Strength equals zero</button>
+          <button class="option-btn" onclick="checkQ(1,this,'d')">H₀: There is a difference between groups &nbsp;|&nbsp; H₁: There is no difference</button>
+        </div>
+        <div id="q1-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 4: Significance Level (α) ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Now that we have H₀ and H₁, we need to set a decision criterion. This is where the <em>significance level (α)</em> comes in.')}
+      ${dialogue('odin','The α is a "bet" — the maximum probability we accept for rejecting H₀ wrongly. In Social Sciences, the standard is <em>α = 0.05 (5%)</em>.')}
+      ${dialogue('odin','This means: we accept at most a 5% chance of rejecting H₀ when it is true.')}
+      ${dialogue('muninn','The α must be set <em>BEFORE</em> looking at the data. Never after. Setting α after seeing the results is what we call "changing the rules mid-game" — and Thorment loves doing that.')}
+      ${dialogue('thor','Hey! I never change the rules... I just "reinterpret" them creatively!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 5: p-value ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Now, the most famous (and most misinterpreted) concept in statistics: the <em>p-value</em>.')}
+      ${dialogue('odin','The p-value answers the question: <em>"If H₀ is true, what is the probability of obtaining a result as extreme as (or more extreme than) what I observed?"</em>')}
+      ${dialogue('odin','If the p-value is <em>less than or equal to α</em> (e.g., p ≤ 0.05), we reject H₀. If it is larger, we <em>do not reject</em> H₀.')}
+      ${dialogue('muninn','Pay attention to three common errors about the p-value:')}
+      ${dialogue('muninn','1) The p-value is NOT the probability that H₀ is true.<br>2) The p-value does NOT measure effect size.<br>3) p = 0.049 and p = 0.051 are not fundamentally different — the significant/non-significant dichotomy is a convenience, not an absolute truth.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 6: CHALLENGE 2 — p-value interpretation ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('The p-value is the probability of observing the data (or more extreme) <em>assuming H₀ is true</em>. It is NOT the probability that H₀ is true — this reversal is called the <em>inverse probability fallacy</em>.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 2: What the p-value Really Says</div>
+        <div class="challenge-question">A researcher tests the magical potion and obtains <em>p = 0.03</em>. Which interpretation is <em>CORRECT</em>?</div>
+        ${hint}
+        <div class="options-grid" id="q2-opts">
+          <button class="option-btn" onclick="checkQ(2,this,'a')">There is a 3% chance that H₀ is true</button>
+          <button class="option-btn" onclick="checkQ(2,this,'b')">If H₀ is true, the probability of observing such an extreme result is 3%</button>
+          <button class="option-btn" onclick="checkQ(2,this,'c')">The potion has 97% efficacy</button>
+          <button class="option-btn" onclick="checkQ(2,this,'d')">There is a 3% chance the result is wrong</button>
+        </div>
+        <div id="q2-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 7: CHALLENGE 3 — Decision with p-value ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Decision rule: If p ≤ α → reject H₀. If p > α → do not reject H₀. With α = 0.05 and p = 0.03 → p < α → we reject H₀.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 3: The Court\'s Verdict</div>
+        <div class="challenge-question">The researcher set <em>α = 0.05</em> and obtained <em>p = 0.03</em>. What is the decision?</div>
+        <div class="data-display">α = 0.05 &nbsp;&nbsp;|&nbsp;&nbsp; p = 0.03 &nbsp;&nbsp;|&nbsp;&nbsp; p < α ?</div>
+        ${hint}
+        <div class="options-grid" id="q3-opts">
+          <button class="option-btn" onclick="checkQ(3,this,'a')">Do not reject H₀ — the result is not significant</button>
+          <button class="option-btn" onclick="checkQ(3,this,'b')">Reject H₀ — there is statistically significant evidence against the null hypothesis</button>
+          <button class="option-btn" onclick="checkQ(3,this,'c')">Accept H₁ with 100% certainty</button>
+          <button class="option-btn" onclick="checkQ(3,this,'d')">Inconclusive — we need more data</button>
+        </div>
+        <div id="q3-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 8: Type I and Type II Errors ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','Odinfather reveals an ancient scroll with a 2×2 table — the decision matrix of the Court.')}
+      ${dialogue('odin','In hypothesis testing, we can commit two types of errors:')}
+      ${dialogue('odin','<em>Type I Error (α) — False Positive</em>: reject H₀ when it is <em>true</em>. Convict an innocent person. The probability is controlled by α.')}
+      ${dialogue('odin','<em>Type II Error (β) — False Negative</em>: NOT reject H₀ when it is <em>false</em>. Acquit a guilty person. The probability is β.')}
+      ${dialogue('muninn','And <em>Statistical Power (1 − β)</em> is the ability to detect an effect when it truly exists. The higher the power, the better the test "sees" reality.')}
+      ${dialogue('thor','So if power is low, I could have a real effect and the test doesn\'t detect it? PERFECT for hiding my misdeeds!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 9: CHALLENGE 4 — Type I Error ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('<em>Type I Error</em> = reject true H₀ = false positive = "convict innocent". <em>Type II Error</em> = fail to reject false H₀ = false negative = "acquit guilty".'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 4: Errors in the Court</div>
+        <div class="challenge-question">The Court of Asgard table:</div>
+        <table class="tribunal-table">
+          <tr><th></th><th>H₀ is True<br>(Innocent)</th><th>H₀ is False<br>(Guilty)</th></tr>
+          <tr><td><strong>Reject H₀</strong><br>(Convict)</td><td class="danger">Type I Error (α)<br>False Positive</td><td class="safe">✅ Correct Decision<br>(Power = 1−β)</td></tr>
+          <tr><td><strong>Do Not Reject H₀</strong><br>(Acquit)</td><td class="safe">✅ Correct Decision</td><td class="danger">Type II Error (β)<br>False Negative</td></tr>
+        </table>
+        <div class="challenge-question">A researcher concludes that the magical potion works (rejects H₀), but in reality it <em>has no effect at all</em>. What type of error did he commit?</div>
+        ${hint}
+        <div class="options-grid" id="q4-opts">
+          <button class="option-btn" onclick="checkQ(4,this,'a')">Type I Error — False Positive (rejected true H₀)</button>
+          <button class="option-btn" onclick="checkQ(4,this,'b')">Type II Error — False Negative</button>
+          <button class="option-btn" onclick="checkQ(4,this,'c')">No error — if the p-value was significant, it is correct</button>
+          <button class="option-btn" onclick="checkQ(4,this,'d')">Sampling error</button>
+        </div>
+        <div id="q4-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 10: CHALLENGE 5 — Type II Error ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Type II Error = fail to reject H₀ when it is false = fail to detect an existing effect = false negative. It is the error of "letting it slip by".'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 5: The Guilty That Escaped</div>
+        <div class="challenge-question">Now the opposite scenario: the magical potion <em>really works</em>, but the researcher, with a small sample (n=10), obtains p = 0.12 and concludes: "there is no evidence of effect".</div>
+        <div class="challenge-question">What type of error did he <em>probably</em> commit?</div>
+        ${hint}
+        <div class="options-grid" id="q5-opts">
+          <button class="option-btn" onclick="checkQ(5,this,'a')">Type I Error — False Positive</button>
+          <button class="option-btn" onclick="checkQ(5,this,'b')">Type II Error — False Negative (failed to detect a real effect, probably due to lack of statistical power with small n)</button>
+          <button class="option-btn" onclick="checkQ(5,this,'c')">No error — p > 0.05 means there is no effect</button>
+          <button class="option-btn" onclick="checkQ(5,this,'d')">Measurement error</button>
+        </div>
+        <div id="q5-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 11: Narrative — p ≤ 0.05 is not magic ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Young one, I must warn you about something Thorment loves to exploit: the <em>obsession with p ≤ 0.05</em>.')}
+      ${dialogue('odin','A "statistically significant" result does NOT mean it is <em>practically important</em>. With a giant sample, even trivial differences yield p < 0.05.')}
+      ${dialogue('odin','And the opposite: p > 0.05 does NOT prove the effect does not exist — it may be that the study simply lacked <em>power</em> to detect it.')}
+      ${dialogue('muninn','This is why it is essential to report the <em>effect size</em> (like Cohen\'s d) alongside the p-value. The p says "is it different from chance?", effect size says "does that difference matter in practice?".')}
+      ${dialogue('thor','Come on! I keep publishing results with p = 0.049 and tiny effect! Nobody notices!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 12: CHALLENGE 6 — Statistical vs practical significance ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('<em>Statistical</em> significance (p < 0.05) = unlikely due to chance. <em>Practical</em> significance = the effect is large enough to matter in the real world. The two do not always go together — especially with very large samples.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 6: Significant... But Does It Matter?</div>
+        <div class="challenge-question">A study with <em>n = 50,000</em> warriors finds that the potion increases strength by <em>0.3 points</em> (on a 0–100 scale), with <em>p = 0.001</em> and <em>Cohen\'s d = 0.02</em>.</div>
+        <div class="data-display">
+          Difference = 0.3 points &nbsp;|&nbsp; p = 0.001 &nbsp;|&nbsp; d = 0.02 (trivial effect)
+        </div>
+        <div class="challenge-question">What is the best interpretation?</div>
+        ${hint}
+        <div class="options-grid" id="q6-opts">
+          <button class="option-btn" onclick="checkQ(6,this,'a')">The result is highly significant (p = 0.001), so the potion works very well</button>
+          <button class="option-btn" onclick="checkQ(6,this,'b')">Despite being statistically significant, the effect is trivial (d = 0.02) and practically irrelevant — the enormous sample detected a real but negligible difference</button>
+          <button class="option-btn" onclick="checkQ(6,this,'c')">Cohen\'s d doesn\'t matter — what counts is the p-value</button>
+          <button class="option-btn" onclick="checkQ(6,this,'d')">The study is wrong because the difference is too small</button>
+        </div>
+        <div id="q6-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 13: CHALLENGE 7 — "Not reject" vs "accept" H₀ ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('In the logic of testing, we never "accept" H₀ — we only <em>do not reject</em> it. Absence of evidence against H₀ is not evidence that H₀ is true. It may be lack of statistical power.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 7: The Language of the Verdict</div>
+        <div class="challenge-question">A researcher obtains p = 0.15 (α = 0.05). Which phrase is most <em>correct</em> for the report?</div>
+        ${hint}
+        <div class="options-grid" id="q7-opts">
+          <button class="option-btn" onclick="checkQ(7,this,'a')">We accept H₀ — the effect does not exist</button>
+          <button class="option-btn" onclick="checkQ(7,this,'b')">We do not reject H₀ — there is not sufficient statistical evidence to claim that an effect exists at the significance level adopted</button>
+          <button class="option-btn" onclick="checkQ(7,this,'c')">H₀ was proven true</button>
+          <button class="option-btn" onclick="checkQ(7,this,'d')">The study failed — p should be less than 0.05</button>
+        </div>
+        <div id="q7-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ MASTER CHALLENGES ━━
+  if(GAME.difficulty==='mestre'){
+
+    // CHALLENGE 8: Statistical Power
+    GAME.scenes.push({type:'narrative',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        ${dialogue('thor','Time for the Master level! Let\'s talk about <em>Statistical Power</em>!')}
+        ${dialogue('odin','Power (1 − β) depends on four factors: <em>effect size</em>, <em>sample size (n)</em>, <em>significance level (α)</em>, and <em>data variability</em>. In practice, the minimum recommendation is power of <em>0.80 (80%)</em> — that is, β = 0.20.')}
+        <button class="continue-btn" onclick="nextScene()">Face It →</button>
+      </div>`});
+
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: Test Power</div>
+          <div class="challenge-question">A researcher plans a study and calculates that power is only <em>0.40 (40%)</em>. What does this mean in practice?</div>
+          <div class="options-grid" id="q8-opts">
+            <button class="option-btn" onclick="checkQ(8,this,'a')">If the effect really exists, the test has only a 40% chance of detecting it — there is a 60% risk of Type II Error</button>
+            <button class="option-btn" onclick="checkQ(8,this,'b')">There is a 40% chance the result will be significant, regardless of whether the effect exists</button>
+            <button class="option-btn" onclick="checkQ(8,this,'c')">The confidence level is 40%</button>
+            <button class="option-btn" onclick="checkQ(8,this,'d')">40% of the data are reliable</button>
+          </div>
+          <div id="q8-fb"></div>
+        </div>
+      </div>`});
+
+    // CHALLENGE 9: One-tailed vs two-tailed
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: One-tailed or Two-tailed?</div>
+          <div class="challenge-question">A researcher wants to test if a new training technique improves strength — but is not certain if it can <em>also worsen</em> it. Which test is most appropriate?</div>
+          <div class="data-display">
+            One-tailed: H₁ predicts direction (greater OR lesser)<br>
+            Two-tailed: H₁ does not predict direction (different, in any way)
+          </div>
+          <div class="options-grid" id="q9-opts">
+            <button class="option-btn" onclick="checkQ(9,this,'a')">One-tailed — he wants to know if it improves</button>
+            <button class="option-btn" onclick="checkQ(9,this,'b')">Two-tailed — since the technique can both improve and worsen, the test should consider both directions</button>
+            <button class="option-btn" onclick="checkQ(9,this,'c')">It doesn\'t matter — the result is the same</button>
+            <button class="option-btn" onclick="checkQ(9,this,'d')">Use both and choose whichever one is significant</button>
+          </div>
+          <div id="q9-fb"></div>
+        </div>
+      </div>`});
+  }
+
+  // ━━ FINAL SCENE ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','The judge\'s gavel falls for the last time. The Court of Asgard recognizes the young researcher as one who can judge evidence with rigor.')}
+      ${dialogue('odin','You have conquered the <em>Realm of Hypothesis Testing</em>! Now you understand that science does not prove absolute truths — it provides <em>evidence</em> against the null hypothesis, always under a controlled margin of uncertainty.')}
+      ${dialogue('thor','Grrrr... next realm, correlations and regressions will confound you!')}
+      ${dialogue('muninn','Always remember: a p-value alone does not tell the whole story. Report effect size, confidence intervals, and never confuse statistical significance with practical importance.')}
+      <button class="continue-btn" onclick="showResults()">View Final Result ⚔️</button>
+    </div>`});
+}
+
+// ════════════════════════════════════════════════════
+const ANSWERS={1:'b',2:'b',3:'b',4:'a',5:'b',6:'b',7:'b',8:'a',9:'b'};
+const EXPLANATIONS={
+  1:{
+    correct:'✅ Perfect! H₀ always starts with <em>absence of effect</em> (no difference). H₁ is what we want to prove (the potion increases strength). We never reverse this logic!',
+    wrong:'❌ H₀ = no effect, no difference (status quo). H₁ = there is an effect (what we want to prove). The correct answer is: <em>H₀: no difference | H₁: potion increases strength</em>.',
+    charC:'odin',charW:'thor'
+  },
+  2:{
+    correct:'✅ Excellent! The p-value = P(data or more extreme | H₀ true). It is a <em>conditional probability of data given H₀</em>, not the probability that H₀ is true! This reversal is the <em>inverse probability fallacy</em>.',
+    wrong:'❌ The p-value is <em>NOT</em> the probability that H₀ is true. It is: "if H₀ is true, what\'s the chance of seeing such extreme data?" — P(data|H₀), not P(H₀|data)!',
+    charC:'muninn',charW:'thor'
+  },
+  3:{
+    correct:'✅ Correct! p = 0.03 < α = 0.05, so we <em>reject H₀</em>. There is statistically significant evidence against the null hypothesis. But remember: rejecting H₀ does not prove H₁ with certainty — it just means the data are very unlikely under H₀.',
+    wrong:'❌ Since p = 0.03 < α = 0.05, the decision is <em>reject H₀</em>. The result is statistically significant. But be careful: it is not 100% certain — there is a 3% chance it is a false positive.',
+    charC:'odin',charW:'thor'
+  },
+  4:{
+    correct:'✅ Perfect! He rejected H₀ (concluded it works), but H₀ was true (the potion has no effect). This is <em>Type I Error — False Positive</em>. He convicted an innocent person. The probability of this happening is α.',
+    wrong:'❌ He rejected a true H₀ = <em>Type I Error (False Positive)</em>. Like convicting an innocent person. Type II Error would be the opposite: failing to reject a false H₀.',
+    charC:'odin',charW:'thor'
+  },
+  5:{
+    correct:'✅ Correct! The potion works (H₀ is false), but he did not reject H₀ — <em>Type II Error (False Negative)</em>. With n=10, power was probably very low to detect the effect. He acquitted a guilty person due to lack of evidence.',
+    wrong:'❌ The effect is real but was not detected = <em>Type II Error (False Negative)</em>. With n=10, statistical power was insufficient. Increasing the sample would probably reveal the effect.',
+    charC:'muninn',charW:'thor'
+  },
+  6:{
+    correct:'✅ Excellent! This is the classic case: enormous sample makes almost everything "significant". Cohen\'s d = 0.02 is <em>trivial</em> (< 0.20 = small). A 0.3-point difference in 100 is irrelevant in practice. <em>Statistical significance ≠ practical significance</em>.',
+    wrong:'❌ The correct answer: despite p = 0.001, the <em>d = 0.02 is trivial</em>. With n = 50,000, almost any difference becomes significant. The p-value without effect size is a blind judge.',
+    charC:'odin',charW:'thor'
+  },
+  7:{
+    correct:'✅ Perfect! We say <em>"we do not reject H₀"</em>, never "we accept H₀". Absence of evidence is not evidence of absence. The test may simply have lacked power to detect the effect. Language matters!',
+    wrong:'❌ The correct phrase is <em>"we do not reject H₀"</em>. Never "we accept H₀" or "we proved H₀". Absence of evidence against H₀ does not prove H₀ is true.',
+    charC:'muninn',charW:'thor'
+  },
+  8:{
+    correct:'✅ Correct! Power = 0.40 means that if the effect exists, the test will detect it in <em>only 40% of cases</em>. In 60% (β = 0.60), it will commit Type II Error. Minimum recommended: 0.80. With such low power, the study is almost a waste of resources.',
+    wrong:'❌ Power = 0.40 → if the effect exists, only <em>40% chance of detecting it</em>. Type II Error risk is 60%. Minimum recommended: 0.80. Solution: increase n, increase α, or look for larger effects.',
+    charC:'odin',charW:'thor'
+  },
+  9:{
+    correct:'✅ Correct! Since the technique can <em>both improve and worsen</em>, the <em>two-tailed</em> test is most appropriate — it detects differences in both directions. Using one-tailed when direction is uncertain (or choosing post hoc) is a Thorment bias.',
+    wrong:'❌ The answer is <em>two-tailed</em>. If there is possibility of effect in both directions, the test must cover both sides. One-tailed only when there is strong theoretical justification for predicting a single direction, set <em>before</em> seeing data.',
+    charC:'muninn',charW:'thor'
+  }
+};
+
+function checkQ(q,btn,ans){
+  const opts=document.querySelectorAll(`#q${q}-opts .option-btn`);
+  opts.forEach(b=>{b.classList.add('disabled');b.onclick=null;});
+  const fb=document.getElementById(`q${q}-fb`),cor=ANSWERS[q],exp=EXPLANATIONS[q];
+  GAME.total++;
+  if(ans===cor){
+    btn.classList.add('correct');GAME.hits++;GAME.xp+=20;updateXPBar();earnGear();
+    fb.innerHTML=`<div class="feedback-box correct">${dialogue(exp.charC,exp.correct+' <span class="xp-badge">+20 XP</span>')}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }else{
+    btn.classList.add('wrong');
+    const ci=['a','b','c','d'].indexOf(cor);if(opts[ci])opts[ci].classList.add('correct');
+    fb.innerHTML=`<div class="feedback-box wrong">${dialogue(exp.charW,exp.wrong)}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }
+}
+
+function countMaxXP(){return (GAME.difficulty==='mestre'?9:7)*20;}
+function renderScene(){if(GAME.currentScene<GAME.scenes.length){content().innerHTML=GAME.scenes[GAME.currentScene].html();restoreGear();window.scrollTo({top:0,behavior:'smooth'});}}
+function nextScene(){GAME.currentScene++;renderScene();}
+
+function showResults(){
+  const pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  let rank,rc;
+  if(pct>=90){rank='🏆 Supreme Judge';rc='#f0c040';}
+  else if(pct>=70){rank='⚔️ Court Arbiter';rc='#58a6ff';}
+  else if(pct>=50){rank='🛡️ Jury Novice';rc='#8b949e';}
+  else{rank='⛓️ Thorment\'s Prisoner';rc='#f85149';}
+  content().innerHTML=`
+  <div class="result-screen">
+    <div class="reino-badge">REALM 5 — COMPLETE</div>
+    <h2>Adventure Results</h2>
+    ${resultVikingHTML()}
+    <div class="result-rank" style="color:${rc}">${rank}</div>
+    <div class="result-stats">
+      <div class="stat-row"><span class="stat-label">Difficulty</span><span class="stat-value">${GAME.difficulty==='mestre'?'⚔️ Master':'🛡️ Apprentice'}</span></div>
+      <div class="stat-row"><span class="stat-label">Correct Challenges</span><span class="stat-value">${GAME.hits} / ${GAME.total}</span></div>
+      <div class="stat-row"><span class="stat-label">Accuracy</span><span class="stat-value">${pct}%</span></div>
+      <div class="stat-row"><span class="stat-label">XP Earned</span><span class="stat-value">${GAME.xp} / ${GAME.maxXP}</span></div>
+    </div>
+    ${dialogue('odin',pct>=70
+      ?'The Court of Asgard recognizes you as a fair judge of evidence! Never forget: science does not prove — it provides degrees of evidence against H₀.'
+      :'The Court demands more practice, young one. Return and face the challenges again. Remember: even the greatest researchers need review!'
+    )}
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+      <button class="continue-btn" onclick="showTitleScreen()">🔄 Play Again</button>
+    </div>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+var GEAR_ITEMS=[{"s":"boots","n":"Court Boots","h":"<div style=\"display:flex;gap:14px\"><div style=\"width:24px;height:18px;background:#2a2a2a;border-radius:3px 3px 4px 7px;border:2px solid #444\"></div><div style=\"width:24px;height:18px;background:#2a2a2a;border-radius:3px 3px 4px 7px;border:2px solid #444\"></div></div>"},{"s":"mail","n":"Toga of Justice","h":"<div style=\"width:60px;height:72px;background:linear-gradient(180deg,#e8e0d0,#c8c0b0);border-radius:7px 7px 4px 4px;border:2px solid #a8a090\"></div>"},{"s":"right","n":"Hammer of Decision","h":"<div style=\"display:flex;flex-direction:column;align-items:center\"><div style=\"width:18px;height:12px;background:#707070;border-radius:3px;border:1px solid #555\"></div><div style=\"width:5px;height:36px;background:#6b4c30;border-radius:2px\"></div></div>"},{"s":"left","n":"Scales of Truth","h":"<div style=\"width:36px;height:40px;position:relative\"><div style=\"position:absolute;top:0;left:50%;transform:translateX(-50%);width:4px;height:24px;background:#a08838\"></div><div style=\"position:absolute;top:0;left:50%;transform:translateX(-50%);width:32px;height:3px;background:#c0a040;border-radius:2px\"></div><div style=\"position:absolute;top:3px;left:1px;width:11px;height:7px;border:2px solid #a08838;border-radius:0 0 5px 5px\"></div><div style=\"position:absolute;top:3px;right:1px;width:11px;height:7px;border:2px solid #a08838;border-radius:0 0 5px 5px\"></div></div>"},{"s":"cape","n":"Judge\'s Mantle","h":"<div style=\"width:84px;height:110px;background:linear-gradient(180deg,#1a1a2e,#0d0d1a);border-radius:5px 5px 28px 28px;clip-path:polygon(16% 0%,84% 0%,100% 18%,92% 100%,50% 88%,8% 100%,0% 18%)\"></div>"},{"s":"helm","n":"Crown of Truth","h":"<div style=\"width:52px;height:24px;background:linear-gradient(135deg,#f0c040,#e0a020);border-radius:26px 26px 5px 5px;border:2px solid #c08818;position:relative\"><div style=\"position:absolute;top:-10px;left:22%;width:3px;height:10px;background:#f0d060;border-radius:2px\"></div><div style=\"position:absolute;top:-13px;left:50%;transform:translateX(-50%);width:3px;height:13px;background:#f0d060;border-radius:2px\"></div><div style=\"position:absolute;top:-10px;right:22%;width:3px;height:10px;background:#f0d060;border-radius:2px\"></div></div>"}];
+var gearEarned=0;
+function armorPanelHTML(){
+  var rows='';
+  for(var i=0;i<GEAR_ITEMS.length;i++){rows+='<div class="gp-row'+(i<gearEarned?' earned':'')+'" id="gprow'+i+'"><span class="gp-dot"></span><span>'+GEAR_ITEMS[i].n+'</span></div>';}
+  var sl='<div class="vm-sparks" id="vmsparks"></div>';
+  sl+='<div class="vm-slot vm-cape" id="vmslot-cape"></div>';
+  sl+='<div class="vm-head"></div><div class="vm-arm-l"></div><div class="vm-arm-r"></div><div class="vm-torso"></div><div class="vm-leg-l"></div><div class="vm-leg-r"></div>';
+  sl+='<div class="vm-slot vm-boots" id="vmslot-boots"></div><div class="vm-slot vm-mail" id="vmslot-mail"></div>';
+  sl+='<div class="vm-slot vm-left" id="vmslot-left"></div><div class="vm-slot vm-right" id="vmslot-right"></div>';
+  sl+='<div class="vm-slot vm-helm" id="vmslot-helm"></div>';
+  return '<div class="armor-panel"><div class="viking-mini" id="vmini">'+sl+'</div><div class="gear-progress">'+rows+'</div></div>';
+}
+function restoreGear(){for(var i=0;i<gearEarned&&i<GEAR_ITEMS.length;i++){var g=GEAR_ITEMS[i],el=document.getElementById('vmslot-'+g.s);if(el){el.innerHTML=g.h;el.classList.add('on');}}}
+function earnGear(){
+  if(gearEarned>=GEAR_ITEMS.length)return;
+  var g=GEAR_ITEMS[gearEarned],el=document.getElementById('vmslot-'+g.s);
+  if(el){el.innerHTML=g.h;el.classList.add('on','vm-flash');setTimeout(function(){el.classList.remove('vm-flash')},500);spawnVMSparks(el);}
+  var row=document.getElementById('gprow'+gearEarned);if(row)row.classList.add('earned');
+  gearEarned++;
+}
+function spawnVMSparks(el){
+  var sc=document.getElementById('vmsparks');if(!sc||!el)return;
+  var r=el.getBoundingClientRect(),sr=document.getElementById('vmini').getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height/2;
+  var cols=['#f0c040','#f08030','#f0e080','#ff6040','#ffd060'];
+  for(var i=0;i<10;i++){var s=document.createElement('div');s.className='vm-spark';
+    var a=Math.random()*Math.PI*2,d=20+Math.random()*30;
+    s.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+cols[Math.floor(Math.random()*5)]+';--sx:'+(Math.cos(a)*d)+'px;--sy:'+(Math.sin(a)*d)+'px;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px';
+    sc.appendChild(s);setTimeout(function(x){x.remove()},700,s);}
+}
+function resultVikingHTML(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var ti=[];if(pct>=90)ti=GEAR_ITEMS;else if(pct>=70)ti=GEAR_ITEMS.slice(0,5);else if(pct>=50)ti=GEAR_ITEMS.slice(0,2);
+  var sm={boots:'rv-boots',mail:'rv-mail',right:'rv-right',left:'rv-left',cape:'rv-cape',helm:'rv-helm'};
+  var html='<div class="result-viking">';
+  html+='<div class="rv-slot rv-cape" id="rvs-cape"></div>';
+  html+='<div class="rv-head"></div><div class="rv-arm-l"></div><div class="rv-arm-r"></div><div class="rv-torso"></div><div class="rv-leg-l"></div><div class="rv-leg-r"></div>';
+  html+='<div class="rv-slot rv-boots" id="rvs-boots"></div><div class="rv-slot rv-mail" id="rvs-mail"></div>';
+  html+='<div class="rv-slot rv-left" id="rvs-left"></div><div class="rv-slot rv-right" id="rvs-right"></div>';
+  html+='<div class="rv-slot rv-helm" id="rvs-helm"></div></div>';
+  setTimeout(function(){ti.forEach(function(g){var e=document.getElementById('rvs-'+g.s);if(e)e.innerHTML=g.h;});},100);
+  return html;
+}
+
+showTitleScreen();
+</script>
+</body>
+</html>

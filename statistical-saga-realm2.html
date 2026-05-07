@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather — Realm 2: Descriptive Statistics</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --bg-panel: #1c2333;
+  --odin-blue: #58a6ff;
+  --thor-red: #f85149;
+  --corvo-purple: #bc8cff;
+  --gold: #f0c040;
+  --silver: #8b949e;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --success: #3fb950;
+  --border: #30363d;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 18px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+#game-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* ── TITLE SCREEN ── */
+.title-screen {
+  text-align: center;
+  padding: 60px 20px;
+  animation: fadeIn 1s ease;
+}
+.title-screen h1 {
+  font-family: 'Bangers', cursive;
+  font-size: 2.8em;
+  color: var(--gold);
+  text-shadow: 2px 2px 8px rgba(240,192,64,0.3);
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+.title-screen h2 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.5em;
+  color: var(--odin-blue);
+  margin-bottom: 30px;
+}
+.title-screen .subtitle {
+  color: var(--text-dim);
+  font-size: 1.1em;
+  margin-bottom: 40px;
+}
+.reino-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--odin-blue), var(--corvo-purple));
+  padding: 6px 20px;
+  border-radius: 20px;
+  font-family: 'Bangers', cursive;
+  font-size: 1em;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+/* ── DIFFICULTY ── */
+.difficulty-select {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.diff-btn {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  color: var(--text);
+  font-family: 'Bangers', cursive;
+  font-size: 1.2em;
+  padding: 16px 32px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 180px;
+}
+.diff-btn:hover { border-color: var(--odin-blue); transform: translateY(-2px); }
+.diff-btn .diff-label { font-size: 1.3em; }
+.diff-btn .diff-desc { font-family: 'Patrick Hand', cursive; font-size: 0.65em; color: var(--text-dim); margin-top: 4px; }
+
+/* ── SCENES / DIALOGUES ── */
+.scene {
+  animation: slideIn 0.5s ease;
+  padding: 10px 0;
+}
+.dialogue-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.dialogue-box.odin { border-left: 4px solid var(--odin-blue); }
+.dialogue-box.thor { border-left: 4px solid var(--thor-red); }
+.dialogue-box.corvo { border-left: 4px solid var(--corvo-purple); }
+.dialogue-box.narrator { border-left: 4px solid var(--gold); }
+
+.char-name {
+  font-family: 'Bangers', cursive;
+  font-size: 1.1em;
+  margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+.char-name.narrator { color: var(--gold); }
+
+.dialogue-text {
+  line-height: 1.5;
+  font-size: 1.05em;
+}
+.dialogue-text em { color: var(--gold); font-style: normal; font-weight: bold; }
+
+/* ── CHALLENGES ── */
+.challenge-box {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+  animation: pulse-border 2s ease infinite;
+}
+@keyframes pulse-border {
+  0%,100% { border-color: var(--gold); box-shadow: 0 0 8px rgba(240,192,64,0.15); }
+  50% { border-color: #f0c040cc; box-shadow: 0 0 16px rgba(240,192,64,0.3); }
+}
+.challenge-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4em;
+  color: var(--gold);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.challenge-question {
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.data-display {
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 12px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 1em;
+  color: var(--odin-blue);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* ── OPTIONS ── */
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.option-btn {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  color: var(--text);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.05em;
+  padding: 14px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.25s;
+  line-height: 1.4;
+}
+.option-btn:hover:not(.disabled) { border-color: var(--odin-blue); background: #1a2233; }
+.option-btn.correct { border-color: var(--success); background: #0d2818; color: var(--success); }
+.option-btn.wrong { border-color: var(--thor-red); background: #2d1116; color: var(--thor-red); }
+.option-btn.disabled { cursor: default; opacity: 0.7; }
+
+/* ── NUMERIC INPUT ── */
+.num-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.num-input {
+  background: var(--bg-dark);
+  border: 2px solid var(--border);
+  color: var(--odin-blue);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.2em;
+  padding: 10px 16px;
+  border-radius: 8px;
+  width: 160px;
+  text-align: center;
+  outline: none;
+}
+.num-input:focus { border-color: var(--odin-blue); }
+.submit-btn {
+  background: var(--odin-blue);
+  color: var(--bg-dark);
+  border: none;
+  font-family: 'Bangers', cursive;
+  font-size: 1.1em;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.submit-btn:hover { transform: scale(1.05); }
+
+/* ── DRAG & DROP (ordering) ── */
+.drag-area {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 12px 0;
+  min-height: 56px;
+  padding: 10px;
+  background: var(--bg-dark);
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+}
+.drag-item {
+  background: var(--bg-card);
+  border: 2px solid var(--odin-blue);
+  color: var(--odin-blue);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.1em;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.2s;
+}
+.drag-item:active { cursor: grabbing; transform: scale(1.08); }
+.drag-item.placed { border-color: var(--success); color: var(--success); }
+.drag-item.error { border-color: var(--thor-red); color: var(--thor-red); }
+
+/* ── FEEDBACK ── */
+.feedback-box {
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  animation: fadeIn 0.4s ease;
+  line-height: 1.5;
+}
+.feedback-box.correct {
+  background: #0d2818;
+  border: 1px solid var(--success);
+  color: var(--success);
+}
+.feedback-box.wrong {
+  background: #2d1116;
+  border: 1px solid var(--thor-red);
+  color: var(--thor-red);
+}
+.xp-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--bg-dark);
+  font-family: 'Bangers', cursive;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  margin-left: 6px;
+}
+
+/* ── XP BAR ── */
+.xp-bar-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.xp-label {
+  font-family: 'Bangers', cursive;
+  color: var(--gold);
+  font-size: 1em;
+  white-space: nowrap;
+}
+.xp-bar-bg {
+  flex: 1;
+  height: 14px;
+  background: var(--bg-dark);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 7px;
+  transition: width 0.6s ease;
+}
+.xp-count {
+  font-family: 'Bangers', cursive;
+  color: var(--text);
+  font-size: 1em;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* ── CONTINUE BUTTON ── */
+.continue-btn {
+  display: block;
+  margin: 20px auto 0;
+  background: transparent;
+  border: 2px solid var(--odin-blue);
+  color: var(--odin-blue);
+  font-family: 'Bangers', cursive;
+  font-size: 1.15em;
+  padding: 12px 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.continue-btn:hover { background: var(--odin-blue); color: var(--bg-dark); }
+
+/* ── FINAL RESULT ── */
+.result-screen {
+  text-align: center;
+  padding: 40px 20px;
+  animation: fadeIn 0.8s ease;
+}
+.result-screen h2 {
+  font-family: 'Bangers', cursive;
+  font-size: 2.2em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.result-rank {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.5em;
+  margin: 16px 0;
+}
+.result-stats {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: left;
+}
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: var(--text-dim); }
+.stat-value { font-family: 'Bangers', cursive; color: var(--odin-blue); }
+
+/* ── HINT (Muninn) ── */
+.hint-box {
+  background: #1a1530;
+  border: 1px solid var(--corvo-purple);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 12px 0;
+  font-size: 0.95em;
+  color: var(--corvo-purple);
+  animation: fadeIn 0.5s ease;
+}
+.hint-box .hint-label {
+  font-family: 'Bangers', cursive;
+  font-size: 1em;
+  margin-bottom: 4px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .title-screen h1 { font-size: 2em; }
+  .title-screen h2 { font-size: 1.2em; }
+  .difficulty-select { flex-direction: column; align-items: center; }
+  #game-container { padding: 12px; }
+  .challenge-box { padding: 16px; }
+}
+
+/* ── ARMOR SYSTEM ── */
+.armor-panel{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.viking-mini{position:relative;width:120px;height:180px;flex-shrink:0}
+.vm-head{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:#d4a574;border:1.5px solid #b8956a;z-index:5}
+.vm-torso{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:44px;height:58px;background:#8b7355;border-radius:7px 7px 4px 4px;z-index:3}
+.vm-arm-l{position:absolute;top:59px;left:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-arm-r{position:absolute;top:59px;right:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-leg-l{position:absolute;top:111px;left:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-leg-r{position:absolute;top:111px;right:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-slot{position:absolute;opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1);transform:scale(.3)}
+.vm-slot.on{opacity:1;transform:scale(1)}
+.vm-helm{top:16px;left:50%;transform:translateX(-50%) scale(.3);z-index:8}.vm-helm.on{transform:translateX(-50%) scale(1)}
+.vm-mail{top:57px;left:50%;transform:translateX(-50%) scale(.3);z-index:4}.vm-mail.on{transform:translateX(-50%) scale(1)}
+.vm-cape{top:53px;left:50%;transform:translateX(-50%) scale(.3);z-index:1}.vm-cape.on{transform:translateX(-50%) scale(1)}
+.vm-left{top:66px;left:0;z-index:7}.vm-right{top:56px;right:0;z-index:7}
+.vm-boots{bottom:4px;left:50%;transform:translateX(-50%) scale(.3);z-index:7;display:flex;gap:10px}.vm-boots.on{transform:translateX(-50%) scale(1)}
+.gear-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.gp-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;font-size:.8em;color:var(--text-dim);transition:all .3s}
+.gp-row.earned{color:var(--success);font-weight:bold}
+.gp-row .gp-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .3s;flex-shrink:0}
+.gp-row.earned .gp-dot{background:var(--success);border-color:var(--success)}
+.vm-sparks{position:absolute;pointer-events:none;z-index:20}
+.vm-spark{position:absolute;border-radius:50%;animation:vmSp .6s ease-out forwards}
+@keyframes vmSp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+.vm-flash{animation:vmFl .4s ease}
+@keyframes vmFl{0%{filter:brightness(1)}30%{filter:brightness(1.8) drop-shadow(0 0 12px rgba(240,180,40,.6))}100%{filter:brightness(1)}}
+.result-viking{position:relative;width:160px;height:240px;margin:16px auto}
+.rv-head{position:absolute;top:36px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#d4a574;border:2px solid #b8956a;z-index:5}
+.rv-torso{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:56px;height:74px;background:#8b7355;border-radius:9px 9px 5px 5px;z-index:3}
+.rv-arm-l{position:absolute;top:77px;left:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-arm-r{position:absolute;top:77px;right:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-leg-l{position:absolute;top:144px;left:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-leg-r{position:absolute;top:144px;right:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-slot{position:absolute}
+.rv-helm{top:20px;left:50%;transform:translateX(-50%);z-index:8}
+.rv-mail{top:74px;left:50%;transform:translateX(-50%);z-index:4}
+.rv-cape{top:69px;left:50%;transform:translateX(-50%);z-index:1}
+.rv-left{top:86px;left:4px;z-index:7}.rv-right{top:72px;right:4px;z-index:7}
+.rv-boots{bottom:4px;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:14px}
+@media(max-width:600px){.armor-panel{flex-direction:column;align-items:center}.viking-mini{width:100px;height:160px}}
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="game-content"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// THE STATISTICAL SAGA OF ODINFATHER — REALM 2
+// DESCRIPTIVE STATISTICS
+// ════════════════════════════════════════════════════
+
+const GAME = {
+  difficulty: null, // 'aprendiz' or 'mestre'
+  xp: 0,
+  maxXP: 0,
+  hits: 0,
+  total: 0,
+  currentScene: 0,
+  scenes: [],
+};
+
+const $ = id => document.getElementById(id);
+const content = () => document.getElementById('game-content');
+
+// ── CHARACTERS ──
+function dialogue(char, text) {
+  const classes = { odin:'odin', thor:'thor', muninn:'corvo', huginn:'corvo', narrator:'narrator' };
+  const names = { odin:'Odinfather 🧙‍♂️', thor:'Thorment ⚡', muninn:'Muninn 🐦‍⬛', huginn:'Huginn 🐦', narrator:'📜 Narrator' };
+  return `<div class="dialogue-box ${classes[char] || 'narrator'}">
+    <div class="char-name ${classes[char] || 'narrator'}">${names[char] || char}</div>
+    <div class="dialogue-text">${text}</div>
+  </div>`;
+}
+
+function hintBox(text) {
+  return `<div class="hint-box"><div class="hint-label">🐦‍⬛ Muninn's Hint</div>${text}</div>`;
+}
+
+// ── XP BAR ──
+function xpBar() {
+  const pct = GAME.maxXP > 0 ? Math.round((GAME.xp / GAME.maxXP) * 100) : 0;
+  return armorPanelHTML()+`<div class="xp-bar-container">
+    <div class="xp-label">⚡ XP</div>
+    <div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${pct}%"></div></div>
+    <div class="xp-count">${GAME.xp} / ${GAME.maxXP}</div>
+  </div>`;
+}
+
+function updateXPBar() {
+  const bar = document.querySelector('.xp-bar-fill');
+  const count = document.querySelector('.xp-count');
+  if (bar && count) {
+    const pct = GAME.maxXP > 0 ? Math.round((GAME.xp / GAME.maxXP) * 100) : 0;
+    bar.style.width = pct + '%';
+    count.textContent = `${GAME.xp} / ${GAME.maxXP}`;
+  }
+}
+
+// ── TITLE SCREEN ──
+function showTitleScreen() {
+  content().innerHTML = `
+    <div class="title-screen">
+      <div class="reino-badge">REALM 2</div>
+      <h1>The Statistical Saga of Odinfather</h1>
+      <h2>Kingdom of Descriptive Statistics</h2>
+      <p class="subtitle">Five vikings enter a tavern... and the mean will never be the same.</p>
+      <div class="difficulty-select">
+        <button class="diff-btn" onclick="startGame('aprendiz')">
+          <div class="diff-label">🛡️ Apprentice</div>
+          <div class="diff-desc">Undergraduate — with Muninn's hints</div>
+        </button>
+        <button class="diff-btn" onclick="startGame('mestre')">
+          <div class="diff-label">⚔️ Master</div>
+          <div class="diff-desc">Graduate — no hints, extra challenges</div>
+        </button>
+      </div>
+    </div>`;
+}
+
+// ── START ──
+function startGame(diff) {
+  GAME.difficulty = diff;
+  GAME.xp = 0;
+  GAME.hits = 0;
+  GAME.total = 0;
+  GAME.currentScene = 0;
+  gearEarned = 0;
+  buildScenes();
+  GAME.maxXP = countMaxXP();
+  renderScene();
+}
+
+// ── BUILD SCENES ──
+function buildScenes() {
+  GAME.scenes = [];
+
+  // ── SCENE 1: Arrival at the Tavern ──
+  GAME.scenes.push({
+    type: 'narrative',
+    html: () => `
+      <div class="scene">
+        ${dialogue('narrator', 'After conquering the challenges of <em>Realm 1 — Quantitative Research</em>, the young researcher ascends the snow-capped mountains of Jotunheim. In the heart of the mountain range, a smoking tavern emerges from the rocks: the <em>Tavern of Data</em>.')}
+        ${dialogue('odin', 'Welcome to the <em>Kingdom of Descriptive Statistics</em>, young scholar! Here you will learn to gaze upon data and tell the story it conceals — without need of any hypothesis test. Only the numbers, bare and true.')}
+        ${dialogue('thor', 'Bare truth? I shall show you how numbers LIE when you do not know what to look for! A well-placed mean deceives even gods!')}
+        ${dialogue('muninn', 'Do not be fooled by Thorment, young researcher. Descriptive statistics is the foundation — without it, no inference stands.')}
+        <button class="continue-btn" onclick="nextScene()">Enter the Tavern →</button>
+      </div>`
+  });
+
+  // ── SCENE 2: Challenge 1 — Mean in the Tavern ──
+  GAME.scenes.push({
+    type: 'narrative',
+    html: () => `
+      <div class="scene">
+        ${dialogue('narrator', 'In the tavern, five vikings sit at the bar. Odinfather points to them.')}
+        ${dialogue('odin', 'These five warriors have just received their wages. Observe the amounts and tell me: what is the <em>average salary</em> of the group?')}
+        ${dialogue('thor', 'Too easy! Or is it? 😈')}
+        <button class="continue-btn" onclick="nextScene()">View the data →</button>
+      </div>`
+  });
+
+  // ── SCENE 3: CHALLENGE — Calculate the Mean ──
+  GAME.scenes.push({
+    type: 'challenge',
+    html: () => {
+      const hint = GAME.difficulty === 'aprendiz' ? hintBox('The <em>arithmetic mean</em> is the sum of all values divided by the number of observations (N). Sum / N = Mean.') : '';
+      return `
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Challenge 1: Wages of the Vikings</div>
+          <div class="challenge-question">Five vikings received the following wages (in gold coins):</div>
+          <div class="data-display">2,000 &nbsp; 2,200 &nbsp; 2,500 &nbsp; 2,800 &nbsp; 3,000</div>
+          <div class="challenge-question">What is the average salary of the group?</div>
+          ${hint}
+          <div class="num-input-group">
+            <input type="number" class="num-input" id="mean-answer" placeholder="Ex: 2500">
+            <button class="submit-btn" onclick="checkMean()">Confirm</button>
+          </div>
+          <div id="mean-feedback"></div>
+        </div>
+      </div>`;
+    }
+  });
+
+  // ── SCENE 4: Narrative — the Outlier arrives ──
+  GAME.scenes.push({
+    type: 'narrative',
+    html: () => `
+      <div class="scene">
+        ${xpBar()}
+        ${dialogue('odin', 'Very well! The mean was <em>2,500 coins</em>. A good representation of the group, in this case.')}
+        ${dialogue('narrator', 'The tavern door swings open with a crash. A warrior cloaked in gold enters pompously. It is <em>Jarl Outlier</em>, the richest noble in Jotunheim.')}
+        ${dialogue('thor', 'HAHAHA! Look who arrived! Now the game gets interesting. The viking earning 2,500 coins must leave and Jarl Outlier — with his <em>20,000</em> — takes his place!')}
+        ${dialogue('muninn', 'Beware, young scholar. The arrival of an extreme value can utterly distort a measure of central tendency. Observe...')}
+        <button class="continue-btn" onclick="nextScene()">Continue →</button>
+      </div>`
+  });
+
+  // ── SCENE 5: CHALLENGE — New Mean with Outlier ──
+  GAME.scenes.push({
+    type: 'challenge',
+    html: () => {
+      const hint = GAME.difficulty === 'aprendiz' ? hintBox('Add all the new values: 2,000 + 2,200 + 2,800 + 3,000 + 20,000. Then divide by 5.') : '';
+      return `
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Challenge 2: The Outlier Trap</div>
+          <div class="challenge-question">With the departure of the 2,500 viking and the arrival of Jarl Outlier (20,000), the new group is:</div>
+          <div class="data-display">2,000 &nbsp; 2,200 &nbsp; 2,800 &nbsp; 3,000 &nbsp; 20,000</div>
+          <div class="challenge-question">What is the new average salary?</div>
+          ${hint}
+          <div class="num-input-group">
+            <input type="number" class="num-input" id="outlier-mean-answer" placeholder="Ex: 6000">
+            <button class="submit-btn" onclick="checkOutlierMean()">Confirm</button>
+          </div>
+          <div id="outlier-mean-feedback"></div>
+        </div>
+      </div>`;
+    }
+  });
+
+  // ── SCENE 6: Discussion about the mean + intro median ──
+  GAME.scenes.push({
+    type: 'narrative',
+    html: () => `
+      <div class="scene">
+        ${xpBar()}
+        ${dialogue('odin', 'Did you see what happened? The mean jumped from 2,500 to <em>6,000 coins</em>! Yet most vikings still earn around 2,000 to 3,000. The mean is now a <em>terrible representation</em> of the group.')}
+        ${dialogue('thor', 'That is why I LOVE the mean! Just one extreme value and — BOOM — the entire story changes! Perfect for deceiving careless researchers!')}
+        ${dialogue('odin', 'Exactly why we need another measure. When we have <em>extreme values (outliers)</em>, there exists a measure that resists such distortions better. Do you know which one?')}
+        <button class="continue-btn" onclick="nextScene()">Answer →</button>
+      </div>`
+  });
+
+  // ── SCENE 7: CHALLENGE — Which measure to use? ──
+  GAME.scenes.push({
+    type: 'challenge',
+    html: () => {
+      const hint = GAME.difficulty === 'aprendiz' ? hintBox('The <em>median</em> is the central value of data when ordered. It is not affected by extreme values, unlike the mean.') : '';
+      return `
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Challenge 3: The Resilient Measure</div>
+          <div class="challenge-question">When data has <em>extreme values (outliers)</em>, which measure of central tendency is most appropriate?</div>
+          ${hint}
+          <div class="options-grid" id="measure-options">
+            <button class="option-btn" onclick="checkMeasure(this, 'media')">Arithmetic mean</button>
+            <button class="option-btn" onclick="checkMeasure(this, 'mediana')">Median</button>
+            <button class="option-btn" onclick="checkMeasure(this, 'moda')">Mode</button>
+            <button class="option-btn" onclick="checkMeasure(this, 'variancia')">Variance</button>
+          </div>
+          <div id="measure-feedback"></div>
+        </div>
+      </div>`;
+    }
+  });
+
+  // ── SCENE 8: Calculate the Median ──
+  GAME.scenes.push({
+    type: 'challenge',
+    html: () => {
+      const hint = GAME.difficulty === 'aprendiz' ? hintBox('Order the values in ascending order: 2,000, 2,200, 2,800, 3,000, 20,000. With N=5 (odd), the median is the value in position (N+1)/2 = 3rd position.') : '';
+      return `
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Challenge 4: Find the Median</div>
+          <div class="challenge-question">Ordered data from the group with Jarl Outlier:</div>
+          <div class="data-display">2,000 &nbsp; 2,200 &nbsp; 2,800 &nbsp; 3,000 &nbsp; 20,000</div>
+          <div class="challenge-question">What is the <em>median</em> of this group?</div>
+          ${hint}
+          <div class="num-input-group">
+            <input type="number" class="num-input" id="median-answer" placeholder="Ex: 2800">
+            <button class="submit-btn" onclick="checkMedian()">Confirm</button>
+          </div>
+          <div id="median-feedback"></div>
+        </div>
+      </div>`;
+    }
+  });
+
+  // ── SCENE 9: Transition to Mode ──
+  GAME.scenes.push({
+    type: 'narrative',
+    html: () => `
+      <div class="scene">
+        ${xpBar()}
+        ${dialogue('odin', 'Excellent! The median of <em>2,800</em> represents the group far better than the mean of 6,000! While the mean was dragged by the outlier, the median remained steadfast at the center.')}
+        ${dialogue('huginn', 'What about the <em>mode</em>, Odinfather? Do the vikings not wish to know?')}
+        ${dialogue('odin', 'The mode is the value that <em>repeats most often</em> in the data. In a group where each viking earns a different amount, there simply is no mode — we say the distribution is <em>amodal</em>.')}
+        ${dialogue('thor', 'Boring. I prefer when things explode. Let us speak of dispersion!')}
+        <button class="continue-btn" onclick="nextScene()">Advance to Dispersion →</button>
+      </div>`
+  });
+
+  // ── SCENE 10: Intro to Dispersion ──
+  GAME.scenes.push({
+    type: 'narrative',
+    html: () => `
+      <div class="scene">
+        ${xpBar()}
+        ${dialogue('narrator', 'Odinfather leads the young researcher to the rear of the tavern, where a huge chalk board displays numbers scattered about.')}
+        ${dialogue('odin', 'Measures of central tendency tell us <em>where</em> data clusters. But they do not tell us <em>how much</em> the data spreads. For that, we need <em>measures of dispersion</em>.')}
+        ${dialogue('muninn', 'The <em>variance</em> measures the spread of data relative to the mean. And the <em>standard deviation</em> is simply the square root of variance — it places dispersion in the same units as the original data.')}
+        ${dialogue('thor', 'Ah, dispersion! The greater it is, the more CHAOS. I adore chaos!')}
+        <button class="continue-btn" onclick="nextScene()">Continue →</button>
+      </div>`
+  });
+
+  // ── SCENE 11: CHALLENGE — Deviations from the Mean ──
+  GAME.scenes.push({
+    type: 'challenge',
+    html: () => {
+      const hint = GAME.difficulty === 'aprendiz' ? hintBox('The <em>deviation</em> of each value from the mean is: (value − mean). If the mean is 2,500, the deviation of 2,000 is −500, of 3,000 is +500. The sum of ALL deviations from the mean is always...') : '';
+      return `
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Challenge 5: The Secret of Deviations</div>
+          <div class="challenge-question">Let us return to the original group (without Jarl Outlier):</div>
+          <div class="data-display">2,000 &nbsp; 2,200 &nbsp; 2,500 &nbsp; 2,800 &nbsp; 3,000 &nbsp;&nbsp;(Mean = 2,500)</div>
+          <div class="challenge-question">In <strong>any and all situations</strong>, the sum of deviations of each value from the mean equals how much?</div>
+          ${hint}
+          <div class="options-grid" id="deviation-options">
+            <button class="option-btn" onclick="checkDeviation(this, '500')">500</button>
+            <button class="option-btn" onclick="checkDeviation(this, '0')">Zero</button>
+            <button class="option-btn" onclick="checkDeviation(this, '-500')">−500</button>
+            <button class="option-btn" onclick="checkDeviation(this, '1000')">1,000</button>
+          </div>
+          <div id="deviation-feedback"></div>
+        </div>
+      </div>`;
+    }
+  });
+
+  // ── SCENE 12: Variance Explanation ──
+  GAME.scenes.push({
+    type: 'narrative',
+    html: () => `
+      <div class="scene">
+        ${xpBar()}
+        ${dialogue('odin', 'The sum of deviations is <em>always zero</em> — it is a fundamental property of the mean. Positive deviations cancel negative ones. This is why, to measure dispersion, we <em>square the deviations</em> before summing them.')}
+        ${dialogue('muninn', 'The formula for variance is: Σ(xi − x̄)² / N. That is, the mean of squared deviations.')}
+        ${dialogue('odin', 'And standard deviation is the square root of variance — it returns the measure to the original units of the data. If the data is in gold coins, the standard deviation is also in gold coins.')}
+        ${dialogue('thor', 'Wow, mathematics. How tedious. Let us see if the young researcher can calculate it!')}
+        <button class="continue-btn" onclick="nextScene()">Face the Challenge →</button>
+      </div>`
+  });
+
+  // ── SCENE 13: CHALLENGE — Interpret Standard Deviation ──
+  GAME.scenes.push({
+    type: 'challenge',
+    html: () => {
+      const hint = GAME.difficulty === 'aprendiz' ? hintBox('Standard deviation measures the spread around the mean. The <em>greater</em> the standard deviation, the more scattered (dispersed) the data. The smaller, the more homogeneous.') : '';
+      return `
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Challenge 6: Tavern A vs. Tavern B</div>
+          <div class="challenge-question">Two taverns measured customer satisfaction (scale 1 to 10):</div>
+          <div class="data-display">Tavern A: Mean = 7.2 &nbsp;|&nbsp; SD = 0.8<br>Tavern B: Mean = 7.2 &nbsp;|&nbsp; SD = 3.1</div>
+          <div class="challenge-question">Both taverns have the <em>same mean</em>. What does the standard deviation tell us about the difference between them?</div>
+          ${hint}
+          <div class="options-grid" id="dp-options">
+            <button class="option-btn" onclick="checkDP(this, 'a')">Tavern A is better because it has lower SD</button>
+            <button class="option-btn" onclick="checkDP(this, 'b')">In Tavern A, ratings are more homogeneous (consistent customers); in Tavern B, there is great variation (some love it, others hate it)</button>
+            <button class="option-btn" onclick="checkDP(this, 'c')">There is no real difference — the mean is the same</button>
+            <button class="option-btn" onclick="checkDP(this, 'd')">Tavern B is better because higher SD indicates more diversity of opinion</button>
+          </div>
+          <div id="dp-feedback"></div>
+        </div>
+      </div>`;
+    }
+  });
+
+  // ── SCENE 14: Thorment attacks — Normal Distribution ──
+  GAME.scenes.push({
+    type: 'narrative',
+    html: () => `
+      <div class="scene">
+        ${xpBar()}
+        ${dialogue('narrator', 'Suddenly, Thorment strikes his hammer on the ground and conjures a floating parchment with a symmetric bell-shaped curve.')}
+        ${dialogue('thor', 'Behold, young scholar! The famous <em>Normal Distribution</em>! The legend says that when data follows this shape, 68% of it lies within one standard deviation of the mean, 95% within two... and 99.7% within three! Can you wield this power?')}
+        ${dialogue('odin', 'The normal distribution is fundamental to all inferential statistics that will come in the next realms. But for now, let us test whether you understand the <em>empirical rule 68-95-99.7</em>.')}
+        <button class="continue-btn" onclick="nextScene()">Face the Challenge →</button>
+      </div>`
+  });
+
+  // ── SCENE 15: CHALLENGE — Empirical Rule ──
+  GAME.scenes.push({
+    type: 'challenge',
+    html: () => {
+      const hint = GAME.difficulty === 'aprendiz' ? hintBox('In the normal distribution:<br>• <em>68%</em> of data lies between μ ± 1σ<br>• <em>95%</em> between μ ± 2σ<br>• <em>99.7%</em> between μ ± 3σ<br>If the mean is 170 and the SD is 10, then μ ± 2σ = 150 to 190.') : '';
+      return `
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Challenge 7: The Golden Rule of the Normal</div>
+          <div class="challenge-question">The height of viking warriors follows a normal distribution with <em>mean = 170 cm</em> and <em>standard deviation = 10 cm</em>.</div>
+          <div class="challenge-question">Approximately <em>95%</em> of warriors have height between which values?</div>
+          ${hint}
+          <div class="options-grid" id="normal-options">
+            <button class="option-btn" onclick="checkNormal(this, 'a')">160 cm and 180 cm</button>
+            <button class="option-btn" onclick="checkNormal(this, 'b')">150 cm and 190 cm</button>
+            <button class="option-btn" onclick="checkNormal(this, 'c')">140 cm and 200 cm</button>
+            <button class="option-btn" onclick="checkNormal(this, 'd')">155 cm and 185 cm</button>
+          </div>
+          <div id="normal-feedback"></div>
+        </div>
+      </div>`;
+    }
+  });
+
+  // ── EXTRA SCENE MASTER: Coefficient of Variation ──
+  if (GAME.difficulty === 'mestre') {
+    GAME.scenes.push({
+      type: 'narrative',
+      html: () => `
+        <div class="scene">
+          ${xpBar()}
+          ${dialogue('thor', 'Did you think it was over, young master? I have one more trick!')}
+          ${dialogue('odin', 'At the Master level, we must go beyond. The <em>Coefficient of Variation (CV)</em> allows comparing the dispersion of groups with different means. CV = (SD / Mean) × 100.')}
+          <button class="continue-btn" onclick="nextScene()">Face It →</button>
+        </div>`
+    });
+
+    GAME.scenes.push({
+      type: 'challenge',
+      html: () => `
+        <div class="scene">
+          ${xpBar()}
+          <div class="challenge-box">
+            <div class="challenge-title">⚔️ Master Challenge: Coefficient of Variation</div>
+            <div class="challenge-question">Two groups of warriors train archery. Accuracy (in points) was measured:</div>
+            <div class="data-display">Group Alpha: Mean = 80 &nbsp;|&nbsp; SD = 12<br>Group Beta: Mean = 50 &nbsp;|&nbsp; SD = 10</div>
+            <div class="challenge-question">Which group has greater <em>relative variability</em> (CV)?</div>
+            <div class="options-grid" id="cv-options">
+              <button class="option-btn" onclick="checkCV(this, 'alfa')">Group Alpha (CV = 15%)</button>
+              <button class="option-btn" onclick="checkCV(this, 'beta')">Group Beta (CV = 20%)</button>
+              <button class="option-btn" onclick="checkCV(this, 'igual')">Both have the same CV</button>
+              <button class="option-btn" onclick="checkCV(this, 'impossivel')">Impossible to determine without more data</button>
+            </div>
+            <div id="cv-feedback"></div>
+          </div>
+        </div>`
+    });
+  }
+
+  // ── FINAL SCENE ──
+  GAME.scenes.push({
+    type: 'narrative',
+    html: () => `
+      <div class="scene">
+        ${xpBar()}
+        ${dialogue('narrator', 'The young researcher rises from the tavern table, now mastering the arts of descriptive statistics.')}
+        ${dialogue('odin', 'You have crossed the <em>Kingdom of Descriptive Statistics</em> with wisdom! Now you know that the mean is sensitive to outliers, that the median is your ally in such cases, and that dispersion is as important as central tendency.')}
+        ${dialogue('thor', 'Grrrrr... next time it will not be so easy. In <em>Realm 3</em>, the probabilities will be against you!')}
+        ${dialogue('huginn', 'Until the next adventure, young warrior of data!')}
+        <button class="continue-btn" onclick="showResults()">View Final Result ⚔️</button>
+      </div>`
+  });
+}
+
+// ── COUNT MAX XP ──
+function countMaxXP() {
+  // 7 base challenges × 20 XP + (2 extra master × 20)
+  let base = 7 * 20;
+  if (GAME.difficulty === 'mestre') base += 20;
+  return base;
+}
+
+// ── RENDER SCENE ──
+function renderScene() {
+  if (GAME.currentScene < GAME.scenes.length) {
+    const scene = GAME.scenes[GAME.currentScene];
+    content().innerHTML = scene.html();
+    restoreGear();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function nextScene() {
+  GAME.currentScene++;
+  renderScene();
+}
+
+// ── CHALLENGE LOGIC ──
+
+// Challenge 1: Mean
+function checkMean() {
+  const input = document.getElementById('mean-answer');
+  const fb = document.getElementById('mean-feedback');
+  const val = parseFloat(input.value);
+  GAME.total++;
+  if (val === 2500) {
+    GAME.hits++;
+    GAME.xp += 20;
+    updateXPBar();earnGear();
+    fb.innerHTML = `<div class="feedback-box correct">
+      ${dialogue('odin', '✅ Perfect! (2,000 + 2,200 + 2,500 + 2,800 + 3,000) / 5 = <em>2,500</em>. The mean is the sum divided by N. <span class="xp-badge">+20 XP</span>')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  } else {
+    fb.innerHTML = `<div class="feedback-box wrong">
+      ${dialogue('thor', '❌ Wrong! The sum is 12,500 and N = 5. Thus, 12,500 / 5 = <em>2,500</em>. The mean is the sum divided by the number of observations!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  }
+  input.disabled = true;
+  document.querySelector('.submit-btn').disabled = true;
+}
+
+// Challenge 2: Mean with Outlier
+function checkOutlierMean() {
+  const input = document.getElementById('outlier-mean-answer');
+  const fb = document.getElementById('outlier-mean-feedback');
+  const val = parseFloat(input.value);
+  GAME.total++;
+  if (val === 6000) {
+    GAME.hits++;
+    GAME.xp += 20;
+    updateXPBar();earnGear();
+    fb.innerHTML = `<div class="feedback-box correct">
+      ${dialogue('odin', '✅ Exact! (2,000 + 2,200 + 2,800 + 3,000 + 20,000) / 5 = <em>6,000</em>. See how a single outlier pulled the mean from 2,500 to 6,000! <span class="xp-badge">+20 XP</span>')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  } else {
+    fb.innerHTML = `<div class="feedback-box wrong">
+      ${dialogue('thor', '❌ The sum of the new values is 30,000 and N = 5. Thus, 30,000 / 5 = <em>6,000</em>. A leap from 2,500 to 6,000 — this is the power of an outlier!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  }
+  input.disabled = true;
+  document.querySelector('.challenge-box .submit-btn').disabled = true;
+}
+
+// Challenge 3: Measure that resists
+function checkMeasure(btn, answer) {
+  const opts = document.querySelectorAll('#measure-options .option-btn');
+  opts.forEach(b => { b.classList.add('disabled'); b.onclick = null; });
+  const fb = document.getElementById('measure-feedback');
+  GAME.total++;
+  if (answer === 'mediana') {
+    btn.classList.add('correct');
+    GAME.hits++;
+    GAME.xp += 20;
+    updateXPBar();earnGear();
+    fb.innerHTML = `<div class="feedback-box correct">
+      ${dialogue('muninn', '✅ Correct! The <em>median</em> is the central value of ordered data and is not affected by extreme values. When outliers exist, it is far more representative than the mean. <span class="xp-badge">+20 XP</span>')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  } else {
+    btn.classList.add('wrong');
+    opts[1].classList.add('correct'); // median is second option
+    fb.innerHTML = `<div class="feedback-box wrong">
+      ${dialogue('thor', '❌ The correct answer is the <em>Median</em>! It sits at the center of ordered data and bravely resists my outliers. The mean is my ally for deception!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  }
+}
+
+// Challenge 4: Calculate Median
+function checkMedian() {
+  const input = document.getElementById('median-answer');
+  const fb = document.getElementById('median-feedback');
+  const val = parseFloat(input.value);
+  GAME.total++;
+  if (val === 2800) {
+    GAME.hits++;
+    GAME.xp += 20;
+    updateXPBar();earnGear();
+    fb.innerHTML = `<div class="feedback-box correct">
+      ${dialogue('odin', '✅ Perfect! Ordered data: 2,000, 2,200, <em>2,800</em>, 3,000, 20,000. With N=5, the central position is (5+1)/2 = 3rd. The 3rd value is 2,800. While the mean went to 6,000, the median stayed at 2,800 — far more representative! <span class="xp-badge">+20 XP</span>')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  } else {
+    fb.innerHTML = `<div class="feedback-box wrong">
+      ${dialogue('thor', '❌ Order the data: 2,000, 2,200, <em>2,800</em>, 3,000, 20,000. The midpoint with N=5 is the 3rd position. Median = 2,800!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  }
+  input.disabled = true;
+  document.querySelector('.challenge-box .submit-btn').disabled = true;
+}
+
+// Challenge 5: Sum of Deviations
+function checkDeviation(btn, answer) {
+  const opts = document.querySelectorAll('#deviation-options .option-btn');
+  opts.forEach(b => { b.classList.add('disabled'); b.onclick = null; });
+  const fb = document.getElementById('deviation-feedback');
+  GAME.total++;
+  if (answer === '0') {
+    btn.classList.add('correct');
+    GAME.hits++;
+    GAME.xp += 20;
+    updateXPBar();earnGear();
+    fb.innerHTML = `<div class="feedback-box correct">
+      ${dialogue('odin', '✅ Excellent! The sum of deviations from the mean is <em>ALWAYS ZERO</em>. It is a fundamental mathematical property of the arithmetic mean: (−500) + (−300) + 0 + 300 + 500 = 0. This is why, to measure dispersion, we use squared deviations! <span class="xp-badge">+20 XP</span>')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  } else {
+    btn.classList.add('wrong');
+    opts[1].classList.add('correct');
+    fb.innerHTML = `<div class="feedback-box wrong">
+      ${dialogue('thor', '❌ The answer is <em>ZERO</em>! The deviations are: −500, −300, 0, +300, +500. Summed they equal zero. Always. In any dataset. This is why variance uses squared deviations!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  }
+}
+
+// Challenge 6: Interpret SD
+function checkDP(btn, answer) {
+  const opts = document.querySelectorAll('#dp-options .option-btn');
+  opts.forEach(b => { b.classList.add('disabled'); b.onclick = null; });
+  const fb = document.getElementById('dp-feedback');
+  GAME.total++;
+  if (answer === 'b') {
+    btn.classList.add('correct');
+    GAME.hits++;
+    GAME.xp += 20;
+    updateXPBar();earnGear();
+    fb.innerHTML = `<div class="feedback-box correct">
+      ${dialogue('muninn', '✅ Very well! Standard deviation indicates the <em>dispersion</em> of data. With SD = 0.8, Tavern A\'s ratings are tightly concentrated around 7.2 (consistent customers). In Tavern B (SD = 3.1), there is enormous variation — some give very high ratings and others very low. The mean alone does not tell the whole story! <span class="xp-badge">+20 XP</span>')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  } else {
+    btn.classList.add('wrong');
+    opts[1].classList.add('correct');
+    fb.innerHTML = `<div class="feedback-box wrong">
+      ${dialogue('odin', '❌ The correct answer is that Tavern A\'s ratings are <em>homogeneous</em> (small SD = little dispersion) and Tavern B has <em>great variation</em> (large SD). Two equal means can hide very different realities!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  }
+}
+
+// Challenge 7: Empirical Rule
+function checkNormal(btn, answer) {
+  const opts = document.querySelectorAll('#normal-options .option-btn');
+  opts.forEach(b => { b.classList.add('disabled'); b.onclick = null; });
+  const fb = document.getElementById('normal-feedback');
+  GAME.total++;
+  if (answer === 'b') {
+    btn.classList.add('correct');
+    GAME.hits++;
+    GAME.xp += 20;
+    updateXPBar();earnGear();
+    fb.innerHTML = `<div class="feedback-box correct">
+      ${dialogue('odin', '✅ Perfect! 95% of data lies between μ ± 2σ. With mean 170 and SD 10: 170 − 20 = <em>150</em> and 170 + 20 = <em>190</em>. The 68-95-99.7 rule is one of the most powerful tools in statistics! <span class="xp-badge">+20 XP</span>')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  } else {
+    btn.classList.add('wrong');
+    opts[1].classList.add('correct');
+    fb.innerHTML = `<div class="feedback-box wrong">
+      ${dialogue('thor', '❌ The answer is <em>150 to 190 cm</em>. In the empirical rule, 95% lie between μ ± 2σ = 170 ± 20. The option 160-180 would be only 1 SD (68%)!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  }
+}
+
+// Master Challenge: CV
+function checkCV(btn, answer) {
+  const opts = document.querySelectorAll('#cv-options .option-btn');
+  opts.forEach(b => { b.classList.add('disabled'); b.onclick = null; });
+  const fb = document.getElementById('cv-feedback');
+  GAME.total++;
+  if (answer === 'beta') {
+    btn.classList.add('correct');
+    GAME.hits++;
+    GAME.xp += 20;
+    updateXPBar();earnGear();
+    fb.innerHTML = `<div class="feedback-box correct">
+      ${dialogue('odin', '✅ Correct! CV of Alpha = 12/80 × 100 = <em>15%</em>. CV of Beta = 10/50 × 100 = <em>20%</em>. Although Group Alpha has higher absolute SD (12 > 10), proportionally Group Beta is more dispersed. CV allows fair comparisons between groups with different means! <span class="xp-badge">+20 XP</span>')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  } else {
+    btn.classList.add('wrong');
+    opts[1].classList.add('correct');
+    fb.innerHTML = `<div class="feedback-box wrong">
+      ${dialogue('thor', '❌ Group Beta\'s CV is <em>20%</em> (10/50 × 100) and Alpha\'s is <em>15%</em> (12/80 × 100). Beware: higher absolute SD does not mean higher relative variability! CV standardizes the comparison.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`;
+  }
+}
+
+// ── FINAL RESULT ──
+function showResults() {
+  const pct = GAME.total > 0 ? Math.round((GAME.hits / GAME.total) * 100) : 0;
+  let rank, rankColor;
+  if (pct >= 90) { rank = '🏆 Champion of Jotunheim'; rankColor = var_gold(); }
+  else if (pct >= 70) { rank = '⚔️ Peak Explorer'; rankColor = var_blue(); }
+  else if (pct >= 50) { rank = '🛡️ Mountain Novice'; rankColor = var_silver(); }
+  else { rank = '⛓️ Frost Captive'; rankColor = var_red(); }
+
+  const totalDesafios = GAME.difficulty === 'mestre' ? 8 : 7;
+
+  content().innerHTML = `
+    <div class="result-screen">
+      <div class="reino-badge">REALM 2 — COMPLETE</div>
+      <h2>Adventure Results</h2>
+      ${resultVikingHTML()}
+      <div class="result-rank" style="color:${rankColor}">${rank}</div>
+
+      <div class="result-stats">
+        <div class="stat-row">
+          <span class="stat-label">Difficulty</span>
+          <span class="stat-value">${GAME.difficulty === 'mestre' ? '⚔️ Master' : '🛡️ Apprentice'}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Correct Challenges</span>
+          <span class="stat-value">${GAME.hits} / ${GAME.total}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Accuracy</span>
+          <span class="stat-value">${pct}%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">XP Earned</span>
+          <span class="stat-value">${GAME.xp} / ${GAME.maxXP}</span>
+        </div>
+      </div>
+
+      ${dialogue('odin', pct >= 70
+        ? 'Excellent, young researcher! You have mastered descriptive statistics and are ready for the challenges of <em>Realm 3</em>!'
+        : 'You must train more, young scholar. Descriptive statistics is the foundation of all. Return and try again!'
+      )}
+
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px;">
+        <button class="continue-btn" onclick="showTitleScreen()">🔄 Play Again</button>
+      </div>
+    </div>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function var_gold() { return '#f0c040'; }
+function var_blue() { return '#58a6ff'; }
+function var_silver() { return '#8b949e'; }
+function var_red() { return '#f85149'; }
+
+// ── INITIALIZE ──
+
+var GEAR_ITEMS=[{"s":"boots","n":"Climbing Boots","h":"<div style=\"display:flex;gap:14px\"><div style=\"width:24px;height:18px;background:#5a4030;border-radius:3px 3px 4px 7px;border:2px solid #7a5840\"></div><div style=\"width:24px;height:18px;background:#5a4030;border-radius:3px 3px 4px 7px;border:2px solid #7a5840\"></div></div>"},{"s":"mail","n":"Explorer's Vest","h":"<div style=\"width:60px;height:72px;background:linear-gradient(180deg,#6a8050,#4a6030);border-radius:7px 7px 4px 4px;border:2px solid #3a5020\"></div>"},{"s":"right","n":"Data Pickaxe","h":"<div style=\"display:flex;flex-direction:column;align-items:center\"><div style=\"width:20px;height:9px;background:#808080;border-radius:3px;transform:rotate(-15deg)\"></div><div style=\"width:5px;height:38px;background:#7a5a30;border-radius:2px\"></div></div>"},{"s":"left","n":"Spyglass of Dispersion","h":"<div style=\"width:34px;height:12px;background:linear-gradient(to right,#a08840,#706030);border-radius:6px;border:1.5px solid #c0a050;position:relative\"><div style=\"position:absolute;left:-2px;top:-3px;width:16px;height:16px;border:2px solid #c0a850;border-radius:50%;background:rgba(150,200,255,0.15)\"></div></div>"},{"s":"cape","n":"Cape of Jotunheim","h":"<div style=\"width:84px;height:110px;background:linear-gradient(180deg,#3a5a70,#203848);border-radius:5px 5px 28px 28px;clip-path:polygon(16% 0%,84% 0%,100% 18%,92% 100%,50% 88%,8% 100%,0% 18%)\"></div>"},{"s":"helm","n":"Helm of Jotun","h":"<div style=\"position:relative;width:54px;margin:0 auto\"><div style=\"width:54px;height:32px;background:linear-gradient(135deg,#7a6a50,#5a4a38);border-radius:27px 27px 7px 7px;border:2px solid #4a3a28;position:relative\"><div style=\"position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:5px;height:9px;background:#5a4a38;border-radius:2px\"></div></div><div style=\"position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:12px;height:10px;background:#5a4a38;border-radius:3px 3px 0 0\"></div></div>"}];
+var gearEarned=0;
+function armorPanelHTML(){
+  var rows='';
+  for(var i=0;i<GEAR_ITEMS.length;i++){rows+='<div class="gp-row'+(i<gearEarned?' earned':'')+'" id="gprow'+i+'"><span class="gp-dot"></span><span>'+GEAR_ITEMS[i].n+'</span></div>';}
+  var sl='<div class="vm-sparks" id="vmsparks"></div>';
+  sl+='<div class="vm-slot vm-cape" id="vmslot-cape"></div>';
+  sl+='<div class="vm-head"></div><div class="vm-arm-l"></div><div class="vm-arm-r"></div><div class="vm-torso"></div><div class="vm-leg-l"></div><div class="vm-leg-r"></div>';
+  sl+='<div class="vm-slot vm-boots" id="vmslot-boots"></div><div class="vm-slot vm-mail" id="vmslot-mail"></div>';
+  sl+='<div class="vm-slot vm-left" id="vmslot-left"></div><div class="vm-slot vm-right" id="vmslot-right"></div>';
+  sl+='<div class="vm-slot vm-helm" id="vmslot-helm"></div>';
+  return '<div class="armor-panel"><div class="viking-mini" id="vmini">'+sl+'</div><div class="gear-progress">'+rows+'</div></div>';
+}
+function restoreGear(){for(var i=0;i<gearEarned&&i<GEAR_ITEMS.length;i++){var g=GEAR_ITEMS[i],el=document.getElementById('vmslot-'+g.s);if(el){el.innerHTML=g.h;el.classList.add('on');}}}
+function earnGear(){
+  if(gearEarned>=GEAR_ITEMS.length)return;
+  var g=GEAR_ITEMS[gearEarned],el=document.getElementById('vmslot-'+g.s);
+  if(el){el.innerHTML=g.h;el.classList.add('on','vm-flash');setTimeout(function(){el.classList.remove('vm-flash')},500);spawnVMSparks(el);}
+  var row=document.getElementById('gprow'+gearEarned);if(row)row.classList.add('earned');
+  gearEarned++;
+}
+function spawnVMSparks(el){
+  var sc=document.getElementById('vmsparks');if(!sc||!el)return;
+  var r=el.getBoundingClientRect(),sr=document.getElementById('vmini').getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height/2;
+  var cols=['#f0c040','#f08030','#f0e080','#ff6040','#ffd060'];
+  for(var i=0;i<10;i++){var s=document.createElement('div');s.className='vm-spark';
+    var a=Math.random()*Math.PI*2,d=20+Math.random()*30;
+    s.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+cols[Math.floor(Math.random()*5)]+';--sx:'+(Math.cos(a)*d)+'px;--sy:'+(Math.sin(a)*d)+'px;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px';
+    sc.appendChild(s);setTimeout(function(x){x.remove()},700,s);}
+}
+function resultVikingHTML(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var ti=[];if(pct>=90)ti=GEAR_ITEMS;else if(pct>=70)ti=GEAR_ITEMS.slice(0,5);else if(pct>=50)ti=GEAR_ITEMS.slice(0,2);
+  var sm={boots:'rv-boots',mail:'rv-mail',right:'rv-right',left:'rv-left',cape:'rv-cape',helm:'rv-helm'};
+  var html='<div class="result-viking">';
+  html+='<div class="rv-slot rv-cape" id="rvs-cape"></div>';
+  html+='<div class="rv-head"></div><div class="rv-arm-l"></div><div class="rv-arm-r"></div><div class="rv-torso"></div><div class="rv-leg-l"></div><div class="rv-leg-r"></div>';
+  html+='<div class="rv-slot rv-boots" id="rvs-boots"></div><div class="rv-slot rv-mail" id="rvs-mail"></div>';
+  html+='<div class="rv-slot rv-left" id="rvs-left"></div><div class="rv-slot rv-right" id="rvs-right"></div>';
+  html+='<div class="rv-slot rv-helm" id="rvs-helm"></div></div>';
+  setTimeout(function(){ti.forEach(function(g){var e=document.getElementById('rvs-'+g.s);if(e)e.innerHTML=g.h;});},100);
+  return html;
+}
+
+showTitleScreen();
+</script>
+</body>
+</html>

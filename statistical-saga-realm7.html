@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather — Realm 7: Equivalence Testing (TOST)</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh;overflow-x:hidden}
+#game-container{max-width:800px;margin:0 auto;padding:20px;min-height:100vh}
+.title-screen{text-align:center;padding:60px 20px;animation:fadeIn 1s ease}
+.title-screen h1{font-family:'Bangers',cursive;font-size:2.8em;color:var(--gold);text-shadow:2px 2px 8px rgba(240,192,64,.3);line-height:1.1;margin-bottom:8px}
+.title-screen h2{font-family:'Permanent Marker',cursive;font-size:1.5em;color:var(--odin-blue);margin-bottom:30px}
+.title-screen .subtitle{color:var(--text-dim);font-size:1.1em;margin-bottom:40px}
+.reino-badge{display:inline-block;background:linear-gradient(135deg,var(--odin-blue),var(--corvo-purple));padding:6px 20px;border-radius:20px;font-family:'Bangers',cursive;font-size:1em;color:#fff;margin-bottom:16px}
+.difficulty-select{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.diff-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Bangers',cursive;font-size:1.2em;padding:16px 32px;border-radius:12px;cursor:pointer;transition:all .3s;min-width:180px}
+.diff-btn:hover{border-color:var(--odin-blue);transform:translateY(-2px)}
+.diff-btn .diff-label{font-size:1.3em}.diff-btn .diff-desc{font-family:'Patrick Hand',cursive;font-size:.65em;color:var(--text-dim);margin-top:4px}
+.scene{animation:slideIn .5s ease;padding:10px 0}
+.dialogue-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative}
+.dialogue-box.odin{border-left:4px solid var(--odin-blue)}.dialogue-box.thor{border-left:4px solid var(--thor-red)}.dialogue-box.corvo{border-left:4px solid var(--corvo-purple)}.dialogue-box.narrator{border-left:4px solid var(--gold)}
+.char-name{font-family:'Bangers',cursive;font-size:1.1em;margin-bottom:6px}
+.char-name.odin{color:var(--odin-blue)}.char-name.thor{color:var(--thor-red)}.char-name.corvo{color:var(--corvo-purple)}.char-name.narrator{color:var(--gold)}
+.dialogue-text{line-height:1.5;font-size:1.05em}.dialogue-text em{color:var(--gold);font-style:normal;font-weight:bold}
+.challenge-box{background:var(--bg-panel);border:2px solid var(--gold);border-radius:12px;padding:24px;margin:20px 0;animation:pulse-border 2s ease infinite}
+@keyframes pulse-border{0%,100%{border-color:var(--gold);box-shadow:0 0 8px rgba(240,192,64,.15)}50%{border-color:#f0c040cc;box-shadow:0 0 16px rgba(240,192,64,.3)}}
+.challenge-title{font-family:'Bangers',cursive;font-size:1.4em;color:var(--gold);margin-bottom:12px;text-align:center}
+.challenge-question{margin-bottom:16px;line-height:1.5}
+.data-display{background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:'Courier New',monospace;font-size:1em;color:var(--odin-blue);text-align:center;letter-spacing:1px;line-height:1.6}
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.option-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Patrick Hand',cursive;font-size:1.05em;padding:14px 18px;border-radius:10px;cursor:pointer;text-align:left;transition:all .25s;line-height:1.4}
+.option-btn:hover:not(.disabled){border-color:var(--odin-blue);background:#1a2233}
+.option-btn.correct{border-color:var(--success);background:#0d2818;color:var(--success)}
+.option-btn.wrong{border-color:var(--thor-red);background:#2d1116;color:var(--thor-red)}
+.option-btn.disabled{cursor:default;opacity:.7}
+.feedback-box{border-radius:10px;padding:16px 20px;margin:16px 0;animation:fadeIn .4s ease;line-height:1.5}
+.feedback-box.correct{background:#0d2818;border:1px solid var(--success);color:var(--success)}
+.feedback-box.wrong{background:#2d1116;border:1px solid var(--thor-red);color:var(--thor-red)}
+.xp-badge{display:inline-block;background:var(--gold);color:var(--bg-dark);font-family:'Bangers',cursive;padding:2px 10px;border-radius:6px;font-size:.9em;margin-left:6px}
+.xp-bar-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.xp-label{font-family:'Bangers',cursive;color:var(--gold);font-size:1em;white-space:nowrap}
+.xp-bar-bg{flex:1;height:14px;background:var(--bg-dark);border-radius:7px;overflow:hidden}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--odin-blue),var(--gold));border-radius:7px;transition:width .6s ease}
+.xp-count{font-family:'Bangers',cursive;color:var(--text);font-size:1em;min-width:60px;text-align:right}
+.continue-btn{display:block;margin:20px auto 0;background:transparent;border:2px solid var(--odin-blue);color:var(--odin-blue);font-family:'Bangers',cursive;font-size:1.15em;padding:12px 36px;border-radius:10px;cursor:pointer;transition:all .25s}
+.continue-btn:hover{background:var(--odin-blue);color:var(--bg-dark)}
+.result-screen{text-align:center;padding:40px 20px;animation:fadeIn .8s ease}
+.result-screen h2{font-family:'Bangers',cursive;font-size:2.2em;color:var(--gold);margin-bottom:8px}
+.result-rank{font-family:'Permanent Marker',cursive;font-size:1.5em;margin:16px 0}
+.result-stats{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:20px 0;text-align:left}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text-dim)}.stat-value{font-family:'Bangers',cursive;color:var(--odin-blue)}
+.hint-box{background:#1a1530;border:1px solid var(--corvo-purple);border-radius:10px;padding:14px 18px;margin:12px 0;font-size:.95em;color:var(--corvo-purple);animation:fadeIn .5s ease}
+.hint-box .hint-label{font-family:'Bangers',cursive;font-size:1em;margin-bottom:4px}
+/* ── VISUAL: Bifrost Scales ── */
+.bifrost-scale{display:flex;align-items:center;justify-content:center;gap:8px;margin:16px 0;flex-wrap:wrap}
+.scale-bound{background:var(--bg-card);border:2px dashed var(--thor-red);border-radius:10px;padding:10px 16px;text-align:center;min-width:80px;font-family:'Courier New',monospace;font-size:1em;color:var(--thor-red)}
+.scale-center{background:var(--bg-card);border:2px solid var(--success);border-radius:10px;padding:10px 20px;text-align:center;min-width:120px}
+.scale-center .s-label{font-family:'Bangers',cursive;color:var(--success);font-size:1em;margin-bottom:4px}
+.scale-center .s-val{font-family:'Courier New',monospace;color:var(--odin-blue);font-size:1.1em}
+.equiv-zone{display:flex;align-items:center;justify-content:center;gap:0;margin:16px 0;flex-wrap:nowrap;overflow-x:auto}
+.ez-segment{padding:12px 6px;text-align:center;font-family:'Courier New',monospace;font-size:.85em;min-width:60px}
+.ez-out{background:#2d1116;color:var(--thor-red);border:1px solid var(--thor-red)}
+.ez-in{background:#0d2818;color:var(--success);border:1px solid var(--success)}
+.ez-bound{background:var(--bg-panel);color:var(--gold);border:1px dashed var(--gold);font-family:'Bangers',cursive;font-size:1em;padding:12px 4px}
+.ci-visual{display:flex;align-items:center;justify-content:center;margin:16px auto;max-width:500px;position:relative;height:60px}
+.ci-line{position:absolute;height:4px;background:var(--odin-blue);border-radius:2px}
+.ci-dot{position:absolute;width:10px;height:10px;background:var(--gold);border-radius:50%;transform:translate(-50%,-50%);top:50%}
+.ci-bound-line{position:absolute;width:2px;height:40px;top:10px}
+.ci-bound-label{position:absolute;font-family:'Courier New',monospace;font-size:.8em;top:0}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.title-screen h1{font-size:2em}.title-screen h2{font-size:1.2em}.difficulty-select{flex-direction:column;align-items:center}#game-container{padding:12px}.challenge-box{padding:16px}.equiv-zone{flex-wrap:wrap}.ez-segment{min-width:50px;font-size:.75em}}
+
+/* ── ARMOR SYSTEM ── */
+.armor-panel{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.viking-mini{position:relative;width:120px;height:180px;flex-shrink:0}
+.vm-head{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:#d4a574;border:1.5px solid #b8956a;z-index:5}
+.vm-torso{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:44px;height:58px;background:#8b7355;border-radius:7px 7px 4px 4px;z-index:3}
+.vm-arm-l{position:absolute;top:59px;left:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-arm-r{position:absolute;top:59px;right:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-leg-l{position:absolute;top:111px;left:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-leg-r{position:absolute;top:111px;right:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-slot{position:absolute;opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1);transform:scale(.3)}
+.vm-slot.on{opacity:1;transform:scale(1)}
+.vm-helm{top:16px;left:50%;transform:translateX(-50%) scale(.3);z-index:8}.vm-helm.on{transform:translateX(-50%) scale(1)}
+.vm-mail{top:57px;left:50%;transform:translateX(-50%) scale(.3);z-index:4}.vm-mail.on{transform:translateX(-50%) scale(1)}
+.vm-cape{top:53px;left:50%;transform:translateX(-50%) scale(.3);z-index:1}.vm-cape.on{transform:translateX(-50%) scale(1)}
+.vm-left{top:66px;left:0;z-index:7}.vm-right{top:56px;right:0;z-index:7}
+.vm-boots{bottom:4px;left:50%;transform:translateX(-50%) scale(.3);z-index:7;display:flex;gap:10px}.vm-boots.on{transform:translateX(-50%) scale(1)}
+.gear-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.gp-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;font-size:.8em;color:var(--text-dim);transition:all .3s}
+.gp-row.earned{color:var(--success);font-weight:bold}
+.gp-row .gp-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .3s;flex-shrink:0}
+.gp-row.earned .gp-dot{background:var(--success);border-color:var(--success)}
+.vm-sparks{position:absolute;pointer-events:none;z-index:20}
+.vm-spark{position:absolute;border-radius:50%;animation:vmSp .6s ease-out forwards}
+@keyframes vmSp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+.vm-flash{animation:vmFl .4s ease}
+@keyframes vmFl{0%{filter:brightness(1)}30%{filter:brightness(1.8) drop-shadow(0 0 12px rgba(240,180,40,.6))}100%{filter:brightness(1)}}
+.result-viking{position:relative;width:160px;height:240px;margin:16px auto}
+.rv-head{position:absolute;top:36px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#d4a574;border:2px solid #b8956a;z-index:5}
+.rv-torso{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:56px;height:74px;background:#8b7355;border-radius:9px 9px 5px 5px;z-index:3}
+.rv-arm-l{position:absolute;top:77px;left:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-arm-r{position:absolute;top:77px;right:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-leg-l{position:absolute;top:144px;left:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-leg-r{position:absolute;top:144px;right:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-slot{position:absolute}
+.rv-helm{top:20px;left:50%;transform:translateX(-50%);z-index:8}
+.rv-mail{top:74px;left:50%;transform:translateX(-50%);z-index:4}
+.rv-cape{top:69px;left:50%;transform:translateX(-50%);z-index:1}
+.rv-left{top:86px;left:4px;z-index:7}.rv-right{top:72px;right:4px;z-index:7}
+.rv-boots{bottom:4px;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:14px}
+@media(max-width:600px){.armor-panel{flex-direction:column;align-items:center}.viking-mini{width:100px;height:160px}}
+</style>
+</head>
+<body>
+<div id="game-container"><div id="game-content"></div></div>
+<script>
+// ════════════════════════════════════════════════════
+// THE STATISTICAL SAGA OF ODINFATHER — REALM 7
+// EQUIVALENCE TESTING (TOST) & SESOI
+// ════════════════════════════════════════════════════
+const GAME={difficulty:null,xp:0,maxXP:0,hits:0,total:0,currentScene:0,scenes:[]};
+const content=()=>document.getElementById('game-content');
+function dialogue(c,t){
+  const cls={odin:'odin',thor:'thor',muninn:'corvo',huginn:'corvo',narrator:'narrator'};
+  const nm={odin:'Odinfather 🧙‍♂️',thor:'Thorment ⚡',muninn:'Muninn 🐦‍⬛',huginn:'Huginn 🐦',narrator:'📜 Narrator'};
+  return `<div class="dialogue-box ${cls[c]||'narrator'}"><div class="char-name ${cls[c]||'narrator'}">${nm[c]||c}</div><div class="dialogue-text">${t}</div></div>`;
+}
+function hintBox(t){return `<div class="hint-box"><div class="hint-label">🐦‍⬛ Muninn's Hint</div>${t}</div>`;}
+function xpBar(){
+  const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;
+  return armorPanelHTML()+`<div class="xp-bar-container"><div class="xp-label">⚡ XP</div><div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${p}%"></div></div><div class="xp-count">${GAME.xp} / ${GAME.maxXP}</div></div>`;
+}
+function updateXPBar(){
+  const b=document.querySelector('.xp-bar-fill'),c=document.querySelector('.xp-count');
+  if(b&&c){const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;b.style.width=p+'%';c.textContent=`${GAME.xp} / ${GAME.maxXP}`;}
+}
+function showTitleScreen(){
+  content().innerHTML=`
+  <div class="title-screen">
+    <div class="reino-badge">REALM 7</div>
+    <h1>The Statistical Saga of Odinfather</h1>
+    <h2>The Realm of Equivalence</h2>
+    <p class="subtitle">On the Bridge of Bifrost, proving that two worlds are equal demands more than simply failing to find a difference.</p>
+    <div class="difficulty-select">
+      <button class="diff-btn" onclick="startGame('aprendiz')"><div class="diff-label">🛡️ Apprentice</div><div class="diff-desc">Undergraduate — with Muninn's hints</div></button>
+      <button class="diff-btn" onclick="startGame('mestre')"><div class="diff-label">⚔️ Master</div><div class="diff-desc">Graduate — no hints, extra challenges</div></button>
+    </div>
+  </div>`;
+}
+function startGame(d){
+  GAME.difficulty=d;GAME.xp=0;GAME.hits=0;GAME.total=0;GAME.currentScene=0;gearEarned=0;
+  buildScenes();GAME.maxXP=countMaxXP();renderScene();
+}
+
+// ════════════════════════════════════════════════════
+function buildScenes(){
+  GAME.scenes=[];
+
+  // ━━ SCENE 1: The Bridge of Bifrost ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('narrator','Leaving the Arena of Valhalla, the young researcher glimpses the brilliant <em>Bridge of Bifrost</em> — the rainbow that connects Asgard to Midgard. The bridge is guarded by Heimdall, who only allows passage to those who prove that both sides are in <em>perfect balance</em>.')}
+      ${dialogue('odin','Welcome to the <em>Realm of Equivalence</em>! Until now, all our tests sought <em>differences</em>. Here, the question inverts: how do we prove that two treatments, two groups, or two moments are <em>essentially equal</em>?')}
+      ${dialogue('thor','Easy! If the t test gave p > 0.05, there\'s no difference. Done, they\'re equal!')}
+      ${dialogue('odin','That is the most dangerous error in statistics, Thorment. <em>Absence of evidence is not evidence of absence.</em> A p > 0.05 does not prove equality — it may only mean we lacked sufficient power to detect the difference.')}
+      <button class="continue-btn" onclick="nextScene()">Cross the Bridge →</button>
+    </div>`});
+
+  // ━━ SCENE 2: The Problem of "No Difference" ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('odin','Imagine: you test a generic drug against the original. The t test yields p = 0.42. You conclude they are equal?')}
+      ${dialogue('thor','Of course! p > 0.05, fails to reject H₀...')}
+      ${dialogue('muninn','Wrong, Thorment. <em>Failing to reject H₀</em> in the classical t test (NHST) means only "we found no significant difference". Perhaps the sample was too small. Perhaps the difference exists but we didn\'t detect it.')}
+      ${dialogue('odin','To <em>prove</em> equivalence, we need a test designed exactly for that: the <em>TOST — Two One-Sided Tests</em>, proposed by Schuirmann (1987).')}
+      ${dialogue('odin','The logic is brilliant: instead of testing whether groups are <em>different</em>, we test whether the difference lies <em>within acceptable limits</em> — the so-called <em>equivalence limits</em>.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 3: CHALLENGE 1 — Why not the classical t test? ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('NHST tests whether there is a <em>difference</em> (H₀: μ₁ = μ₂). "Failing to reject H₀" is not the same as "confirming H₀". To <em>confirm</em> equivalence, we must invert the logic: H₀ becomes "the groups are NOT equivalent".'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 1: The Fallacy of Non-Difference</div>
+        <div class="challenge-question">A researcher compares two drugs with a t test and obtains p = 0.35. He concludes that the drugs are equivalent. Why is this conclusion <em>incorrect</em>?</div>
+        ${hint}
+        <div class="options-grid" id="q1-opts">
+          <button class="option-btn" onclick="checkQ(1,this,'a')">The conclusion is correct — p > 0.05 proves equality</button>
+          <button class="option-btn" onclick="checkQ(1,this,'b')">Because "failing to reject H₀ of difference" does not prove equivalence — absence of evidence is not evidence of absence. It may be lack of statistical power</button>
+          <button class="option-btn" onclick="checkQ(1,this,'c')">Because p = 0.35 is too high, it should be at least p > 0.95</button>
+          <button class="option-btn" onclick="checkQ(1,this,'d')">Because the t test only works with large samples</button>
+        </div>
+        <div id="q1-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 4: SESOI ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Before running TOST, we must define something fundamental: the <em>SESOI — Smallest Effect Size of Interest</em> (smallest practically relevant effect size).')}
+      ${dialogue('muninn','The SESOI is the <em>limit</em> below which the difference is considered practically irrelevant. It is you, the researcher, who defines it — based on theory, clinical practice, or business context.')}
+      ${dialogue('odin','For example: if the difference in strength between two clans is less than <em>±3 points</em>, we consider them equivalent in practice. That ±3 is our <em>Δ (delta)</em>, the equivalence limits.')}
+      <div class="equiv-zone">
+        <div class="ez-segment ez-out">Not equiv.<br>< −Δ</div>
+        <div class="ez-segment ez-bound">−Δ</div>
+        <div class="ez-segment ez-in">Equivalence<br>Zone</div>
+        <div class="ez-segment ez-bound">+Δ</div>
+        <div class="ez-segment ez-out">Not equiv.<br>> +Δ</div>
+      </div>
+      ${dialogue('odin','If the <em>true difference</em> falls within [−Δ, +Δ], we declare equivalence. TOST tests exactly this.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 5: CHALLENGE 2 — What is SESOI? ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('SESOI = <em>Smallest Effect Size Of Interest</em>. It is the smallest effect that would have <em>practical</em> relevance. It is defined BEFORE collecting data, based on theory, practice, or area benchmarks.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 2: Defining the SESOI</div>
+        <div class="challenge-question">Which option correctly describes <em>SESOI</em> (Smallest Effect Size of Interest)?</div>
+        ${hint}
+        <div class="options-grid" id="q2-opts">
+          <button class="option-btn" onclick="checkQ(2,this,'a')">It is the effect size found in the sample</button>
+          <button class="option-btn" onclick="checkQ(2,this,'b')">It is the smallest effect size considered relevant in practice — defines the equivalence limits (±Δ) and must be defined a priori based on theory or applied relevance</button>
+          <button class="option-btn" onclick="checkQ(2,this,'c')">It is the smallest p-value acceptable for concluding equivalence</button>
+          <button class="option-btn" onclick="checkQ(2,this,'d')">It is automatically calculated by statistical software</button>
+        </div>
+        <div id="q2-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 6: The Logic of TOST ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Now comes the elegance of TOST. There are <em>two one-sided t tests</em> simultaneously:')}
+      ${dialogue('odin','<em>Test 1 (upper)</em>: H₀₁: μ₁ − μ₂ ≥ +Δ (the difference is too large on the positive side)<br><em>Test 2 (lower)</em>: H₀₂: μ₁ − μ₂ ≤ −Δ (the difference is too large on the negative side)')}
+      ${dialogue('muninn','If we reject <em>both</em> H₀s (both p < α), we conclude that the difference lies <em>within</em> [−Δ, +Δ] → <em>equivalence</em>!')}
+      ${dialogue('odin','Notice: in TOST, H₀ is <em>non-equivalence</em>. The logic is inverted compared to classical NHST. We reject H₀ to conclude that groups ARE equivalent.')}
+      ${dialogue('thor','Wait... so rejecting H₀ here is GOOD? What confusion!')}
+      ${dialogue('odin','It is the beauty of the inversion, Thorment. In NHST, rejecting H₀ = "there is a difference". In TOST, rejecting H₀ = "there is equivalence". Rejection is always the conclusion you need <em>active evidence</em> to support.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 7: CHALLENGE 3 — H₀ of TOST ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('In TOST, H₀ says that groups are <em>NOT</em> equivalent (the difference is ≥ Δ in magnitude). We reject H₀ to conclude equivalence — the logic is <em>inverted</em> compared to the classical t test.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 3: The Inverted Hypothesis</div>
+        <div class="challenge-question">In the TOST procedure, what is the <em>H₀ (null hypothesis)</em>?</div>
+        ${hint}
+        <div class="options-grid" id="q3-opts">
+          <button class="option-btn" onclick="checkQ(3,this,'a')">H₀: the groups are equivalent (difference = 0)</button>
+          <button class="option-btn" onclick="checkQ(3,this,'b')">H₀: the groups are NOT equivalent — the difference is at least ±Δ in magnitude (|μ₁ − μ₂| ≥ Δ)</button>
+          <button class="option-btn" onclick="checkQ(3,this,'c')">H₀: the means are equal (μ₁ = μ₂)</button>
+          <button class="option-btn" onclick="checkQ(3,this,'d')">There is no H₀ in TOST — it uses only confidence intervals</button>
+        </div>
+        <div id="q3-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 8: The CI approach — 90% CI ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('muninn','There is an equivalent and visual way to verify equivalence: the <em>confidence interval</em>.')}
+      ${dialogue('odin','If the <em>90% CI</em> (attention: 90%, not 95%!) of the difference between means falls <em>entirely within</em> the limits [−Δ, +Δ], we conclude equivalence at the α = 0.05 level.')}
+      ${dialogue('thor','Why 90% and not 95%?')}
+      ${dialogue('odin','Because TOST uses two one-sided tests with α = 0.05 each. The CI corresponding to two one-sided tests of α = 0.05 is the <em>90% CI</em> of (1 − 2α). It is the exact translation of the logic of the two tests.')}
+      ${dialogue('muninn','In practice: calculate the 90% CI of the difference. If both ends of the CI fall within [−Δ, +Δ] → equivalence.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 9: CHALLENGE 4 — CI and Equivalence ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Check if <em>ALL</em> of the 90% CI fits within [−Δ, +Δ]. If any end of the CI exceeds the limits, there is no evidence of equivalence. Here: 90% CI = [−1.8 ; 3.2] and Δ = ±4.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 4: The Scales of Bifrost</div>
+        <div class="challenge-question">Comparing two training methods, we obtained:</div>
+        <div class="data-display">
+          Difference of means = 0.7<br>
+          90% CI of difference: [−1.8 ; 3.2]<br>
+          SESOI defined: Δ = ±4 points
+        </div>
+        <div class="equiv-zone">
+          <div class="ez-segment ez-out">< −4</div>
+          <div class="ez-segment ez-bound">−4</div>
+          <div class="ez-segment ez-in">⬤ [−1.8 ... 3.2] ⬤</div>
+          <div class="ez-segment ez-bound">+4</div>
+          <div class="ez-segment ez-out">> +4</div>
+        </div>
+        <div class="challenge-question">The 90% CI [−1.8 ; 3.2] is entirely within [−4 ; +4]. What is the conclusion?</div>
+        ${hint}
+        <div class="options-grid" id="q4-opts">
+          <button class="option-btn" onclick="checkQ(4,this,'a')">Nothing can be concluded without the p-value of TOST</button>
+          <button class="option-btn" onclick="checkQ(4,this,'b')">The two methods are equivalent — the 90% CI falls entirely within the equivalence limits [−Δ, +Δ], so we reject H₀ of TOST</button>
+          <button class="option-btn" onclick="checkQ(4,this,'c')">The methods are different because the difference is 0.7 (not exactly zero)</button>
+          <button class="option-btn" onclick="checkQ(4,this,'d')">We need to use a 95% CI, not 90%</button>
+        </div>
+        <div id="q4-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 10: Paired vs Independent in TOST ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Like the t test, TOST has <em>independent</em> and <em>paired</em> versions.')}
+      ${dialogue('odin','<em>Independent TOST</em>: two distinct groups — ex.: generic vs original drug in different patients.')}
+      ${dialogue('odin','<em>Paired TOST</em>: same individuals in two conditions — ex.: measuring the accuracy of the same warrior with weapon A and weapon B.')}
+      ${dialogue('muninn','The logic is identical: define the SESOI (Δ), run the two one-sided tests on the difference (between groups or within-subject), and check if both reject H₀.')}
+      ${dialogue('odin','The advantage of paired follows the same as the classical t test: by comparing each subject with themselves, we eliminate variability between individuals and gain <em>more power</em> to detect equivalence.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 11: CHALLENGE 5 — Paired or Independent? ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Ask: are they the <em>same</em> warriors using both weapons, or two <em>different groups</em>? Same individuals in two conditions → paired.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 5: Paired or Independent?</div>
+        <div class="challenge-question">A blacksmith of Asgard created a new sword and wants to prove it is <em>equivalent</em> to the traditional sword. He asks <em>15 warriors</em> to use both swords (counterbalanced order) and measures the accuracy of each with each sword. Which TOST to use?</div>
+        ${hint}
+        <div class="options-grid" id="q5-opts">
+          <button class="option-btn" onclick="checkQ(5,this,'a')">Independent TOST — they are two different swords</button>
+          <button class="option-btn" onclick="checkQ(5,this,'b')">Paired TOST — the same 15 warriors use both swords, each warrior is compared with themselves</button>
+          <button class="option-btn" onclick="checkQ(5,this,'c')">Classical paired t test — p > 0.05 is sufficient</button>
+          <button class="option-btn" onclick="checkQ(5,this,'d')">It is not possible to test equivalence with n = 15</button>
+        </div>
+        <div id="q5-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 12: CHALLENGE 6 — Interpreting TOST output ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('In TOST, both one-sided tests must be significant (p < 0.05) to conclude equivalence. Here: p₁ = 0.003 and p₂ = 0.011, both < 0.05. The 90% CI [−1.2 ; 2.8] is within [−5 ; +5].'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 6: Reading the Runes of TOST</div>
+        <div class="challenge-question">Output of independent TOST (Potion A vs Potion B, Δ = ±5):</div>
+        <div class="data-display">
+          Difference of means = 0.8<br>
+          Upper test: t(58) = −2.82, p₁ = 0.003<br>
+          Lower test: t(58) = 2.35, p₂ = 0.011<br>
+          90% CI: [−1.2 ; 2.8]<br>
+          Equivalence limits: [−5 ; +5]
+        </div>
+        <div class="challenge-question">What is the conclusion?</div>
+        ${hint}
+        <div class="options-grid" id="q6-opts">
+          <button class="option-btn" onclick="checkQ(6,this,'a')">The groups are different because the difference is not exactly zero</button>
+          <button class="option-btn" onclick="checkQ(6,this,'b')">Equivalence confirmed — both one-sided tests are significant (p₁ and p₂ < 0.05) and the 90% CI [−1.2 ; 2.8] is entirely within [−5 ; +5]</button>
+          <button class="option-btn" onclick="checkQ(6,this,'c')">Nothing can be concluded — we need a classical t test also</button>
+          <button class="option-btn" onclick="checkQ(6,this,'d')">Only one of the tests is significant, so there is no equivalence</button>
+        </div>
+        <div id="q6-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 13: The 4 quadrants NHST × TOST ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','One of the greatest contributions of TOST is that it can be combined with NHST. When we run <em>both</em>, four possible scenarios emerge:')}
+      ${dialogue('odin','<em>1. NHST sig. + TOST non-sig.</em> → Statistically significant difference and not equivalent. Real and relevant effect.<br><em>2. NHST non-sig. + TOST sig.</em> → No significant difference and confirmed equivalence. Trivial effects.<br><em>3. NHST sig. + TOST sig.</em> → Significant difference BUT equivalent. The difference exists but is so small it falls within SESOI. Statistically significant, practically irrelevant!<br><em>4. NHST non-sig. + TOST non-sig.</em> → Inconclusive. Found no difference, but also did not prove equivalence. Needs more data.')}
+      ${dialogue('muninn','Scenario 3 is the most revealing: it shows that <em>statistical significance ≠ practical relevance</em>. An effect can be "real" but so small that it does not matter.')}
+      ${dialogue('thor','So my warriors could be "significantly" stronger... but by so little that in practice it is irrelevant?')}
+      ${dialogue('odin','Exactly, Thorment. It is the humility that statistics demands.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 14: CHALLENGE 7 — The 4 quadrants ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('NHST significant = detected difference. TOST significant = proved equivalence. If BOTH are significant: there is a difference, but it is so small that it falls within SESOI. <em>Statistically significant, practically irrelevant.</em>'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 7: The Paradox of the Quadrants</div>
+        <div class="challenge-question">A study with n = 500 per group finds:</div>
+        <div class="data-display">
+          NHST: t(998) = 2.10, p = 0.036 → significant<br>
+          TOST (Δ = ±5): p₁ = 0.001, p₂ = 0.002 → equivalence confirmed<br>
+          Observed difference = 0.9 points, d = 0.13
+        </div>
+        <div class="challenge-question">Both are significant! What does this mean?</div>
+        ${hint}
+        <div class="options-grid" id="q7-opts">
+          <button class="option-btn" onclick="checkQ(7,this,'a')">Contradiction — the results are invalid</button>
+          <button class="option-btn" onclick="checkQ(7,this,'b')">The difference is real (p = 0.036) but trivial (d = 0.13, within SESOI ±5) — statistically significant but practically irrelevant. It is the power of large samples detecting minuscule effects</button>
+          <button class="option-btn" onclick="checkQ(7,this,'c')">The groups are different AND equivalent at the same time — impossible, there is error in the study</button>
+          <button class="option-btn" onclick="checkQ(7,this,'d')">We should consider only NHST and ignore TOST</button>
+        </div>
+        <div id="q7-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ MASTER CHALLENGES ━━
+  if(GAME.difficulty==='mestre'){
+    // CHALLENGE 8: Power and sample size in TOST
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: Power in TOST</div>
+          <div class="challenge-question">To test <em>equivalence</em> with a narrow SESOI (small Δ), what happens to the required sample size compared to a classical <em>difference</em> test?</div>
+          <div class="options-grid" id="q8-opts">
+            <button class="option-btn" onclick="checkQ(8,this,'a')">Need smaller sample — proving equality is easier</button>
+            <button class="option-btn" onclick="checkQ(8,this,'b')">Need considerably larger sample — the smaller the Δ, the more participants are needed to have sufficient power to demonstrate that the difference is within narrow limits</button>
+            <button class="option-btn" onclick="checkQ(8,this,'c')">Sample size is the same — depends only on α</button>
+            <button class="option-btn" onclick="checkQ(8,this,'d')">It is not possible to calculate power for TOST</button>
+          </div>
+          <div id="q8-fb"></div>
+        </div>
+      </div>`});
+
+    // CHALLENGE 9: Non-inferiority/superiority tests
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: Beyond Equivalence</div>
+          <div class="challenge-question">A pharmaceutical company wants to demonstrate that its new drug is not <em>worse</em> than the original, but accepts that it may be <em>better</em>. It does not need to prove total equality — only that it is not inferior. Which procedure?</div>
+          <div class="options-grid" id="q9-opts">
+            <button class="option-btn" onclick="checkQ(9,this,'a')">Two-sided TOST — it is the same procedure</button>
+            <button class="option-btn" onclick="checkQ(9,this,'b')">Non-inferiority test (one-sided) — uses only the lower equivalence limit (−Δ). It is a single one-sided test: H₀: μ_new − μ_original ≤ −Δ. If rejected, the new is not inferior to the original</button>
+            <button class="option-btn" onclick="checkQ(9,this,'c')">Classical one-sided t test</button>
+            <button class="option-btn" onclick="checkQ(9,this,'d')">No statistical test can answer this</button>
+          </div>
+          <div id="q9-fb"></div>
+        </div>
+      </div>`});
+  }
+
+  // ━━ FINAL SCENE ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','The Bridge of Bifrost glows in perfect balance. The young researcher learned that proving equality demands more rigor than proving difference.')}
+      ${dialogue('odin','You have conquered the <em>Realm of Equivalence</em>! Now you understand that absence of evidence was never evidence of absence. TOST is the tool that closes that gap — with rigor, with a priori defined SESOI and with the humility to recognize that not every significant difference matters in practice.')}
+      ${dialogue('thor','I admit... I learned that "finding no difference" and "proving equivalence" are very different things.')}
+      ${dialogue('muninn','Notable evolution, Thorment. Remember: TOST complements NHST. Together, they form the four quadrants that every researcher should report.')}
+      ${dialogue('odin','The Saga continues! In the next Realms, we will face ANOVA, correlation, regression and much more. Onward, young researcher!')}
+      <button class="continue-btn" onclick="showResults()">View Final Result ⚖️</button>
+    </div>`});
+}
+
+// ════════════════════════════════════════════════════
+const ANSWERS={1:'b',2:'b',3:'b',4:'b',5:'b',6:'b',7:'b',8:'b',9:'b'};
+const EXPLANATIONS={
+  1:{
+    correct:'✅ Perfect! The classical t test tests H₀: μ₁ = μ₂. "Failing to reject" this H₀ (p > 0.05) does <em>not prove</em> they are equal — it may be lack of power. It is the classic error of interpreting "non-significant" as "equal". To prove equivalence, we need <em>TOST</em>.',
+    wrong:'❌ A p > 0.05 in the classical t test means only "we found no evidence of difference" — it does NOT mean "they are equal". <em>Absence of evidence ≠ evidence of absence.</em> To prove equivalence, use TOST.',
+    charC:'odin',charW:'thor'
+  },
+  2:{
+    correct:'✅ Exactly! The <em>SESOI</em> is defined a priori by the researcher and represents the smallest difference that would be <em>practically relevant</em>. It establishes the equivalence limits (±Δ). Can be based on benchmarks (e.g., d = 0.20), clinical relevance or area consensus.',
+    wrong:'❌ SESOI is not calculated from the sample nor by software. It is the <em>smallest effect of practical interest</em>, defined <em>before</em> collection based on theory, clinical practice or benchmarks. It defines the ±Δ limits of TOST.',
+    charC:'muninn',charW:'thor'
+  },
+  3:{
+    correct:'✅ Correct! In TOST, H₀ is <em>non-equivalence</em>: the difference is outside the ±Δ limits. We reject H₀ to conclude <em>equivalence</em>. The logic is inverted compared to NHST, where H₀ is "no difference".',
+    wrong:'❌ Beware the inversion! In TOST, H₀ says that groups are <em>NOT equivalent</em> (|μ₁ − μ₂| ≥ Δ). We reject H₀ to conclude equivalence. It is opposite to classical NHST.',
+    charC:'odin',charW:'thor'
+  },
+  4:{
+    correct:'✅ Perfect! The 90% CI [−1.8 ; 3.2] is <em>entirely</em> within the limits [−4 ; +4]. This is equivalent to rejecting both one-sided TOST tests. Conclusion: equivalence at α = 0.05. The difference of 0.7 does not need to be zero — it just needs to be irrelevant within SESOI.',
+    wrong:'❌ The 90% CI [−1.8 ; 3.2] fits completely within [−4 ; +4] → <em>equivalence confirmed</em>. In TOST, we use 90% CI (not 95%) and the difference does not need to be zero — it just needs to be within equivalence limits.',
+    charC:'odin',charW:'thor'
+  },
+  5:{
+    correct:'✅ Correct! The <em>same 15 warriors</em> using both swords = paired design (within-subjects). Therefore, we use <em>paired TOST</em>, which analyzes intra-subject differences. Counterbalancing controls for order effects.',
+    wrong:'❌ They are the <em>same warriors</em> in two conditions → <em>paired TOST</em>. And a t test with p > 0.05 is not enough — that does not prove equivalence. We need TOST with defined SESOI.',
+    charC:'muninn',charW:'thor'
+  },
+  6:{
+    correct:'✅ Excellent reading! Both one-sided tests are significant (p₁ = 0.003 < 0.05 and p₂ = 0.011 < 0.05), and the 90% CI [−1.2 ; 2.8] is within [−5 ; +5]. Double confirmation: <em>equivalence</em>. The difference of 0.8 exists but is irrelevant within SESOI.',
+    wrong:'❌ To conclude equivalence in TOST, <em>both</em> one-sided tests must be significant (p < α). Here: p₁ = 0.003 and p₂ = 0.011, both < 0.05. And the CI confirms: [−1.2 ; 2.8] is within [−5 ; +5].',
+    charC:'odin',charW:'thor'
+  },
+  7:{
+    correct:'✅ Brilliant! It is not a contradiction — it is <em>scenario 3 of the quadrants</em>. With n = 500, power is enormous and detects even minuscule differences (d = 0.13). The difference is "real" statistically, but trivial in practice (0.9 points within SESOI ±5). It is living proof that <em>statistical significance ≠ practical relevance</em>.',
+    wrong:'❌ It is not a contradiction! With large samples, NHST detects <em>trivial</em> differences. Here, d = 0.13 is minuscule and the difference (0.9) falls within SESOI (±5). TOST confirms: <em>practically irrelevant</em>. It is the "significant but equivalent" scenario — the most revealing of the 4 quadrants.',
+    charC:'muninn',charW:'thor'
+  },
+  8:{
+    correct:'✅ Correct! Proving equivalence with narrow Δ requires <em>large</em> samples. The smaller the SESOI, the more precise the estimate must be — and precision requires more data. Equivalence/bioequivalence studies frequently need 2 to 4 times more participants than difference studies.',
+    wrong:'❌ Proving equivalence with narrow SESOI requires <em>larger</em> samples than difference tests. The smaller the Δ, the more participants are needed. It is counterintuitive: "proving equality" is harder than "finding difference".',
+    charC:'odin',charW:'thor'
+  },
+  9:{
+    correct:'✅ Perfect! The <em>non-inferiority test</em> is a one-sided version of TOST. Uses only the lower limit (−Δ). H₀: the new treatment is inferior by at least Δ. If we reject it, we conclude that the new is <em>not inferior</em> to the original. Very used in clinical trials when the new treatment has other advantages (cost, convenience).',
+    wrong:'❌ When we want to prove that something is "not worse" (without requiring total equality), we use the <em>non-inferiority test</em> — a single one-sided test with limit −Δ. It is relative of TOST, but asymmetric. Widely used in pharmaceuticals when the generic does not need to be identical, just "not worse".',
+    charC:'muninn',charW:'thor'
+  }
+};
+
+function checkQ(q,btn,ans){
+  const opts=document.querySelectorAll(`#q${q}-opts .option-btn`);
+  opts.forEach(b=>{b.classList.add('disabled');b.onclick=null;});
+  const fb=document.getElementById(`q${q}-fb`),cor=ANSWERS[q],exp=EXPLANATIONS[q];
+  GAME.total++;
+  if(ans===cor){
+    btn.classList.add('correct');GAME.hits++;GAME.xp+=20;updateXPBar();earnGear();
+    fb.innerHTML=`<div class="feedback-box correct">${dialogue(exp.charC,exp.correct+' <span class="xp-badge">+20 XP</span>')}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }else{
+    btn.classList.add('wrong');
+    const ci=['a','b','c','d'].indexOf(cor);if(opts[ci])opts[ci].classList.add('correct');
+    fb.innerHTML=`<div class="feedback-box wrong">${dialogue(exp.charW,exp.wrong)}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }
+}
+
+function countMaxXP(){return (GAME.difficulty==='mestre'?9:7)*20;}
+function renderScene(){if(GAME.currentScene<GAME.scenes.length){content().innerHTML=GAME.scenes[GAME.currentScene].html();restoreGear();window.scrollTo({top:0,behavior:'smooth'});}}
+function nextScene(){GAME.currentScene++;renderScene();}
+
+function showResults(){
+  const pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  let rank,rc;
+  if(pct>=90){rank='🏆 Keeper of Bifrost';rc='#f0c040';}
+  else if(pct>=70){rank='⚖️ Balance Master';rc='#58a6ff';}
+  else if(pct>=50){rank='🛡️ Equivalence Seeker';rc='#8b949e';}
+  else{rank='⛓️ Lost in the Void';rc='#f85149';}
+  content().innerHTML=`
+  <div class="result-screen">
+    <div class="reino-badge">REALM 7 — COMPLETE</div>
+    <h2>Adventure Results</h2>
+    ${resultVikingHTML()}
+    <div class="result-rank" style="color:${rc}">${rank}</div>
+    <div class="result-stats">
+      <div class="stat-row"><span class="stat-label">Difficulty</span><span class="stat-value">${GAME.difficulty==='mestre'?'⚔️ Master':'🛡️ Apprentice'}</span></div>
+      <div class="stat-row"><span class="stat-label">Correct Challenges</span><span class="stat-value">${GAME.hits} / ${GAME.total}</span></div>
+      <div class="stat-row"><span class="stat-label">Accuracy</span><span class="stat-value">${pct}%</span></div>
+      <div class="stat-row"><span class="stat-label">XP Earned</span><span class="stat-value">${GAME.xp} / ${GAME.maxXP}</span></div>
+    </div>
+    ${dialogue('odin',pct>=70
+      ?'The Bridge of Bifrost is in balance! You have mastered equivalence testing — a rare and powerful skill. Few researchers go beyond NHST. Onward!'
+      :'The bridge sways dangerously... Return and study the foundations of TOST. Remember: proving equality is harder than finding difference!'
+    )}
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+      <button class="continue-btn" onclick="showTitleScreen()">🔄 Play Again</button>
+    </div>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+var GEAR_ITEMS=[{"s":"boots","n":"Sandals of Bifrost","h":"<div style=\"display:flex;gap:14px\"><div style=\"width:24px;height:18px;background:#4a3880;border-radius:3px 3px 4px 7px;border:2px solid #6050a0\"></div><div style=\"width:24px;height:18px;background:#4a3880;border-radius:3px 3px 4px 7px;border:2px solid #6050a0\"></div></div>"},{"s":"mail","n":"Tunic of Balance","h":"<div style=\"width:60px;height:72px;background:linear-gradient(180deg,#5848a0,#383070);border-radius:7px 7px 4px 4px;border:2px solid #484090\"></div>"},{"s":"right","n":"Prism of Equivalence","h":"<div style=\"margin-top:8px;display:flex;flex-direction:column;align-items:center\"><div style=\"width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:22px solid #a080e0\"></div><div style=\"width:24px;height:3px;background:linear-gradient(to right,#e04040,#e0e040,#4040e0);margin-top:3px;border-radius:1px\"></div></div>"},{"s":"left","n":"Golden Scales","h":"<div style=\"width:36px;height:42px;position:relative\"><div style=\"position:absolute;top:3px;left:50%;transform:translateX(-50%);width:4px;height:26px;background:#d4a535\"></div><div style=\"position:absolute;top:3px;left:50%;transform:translateX(-50%);width:32px;height:3px;background:#f0c848;border-radius:2px\"></div><div style=\"position:absolute;top:6px;left:0;width:12px;height:8px;border:2px solid #d4a535;border-radius:0 0 6px 6px\"></div><div style=\"position:absolute;top:6px;right:0;width:12px;height:8px;border:2px solid #d4a535;border-radius:0 0 6px 6px\"></div><div style=\"position:absolute;top:0;left:50%;transform:translateX(-50%);width:7px;height:7px;background:#f0d060;border-radius:50%\"></div></div>"},{"s":"cape","n":"Rainbow Cape","h":"<div style=\"width:84px;height:110px;background:linear-gradient(180deg,#e04040,#e08040,#e0c040,#40a040,#4060c0,#7040a0);border-radius:5px 5px 28px 28px;clip-path:polygon(16% 0%,84% 0%,100% 18%,92% 100%,50% 88%,8% 100%,0% 18%);opacity:0.85\"></div>"},{"s":"helm","n":"Crown of Bifrost","h":"<div style=\"width:52px;height:24px;background:linear-gradient(90deg,#e04040,#e0a040,#40c040,#4080e0,#8040c0);border-radius:26px 26px 5px 5px;border:2px solid #a080c0;position:relative\"><div style=\"position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:9px;height:14px;background:linear-gradient(180deg,#f0e0ff,#c0a0e0);border-radius:3px 3px 2px 2px\"></div></div>"}];
+var gearEarned=0;
+function armorPanelHTML(){
+  var rows='';
+  for(var i=0;i<GEAR_ITEMS.length;i++){rows+='<div class="gp-row'+(i<gearEarned?' earned':'')+'" id="gprow'+i+'"><span class="gp-dot"></span><span>'+GEAR_ITEMS[i].n+'</span></div>';}
+  var sl='<div class="vm-sparks" id="vmsparks"></div>';
+  sl+='<div class="vm-slot vm-cape" id="vmslot-cape"></div>';
+  sl+='<div class="vm-head"></div><div class="vm-arm-l"></div><div class="vm-arm-r"></div><div class="vm-torso"></div><div class="vm-leg-l"></div><div class="vm-leg-r"></div>';
+  sl+='<div class="vm-slot vm-boots" id="vmslot-boots"></div><div class="vm-slot vm-mail" id="vmslot-mail"></div>';
+  sl+='<div class="vm-slot vm-left" id="vmslot-left"></div><div class="vm-slot vm-right" id="vmslot-right"></div>';
+  sl+='<div class="vm-slot vm-helm" id="vmslot-helm"></div>';
+  return '<div class="armor-panel"><div class="viking-mini" id="vmini">'+sl+'</div><div class="gear-progress">'+rows+'</div></div>';
+}
+function restoreGear(){for(var i=0;i<gearEarned&&i<GEAR_ITEMS.length;i++){var g=GEAR_ITEMS[i],el=document.getElementById('vmslot-'+g.s);if(el){el.innerHTML=g.h;el.classList.add('on');}}}
+function earnGear(){
+  if(gearEarned>=GEAR_ITEMS.length)return;
+  var g=GEAR_ITEMS[gearEarned],el=document.getElementById('vmslot-'+g.s);
+  if(el){el.innerHTML=g.h;el.classList.add('on','vm-flash');setTimeout(function(){el.classList.remove('vm-flash')},500);spawnVMSparks(el);}
+  var row=document.getElementById('gprow'+gearEarned);if(row)row.classList.add('earned');
+  gearEarned++;
+}
+function spawnVMSparks(el){
+  var sc=document.getElementById('vmsparks');if(!sc||!el)return;
+  var r=el.getBoundingClientRect(),sr=document.getElementById('vmini').getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height/2;
+  var cols=['#f0c040','#f08030','#f0e080','#ff6040','#ffd060'];
+  for(var i=0;i<10;i++){var s=document.createElement('div');s.className='vm-spark';
+    var a=Math.random()*Math.PI*2,d=20+Math.random()*30;
+    s.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+cols[Math.floor(Math.random()*5)]+';--sx:'+(Math.cos(a)*d)+'px;--sy:'+(Math.sin(a)*d)+'px;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px';
+    sc.appendChild(s);setTimeout(function(x){x.remove()},700,s);}
+}
+function resultVikingHTML(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var ti=[];if(pct>=90)ti=GEAR_ITEMS;else if(pct>=70)ti=GEAR_ITEMS.slice(0,5);else if(pct>=50)ti=GEAR_ITEMS.slice(0,2);
+  var sm={boots:'rv-boots',mail:'rv-mail',right:'rv-right',left:'rv-left',cape:'rv-cape',helm:'rv-helm'};
+  var html='<div class="result-viking">';
+  html+='<div class="rv-slot rv-cape" id="rvs-cape"></div>';
+  html+='<div class="rv-head"></div><div class="rv-arm-l"></div><div class="rv-arm-r"></div><div class="rv-torso"></div><div class="rv-leg-l"></div><div class="rv-leg-r"></div>';
+  html+='<div class="rv-slot rv-boots" id="rvs-boots"></div><div class="rv-slot rv-mail" id="rvs-mail"></div>';
+  html+='<div class="rv-slot rv-left" id="rvs-left"></div><div class="rv-slot rv-right" id="rvs-right"></div>';
+  html+='<div class="rv-slot rv-helm" id="rvs-helm"></div></div>';
+  setTimeout(function(){ti.forEach(function(g){var e=document.getElementById('rvs-'+g.s);if(e)e.innerHTML=g.h;});},100);
+  return html;
+}
+
+showTitleScreen();
+</script>
+</body>
+</html>
