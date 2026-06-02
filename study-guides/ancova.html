@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANCOVA — Step by Step | Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117; --bg-card: #161b22; --bg-panel: #1c2333;
+  --odin-blue: #58a6ff; --thor-red: #f85149; --corvo-purple: #bc8cff;
+  --gold: #f0c040; --silver: #8b949e; --text: #e6edf3; --text-dim: #8b949e;
+  --success: #3fb950; --border: #30363d;
+  --einherjar: #58a6ff; --berserker: #f85149; --valkyrie: #bc8cff;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg-dark); color: var(--text);
+  font-family: 'Patrick Hand', cursive; font-size: 18px;
+  line-height: 1.6; min-height: 100vh;
+}
+.container { max-width: 920px; margin: 0 auto; padding: 20px; }
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg-dark); padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+.progress-label {
+  font-family: 'Permanent Marker', cursive; font-size: 14px;
+  color: var(--text-dim); margin-bottom: 6px; text-align: center;
+}
+.progress-track {
+  width: 100%; height: 8px; background: var(--bg-panel);
+  border-radius: 4px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 4px; transition: width 0.5s ease;
+}
+
+/* STEP CONTENT */
+.step-content {
+  min-height: 60vh; padding: 30px 0;
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.step-title {
+  font-family: 'Bangers', cursive; font-size: 2.2rem;
+  color: var(--gold); margin-bottom: 20px; letter-spacing: 1px;
+}
+.step-subtitle {
+  font-family: 'Permanent Marker', cursive; font-size: 1.3rem;
+  color: var(--odin-blue); margin-bottom: 15px;
+}
+
+/* DIALOGUE BOXES */
+.dialogue-box {
+  border-radius: 12px; padding: 16px 20px; margin: 16px 0;
+  border-left: 4px solid; position: relative;
+}
+.dialogue-box.odin { background: rgba(88,166,255,0.08); border-left-color: var(--odin-blue); }
+.dialogue-box.thor { background: rgba(248,81,73,0.08); border-left-color: var(--thor-red); }
+.dialogue-box.corvo { background: rgba(188,140,255,0.08); border-left-color: var(--corvo-purple); }
+.dialogue-box.huginn { background: rgba(188,140,255,0.12); border-left-color: var(--corvo-purple); }
+.char-name {
+  font-family: 'Permanent Marker', cursive; font-size: 1rem; margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+.char-name.huginn { color: var(--corvo-purple); }
+.dialogue-text { font-size: 1.05rem; line-height: 1.5; }
+
+/* DATA TABLE */
+.data-table {
+  width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 1rem;
+}
+.data-table th, .data-table td {
+  padding: 10px 14px; text-align: center; border: 1px solid var(--border);
+}
+.data-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive; font-size: 0.95rem;
+}
+.data-table td { background: var(--bg-card); transition: background 0.2s; }
+.data-table tr:hover td { background: rgba(88,166,255,0.1); }
+.mean-row td, .mean-row th {
+  font-family: 'Permanent Marker', cursive; background: var(--bg-panel) !important;
+  color: var(--gold);
+}
+
+/* FORMULA */
+.formula {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 20px; margin: 16px 0;
+  font-size: 1.15rem; text-align: center;
+  font-family: 'Patrick Hand', cursive; color: var(--gold);
+}
+.formula-label {
+  font-family: 'Permanent Marker', cursive; color: var(--text-dim);
+  font-size: 0.85rem; margin-bottom: 6px;
+}
+
+/* CALC TABLE */
+.calc-table {
+  width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.95rem;
+}
+.calc-table th, .calc-table td {
+  padding: 8px 10px; text-align: center; border: 1px solid var(--border);
+}
+.calc-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive;
+  font-size: 0.85rem; color: var(--text-dim);
+}
+.calc-table td { background: var(--bg-card); }
+
+/* ANOVA TABLE */
+.anova-table {
+  width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95rem;
+}
+.anova-table th, .anova-table td {
+  padding: 10px 12px; text-align: center; border: 1px solid var(--border);
+}
+.anova-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive;
+  color: var(--gold); font-size: 0.9rem;
+}
+.anova-table td { background: var(--bg-card); }
+.anova-table .sig { color: var(--success); font-weight: bold; }
+.anova-table .ns { color: var(--text-dim); }
+.anova-table .total-row td { background: var(--bg-panel); font-weight: bold; }
+
+/* ANIMATED BAR */
+.bar-container { margin: 20px 0; }
+.bar-wrapper { display: flex; align-items: center; margin: 8px 0; }
+.bar-label {
+  width: 140px; font-family: 'Permanent Marker', cursive;
+  font-size: 0.9rem; text-align: right; padding-right: 10px; flex-shrink:0;
+}
+.bar-track {
+  flex: 1; height: 30px; background: var(--bg-panel);
+  border-radius: 6px; overflow: hidden; position: relative;
+}
+.bar-fill {
+  height: 100%; border-radius: 6px;
+  transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
+  width: 0;
+}
+.bar-value {
+  width: 90px; font-size: 0.9rem; padding-left: 10px; color: var(--gold); flex-shrink:0;
+}
+
+/* NAVIGATION */
+.nav-container {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 0; border-top: 1px solid var(--border); margin-top: 30px;
+}
+.nav-btn {
+  font-family: 'Permanent Marker', cursive; font-size: 1.1rem;
+  padding: 12px 28px; border-radius: 10px; border: 2px solid var(--border);
+  background: var(--bg-card); color: var(--text); cursor: pointer;
+  transition: all 0.3s;
+}
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--odin-blue); background: rgba(88,166,255,0.15);
+  transform: translateY(-2px);
+}
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.nav-btn.next { border-color: var(--odin-blue); color: var(--odin-blue); }
+.step-indicator {
+  font-family: 'Permanent Marker', cursive; font-size: 0.9rem; color: var(--text-dim);
+}
+
+/* STACKED BAR */
+.ss-stack { display: flex; height: 40px; border-radius: 8px; overflow: hidden; margin: 16px 0; }
+.ss-stack div { display: flex; align-items: center; justify-content: center; font-family: 'Permanent Marker', cursive; font-size: 0.75rem; transition: width 1s ease; }
+.ss-legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 10px 0; font-size: 0.9rem; }
+.ss-legend span { display: flex; align-items: center; gap: 6px; }
+.ss-legend .dot { width: 12px; height: 12px; border-radius: 3px; }
+
+/* HIGHLIGHT */
+.highlight { color: var(--gold); font-weight: bold; }
+.highlight-blue { color: var(--odin-blue); }
+.highlight-red { color: var(--thor-red); }
+.highlight-green { color: var(--success); }
+.highlight-purple { color: var(--corvo-purple); }
+
+/* APA BOX */
+.apa-box {
+  background: rgba(63,185,80,0.08); border: 1px solid var(--success);
+  border-radius: 10px; padding: 18px; margin: 16px 0;
+  font-family: 'Patrick Hand', cursive; font-size: 1rem;
+  line-height: 1.7;
+}
+.apa-box .apa-label {
+  font-family: 'Permanent Marker', cursive; color: var(--success);
+  font-size: 0.85rem; margin-bottom: 8px;
+}
+
+/* HYP BOX */
+.hyp-box {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px; margin: 14px 0;
+}
+.hyp-box h4 {
+  font-family: 'Permanent Marker', cursive; color: var(--odin-blue);
+  margin-bottom: 8px; font-size: 1rem;
+}
+.hyp-box p { font-size: 1rem; margin: 4px 0; }
+
+/* CONCEPT BOX */
+.concept-box {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px; margin: 16px 0;
+}
+.concept-box h4 {
+  font-family: 'Permanent Marker', cursive; color: var(--gold);
+  margin-bottom: 10px; font-size: 1rem;
+}
+.concept-box ul { margin-left: 20px; margin-top: 6px; }
+.concept-box li { margin-bottom: 6px; }
+
+/* GLM BOX */
+.glm-box {
+  background: var(--bg-panel); border: 2px solid var(--odin-blue);
+  border-radius: 12px; padding: 22px; margin: 18px 0; text-align: center;
+}
+.glm-box .glm-eq {
+  font-size: 1.3rem; color: var(--gold); margin: 10px 0;
+  font-family: 'Patrick Hand', cursive;
+}
+.glm-box .glm-desc {
+  font-size: 0.95rem; color: var(--text-dim); margin: 4px 0;
+}
+
+/* CHECKLIST */
+.checklist { list-style: none; margin: 12px 0; }
+.checklist li { padding: 8px 0; padding-left: 28px; position: relative; }
+.checklist li::before {
+  content: '✓'; position: absolute; left: 0; color: var(--success);
+  font-weight: bold; font-size: 1.1rem;
+}
+.checklist li.fail::before { content: '✗'; color: var(--thor-red); }
+
+/* SVG CONTAINER */
+.svg-container { margin: 20px 0; text-align: center; }
+.svg-container svg { max-width: 100%; height: auto; }
+
+/* SIGNATURE */
+.signature {
+  text-align: center; padding: 30px 0; color: var(--text-dim);
+  font-family: 'Permanent Marker', cursive; font-size: 0.85rem;
+  border-top: 1px solid var(--border); margin-top: 30px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .step-title { font-size: 1.6rem; }
+  .data-table, .calc-table, .anova-table { font-size: 0.8rem; }
+  .data-table th, .data-table td, .calc-table th, .calc-table td { padding: 6px 4px; }
+  .bar-label { width: 100px; font-size: 0.75rem; }
+  .nav-btn { padding: 10px 18px; font-size: 0.95rem; }
+  .formula { font-size: 1rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- PROGRESS -->
+<div class="progress-bar-container">
+  <div class="progress-label" id="progressLabel">Step 0 of 11</div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<!-- CONTENT -->
+<div id="stepContent" class="step-content"></div>
+
+<!-- NAVIGATION -->
+<div class="nav-container">
+  <button class="nav-btn" id="btnPrev" onclick="prevStep()" disabled>&#9664; Back</button>
+  <span class="step-indicator" id="stepIndicator">0 / 11</span>
+  <button class="nav-btn next" id="btnNext" onclick="nextStep()">Next &#9654;</button>
+</div>
+
+<div class="signature">Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026</div>
+</div>
+
+<script>
+// ============================================================
+// DATA — 3 Schools de Esgrima, n=5 cada
+// Covariate = Years of Experience Prévia
+// VD = Pontuação Final de Skill (0–100)
+// ============================================================
+const SCHOOLS = ['Einherjar', 'Berserker', 'Valkíria'];
+const SCHOOL_COLORS = ['#58a6ff', '#f85149', '#bc8cff'];
+const SCHOOL_ICONS = ['⚔️', '🪓', '🛡️'];
+
+// Each student: {school, xp (covariate), skill (DV)}
+const RAW = [
+  // Einherjar — high covariate, high DV
+  { school: 0, xp: 8, skill: 82 },
+  { school: 0, xp: 6, skill: 75 },
+  { school: 0, xp: 7, skill: 79 },
+  { school: 0, xp: 9, skill: 88 },
+  { school: 0, xp: 5, skill: 70 },
+  // Berserker — moderate covariate, moderate DV
+  { school: 1, xp: 4, skill: 68 },
+  { school: 1, xp: 3, skill: 60 },
+  { school: 1, xp: 5, skill: 72 },
+  { school: 1, xp: 2, skill: 55 },
+  { school: 1, xp: 6, skill: 76 },
+  // Valkíria — low covariate, low-moderate DV
+  { school: 2, xp: 2, skill: 62 },
+  { school: 2, xp: 1, skill: 54 },
+  { school: 2, xp: 3, skill: 65 },
+  { school: 2, xp: 1, skill: 50 },
+  { school: 2, xp: 3, skill: 67 },
+];
+
+const N = RAW.length; // 15
+const k = 3; // groups
+
+// ---------- helpers ----------
+function mean(arr) { return arr.reduce((s,v) => s+v, 0) / arr.length; }
+function sum(arr) { return arr.reduce((s,v) => s+v, 0); }
+function round2(v) { return Math.round(v * 100) / 100; }
+function round4(v) { return Math.round(v * 10000) / 10000; }
+
+// ---------- Group means ----------
+const groupData = [0,1,2].map(g => RAW.filter(r => r.school === g));
+const groupMeanSkill = groupData.map(g => mean(g.map(r => r.skill)));
+const groupMeanXP = groupData.map(g => mean(g.map(r => r.xp)));
+const grandMeanSkill = mean(RAW.map(r => r.skill));
+const grandMeanXP = mean(RAW.map(r => r.xp));
+
+// ---------- ANOVA simples (sem covariate) ----------
+const SS_between_anova = groupData.reduce((s, g, i) =>
+  s + g.length * (groupMeanSkill[i] - grandMeanSkill) ** 2, 0);
+const SS_within_anova = RAW.reduce((s, r) =>
+  s + (r.skill - groupMeanSkill[r.school]) ** 2, 0);
+const SS_total = RAW.reduce((s, r) => s + (r.skill - grandMeanSkill) ** 2, 0);
+const df_between = k - 1;
+const df_within_anova = N - k;
+const MS_between_anova = SS_between_anova / df_between;
+const MS_within_anova = SS_within_anova / df_within_anova;
+const F_anova = MS_between_anova / MS_within_anova;
+
+// ---------- Regressão global: skill = b0 + b1*xp ----------
+const Sxx = RAW.reduce((s,r) => s + (r.xp - grandMeanXP)**2, 0);
+const Sxy = RAW.reduce((s,r) => s + (r.xp - grandMeanXP)*(r.skill - grandMeanSkill), 0);
+const b1_pooled = Sxy / Sxx; // slope pooled within
+const b0_pooled = grandMeanSkill - b1_pooled * grandMeanXP;
+
+// ---------- Pooled within-groups regression for ANCOVA ----------
+// Pooled within Sxx, Sxy, Syy
+let Sxx_w = 0, Sxy_w = 0, Syy_w = 0;
+groupData.forEach((g, gi) => {
+  const mx = groupMeanXP[gi];
+  const my = groupMeanSkill[gi];
+  g.forEach(r => {
+    Sxx_w += (r.xp - mx) ** 2;
+    Sxy_w += (r.xp - mx) * (r.skill - my);
+    Syy_w += (r.skill - my) ** 2;
+  });
+});
+const b_within = Sxy_w / Sxx_w; // pooled within-group slope
+
+// SS_error(ANCOVA) = Syy_w - (Sxy_w)^2 / Sxx_w
+const SS_error_ancova = Syy_w - (Sxy_w ** 2) / Sxx_w;
+const df_error_ancova = N - k - 1; // 15 - 3 - 1 = 11
+
+// SS_covariate: reduction in SS due to covariate
+const SS_covariate = (Sxy_w ** 2) / Sxx_w;
+
+// Adjusted group means: adj_Yi = Yi_bar - b_within*(Xi_bar - X_grand)
+const adjMeans = groupData.map((g, i) =>
+  groupMeanSkill[i] - b_within * (groupMeanXP[i] - grandMeanXP)
+);
+
+// SS_groups(adjusted) — total adjusted for covariate minus error
+// Full model: Y = b0 + b1*X + b2*D1 + b3*D2
+// Reduced model: Y = b0 + b1*X
+// SS_groups(adj) = SS_error(reduced) - SS_error(full)
+
+// Reduced model: single regression
+const SS_error_reduced = SS_total - (Sxy**2) / Sxx;
+const SS_groups_adj = SS_error_reduced - SS_error_ancova;
+
+const MS_groups_adj = SS_groups_adj / df_between;
+const MS_error_ancova = SS_error_ancova / df_error_ancova;
+const F_ancova = MS_groups_adj / MS_error_ancova;
+
+const MS_covariate = SS_covariate / 1;
+const F_covariate = MS_covariate / MS_error_ancova;
+
+// Partial eta squared
+const eta_p_groups = SS_groups_adj / (SS_groups_adj + SS_error_ancova);
+const eta_p_cov = SS_covariate / (SS_covariate + SS_error_ancova);
+
+// Residuals for visualization
+const residuals = RAW.map(r => {
+  const predicted = b0_pooled + b1_pooled * r.xp;
+  return { ...r, predicted, residual: r.skill - predicted };
+});
+
+// Per-group slopes for homogeneity check
+const groupSlopes = groupData.map((g, gi) => {
+  const mx = groupMeanXP[gi], my = groupMeanSkill[gi];
+  const sxx = g.reduce((s,r) => s + (r.xp - mx)**2, 0);
+  const sxy = g.reduce((s,r) => s + (r.xp - mx)*(r.skill - my), 0);
+  return sxx > 0 ? sxy / sxx : 0;
+});
+
+// F critical values (approximate for alpha=0.05)
+const Fcrit_2_11 = 3.982;
+const Fcrit_2_12 = 3.885;
+const Fcrit_1_11 = 4.844;
+
+// ============================================================
+// DIALOGUE HELPER
+// ============================================================
+function dlg(character, name, text) {
+  return `<div class="dialogue-box ${character}"><div class="char-name ${character}">${name}</div><div class="dialogue-text">${text}</div></div>`;
+}
+
+// ============================================================
+// STEPS
+// ============================================================
+const TOTAL_STEPS = 12; // 0..11
+let currentStep = 0;
+
+function getStepHTML(step) {
+  switch(step) {
+
+  // ==== STEP 0: INTRO ====
+  case 0: return `
+<div class="step-title">&#128214; Step 0 &mdash; The Problem: Unequal Groups at the Starting Line</div>
+<p>Na <span class="highlight">Biblioteca dos S&aacute;bios de Asgard</span>, tr&ecirc;s grandes schools de esgrima competem pelo t&iacute;tulo de melhor forma&ccedil;&atilde;o de warriors:</p>
+<ul style="margin:12px 0 12px 24px;">
+  <li><span class="highlight-blue">${SCHOOL_ICONS[0]} Einherjar</span> &mdash; School dos Her&oacute;is Ca&iacute;dos</li>
+  <li><span class="highlight-red">${SCHOOL_ICONS[1]} Berserker</span> &mdash; School da F&uacute;ria Controlada</li>
+  <li><span class="highlight-purple">${SCHOOL_ICONS[2]} Valk&iacute;ria</span> &mdash; School das Guerreiras Celestes</li>
+</ul>
+<p>Cinco alunos de cada school fizeram um teste final de skill com espada. O problema? Alguns alunos j&aacute; chegaram com <span class="highlight">anos de experience pr&eacute;via</span> &mdash; e isso n&atilde;o &eacute; m&eacute;rito da school!</p>
+
+${dlg('thor','&#9889; Thorment','Simple! Compara as m&eacute;dias finais e pronto. Einherjar arrebenta &mdash; olha os n&uacute;meros!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Easy, Thorment. Os Einherjar j&aacute; tinham mais experience <em>antes</em> de entrar na school. Comparar m&eacute;dias brutas seria como comparar corredores que largaram de pontos diferentes. Precisamos de <strong>ANCOVA</strong> &mdash; ela remove a vantagem inicial e mostra o efeito <em>puro</em> de cada school.')}
+${dlg('corvo','&#129429; Muninn whispers:','<strong>ANCOVA</strong> = Analysis of Covariance. Combina ANOVA com regress&atilde;o para controlar vari&aacute;veis pr&eacute;-existentes (covari&aacute;veis), revelando o efeito l&iacute;quido do tratamento.')}
+
+<p style="margin-top:16px;">VD: <span class="highlight">Score final de skill</span> (0&ndash;100)<br>
+VI: <span class="highlight">School</span> (3 grupos)<br>
+Covariate: <span class="highlight">Anos de experience pr&eacute;via</span></p>
+`;
+
+  // ==== STEP 1: O QUE É ANCOVA ====
+  case 1: return `
+<div class="step-title">&#128300; Step 1 &mdash; What Is ANCOVA?</div>
+<p><strong>ANCOVA = ANOVA + Regress&atilde;o.</strong> A ideia &eacute; engenhosamente simples: antes de comparar os grupos, a ANCOVA <em>remove</em> a influ&ecirc;ncia de uma vari&aacute;vel cont&iacute;nua (a covariate) sobre a VD.</p>
+
+<div class="concept-box">
+  <h4>&#127859; The Recipe Metaphor</h4>
+  <p>Imagine que voc&ecirc; quer comparar tr&ecirc;s receitas de hidromel. Por&eacute;m, cada cervejeiro usou mel de qualidade diferente. A ANCOVA &ldquo;equaliza&rdquo; o mel &mdash; como se todos tivessem partido do mesmo ingrediente &mdash; e a&iacute; compara as receitas de verdade.</p>
+</div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','ANCOVA &eacute; a <strong>purifica&ccedil;&atilde;o da variance</strong>. Ela extrai da VD tudo que a covariate explica, e s&oacute; ent&atilde;o testa se os grupos diferem no que sobrou &mdash; a parte limpa.')}
+
+<div class="formula">
+  <div class="formula-label">Conceptual Model</div>
+  Y<sub>ij</sub> = &mu; + &tau;<sub>j</sub> + &beta;(X<sub>ij</sub> &minus; X&#772;) + &epsilon;<sub>ij</sub>
+</div>
+
+<p>Onde:</p>
+<ul style="margin:8px 0 8px 24px;">
+  <li><strong>Y<sub>ij</sub></strong> = pontua&ccedil;&atilde;o do aluno <em>i</em> no grupo <em>j</em></li>
+  <li><strong>&mu;</strong> = m&eacute;dia geral</li>
+  <li><strong>&tau;<sub>j</sub></strong> = efeito do grupo (school)</li>
+  <li><strong>&beta;</strong> = slope da covariate (regress&atilde;o)</li>
+  <li><strong>X<sub>ij</sub> &minus; X&#772;</strong> = covariate centrada</li>
+  <li><strong>&epsilon;<sub>ij</sub></strong> = erro residual</li>
+</ul>
+
+${dlg('corvo','&#129429; Muninn whispers:','A ANCOVA particiona a variance em tr&ecirc;s fontes: (1) variance explicada pela covariate, (2) variance entre grupos ap&oacute;s ajuste, e (3) erro residual. A covariate &ldquo;rouba&rdquo; variance do erro, aumentando o poder do teste.')}
+`;
+
+  // ==== STEP 2: QUANDO USAR ====
+  case 2: return `
+<div class="step-title">&#128204; Step 2 &mdash; When to Use ANCOVA?</div>
+
+<div class="concept-box">
+  <h4>&#9989; Use ANCOVA quando:</h4>
+  <ul class="checklist">
+    <li>Os grupos diferem em uma vari&aacute;vel pr&eacute;-existente (ex: experience, idade, pr&eacute;-teste)</li>
+    <li>Quer <strong>aumentar o poder estat&iacute;stico</strong> reduzindo a variance de erro</li>
+    <li>A covariate &eacute; cont&iacute;nua e medida <em>antes</em> do tratamento</li>
+    <li>A rela&ccedil;&atilde;o covariate&ndash;VD &eacute; linear</li>
+  </ul>
+</div>
+
+${dlg('thor','&#9889; Thorment','Se a randomiza&ccedil;&atilde;o falhou, ANCOVA salva, certo? Jogo a covariate l&aacute; e pronto!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','<strong>Careful!</strong> ANCOVA n&atilde;o &eacute; band-aid para randomiza&ccedil;&atilde;o falha. Se os grupos diferem sistematicamente em vari&aacute;veis n&atilde;o medidas, a ANCOVA n&atilde;o corrige isso. Ela controla <em>apenas</em> o que voc&ecirc; inclui como covariate.')}
+
+<div class="concept-box">
+  <h4>&#9888;&#65039; Important Caveats</h4>
+  <ul>
+    <li style="margin-bottom:8px;"><strong>No corrige randomiza&ccedil;&atilde;o falha</strong> &mdash; vari&aacute;veis n&atilde;o medidas continuam confundindo</li>
+    <li style="margin-bottom:8px;"><strong>Covariate deve ser medida antes do tratamento</strong> &mdash; se afetada pelo tratamento, vira mediadora, n&atilde;o covariate</li>
+    <li style="margin-bottom:8px;"><strong>Covariate n&atilde;o deve ser efeito do tratamento</strong> &mdash; caso contr&aacute;rio, voc&ecirc; remove parte do efeito que quer medir!</li>
+  </ul>
+</div>
+
+${dlg('corvo','&#129429; Muninn whispers:','ANCOVA em experimentos verdadeiros (com randomiza&ccedil;&atilde;o): aumenta poder. ANCOVA em quasi-experimentos (sem randomiza&ccedil;&atilde;o): oferece controle estat&iacute;stico parcial, mas n&atilde;o equivale a controle experimental.')}
+
+<p style="margin-top:16px;"><span class="highlight">Rule of thumb de Odin:</span> Se a covariate correlaciona fortemente com a VD (r &gt; 0.30), ANCOVA vai aumentar poder substancialmente. Se a correla&ccedil;&atilde;o &eacute; fraca, o ganho &eacute; m&iacute;nimo &mdash; e voc&ecirc; perde 1 grau de liberdade.</p>
+`;
+
+  // ==== STEP 3: PRESSUPOSTOS ====
+  case 3: return `
+<div class="step-title">&#128220; Step 3 &mdash; Assumptions da ANCOVA</div>
+<p>ANCOVA herda todos os pressupostos da ANOVA <em>e</em> adiciona pressupostos pr&oacute;prios da regress&atilde;o:</p>
+
+<div class="concept-box">
+  <h4>Assumptions herdados da ANOVA</h4>
+  <ul class="checklist">
+    <li>Independence das observa&ccedil;&otilde;es</li>
+    <li>Normality dos residuals (dentro de cada grupo)</li>
+    <li>Homogeneidade de variances (Levene)</li>
+  </ul>
+</div>
+
+<div class="concept-box" style="border-color: var(--gold);">
+  <h4 style="color: var(--thor-red);">&#9889; Assumptions EXCLUSIVOS da ANCOVA</h4>
+  <ul class="checklist">
+    <li><strong>Linearity</strong> &mdash; Rela&ccedil;&atilde;o entre covariate e VD deve ser linear</li>
+    <li><strong>Homogeneidade de slopes de regress&atilde;o</strong> &mdash; As retas de regress&atilde;o devem ser <em>paralelas</em> entre grupos (CRUCIAL!)</li>
+    <li><strong>Covariate medida sem erro</strong> &mdash; Errors de medi&ccedil;&atilde;o enviesam a corre&ccedil;&atilde;o</li>
+    <li><strong>Covariate independente do tratamento</strong> &mdash; O tratamento n&atilde;o deve afetar a covariate</li>
+  </ul>
+</div>
+
+${dlg('thor','&#9889; Thorment','Assumptions demais! Ignoro todos e rodo logo o teste.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Violar a <strong>homogeneidade de slopes</strong> &eacute; fatal. Se as retas n&atilde;o s&atilde;o paralelas, o ajuste da covariate funciona diferente para cada grupo &mdash; e as m&eacute;dias ajustadas ficam sem sentido. Vamos ver isso em detalhe no pr&oacute;ximo passo.')}
+
+<p><strong>How to verify?</strong></p>
+<table class="calc-table">
+  <thead>
+    <tr><th>Assumption</th><th>Test / Verification</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Linearity</td><td>Scatterplot covariate &times; VD por grupo</td></tr>
+    <tr><td>Homogeneidade de slopes</td><td>Intera&ccedil;&atilde;o Grupo &times; Covariate (deve ser n.s.)</td></tr>
+    <tr><td>Normality</td><td>Shapiro-Wilk nos residuals</td></tr>
+    <tr><td>Homogeneidade de variances</td><td>Levene's Test</td></tr>
+    <tr><td>Independence da covariate</td><td>ANOVA da covariate entre grupos (idealmente n.s. em experimentos)</td></tr>
+  </tbody>
+</table>
+
+${dlg('corvo','&#129429; Muninn whispers:','Se a covariate j&aacute; difere entre os grupos (como no nosso caso &mdash; quasi-experimento), ANCOVA ainda funciona, mas a interpreta&ccedil;&atilde;o causal &eacute; mais fr&aacute;gil. Em experimentos verdadeiros com randomiza&ccedil;&atilde;o, a covariate deveria n&atilde;o diferir significantmente entre grupos.')}
+`;
+
+  // ==== STEP 4: HOMOGENEIDADE DE INCLINAÇÕES ====
+  case 4: return `
+<div class="step-title">&#128208; Step 4 &mdash; Homogeneity of Slopes</div>
+<p>Este &eacute; o pressuposto <strong>mais cr&iacute;tico</strong> e exclusivo da ANCOVA. Se as slopes das retas de regress&atilde;o diferem entre os grupos, a ANCOVA &eacute; inapropriada.</p>
+
+<div class="step-subtitle">O que significa &ldquo;slopes homog&ecirc;neas&rdquo;?</div>
+<p>A rela&ccedil;&atilde;o entre a covariate (experience) e a VD (skill) deve ser <strong>a mesma em todos os grupos</strong>. Cada ano extra de experience deve &ldquo;valer&rdquo; o mesmo ganho de skill, n&atilde;o importa a school.</p>
+
+<div class="svg-container" id="slopeSVG"></div>
+
+<p><strong>Slopes estimadas por grupo:</strong></p>
+<table class="calc-table">
+  <thead>
+    <tr><th>School</th><th>Slope (b)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td style="color:var(--einherjar);">${SCHOOL_ICONS[0]} Einherjar</td><td>${round2(groupSlopes[0])}</td></tr>
+    <tr><td style="color:var(--berserker);">${SCHOOL_ICONS[1]} Berserker</td><td>${round2(groupSlopes[1])}</td></tr>
+    <tr><td style="color:var(--valkyrie);">${SCHOOL_ICONS[2]} Valk&iacute;ria</td><td>${round2(groupSlopes[2])}</td></tr>
+    <tr style="font-weight:bold;"><td>Pooled (b<sub>within</sub>)</td><td style="color:var(--gold);">${round2(b_within)}</td></tr>
+  </tbody>
+</table>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','As slopes s&atilde;o razoavelmente parecidas &mdash; as retas s&atilde;o quase paralelas. Bom sinal! Se fossem muito diferentes, cada school &ldquo;aproveitaria&rdquo; a experience de forma distinta, e a ANCOVA n&atilde;o faria sentido.')}
+
+<div class="concept-box" style="border-color: var(--thor-red);">
+  <h4 style="color: var(--thor-red);">&#9888;&#65039; Se as slopes N&Atilde;O forem homog&ecirc;neas:</h4>
+  <ul>
+    <li>A intera&ccedil;&atilde;o Grupo &times; Covariate &eacute; significant</li>
+    <li>ANCOVA &eacute; inapropriada &mdash; as m&eacute;dias ajustadas n&atilde;o t&ecirc;m sentido</li>
+    <li>Alternativa: usar <strong>an&aacute;lise de modera&ccedil;&atilde;o</strong> (a covariate modera o efeito do grupo)</li>
+    <li>Ou: Johnson-Neyman procedure para identificar regi&otilde;es de signific&acirc;ncia</li>
+  </ul>
+</div>
+
+${dlg('corvo','&#129429; Muninn whispers:','Teste formal: inclua a intera&ccedil;&atilde;o Grupo &times; Covariate no modelo. Se F da intera&ccedil;&atilde;o for n.s. (p &gt; .05), o pressuposto &eacute; sustentado. Alguns autores usam crit&eacute;rio mais liberal (p &gt; .10).')}
+`;
+
+  // ==== STEP 5: OS DADOS ====
+  case 5: return `
+<div class="step-title">&#128202; Step 5 &mdash; The Data</div>
+<p>Aqui est&atilde;o os 15 warriors-aprendizes com suas schools, anos de experience pr&eacute;via (covariate) e pontua&ccedil;&atilde;o final de skill (VD):</p>
+
+<table class="data-table">
+  <thead>
+    <tr><th>#</th><th>School</th><th>Experience (X)</th><th>Skill (Y)</th></tr>
+  </thead>
+  <tbody>
+    ${RAW.map((r,i) => `<tr>
+      <td>${i+1}</td>
+      <td style="color:${SCHOOL_COLORS[r.school]};">${SCHOOL_ICONS[r.school]} ${SCHOOLS[r.school]}</td>
+      <td>${r.xp} anos</td>
+      <td>${r.skill}</td>
+    </tr>`).join('')}
+  </tbody>
+</table>
+
+<div class="step-subtitle">Means por Grupo (Raws)</div>
+<table class="calc-table">
+  <thead>
+    <tr><th>School</th><th>Mean Experience (X&#772;)</th><th>Mean Skill (Y&#772;)</th></tr>
+  </thead>
+  <tbody>
+    ${SCHOOLS.map((s,i) => `<tr>
+      <td style="color:${SCHOOL_COLORS[i]};">${SCHOOL_ICONS[i]} ${s}</td>
+      <td>${round2(groupMeanXP[i])} anos</td>
+      <td>${round2(groupMeanSkill[i])}</td>
+    </tr>`).join('')}
+    <tr class="mean-row">
+      <td>Mean Geral</td>
+      <td>${round2(grandMeanXP)} anos</td>
+      <td>${round2(grandMeanSkill)}</td>
+    </tr>
+  </tbody>
+</table>
+
+${dlg('thor','&#9889; Thorment','Olha a&iacute;! Einherjar com m&eacute;dia ${round2(groupMeanSkill[0])} contra Valk&iacute;ria com ${round2(groupMeanSkill[2])}. Caso encerrado!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Repara na experience, Thorment: Einherjar t&ecirc;m <strong>${round2(groupMeanXP[0])} anos</strong> de m&eacute;dia contra <strong>${round2(groupMeanXP[2])}</strong> das Valk&iacute;rias. Ser&aacute; que a school &eacute; boa, ou os alunos j&aacute; chegaram prontos? A ANCOVA vai separar esses efeitos.')}
+
+<div class="svg-container" id="scatterRawSVG"></div>
+`;
+
+  // ==== STEP 6: CÁLCULO CONCEITUAL ====
+  case 6: return `
+<div class="step-title">&#9881;&#65039; Step 6 &mdash; Calculation Conceitual</div>
+<p>A ANCOVA opera em tr&ecirc;s movimentos conceituais:</p>
+
+<div class="concept-box">
+  <h4>Step 1: Pooled Regression (within-groups)</h4>
+  <p>Calcula a reta de regress&atilde;o Y &sim; X <strong>dentro de cada grupo</strong>, usando uma slope comum (pooled).</p>
+  <div class="formula">
+    b<sub>within</sub> = SP<sub>within</sub> / SS<sub>X(within)</sub> = ${round2(Sxy_w)} / ${round2(Sxx_w)} = <span class="highlight">${round2(b_within)}</span>
+  </div>
+  <p>Interpreta&ccedil;&atilde;o: para cada ano extra de experience, a skill sobe <span class="highlight">${round2(b_within)} pontos</span>.</p>
+</div>
+
+<div class="concept-box">
+  <h4>Movimento 2: Calcular Residuals Ajustados</h4>
+  <p>Remove da VD a parte que a covariate explica:</p>
+  <div class="formula">
+    Y<sub>ajustado</sub> = Y<sub>observado</sub> &minus; b<sub>within</sub> &times; (X<sub>i</sub> &minus; X&#772;)
+  </div>
+  <p>&Eacute; como se todos os warriors tivessem a <em>mesma</em> experience (${round2(grandMeanXP)} anos). O campo agora &eacute; nivelado.</p>
+</div>
+
+<div class="concept-box">
+  <h4>Step 3: ANOVA on Adjusted Values</h4>
+  <p>Compara os grupos usando as <strong>m&eacute;dias ajustadas</strong>, n&atilde;o as brutas.</p>
+</div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Pense assim: a covariate &eacute; como um peso extra na mochila de alguns corredores. A ANCOVA tira o peso de todos e manda correr de novo &mdash; a&iacute; voc&ecirc; v&ecirc; quem &eacute; r&aacute;pido de verdade.')}
+
+<div class="step-subtitle">Somas de Quadrados</div>
+<table class="calc-table">
+  <thead>
+    <tr><th>Component</th><th>Formula</th><th>Value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>SS<sub>Total</sub></td><td>&Sigma;(Y<sub>i</sub> &minus; Y&#772;)&sup2;</td><td>${round2(SS_total)}</td></tr>
+    <tr><td>SS<sub>Covariate</sub></td><td>(SP<sub>w</sub>)&sup2; / SS<sub>Xw</sub></td><td>${round2(SS_covariate)}</td></tr>
+    <tr><td>SS<sub>Grupos(adj)</sub></td><td>SS<sub>erro(reduzido)</sub> &minus; SS<sub>erro(completo)</sub></td><td>${round2(SS_groups_adj)}</td></tr>
+    <tr><td>SS<sub>Error(ANCOVA)</sub></td><td>SS<sub>Yw</sub> &minus; (SP<sub>w</sub>)&sup2;/SS<sub>Xw</sub></td><td>${round2(SS_error_ancova)}</td></tr>
+  </tbody>
+</table>
+
+${dlg('corvo','&#129429; Muninn whispers:','Note que SS<sub>Error(ANCOVA)</sub> = ${round2(SS_error_ancova)} &eacute; <strong>menor</strong> que SS<sub>Error(ANOVA)</sub> = ${round2(SS_within_anova)}. A covariate &ldquo;absorveu&rdquo; ${round2(SS_within_anova - SS_error_ancova)} pontos de variance que antes era erro. Mais poder!')}
+`;
+
+  // ==== STEP 7: MÉDIAS AJUSTADAS ====
+  case 7: return `
+<div class="step-title">&#127942; Step 7 &mdash; Adjusted Means: The Revelation</div>
+<p>As <strong>m&eacute;dias ajustadas</strong> (adjusted means / estimated marginal means) s&atilde;o o produto-estrela da ANCOVA. Elas mostram qual seria a m&eacute;dia de cada grupo <em>se todos tivessem a mesma covariate</em>.</p>
+
+<div class="formula">
+  <div class="formula-label">Formula da Mean Adjusted</div>
+  Y&#772;<sub>adj,j</sub> = Y&#772;<sub>j</sub> &minus; b<sub>within</sub> &times; (X&#772;<sub>j</sub> &minus; X&#772;)
+</div>
+
+<table class="data-table">
+  <thead>
+    <tr><th>School</th><th>Mean Raw</th><th>Ajuste</th><th>Mean Adjusted</th><th>Change</th></tr>
+  </thead>
+  <tbody>
+    ${SCHOOLS.map((s,i) => {
+      const adj = round2(b_within * (groupMeanXP[i] - grandMeanXP));
+      const dir = adjMeans[i] > groupMeanSkill[i] ? '&#9650;' : (adjMeans[i] < groupMeanSkill[i] ? '&#9660;' : '&mdash;');
+      const dirColor = adjMeans[i] > groupMeanSkill[i] ? 'var(--success)' : (adjMeans[i] < groupMeanSkill[i] ? 'var(--thor-red)' : 'var(--text-dim)');
+      return `<tr>
+        <td style="color:${SCHOOL_COLORS[i]};">${SCHOOL_ICONS[i]} ${s}</td>
+        <td>${round2(groupMeanSkill[i])}</td>
+        <td>${round2(b_within)} &times; (${round2(groupMeanXP[i])} &minus; ${round2(grandMeanXP)}) = ${adj}</td>
+        <td style="font-weight:bold; color:var(--gold);">${round2(adjMeans[i])}</td>
+        <td style="color:${dirColor};">${dir} ${round2(Math.abs(adjMeans[i] - groupMeanSkill[i]))}</td>
+      </tr>`;
+    }).join('')}
+  </tbody>
+</table>
+
+<div id="adjustedBars" class="bar-container"></div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Veja a invers&atilde;o! As Valk&iacute;rias, que tinham a <em>pior</em> m&eacute;dia bruta, sobem ap&oacute;s o ajuste. Os Einherjar, com a melhor m&eacute;dia bruta, descem. A vantagem deles era em grande parte a <strong>experience pr&eacute;via</strong>, n&atilde;o a school!')}
+${dlg('thor','&#9889; Thorment','Espera a&iacute;... ent&atilde;o o ranking mudou?! Isso n&atilde;o &eacute; justo!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Pelo contr&aacute;rio &mdash; <em>agora</em> &eacute; justo. A ANCOVA nivelou o campo.')}
+`;
+
+  // ==== STEP 8: TABELA ANCOVA ====
+  case 8: return `
+<div class="step-title">&#128202; Step 8 &mdash; The ANCOVA Table</div>
+<p>Vamos montar a tabela de ANCOVA completa e compar&aacute;-la com a ANOVA simples:</p>
+
+<div class="step-subtitle">Tabela ANCOVA</div>
+<table class="anova-table">
+  <thead>
+    <tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F</th><th>p</th><th>&eta;<sub>p</sub>&sup2;</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Covariate (XP)</td>
+      <td>${round2(SS_covariate)}</td>
+      <td>1</td>
+      <td>${round2(MS_covariate)}</td>
+      <td>${round2(F_covariate)}</td>
+      <td class="${F_covariate > Fcrit_1_11 ? 'sig' : 'ns'}">${F_covariate > Fcrit_1_11 ? '< .001' : 'n.s.'}</td>
+      <td>${round4(eta_p_cov)}</td>
+    </tr>
+    <tr>
+      <td>School (ajustada)</td>
+      <td>${round2(SS_groups_adj)}</td>
+      <td>${df_between}</td>
+      <td>${round2(MS_groups_adj)}</td>
+      <td>${round2(F_ancova)}</td>
+      <td class="${F_ancova > Fcrit_2_11 ? 'sig' : 'ns'}">${F_ancova > Fcrit_2_11 ? '< .05' : 'n.s.'}</td>
+      <td>${round4(eta_p_groups)}</td>
+    </tr>
+    <tr>
+      <td>Error</td>
+      <td>${round2(SS_error_ancova)}</td>
+      <td>${df_error_ancova}</td>
+      <td>${round2(MS_error_ancova)}</td>
+      <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+    <tr class="total-row">
+      <td>Total</td>
+      <td>${round2(SS_total)}</td>
+      <td>${N-1}</td>
+      <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="step-subtitle">Comparison com Simple ANOVA (sem covariate)</div>
+<table class="anova-table">
+  <thead>
+    <tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>School</td>
+      <td>${round2(SS_between_anova)}</td>
+      <td>${df_between}</td>
+      <td>${round2(MS_between_anova)}</td>
+      <td>${round2(F_anova)}</td>
+    </tr>
+    <tr>
+      <td>Error</td>
+      <td>${round2(SS_within_anova)}</td>
+      <td>${df_within_anova}</td>
+      <td>${round2(MS_within_anova)}</td>
+      <td>&mdash;</td>
+    </tr>
+  </tbody>
+</table>
+
+<div id="ssCompareStack"></div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Compare os dois MS<sub>Error</sub>: ANOVA = ${round2(MS_within_anova)}, ANCOVA = ${round2(MS_error_ancova)}. A covariate reduziu o erro em ${round2(((MS_within_anova - MS_error_ancova)/MS_within_anova)*100)}%! Isso &eacute; o poder da ANCOVA: menos ru&iacute;do, mais sinal.')}
+${dlg('corvo','&#129429; Muninn whispers:','Na ANCOVA, o df do erro cai de ${df_within_anova} para ${df_error_ancova} (perde 1 df pela covariate). Mas a redu&ccedil;&atilde;o no MS<sub>Error</sub> mais que compensa essa perda.')}
+`;
+
+  // ==== STEP 9: CONEXÃO GLM ====
+  case 9: return `
+<div class="step-title">&#128301; Step 9 &mdash; Connection to the GLM</div>
+<p>ANCOVA n&atilde;o &eacute; um teste &ldquo;&agrave; parte&rdquo; &mdash; &eacute; um caso especial do <strong>Modelo Linear Geral</strong> (GLM). ANOVA e Regress&atilde;o s&atilde;o tamb&eacute;m casos especiais do mesmo modelo.</p>
+
+<div class="glm-box">
+  <div class="formula-label">ANOVA (s&oacute; grupos)</div>
+  <div class="glm-eq">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>D<sub>1</sub> + &beta;<sub>2</sub>D<sub>2</sub> + &epsilon;</div>
+  <div class="glm-desc">D<sub>1</sub>, D<sub>2</sub> = dummies de grupo (k&minus;1 = 2)</div>
+</div>
+
+<div class="glm-box" style="border-color: var(--gold);">
+  <div class="formula-label">Regress&atilde;o (s&oacute; covariate)</div>
+  <div class="glm-eq">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>X + &epsilon;</div>
+  <div class="glm-desc">X = covariate cont&iacute;nua</div>
+</div>
+
+<div class="glm-box" style="border-color: var(--success);">
+  <div class="formula-label" style="color: var(--success);">ANCOVA (grupos + covariate)</div>
+  <div class="glm-eq" style="font-size:1.4rem;">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>X + &beta;<sub>2</sub>D<sub>1</sub> + &beta;<sub>3</sub>D<sub>2</sub> + &epsilon;</div>
+  <div class="glm-desc">Combina regress&atilde;o cont&iacute;nua com fatores categ&oacute;ricos</div>
+</div>
+
+<div class="svg-container" id="glmDiagramSVG"></div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No fundo, ANOVA, regress&atilde;o e ANCOVA s&atilde;o o <em>mesmo modelo</em>. A diferen&ccedil;a &eacute; o tipo de preditor: categ&oacute;rico (ANOVA), cont&iacute;nuo (regress&atilde;o), ou ambos (ANCOVA). O GLM unifica tudo.')}
+
+<div class="concept-box">
+  <h4>No nosso exemplo:</h4>
+  <div class="formula">
+    Skill = &beta;<sub>0</sub> + ${round2(b_within)} &times; Experience + &beta;<sub>2</sub> &times; D<sub>Einherjar</sub> + &beta;<sub>3</sub> &times; D<sub>Berserker</sub> + &epsilon;
+  </div>
+  <p style="margin-top:8px;">Onde D<sub>Einherjar</sub> = 1 se Einherjar, 0 caso contr&aacute;rio (Valk&iacute;ria &eacute; o grupo de refer&ecirc;ncia).</p>
+  <p>Os coeficientes &beta;<sub>2</sub> e &beta;<sub>3</sub> representam a diferen&ccedil;a <strong>ajustada</strong> de cada school em rela&ccedil;&atilde;o &agrave;s Valk&iacute;rias, controlando a experience.</p>
+</div>
+
+${dlg('corvo','&#129429; Muninn whispers:','Pensar em termos de GLM ajuda a entender extens&otilde;es: MANCOVA (m&uacute;ltiplas VDs), ANCOVA com m&uacute;ltiplas covari&aacute;veis, ou modelos com intera&ccedil;&otilde;es grupo &times; covariate. Tudo &eacute; o mesmo framework.')}
+
+${dlg('thor','&#9889; Thorment','Se tudo &eacute; a mesma coisa, por que tantos nomes?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Hist&oacute;ria, Thorment. Fisher desenvolveu ANOVA para experimentos agr&iacute;colas, Galton fez regress&atilde;o para hereditariedade. S&oacute; depois perceberam que eram a mesma matem&aacute;tica. O GLM unifica.')}
+`;
+
+  // ==== STEP 10: REPORTE APA ====
+  case 10: return `
+<div class="step-title">&#128221; Step 10 &mdash; APA Format Report</div>
+<p>Relatar ANCOVA em um paper exige precis&atilde;o. O leitor precisa saber: (1) a covariate e sua rela&ccedil;&atilde;o com a VD, (2) que os pressupostos foram verificados, (3) o resultado principal com m&eacute;dias ajustadas.</p>
+
+<div class="apa-box">
+  <div class="apa-label">&#128221; APA Report &mdash; Covariate</div>
+  <p>Uma ANCOVA foi conduzida para comparar a skill com espada entre tr&ecirc;s schools (Einherjar, Berserker, Valk&iacute;ria), controlando para anos de experience pr&eacute;via como covariate. O pressuposto de homogeneidade das slopes de regress&atilde;o foi sustentado, <em>F</em>(2, 9) &lt; 1, <em>p</em> &gt; .05.</p>
+</div>
+
+<div class="apa-box">
+  <div class="apa-label">&#128221; APA Report &mdash; Covariate Significativa</div>
+  <p>A covariate (experience) foi significantmente relacionada &agrave; skill, <em>F</em>(1, ${df_error_ancova}) = ${round2(F_covariate)}, <em>p</em> &lt; .001, <em>&eta;</em><sub>p</sub><sup>2</sup> = ${round4(eta_p_cov)}.</p>
+</div>
+
+<div class="apa-box">
+  <div class="apa-label">&#128221; APA Report &mdash; Efeito Principal</div>
+  <p>Ap&oacute;s controlar para a experience pr&eacute;via, ${F_ancova > Fcrit_2_11 ? 'houve um efeito significant da school sobre a skill' : 'n&atilde;o houve efeito significant da school sobre a skill'}, <em>F</em>(${df_between}, ${df_error_ancova}) = ${round2(F_ancova)}, <em>p</em> ${F_ancova > Fcrit_2_11 ? '< .05' : '> .05'}, <em>&eta;</em><sub>p</sub><sup>2</sup> = ${round4(eta_p_groups)}.</p>
+</div>
+
+<div class="apa-box">
+  <div class="apa-label">&#128221; APA Report &mdash; Means Adjusteds</div>
+  <p>As m&eacute;dias ajustadas foram: Einherjar, <em>M</em><sub>adj</sub> = ${round2(adjMeans[0])}; Berserker, <em>M</em><sub>adj</sub> = ${round2(adjMeans[1])}; Valk&iacute;ria, <em>M</em><sub>adj</sub> = ${round2(adjMeans[2])}.</p>
+</div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Sempre reporte as m&eacute;dias <strong>ajustadas</strong> (adjusted / estimated marginal means), n&atilde;o as brutas. E mencione exatamente qual covariate foi controlada. Sem isso, o leitor n&atilde;o consegue interpretar.')}
+
+<div class="concept-box">
+  <h4>Report Checklist</h4>
+  <ul class="checklist">
+    <li>Identificar a covariate e justificar sua inclus&atilde;o</li>
+    <li>Mencionar verifica&ccedil;&atilde;o da homogeneidade de slopes</li>
+    <li>Reportar F e p da covariate</li>
+    <li>Reportar F, df, p e &eta;<sub>p</sub><sup>2</sup> do efeito principal</li>
+    <li>Apresentar m&eacute;dias ajustadas (com EP ou IC 95%)</li>
+    <li>Se significant: post-hoc com corre&ccedil;&atilde;o de Bonferroni nas m&eacute;dias ajustadas</li>
+  </ul>
+</div>
+
+${dlg('thor','&#9889; Thorment','Eu s&oacute; jogo o output do SPSS e pronto.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','O output &eacute; o <em>in&iacute;cio</em>, n&atilde;o o fim. Interpretar e contextualizar os n&uacute;meros &eacute; trabalho do pesquisador.')}
+`;
+
+  // ==== STEP 11: LIÇÃO DOS CORVOS ====
+  case 11: return `
+<div class="step-title">&#129429; Step 11 &mdash; Lesson of the Ravens</div>
+
+${dlg('corvo','&#129429; Muninn summarizes:','<strong>Key Points desta receita:</strong><br><br>' +
+  '&#10003; <strong>ANCOVA = ANOVA + covariate.</strong> Remove da VD a variance explicada por uma vari&aacute;vel cont&iacute;nua pr&eacute;-existente.<br><br>' +
+  '&#10003; <strong>Means ajustadas</strong> mostram o efeito &ldquo;puro&rdquo; do tratamento, como se todos partissem do mesmo baseline.<br><br>' +
+  '&#10003; <strong>Homogeneidade de slopes</strong> &eacute; o pressuposto mais cr&iacute;tico &mdash; se as retas n&atilde;o s&atilde;o paralelas, ANCOVA &eacute; inadequada.<br><br>' +
+  '&#10003; <strong>Reduz o erro</strong>: ao absorver variance da covariate, MS<sub>Error</sub> diminui e o poder aumenta.<br><br>' +
+  '&#10003; <strong>GLM unifica tudo</strong>: ANCOVA combina preditores categ&oacute;ricos e cont&iacute;nuos no mesmo modelo.'
+)}
+
+<div class="concept-box" style="border-color: var(--corvo-purple);">
+  <h4 style="color: var(--corvo-purple);">&#129429; When ANCOVA vs. ANOVA?</h4>
+  <table class="calc-table">
+    <thead>
+      <tr><th>Situation</th><th>Use</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Grupos comparados sem covariate relevante</td><td>ANOVA</td></tr>
+      <tr><td>Covariate pr&eacute;-existente correlaciona com VD</td><td>ANCOVA</td></tr>
+      <tr><td>Quer aumentar poder em experimento randomizado</td><td>ANCOVA</td></tr>
+      <tr><td>Slopes diferem entre grupos</td><td>An&aacute;lise de Modera&ccedil;&atilde;o</td></tr>
+      <tr><td>M&uacute;ltiplas VDs</td><td>MANCOVA</td></tr>
+      <tr><td>M&uacute;ltiplas covari&aacute;veis + m&uacute;ltiplas VDs</td><td>MANCOVA</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="dialogue-box huginn" style="border-left-color: var(--corvo-purple);">
+  <div class="char-name huginn" style="color: var(--corvo-purple);">&#129429; Huginn challenges:</div>
+  <div class="dialogue-text">
+    <strong>Challenges for the reader:</strong><br><br>
+    1. <em>E se a homogeneidade de slopes falhar?</em> A ANCOVA padr&atilde;o n&atilde;o serve. Voc&ecirc; precisa de um modelo com intera&ccedil;&atilde;o grupo &times; covariate &mdash; e interpretar que o efeito do tratamento <strong>depende</strong> do valor da covariate. Isso n&atilde;o &eacute; um problema, &eacute; um achado!<br><br>
+    2. <em>Posso usar mais de uma covariate?</em> Sim! Mas cada covariate &ldquo;custa&rdquo; 1 df. Com amostras pequenas, o custo pode n&atilde;o compensar o ganho.<br><br>
+    3. <em>ANCOVA &eacute; equivalente a usar scores de diferen&ccedil;a (p&oacute;s &minus; pr&eacute;)?</em> No necessariamente! Lord&rsquo;s paradox mostra que ANCOVA e scores de mudan&ccedil;a podem dar resultados opostos. A escolha depende da pergunta de pesquisa.<br><br>
+    4. <em>Se a covariate n&atilde;o for significant, ainda ajuda?</em> Se a covariate n&atilde;o correlaciona com a VD, voc&ecirc; perde 1 df sem ganhar nada. Nesse caso, ANOVA simples &eacute; prefer&iacute;vel.
+  </div>
+</div>
+
+<div class="svg-container" id="variancePartitionSVG"></div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A ANCOVA &eacute; uma das t&eacute;cnicas mais &uacute;teis &mdash; e mais mal utilizadas &mdash; da estat&iacute;stica. Use com sabedoria: verifique os pressupostos, reporte as m&eacute;dias ajustadas, e lembre-se de que controlar estatisticamente <strong>n&atilde;o equivale</strong> a controlar experimentalmente.')}
+
+<p style="text-align:center; margin-top:24px; font-family:'Bangers',cursive; font-size:1.8rem; color:var(--gold);">&#127942; ANCOVA Recipe Complete! &#127942;</p>
+`;
+
+  default: return '<p>Step not found.</p>';
+  }
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderStep() {
+  const el = document.getElementById('stepContent');
+  el.style.animation = 'none';
+  el.offsetHeight;
+  el.style.animation = 'fadeIn 0.4s ease';
+  el.innerHTML = getStepHTML(currentStep);
+
+  // Progress
+  const pct = (currentStep / (TOTAL_STEPS - 1)) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Step ${currentStep} of ${TOTAL_STEPS - 1}`;
+  document.getElementById('stepIndicator').textContent = `${currentStep} / ${TOTAL_STEPS - 1}`;
+
+  // Buttons
+  document.getElementById('btnPrev').disabled = currentStep === 0;
+  document.getElementById('btnNext').disabled = currentStep === TOTAL_STEPS - 1;
+  document.getElementById('btnNext').innerHTML = currentStep === TOTAL_STEPS - 1 ? 'End' : 'Next &#9654;';
+
+  // Post-render
+  setTimeout(() => {
+    if (currentStep === 4) drawSlopesSVG();
+    if (currentStep === 5) { drawScatterRaw(); }
+    if (currentStep === 7) animateAdjustedBars();
+    if (currentStep === 8) drawSSCompare();
+    if (currentStep === 9) drawGLMDiagram();
+    if (currentStep === 11) drawVariancePartition();
+  }, 300);
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextStep() { if (currentStep < TOTAL_STEPS - 1) { currentStep++; renderStep(); } }
+function prevStep() { if (currentStep > 0) { currentStep--; renderStep(); } }
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextStep(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevStep(); }
+});
+
+// ============================================================
+// SVG: SLOPES (Step 4)
+// ============================================================
+function drawSlopesSVG() {
+  const container = document.getElementById('slopeSVG');
+  if (!container) return;
+
+  const W = 700, H = 380;
+  const pad = { t: 50, r: 50, b: 60, l: 60 };
+  const pw = W - pad.l - pad.r;
+  const ph = H - pad.t - pad.b;
+
+  const xMin = 0, xMax = 10;
+  const yMin = 40, yMax = 95;
+
+  function xPos(v) { return pad.l + ((v - xMin) / (xMax - xMin)) * pw; }
+  function yPos(v) { return pad.t + ph - ((v - yMin) / (yMax - yMin)) * ph; }
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:'Patrick Hand',cursive;">`;
+
+  // Background
+  svg += `<rect width="${W}" height="${H}" fill="#1c2333" rx="10"/>`;
+
+  // Title
+  svg += `<text x="${W/2}" y="30" text-anchor="middle" fill="#f0c040" font-family="Bangers,cursive" font-size="20">Homogeneity of Slopes: Retas Paralelas?</text>`;
+
+  // Grid
+  for (let v = yMin; v <= yMax; v += 10) {
+    svg += `<line x1="${pad.l}" y1="${yPos(v)}" x2="${W-pad.r}" y2="${yPos(v)}" stroke="#30363d" stroke-width="1"/>`;
+    svg += `<text x="${pad.l-8}" y="${yPos(v)+4}" text-anchor="end" fill="#8b949e" font-size="13">${v}</text>`;
+  }
+  for (let v = 0; v <= 10; v += 2) {
+    svg += `<line x1="${xPos(v)}" y1="${pad.t}" x2="${xPos(v)}" y2="${H-pad.b}" stroke="#30363d" stroke-width="1"/>`;
+    svg += `<text x="${xPos(v)}" y="${H-pad.b+20}" text-anchor="middle" fill="#8b949e" font-size="13">${v}</text>`;
+  }
+
+  // Axis labels
+  svg += `<text x="${W/2}" y="${H-10}" text-anchor="middle" fill="#8b949e" font-family="Permanent Marker,cursive" font-size="14">Years of Experience (Covariate)</text>`;
+  svg += `<text x="16" y="${H/2}" text-anchor="middle" fill="#8b949e" font-family="Permanent Marker,cursive" font-size="14" transform="rotate(-90,16,${H/2})">Skill (VD)</text>`;
+
+  // Points and regression lines per group
+  groupData.forEach((g, gi) => {
+    const col = SCHOOL_COLORS[gi];
+    const mx = groupMeanXP[gi], my = groupMeanSkill[gi];
+    const slope = groupSlopes[gi];
+    const intercept = my - slope * mx;
+
+    // Regression line
+    const x1 = Math.max(xMin, 0), x2 = Math.min(xMax, 10);
+    const y1 = intercept + slope * x1, y2 = intercept + slope * x2;
+    svg += `<line x1="${xPos(x1)}" y1="${yPos(y1)}" x2="${xPos(x2)}" y2="${yPos(y2)}" stroke="${col}" stroke-width="2.5" stroke-dasharray="${gi === 1 ? '8,4' : gi === 2 ? '4,4' : 'none'}" opacity="0.8"/>`;
+
+    // Points
+    g.forEach(r => {
+      svg += `<circle cx="${xPos(r.xp)}" cy="${yPos(r.skill)}" r="5" fill="${col}" stroke="#0d1117" stroke-width="1.5"/>`;
+    });
+  });
+
+  // Legend
+  const legendY = pad.t + 10;
+  SCHOOLS.forEach((s, i) => {
+    const lx = W - pad.r - 130;
+    const ly = legendY + i * 22;
+    svg += `<rect x="${lx}" y="${ly-5}" width="16" height="3" fill="${SCHOOL_COLORS[i]}"/>`;
+    svg += `<text x="${lx+22}" y="${ly}" fill="${SCHOOL_COLORS[i]}" font-size="13" font-family="Permanent Marker,cursive">${SCHOOL_ICONS[i]} ${s} (b=${round2(groupSlopes[i])})</text>`;
+  });
+
+  svg += `</svg>`;
+  container.innerHTML = svg;
+}
+
+// ============================================================
+// SVG: SCATTER RAW (Step 5)
+// ============================================================
+function drawScatterRaw() {
+  const container = document.getElementById('scatterRawSVG');
+  if (!container) return;
+
+  const W = 700, H = 380;
+  const pad = { t: 50, r: 50, b: 60, l: 60 };
+  const pw = W - pad.l - pad.r;
+  const ph = H - pad.t - pad.b;
+
+  const xMin = 0, xMax = 10;
+  const yMin = 40, yMax = 95;
+
+  function xPos(v) { return pad.l + ((v - xMin) / (xMax - xMin)) * pw; }
+  function yPos(v) { return pad.t + ph - ((v - yMin) / (yMax - yMin)) * ph; }
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:'Patrick Hand',cursive;">`;
+  svg += `<rect width="${W}" height="${H}" fill="#1c2333" rx="10"/>`;
+  svg += `<text x="${W/2}" y="30" text-anchor="middle" fill="#f0c040" font-family="Bangers,cursive" font-size="20">Raw Data: Experiência vs. Skill</text>`;
+
+  // Grid
+  for (let v = yMin; v <= yMax; v += 10) {
+    svg += `<line x1="${pad.l}" y1="${yPos(v)}" x2="${W-pad.r}" y2="${yPos(v)}" stroke="#30363d"/>`;
+    svg += `<text x="${pad.l-8}" y="${yPos(v)+4}" text-anchor="end" fill="#8b949e" font-size="13">${v}</text>`;
+  }
+  for (let v = 0; v <= 10; v += 2) {
+    svg += `<text x="${xPos(v)}" y="${H-pad.b+20}" text-anchor="middle" fill="#8b949e" font-size="13">${v}</text>`;
+  }
+
+  // Axis labels
+  svg += `<text x="${W/2}" y="${H-10}" text-anchor="middle" fill="#8b949e" font-family="Permanent Marker,cursive" font-size="14">Years of Experience</text>`;
+  svg += `<text x="16" y="${H/2}" text-anchor="middle" fill="#8b949e" font-family="Permanent Marker,cursive" font-size="14" transform="rotate(-90,16,${H/2})">Skill</text>`;
+
+  // Overall regression line
+  const gx1 = 0, gx2 = 10;
+  const gy1 = b0_pooled + b1_pooled * gx1;
+  const gy2 = b0_pooled + b1_pooled * gx2;
+  svg += `<line x1="${xPos(gx1)}" y1="${yPos(gy1)}" x2="${xPos(gx2)}" y2="${yPos(gy2)}" stroke="#f0c040" stroke-width="2" stroke-dasharray="6,3" opacity="0.5"/>`;
+
+  // Points
+  RAW.forEach(r => {
+    svg += `<circle cx="${xPos(r.xp)}" cy="${yPos(r.skill)}" r="6" fill="${SCHOOL_COLORS[r.school]}" stroke="#0d1117" stroke-width="1.5"/>`;
+  });
+
+  // Group mean markers
+  SCHOOLS.forEach((s, i) => {
+    svg += `<rect x="${xPos(groupMeanXP[i])-4}" y="${yPos(groupMeanSkill[i])-4}" width="8" height="8" fill="none" stroke="${SCHOOL_COLORS[i]}" stroke-width="2" transform="rotate(45,${xPos(groupMeanXP[i])},${yPos(groupMeanSkill[i])})"/>`;
+    svg += `<text x="${xPos(groupMeanXP[i])+12}" y="${yPos(groupMeanSkill[i])-8}" fill="${SCHOOL_COLORS[i]}" font-size="12" font-family="Permanent Marker,cursive">${SCHOOL_ICONS[i]} (${round2(groupMeanXP[i])}, ${round2(groupMeanSkill[i])})</text>`;
+  });
+
+  // Legend
+  svg += `<text x="${W-pad.r-100}" y="${pad.t+15}" fill="#f0c040" font-size="11" font-family="Permanent Marker,cursive" opacity="0.7">--- Overall regression</text>`;
+
+  svg += `</svg>`;
+  container.innerHTML = svg;
+}
+
+// ============================================================
+// ANIMATED BARS: Adjusted Means (Step 7)
+// ============================================================
+function animateAdjustedBars() {
+  const container = document.getElementById('adjustedBars');
+  if (!container) return;
+
+  const maxVal = 90;
+  let html = '<div class="step-subtitle">Médias Raws vs. Adjusteds</div>';
+
+  SCHOOLS.forEach((s, i) => {
+    const raw = groupMeanSkill[i];
+    const adj = adjMeans[i];
+    const rawPct = (raw / maxVal) * 100;
+    const adjPct = (adj / maxVal) * 100;
+
+    html += `
+    <p style="margin:12px 0 4px; color:${SCHOOL_COLORS[i]}; font-family:'Permanent Marker',cursive; font-size:0.95rem;">${SCHOOL_ICONS[i]} ${s}</p>
+    <div class="bar-wrapper">
+      <div class="bar-label" style="color:var(--text-dim);">Raw</div>
+      <div class="bar-track">
+        <div class="bar-fill" id="rawBar${i}" style="background:${SCHOOL_COLORS[i]}; opacity:0.4;"></div>
+      </div>
+      <div class="bar-value">${round2(raw)}</div>
+    </div>
+    <div class="bar-wrapper">
+      <div class="bar-label" style="color:var(--gold);">Adjusted</div>
+      <div class="bar-track">
+        <div class="bar-fill" id="adjBar${i}" style="background:${SCHOOL_COLORS[i]};"></div>
+      </div>
+      <div class="bar-value" style="color:var(--gold);">${round2(adj)}</div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+
+  // Animate
+  setTimeout(() => {
+    SCHOOLS.forEach((s, i) => {
+      const rawEl = document.getElementById('rawBar' + i);
+      const adjEl = document.getElementById('adjBar' + i);
+      if (rawEl) rawEl.style.width = ((groupMeanSkill[i] / maxVal) * 100) + '%';
+      if (adjEl) adjEl.style.width = ((adjMeans[i] / maxVal) * 100) + '%';
+    });
+  }, 100);
+}
+
+// ============================================================
+// SS COMPARE STACKED BAR (Step 8)
+// ============================================================
+function drawSSCompare() {
+  const container = document.getElementById('ssCompareStack');
+  if (!container) return;
+
+  const totalSS = SS_total;
+
+  // ANOVA partition
+  const anovaBetPct = (SS_between_anova / totalSS * 100).toFixed(1);
+  const anovaErrPct = (SS_within_anova / totalSS * 100).toFixed(1);
+
+  // ANCOVA partition
+  const ancovaCovPct = (SS_covariate / totalSS * 100).toFixed(1);
+  const ancovaGrpPct = (SS_groups_adj / totalSS * 100).toFixed(1);
+  const ancovaErrPct = (SS_error_ancova / totalSS * 100).toFixed(1);
+
+  let html = `
+  <div class="step-subtitle" style="margin-top:20px;">Partição da Variance: ANOVA vs. ANCOVA</div>
+
+  <p style="font-family:'Permanent Marker',cursive; font-size:0.9rem; color:var(--text-dim); margin:8px 0;">Simple ANOVA</p>
+  <div class="ss-stack">
+    <div style="width:${anovaBetPct}%; background:var(--odin-blue);">${anovaBetPct}%</div>
+    <div style="width:${anovaErrPct}%; background:var(--thor-red); opacity:0.6;">${anovaErrPct}%</div>
+  </div>
+  <div class="ss-legend">
+    <span><span class="dot" style="background:var(--odin-blue);"></span>SS<sub>School</sub></span>
+    <span><span class="dot" style="background:var(--thor-red); opacity:0.6;"></span>SS<sub>Error</sub></span>
+  </div>
+
+  <p style="font-family:'Permanent Marker',cursive; font-size:0.9rem; color:var(--text-dim); margin:12px 0 8px;">ANCOVA (com covariate)</p>
+  <div class="ss-stack">
+    <div style="width:${ancovaCovPct}%; background:var(--gold);">${ancovaCovPct}%</div>
+    <div style="width:${ancovaGrpPct}%; background:var(--odin-blue);">${ancovaGrpPct}%</div>
+    <div style="width:${ancovaErrPct}%; background:var(--thor-red); opacity:0.6;">${ancovaErrPct}%</div>
+  </div>
+  <div class="ss-legend">
+    <span><span class="dot" style="background:var(--gold);"></span>SS<sub>Covariate</sub></span>
+    <span><span class="dot" style="background:var(--odin-blue);"></span>SS<sub>School(adj)</sub></span>
+    <span><span class="dot" style="background:var(--thor-red); opacity:0.6;"></span>SS<sub>Error</sub></span>
+  </div>
+  <p style="margin-top:10px; font-size:0.95rem;">A covariate absorveu <span class="highlight">${ancovaCovPct}%</span> da variance total — variance que antes inchava o erro!</p>
+  `;
+
+  container.innerHTML = html;
+}
+
+// ============================================================
+// GLM DIAGRAM (Step 9)
+// ============================================================
+function drawGLMDiagram() {
+  const container = document.getElementById('glmDiagramSVG');
+  if (!container) return;
+
+  const W = 700, H = 280;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:'Patrick Hand',cursive;">`;
+  svg += `<rect width="${W}" height="${H}" fill="#1c2333" rx="10"/>`;
+
+  // Title
+  svg += `<text x="${W/2}" y="30" text-anchor="middle" fill="#f0c040" font-family="Bangers,cursive" font-size="18">GLM: General Linear Model</text>`;
+
+  // Boxes
+  // Covariate box
+  svg += `<rect x="40" y="60" width="160" height="50" rx="8" fill="none" stroke="#f0c040" stroke-width="2"/>`;
+  svg += `<text x="120" y="82" text-anchor="middle" fill="#f0c040" font-family="Permanent Marker,cursive" font-size="14">Covariate</text>`;
+  svg += `<text x="120" y="100" text-anchor="middle" fill="#8b949e" font-size="12">(Experiência)</text>`;
+
+  // Group box
+  svg += `<rect x="40" y="140" width="160" height="50" rx="8" fill="none" stroke="#58a6ff" stroke-width="2"/>`;
+  svg += `<text x="120" y="162" text-anchor="middle" fill="#58a6ff" font-family="Permanent Marker,cursive" font-size="14">Fator (School)</text>`;
+  svg += `<text x="120" y="180" text-anchor="middle" fill="#8b949e" font-size="12">(D₁, D₂ dummies)</text>`;
+
+  // Y box
+  svg += `<rect x="460" y="100" width="180" height="50" rx="8" fill="none" stroke="#3fb950" stroke-width="2"/>`;
+  svg += `<text x="550" y="122" text-anchor="middle" fill="#3fb950" font-family="Permanent Marker,cursive" font-size="14">VD: Skill</text>`;
+  svg += `<text x="550" y="140" text-anchor="middle" fill="#8b949e" font-size="12">(Y)</text>`;
+
+  // Arrows
+  // Covariate -> Y
+  svg += `<line x1="200" y1="85" x2="455" y2="120" stroke="#f0c040" stroke-width="2" marker-end="url(#arrowGold)"/>`;
+  svg += `<text x="320" y="88" text-anchor="middle" fill="#f0c040" font-size="13">β₁ = ${round2(b_within)}</text>`;
+
+  // Group -> Y
+  svg += `<line x1="200" y1="165" x2="455" y2="130" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowBlue)"/>`;
+  svg += `<text x="320" y="166" text-anchor="middle" fill="#58a6ff" font-size="13">β₂, β₃</text>`;
+
+  // Errorr -> Y
+  svg += `<rect x="460" y="190" width="180" height="40" rx="8" fill="none" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  svg += `<text x="550" y="215" text-anchor="middle" fill="#f85149" font-size="13">ε (Error Residual)</text>`;
+  svg += `<line x1="550" y1="190" x2="550" y2="155" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrowRed)"/>`;
+
+  // Arrow markers
+  svg += `<defs>
+    <marker id="arrowGold" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f0c040"/></marker>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#58a6ff"/></marker>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f85149"/></marker>
+  </defs>`;
+
+  // Labels
+  svg += `<text x="${W/2}" y="${H-15}" text-anchor="middle" fill="#8b949e" font-size="12">ANCOVA = Preditores categóricos (School) + contínuo (Experiência) no mesmo modelo</text>`;
+
+  svg += `</svg>`;
+  container.innerHTML = svg;
+}
+
+// ============================================================
+// VARIANCE PARTITION DIAGRAM (Step 11)
+// ============================================================
+function drawVariancePartition() {
+  const container = document.getElementById('variancePartitionSVG');
+  if (!container) return;
+
+  const W = 700, H = 320;
+  const cx = W / 2, cy = 170, R = 110;
+
+  const totalSS = SS_total;
+  const covPct = SS_covariate / totalSS;
+  const grpPct = SS_groups_adj / totalSS;
+  const errPct = SS_error_ancova / totalSS;
+
+  // Build pie chart
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:'Patrick Hand',cursive;">`;
+  svg += `<rect width="${W}" height="${H}" fill="#1c2333" rx="10"/>`;
+  svg += `<text x="${W/2}" y="30" text-anchor="middle" fill="#f0c040" font-family="Bangers,cursive" font-size="20">Partição da Variance (ANCOVA)</text>`;
+
+  function arcPath(startAngle, endAngle, r) {
+    const x1 = cx + r * Math.cos(startAngle);
+    const y1 = cy + r * Math.sin(startAngle);
+    const x2 = cx + r * Math.cos(endAngle);
+    const y2 = cy + r * Math.sin(endAngle);
+    const large = (endAngle - startAngle) > Math.PI ? 1 : 0;
+    return `M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z`;
+  }
+
+  const slices = [
+    { pct: covPct, color: '#f0c040', label: 'Covariate', val: (covPct*100).toFixed(1) },
+    { pct: grpPct, color: '#58a6ff', label: 'School (adj)', val: (grpPct*100).toFixed(1) },
+    { pct: errPct, color: '#f85149', label: 'Error', val: (errPct*100).toFixed(1) },
+  ];
+
+  let angle = -Math.PI / 2;
+  slices.forEach(sl => {
+    const endAngle = angle + sl.pct * 2 * Math.PI;
+    svg += `<path d="${arcPath(angle, endAngle, R)}" fill="${sl.color}" opacity="0.7" stroke="#0d1117" stroke-width="2"/>`;
+
+    // Label
+    const midAngle = (angle + endAngle) / 2;
+    const lx = cx + (R + 40) * Math.cos(midAngle);
+    const ly = cy + (R + 40) * Math.sin(midAngle);
+    svg += `<text x="${lx}" y="${ly}" text-anchor="middle" fill="${sl.color}" font-family="Permanent Marker,cursive" font-size="13">${sl.label}</text>`;
+    svg += `<text x="${lx}" y="${ly+16}" text-anchor="middle" fill="#e6edf3" font-size="12">${sl.val}%</text>`;
+
+    angle = endAngle;
+  });
+
+  // Center label
+  svg += `<circle cx="${cx}" cy="${cy}" r="40" fill="#1c2333"/>`;
+  svg += `<text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#e6edf3" font-family="Permanent Marker,cursive" font-size="13">SS Total</text>`;
+  svg += `<text x="${cx}" y="${cy+14}" text-anchor="middle" fill="#f0c040" font-size="12">${round2(totalSS)}</text>`;
+
+  svg += `</svg>`;
+  container.innerHTML = svg;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderStep();
+</script>
+</body>
+</html>

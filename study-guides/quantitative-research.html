@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantitative Research — Step by Step | Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --bg-panel: #1c2333;
+  --odin-blue: #58a6ff;
+  --thor-red: #f85149;
+  --corvo-purple: #bc8cff;
+  --gold: #f0c040;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --success: #3fb950;
+  --border: #30363d;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 18px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-dark);
+  padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-panel);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* STEP CONTENT */
+.step-content {
+  min-height: 60vh;
+  padding: 30px 0;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+  font-family: 'Bangers', cursive;
+  font-size: 2.2rem;
+  color: var(--gold);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.step-subtitle {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.3rem;
+  color: var(--odin-blue);
+  margin-bottom: 15px;
+}
+
+/* DIALOGUE BOXES */
+.dialogue-box {
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  border-left: 4px solid;
+  position: relative;
+}
+
+.dialogue-box.odin {
+  background: rgba(88,166,255,0.08);
+  border-left-color: var(--odin-blue);
+}
+.dialogue-box.thor {
+  background: rgba(248,81,73,0.08);
+  border-left-color: var(--thor-red);
+}
+.dialogue-box.corvo {
+  background: rgba(188,140,255,0.08);
+  border-left-color: var(--corvo-purple);
+}
+.dialogue-box.huginn {
+  background: rgba(188,140,255,0.08);
+  border-left-color: var(--corvo-purple);
+}
+
+.char-name {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+.char-name.huginn { color: var(--corvo-purple); }
+
+.dialogue-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* DATA TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 1rem;
+}
+
+.data-table th, .data-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+.data-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+}
+
+.data-table td {
+  background: var(--bg-card);
+  transition: background 0.2s;
+}
+
+.data-table tr:hover td {
+  background: rgba(88,166,255,0.1);
+}
+
+/* FORMULA / DATA-DISPLAY */
+.formula {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-size: 1.15rem;
+  text-align: center;
+  font-family: 'Patrick Hand', cursive;
+  color: var(--gold);
+}
+
+.formula-label {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.data-display {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.data-display .label {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--gold);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+/* CONCEPT CARDS */
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.concept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.concept-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.concept-card p {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.concept-card.blue { border-left: 3px solid var(--odin-blue); }
+.concept-card.blue h4 { color: var(--odin-blue); }
+
+.concept-card.red { border-left: 3px solid var(--thor-red); }
+.concept-card.red h4 { color: var(--thor-red); }
+
+.concept-card.gold { border-left: 3px solid var(--gold); }
+.concept-card.gold h4 { color: var(--gold); }
+
+.concept-card.green { border-left: 3px solid var(--success); }
+.concept-card.green h4 { color: var(--success); }
+
+.concept-card.purple { border-left: 3px solid var(--corvo-purple); }
+.concept-card.purple h4 { color: var(--corvo-purple); }
+
+/* THREAT LIST */
+.threat-list {
+  list-style: none;
+  margin: 16px 0;
+  padding: 0;
+}
+
+.threat-list li {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  border-left: 3px solid var(--thor-red);
+}
+
+.threat-list li strong {
+  color: var(--gold);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+}
+
+/* CHECKLIST */
+.checklist {
+  list-style: none;
+  margin: 16px 0;
+  padding: 0;
+}
+
+.checklist li {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  border-left: 3px solid var(--success);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.checklist li .check-icon {
+  color: var(--success);
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* NAVIGATION */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 40px;
+  gap: 12px;
+}
+
+.nav-btn {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover {
+  border-color: var(--odin-blue);
+  background: rgba(88,166,255,0.1);
+}
+
+.nav-btn.primary {
+  background: var(--odin-blue);
+  color: var(--bg-dark);
+  border-color: var(--odin-blue);
+}
+
+.nav-btn.primary:hover {
+  background: #79bbff;
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* SIGNATURE */
+.signature {
+  text-align: center;
+  padding: 30px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* HIGHLIGHT */
+.hl-gold { color: var(--gold); font-weight: bold; }
+.hl-blue { color: var(--odin-blue); }
+.hl-red { color: var(--thor-red); }
+.hl-green { color: var(--success); }
+.hl-purple { color: var(--corvo-purple); }
+
+em {
+  color: var(--gold);
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* LICAO DOS CORVOS */
+.licao-box {
+  background: rgba(188,140,255,0.06);
+  border: 2px solid var(--corvo-purple);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.licao-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--corvo-purple);
+  margin-bottom: 12px;
+}
+
+.licao-section {
+  margin: 12px 0;
+}
+
+.licao-section h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1rem;
+  color: var(--corvo-purple);
+  margin-bottom: 6px;
+}
+
+.licao-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.licao-section li {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+/* BOX HISTORICO */
+.box-historico {
+  background: var(--bg-panel);
+  border: 1px solid var(--gold);
+  border-left: 4px solid var(--gold);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+
+.box-historico .box-title {
+  font-family: 'Bangers', cursive;
+  color: var(--gold);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+/* BOX ARMADILHA */
+.box-armadilha {
+  background: rgba(248,81,73,0.05);
+  border: 1px solid var(--thor-red);
+  border-left: 4px solid var(--thor-red);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+
+.box-armadilha .box-title {
+  font-family: 'Bangers', cursive;
+  color: var(--thor-red);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+/* CYCLE DIAGRAM */
+.cycle-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0;
+  align-items: center;
+}
+
+.cycle-step {
+  background: var(--bg-card);
+  border: 2px solid var(--odin-blue);
+  border-radius: 10px;
+  padding: 12px 18px;
+  text-align: center;
+  min-width: 120px;
+}
+
+.cycle-step .cycle-num {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--gold);
+}
+
+.cycle-step .cycle-label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.85rem;
+  color: var(--odin-blue);
+}
+
+.cycle-arrow {
+  font-size: 1.5rem;
+  color: var(--gold);
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container { padding: 12px; }
+  .step-title { font-size: 1.6rem; }
+  .concept-grid { grid-template-columns: 1fr; }
+  .nav-btn { padding: 10px 18px; font-size: 0.95rem; }
+  body { font-size: 16px; }
+  .data-table { font-size: 0.85rem; }
+  .data-table th, .data-table td { padding: 6px 8px; }
+}
+
+/* FADE ANIMATIONS */
+.fade-in {
+  animation: fadeIn 0.6s ease both;
+}
+
+.fade-in-delay {
+  animation: fadeIn 0.6s ease 0.3s both;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="progress-bar-container">
+    <div class="progress-label" id="progressLabel">Step 0 of 11</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="step-content" id="stepContent"></div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" id="btnBack" onclick="goBack()" disabled>&#9664; Back</button>
+    <button class="nav-btn primary" id="btnNext" onclick="goNext()">Next &#9654;</button>
+  </div>
+
+  <div class="signature">
+    Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026
+  </div>
+</div>
+
+<script>
+// ===== DIALOGUE HELPER =====
+function dialogue(character, name, text) {
+  return `<div class="dialogue-box ${character}">
+    <div class="char-name ${character}">${name}</div>
+    <div class="dialogue-text">${text}</div>
+  </div>`;
+}
+
+// ===== STEP FUNCTIONS =====
+const totalSteps = 12; // 0..11
+let currentStep = 0;
+
+// ---- STEP 0: INTRO ----
+function step0() {
+  return `
+    <div class="step-title">Quantitative Research: The Council at the Gates of Midgard</div>
+
+    <p>O Jarl examina o pergaminho de colheitas do trimestre e decreta: "A producao de cevada melhorou." Melhorou com base em que? Num palpite? No sorriso do fazendeiro que lhe trouxe hidromel?</p>
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'A pesquisa quantitativa existe para transformar impressoes em <em>evidencias</em> &mdash; e evidencias em decisoes defensaveis. Nao e questao de preferencia. E questao de consequencia.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Pra que tanta complicacao? Basta perguntar pro povo e sentir o mercado! Dados sao frescura de escriba...')}
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Quando um mercador de Midgard lanca uma rota comercial baseado numa amostra enviesada de viajantes, navios afundam e ouro evapora. A diferenca entre pesquisa e opiniao nao e sofisticacao &mdash; e <em>responsabilidade</em>.')}
+
+    ${dialogue('corvo', '🐦‍⬛‍⬛ Muninn whispers:', 'A raiz da palavra "estatistica" vem do latim <em>status</em> &mdash; o estado das coisas. Desde o seculo XVII, quantificar e governar.')}
+
+    <p>Neste guia, vamos percorrer os fundamentos da pesquisa quantitativa &mdash; passo a passo, sem atalhos de Thorment. Cada conceito e um ingrediente na cozinha de Odinfather: pule um e o prato desanda.</p>
+
+    <div class="box-historico">
+      <div class="box-title">Historical Box: Fisher e a Senhora que Tomava Cha</div>
+      <p>Em 1920, em Cambridge, a biologa Muriel Bristol alegou distinguir &mdash; pelo sabor &mdash; se o leite foi colocado antes ou depois do cha. Ronald Fisher preparou oito xicaras em ordem aleatoria. Bristol acertou todas. O experimento se tornou a base de <em>The Design of Experiments</em> (1935). Licao de Odinfather: ate a afirmacao mais trivial pode &mdash; e deve &mdash; ser testada com rigor.</p>
+    </div>
+  `;
+}
+
+// ---- STEP 1: QUANTI VS QUALI ----
+function step1() {
+  return `
+    <div class="step-title">Quantitative vs. Qualitative</div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Basta perguntar pros guerreiros o que eles acham! Entrevista profunda, observacao... pra que numeros?')}
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Pesquisa qualitativa e pesquisa quantitativa nao sao inimigas &mdash; sao abordagens para perguntas diferentes. Entretanto, confundir quando usar cada uma e a receita do desastre.')}
+
+    <table class="data-table">
+      <tr>
+        <th>Criterion</th>
+        <th style="color:var(--odin-blue)">Quantitativa</th>
+        <th style="color:var(--success)">Qualitativa</th>
+      </tr>
+      <tr>
+        <td><strong>Objective</strong></td>
+        <td>Medir, testar hipoteses, generalizar</td>
+        <td>Compreender, explorar, interpretar</td>
+      </tr>
+      <tr>
+        <td><strong>Dados</strong></td>
+        <td>Numeros, escalas, metricas</td>
+        <td>Palavras, narrativas, imagens</td>
+      </tr>
+      <tr>
+        <td><strong>Amostra</strong></td>
+        <td>Grande, representativa</td>
+        <td>Pequena, intencional</td>
+      </tr>
+      <tr>
+        <td><strong>Analise</strong></td>
+        <td>Estatistica (testes, modelos)</td>
+        <td>Tematica, discursiva, fenomenologica</td>
+      </tr>
+      <tr>
+        <td><strong>Resultado</strong></td>
+        <td>Generalizacoes, p-valores, IC</td>
+        <td>Categorias, padroes, significados</td>
+      </tr>
+      <tr>
+        <td><strong>Norse Example</strong></td>
+        <td>"Aldeias com forja produzem 23% mais armas" (n=200)</td>
+        <td>"Como ferreiros percebem a forja como identidade do cla"</td>
+      </tr>
+    </table>
+
+    ${dialogue('corvo', '🐦‍⬛‍⬛ Muninn whispers:', 'A pergunta de pesquisa dita o metodo &mdash; nunca o contrario. Perguntas de "quanto", "com que frequencia" e "qual a relacao entre" pedem abordagem quantitativa.')}
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Thorment quer que voce escolha pelo esforco minimo. Odinfather quer que voce escolha pela pergunta. A panela depende do prato &mdash; nao da preguica do cozinheiro.')}
+  `;
+}
+
+// ---- STEP 2: TIPOS DE VARIAVEIS ----
+function step2() {
+  return `
+    <div class="step-title">Types of Variables</div>
+
+    <p>Thorment acha que variavel e variavel. "Joga no modelo e roda", ele diz, erguendo o martelo sobre a tecla Enter. Odinfather respira fundo. E explica.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card blue">
+        <h4>Independent Variable (IV)</h4>
+        <p>O que voce manipula ou mede como causa. Exemplo: tipo de arma usada na batalha (espada, machado, lanca).</p>
+      </div>
+      <div class="concept-card gold">
+        <h4>Dependent Variable (DV)</h4>
+        <p>O efeito que voce quer explicar. Exemplo: numero de inimigos derrotados no combate.</p>
+      </div>
+      <div class="concept-card green">
+        <h4>Moderating Variable</h4>
+        <p>Altera a forca ou direcao da relacao VI &rarr; VD. Exemplo: experiencia do guerreiro &mdash; espada funciona melhor para veteranos?</p>
+      </div>
+      <div class="concept-card purple">
+        <h4>Mediating Variable</h4>
+        <p>O mecanismo que explica *como* a VI afeta a VD. Exemplo: tipo de arma &rarr; <em>confianca do guerreiro</em> &rarr; desempenho em batalha.</p>
+      </div>
+      <div class="concept-card red">
+        <h4>Control Variable</h4>
+        <p>O que voce mantem constante para isolar o efeito. Exemplo: mesmo terreno, mesma hora, mesma alimentacao pre-batalha.</p>
+      </div>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Se voce nao sabe quem e a VI e quem e a VD no seu estudo, voce nao tem um estudo. Tem um passeio de longship sem destino.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Moderadora, mediadora... isso tudo e a mesma coisa, nao?')}
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Nao. A <em>moderadora</em> muda a forca da relacao (para quem funciona mais). A <em>mediadora</em> explica o caminho pelo qual o efeito acontece (por que funciona). Confundir as duas e erro grave &mdash; e Thorment comete toda semana.')}
+
+    <div class="data-display">
+      <div class="label">Viking Conceptual Model</div>
+      <p style="text-align:center; font-family:'Permanent Marker'; font-size:1.1rem;">
+        <span class="hl-blue">Weapon Type (IV)</span>
+        &nbsp;&rarr;&nbsp;
+        <span class="hl-purple">Confidence (Mediator)</span>
+        &nbsp;&rarr;&nbsp;
+        <span class="hl-gold">Performance (DV)</span>
+      </p>
+      <p style="text-align:center; margin-top:8px; font-size:0.95rem;">
+        <span class="hl-green">Warrior Experience (Moderator)</span> altera a forca de VI &rarr; VD
+      </p>
+    </div>
+  `;
+}
+
+// ---- STEP 3: ESCALAS DE MEDIDA ----
+function step3() {
+  return `
+    <div class="step-title">Measurement Scales: The Four Levels</div>
+
+    <p>A escolha do teste estatistico depende do tipo de variavel. Rodar uma ANOVA com variavel dependente nominal e como usar um termometro para medir o peso de um porco &mdash; o instrumento funciona, mas mede a coisa errada.</p>
+
+    <table class="data-table">
+      <tr>
+        <th>Escala</th>
+        <th>Propriedade</th>
+        <th>Norse Example</th>
+        <th>Operacoes</th>
+      </tr>
+      <tr>
+        <td><span class="hl-blue">Nominal</span></td>
+        <td>Categorias sem ordem</td>
+        <td>Nome do cla: Fenrir, Hel, Jormungandr</td>
+        <td>= , &ne;</td>
+      </tr>
+      <tr>
+        <td><span class="hl-green">Ordinal</span></td>
+        <td>Ordem, distancias desiguais</td>
+        <td>Ranking de guerreiros: Jarl > Huskarl > Thrall</td>
+        <td>= , &ne; , &lt; , &gt;</td>
+      </tr>
+      <tr>
+        <td><span class="hl-gold">Intervalar</span></td>
+        <td>Distancias iguais, zero arbitrario</td>
+        <td>Temperatura do forno da forja (Celsius)</td>
+        <td>= , &ne; , &lt; , &gt; , + , &minus;</td>
+      </tr>
+      <tr>
+        <td><span class="hl-red">Razao</span></td>
+        <td>Distancias iguais, zero absoluto</td>
+        <td>Moedas de ouro arrecadadas no tributo</td>
+        <td>= , &ne; , &lt; , &gt; , + , &minus; , &times; , &divide;</td>
+      </tr>
+    </table>
+
+    ${dialogue('thor', '⚡ Thorment', 'Likert de 5 pontos e intervalar, certo? Entao posso calcular a media!')}
+
+    <div class="box-armadilha">
+      <div class="box-title">Trap Box</div>
+      <p>"Dados em escala Likert de 5 pontos sao intervalares?" &mdash; Esse debate nunca termina. A maioria dos pesquisadores em Administracao trata como intervalar, mas saiba que essa decisao tem consequencias e voce precisa justifica-la.</p>
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛‍⬛ Muninn whispers:', 'Memorize o acronimo <em>NOIR</em>: Nominal, Ordinal, Intervalar, Razao. Cada degrau acrescenta uma propriedade matematica ao anterior.')}
+
+    <p style="margin-top:16px">Por outro lado, existe outra distincao que cruza os quatro degraus:</p>
+
+    <div class="concept-grid">
+      <div class="concept-card blue">
+        <h4>Discretas</h4>
+        <p>Valores especificos e contaveis. Nao existe "1,47 ovo" na receita. Numero de filhos do Jarl, aldeias sob tributo, cabecas de gado. Voce <strong>conta</strong>.</p>
+      </div>
+      <div class="concept-card gold">
+        <h4>Continuas</h4>
+        <p>Valores infinitos entre dois pontos. Temperatura do forno, peso da farinha em quilos, tempo de cozimento do pao. Voce <strong>mede</strong>.</p>
+      </div>
+    </div>
+  `;
+}
+
+// ---- STEP 4: HIPOTESES ----
+function step4() {
+  return `
+    <div class="step-title">Hipoteses: H&#8320; e H&#8321;</div>
+
+    <p>Da teoria nascem <em>hipoteses</em> &mdash; afirmacoes testaveis, falsificaveis, com direcao e escopo. Sem hipotese, nao existe teste. Sem teste, nao existe ciencia.</p>
+
+    <div class="data-display">
+      <div class="label">Formal Definition</div>
+      <p><span class="hl-blue">H&#8320; (Hipotese Nula):</span> Nao existe efeito ou diferenca na populacao. O resultado observado e apenas variacao aleatoria.</p>
+      <p style="margin-top:8px"><span class="hl-gold">H&#8321; (Hipotese Alternativa):</span> Existe um efeito ou diferenca real na populacao. O resultado nao e obra do acaso.</p>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Minha hipotese: "Espadas sao boas e guerreiros sao fortes." Pronto! Vamos rodar o SPSS!')}
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Isso nao e uma hipotese, Thorment. E uma platitude. Uma hipotese precisa ser <em>especifica</em>, <em>direcional</em> e <em>falsificavel</em>.')}
+
+    <div class="concept-grid">
+      <div class="concept-card red">
+        <h4>BAD Hypothesis (Thorment)</h4>
+        <p>"Espadas boas sao importantes para guerreiros."</p>
+        <p style="margin-top:6px; color:var(--thor-red); font-size:0.9rem;">Vaga, nao testavel, nao falsificavel. O que e "boa"? "Importante" como?</p>
+      </div>
+      <div class="concept-card green">
+        <h4>GOOD Hypothesis (Odinfather)</h4>
+        <p>"A qualidade do aco da forja de Nidavellir aumenta a durabilidade das espadas em 20% comparado ao aco de Svartalfheim."</p>
+        <p style="margin-top:6px; color:var(--success); font-size:0.9rem;">Especifica, direcional, mensuravel, falsificavel.</p>
+      </div>
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛‍⬛ Muninn whispers:', 'O teste estatistico avalia <em>H&#8320;</em>. Se a probabilidade dos dados sob H&#8320; for muito baixa (p &lt; &alpha;), rejeitamos H&#8320; em favor de H&#8321;. Nunca "provamos" H&#8321; &mdash; apenas encontramos evidencia contra H&#8320;.')}
+
+    ${dialogue('huginn', '🐦‍⬛‍⬛ Huginn challenges:', 'Se sua hipotese surgiu <em>depois</em> de ver os resultados, ela nao e uma hipotese. E uma profecia retroativa. Isso tem nome tecnico: <em>HARKing</em> (Hypothesizing After Results are Known). Thorment adora.')}
+  `;
+}
+
+// ---- STEP 5: VALIDADE INTERNA ----
+function step5() {
+  return `
+    <div class="step-title">Internal Validity</div>
+
+    <p>Validade interna responde a uma pergunta brutal: a relacao que voce encontrou entre VI e VD e <em>causal</em>, ou existe uma explicacao alternativa?</p>
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Uma pesquisa com alta validade interna permite dizer: "A mudou B." Com baixa validade interna, voce so pode dizer: "A e B aconteceram juntos &mdash; e talvez C, D e E tambem tenham ajudado."')}
+
+    <p class="step-subtitle">The 7 Classic Threats (Campbell & Stanley)</p>
+
+    <ul class="threat-list">
+      <li>
+        <strong>1. Historia</strong><br>
+        Eventos externos que acontecem durante o estudo. O cla testou uma nova espada, mas no meio do experimento veio uma tempestade que afetou todas as batalhas.
+      </li>
+      <li>
+        <strong>2. Maturation</strong><br>
+        Mudancas naturais nos participantes ao longo do tempo. Os guerreiros ficaram mais fortes simplesmente porque treinaram entre as medicoes &mdash; nao por causa da espada nova.
+      </li>
+      <li>
+        <strong>3. Instrumentation</strong><br>
+        Mudanca no instrumento de medida. O escriba que contava baixas na primeira batalha foi substituido por um aprendiz menos preciso na segunda.
+      </li>
+      <li>
+        <strong>4. Regression to the Mean</strong><br>
+        Valores extremos tendem a voltar para a media. O pior cla da temporada passada melhorou &mdash; mas isso seria esperado mesmo sem intervencao.
+      </li>
+      <li>
+        <strong>5. Selecao</strong><br>
+        Grupos nao equivalentes desde o inicio. Se voce comparou guerreiros voluntarios com recrutados, a motivacao ja era diferente antes do tratamento.
+      </li>
+      <li>
+        <strong>6. Experimental Mortality</strong><br>
+        Participantes que abandonam o estudo. Se so os guerreiros mais fortes sobrevivem ate a medicao final, seus resultados estao inflados.
+      </li>
+      <li>
+        <strong>7. Interaction Between Threats</strong><br>
+        Combinacao de duas ou mais ameacas. Selecao + maturacao: o grupo experimental ja era mais forte E teve mais tempo para treinar.
+      </li>
+    </ul>
+
+    ${dialogue('thor', '⚡ Thorment', 'Sete ameacas? Quem se importa! Se o p-valor deu significativo, acabou!')}
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'O p-valor nao distingue sinal de ruido quando o design e comprometido. Um p < 0,05 com validade interna zero vale menos que um pergaminho em branco.')}
+  `;
+}
+
+// ---- STEP 6: VALIDADE EXTERNA ----
+function step6() {
+  return `
+    <div class="step-title">External Validity: From Midgard to Asgard?</div>
+
+    <p>Se validade interna pergunta "o efeito e real?", validade externa pergunta: "o efeito se aplica <em>alem desta amostra</em>?"</p>
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Voce testou um elixir de cura em 30 guerreiros de Midgard. Funcionou. Boa noticia. Mas &mdash; funcionaria tambem em Asgard? Em Jotunheim? Em mulheres? Em velhos? Essa e a questao da <em>generalizacao</em>.')}
+
+    <div class="concept-grid">
+      <div class="concept-card blue">
+        <h4>Generalization to Populations</h4>
+        <p>Os resultados valem para pessoas diferentes da amostra? Se voce so testou homens jovens de um cla, nao pode afirmar nada sobre mulheres ou idosos de outros clas.</p>
+      </div>
+      <div class="concept-card gold">
+        <h4>Generalization to Contexts</h4>
+        <p>Os resultados valem em outros ambientes? O que funciona numa batalha em campo aberto pode nao funcionar num cerco a fortaleza.</p>
+      </div>
+      <div class="concept-card green">
+        <h4>Temporal Generalization</h4>
+        <p>Os resultados valem em outras epocas? Taticas de combate que funcionaram no verao podem falhar no inverno nordico.</p>
+      </div>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Testei em Midgard, vale pra todos os Nove Reinos! Obvio!')}
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Errado. <em>Replicacao</em> em contextos diferentes e a unica forma de ganhar confianca na generalizacao. Um unico estudo nao prova universalidade &mdash; sugere uma possibilidade.')}
+
+    <div class="box-armadilha">
+      <div class="box-title">Trap Box: Convenience Sample</div>
+      <p>Se seus 5.000 respondentes vieram todos de uma unica aldeia, de um unico cla, de um unico reino &mdash; voce nao tem uma amostra grande. Tem um estudo de caso disfarcado de survey. Amostra grande sem representatividade e <em>lixo com muitos dados</em>.</p>
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛‍⬛ Muninn whispers:', 'Existe uma tensao classica: designs que maximizam validade <em>interna</em> (laboratorio controlado) muitas vezes sacrificam validade <em>externa</em> (mundo real) &mdash; e vice-versa.')}
+  `;
+}
+
+// ---- STEP 7: CONFIABILIDADE ----
+function step7() {
+  return `
+    <div class="step-title">Reliability: The Scale That Does Not Lie</div>
+
+    <p>Confiabilidade e a <em>consistencia</em> de uma medida. Se voce pesa o mesmo saco de cevada tres vezes na balanca do mercado de Birka e obtem 48kg, 51kg e 44kg &mdash; a balanca nao e confiavel. O problema nao e a cevada; e o instrumento.</p>
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Um instrumento <em>confiavel</em> produz resultados consistentes em medicoes repetidas sob as mesmas condicoes. Sem confiabilidade, seus dados sao ruido disfarcado de informacao.')}
+
+    <div class="concept-grid">
+      <div class="concept-card blue">
+        <h4>Test-Retest</h4>
+        <p>Aplica o mesmo instrumento duas vezes ao mesmo grupo. A correlacao entre as medicoes indica estabilidade temporal. Se guerreiros respondem uma escala de moral hoje e daqui a duas semanas, os resultados devem ser similares.</p>
+      </div>
+      <div class="concept-card gold">
+        <h4>Internal Consistency</h4>
+        <p>Os itens do instrumento medem a mesma coisa? O <em>alfa de Cronbach</em> avalia se as perguntas de uma escala convergem. Valores acima de 0,70 sao geralmente aceitos.</p>
+      </div>
+      <div class="concept-card green">
+        <h4>Parallel Forms</h4>
+        <p>Duas versoes equivalentes do instrumento. Se ambas dao resultados semelhantes, a confiabilidade esta garantida. Como ter duas balancas diferentes na feira e conferir se concordam.</p>
+      </div>
+      <div class="concept-card purple">
+        <h4>Inter-Rater</h4>
+        <p>Dois ou mais juizes avaliam o mesmo fenomeno. Se tres mestres de armas classificam a qualidade de uma espada e concordam, a medida e confiavel.</p>
+      </div>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Alfa de Cronbach acima de 0,70? Isso ai qualquer escala atinge. So botar 20 perguntas parecidas!')}
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Cuidado. Inflar o alfa com itens redundantes e como pesar o mesmo saco de cevada 20 vezes &mdash; a media fica estavel, mas voce nao aprendeu nada novo. <em>Confiabilidade sem validade e consistencia no erro.</em>')}
+
+    <div class="data-display">
+      <div class="label">Relacao Confiabilidade &times; Validade</div>
+      <p><span class="hl-red">Nem confiavel, nem valido:</span> balas espalhadas, longe do alvo.</p>
+      <p><span class="hl-blue">Confiavel, mas nao valido:</span> balas agrupadas, mas longe do centro.</p>
+      <p><span class="hl-green">Confiavel E valido:</span> balas agrupadas no centro do alvo.</p>
+      <p style="margin-top:8px; color:var(--text-dim);">Voce pode ser consistente e estar errado. Validade exige confiabilidade, mas confiabilidade nao garante validade.</p>
+    </div>
+  `;
+}
+
+// ---- STEP 8: DESENHOS DE PESQUISA ----
+function step8() {
+  return `
+    <div class="step-title">Research Designs</div>
+
+    <p>O design de pesquisa e a planta baixa do estudo. Errar aqui e como erguer uma muralha com a fundacao torta &mdash; nao importa quao imponente fique a torre de vigia.</p>
+
+    <table class="data-table">
+      <tr>
+        <th>Design</th>
+        <th>Manipulation?</th>
+        <th>Control?</th>
+        <th>Causal Inference</th>
+        <th>Norse Example</th>
+      </tr>
+      <tr>
+        <td><span class="hl-gold">Experimental</span></td>
+        <td>Yes</td>
+        <td>Control group + randomization</td>
+        <td><span class="hl-green">Alta</span></td>
+        <td>Dois fornos identicos: um com tempero novo, outro sem. Qual pao fica melhor?</td>
+      </tr>
+      <tr>
+        <td><span class="hl-blue">Quase-experimental</span></td>
+        <td>Yes</td>
+        <td>No randomization</td>
+        <td><span class="hl-gold">Moderada</span></td>
+        <td>Comparar duas aldeias: uma recebeu treinamento de combate, outra nao (sem sorteio).</td>
+      </tr>
+      <tr>
+        <td><span class="hl-purple">Survey</span></td>
+        <td>No</td>
+        <td>None</td>
+        <td><span class="hl-red">Baixa</span></td>
+        <td>Questionario sobre satisfacao com o Jarl, aplicado a 500 guerreiros.</td>
+      </tr>
+      <tr>
+        <td><span class="hl-blue">Correlacional</span></td>
+        <td>No</td>
+        <td>None</td>
+        <td><span class="hl-red">Baixa</span></td>
+        <td>Associacao entre tamanho do rebanho e riqueza da aldeia (dados secundarios).</td>
+      </tr>
+    </table>
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Experimentos sao o padrao-ouro. Quando a randomizacao e impossivel ou antietica &mdash; nao da pra sortear quais aldeias serao saqueadas &mdash; usa-se quase-experimento. O survey e o arroz-com-feijao da Administracao: facil de coletar, dificil de fazer bem.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Survey com amostra de conveniencia! Rapido, barato e o reviewer nao reclama!')}
+
+    ${dialogue('huginn', '🐦‍⬛‍⬛ Huginn challenges:', 'A pergunta de pesquisa deve ditar o design &mdash; <em>nunca o contrario</em>. Voce nao escolhe a panela antes de saber o que vai cozinhar.')}
+
+    <div class="box-armadilha">
+      <div class="box-title">Trap Box: Common Method Bias</div>
+      <p>Quando o mesmo guerreiro, no mesmo momento, responde tanto a variavel independente quanto a dependente &mdash; e como perguntar ao reu se ele e culpado. O risco e que correlacoes infladas aparecam por causa do <em>metodo</em>, nao da <em>realidade</em>.</p>
+    </div>
+  `;
+}
+
+// ---- STEP 9: VIES E AMEACAS ----
+function step9() {
+  return `
+    <div class="step-title">Common Biases and Threats</div>
+
+    <p>Vieses sao distorcoes sistematicas que contaminam resultados. Thorment coleciona vieses como trofeusde batalha &mdash; sem perceber que cada um compromete sua pesquisa.</p>
+
+    <ul class="threat-list">
+      <li>
+        <strong>Confirmation Bias</strong><br>
+        Buscar apenas evidencias que confirmam sua crenca. Thorment acredita que espadas de Nidavellir sao superiores e ignora toda evidencia contraria.
+        ${dialogue('thor', '⚡ Thorment', 'Olha &mdash; encontrei TRES estudos que comprovam minha hipotese! Os outros doze que contradizem? Metodologia fraca.')}
+      </li>
+      <li>
+        <strong>Survivorship Bias</strong><br>
+        Analisar so quem "sobreviveu" ao processo. Se voce estuda apenas mercadores bem-sucedidos na feira de Birka, ignora todos que faliram &mdash; e suas conclusoes estao infladas.
+      </li>
+      <li>
+        <strong>Selection Bias</strong><br>
+        Amostra nao-aleatoria que distorce resultados. Perguntar "voce gosta de hidromel?" apenas dentro de uma taverna gera 98% de "sim" &mdash; surpresa zero.
+      </li>
+      <li>
+        <strong>Social Desirability Bias</strong><br>
+        Respondentes dizem o que acham que o pesquisador quer ouvir. "O Jarl e um bom lider?" &mdash; perguntou o proprio Jarl.
+      </li>
+      <li>
+        <strong>Response Bias</strong><br>
+        Tendencia a marcar sempre o mesmo ponto da escala (aquiescencia) ou respostas extremas. O guerreiro marca 5 em tudo porque esta com pressa para o banquete.
+      </li>
+      <li>
+        <strong>Researcher Bias</strong><br>
+        O pesquisador influencia inconscientemente os resultados. Odinfather insiste: pre-registre hipoteses e plano de analise <em>antes</em> de coletar dados.
+      </li>
+    </ul>
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Vieses nao sao erros de calculo &mdash; sao erros de <em>design</em>. Nenhum teste estatistico corrige dados enviesados. Lixo entra, lixo sai.')}
+
+    ${dialogue('corvo', '🐦‍⬛‍⬛ Muninn whispers:', 'O antidoto contra vieses: randomizacao, cegamento, pre-registro, instrumentos validados e &mdash; acima de tudo &mdash; humildade epistemo logica.')}
+  `;
+}
+
+// ---- STEP 10: LICAO DOS CORVOS ----
+function step10() {
+  return `
+    <div class="step-title">Lesson of the Ravens</div>
+
+    <div class="licao-box">
+      <div class="licao-title">Muninn Summarizes &mdash; O Que Voce Precisa Guardar</div>
+
+      <div class="licao-section">
+        <h4>Key Points</h4>
+        <ul>
+          <li>Pesquisa quantitativa transforma impressoes em <em>evidencias</em> &mdash; e evidencias em decisoes defensaveis.</li>
+          <li>A pergunta de pesquisa dita o metodo: "quanto?", "qual a relacao?" e "com que frequencia?" pedem abordagem quantitativa.</li>
+          <li>Variaveis se classificam em VI, VD, moderadora, mediadora e controle &mdash; confundir e fatal.</li>
+          <li>Escalas seguem o NOIR: Nominal, Ordinal, Intervalar, Razao. O teste depende da escala.</li>
+          <li>Hipoteses devem ser especificas, direcionais e falsificaveis. Se nao e falsificavel, nao e ciencia.</li>
+          <li>Validade interna = o efeito e real? Validade externa = o efeito generaliza?</li>
+          <li>Confiabilidade = consistencia da medida. Validade exige confiabilidade, mas nao o contrario.</li>
+          <li>Experimentos sao o padrao-ouro. Surveys sao o arroz-com-feijao &mdash; mas exigem cuidado redobrado.</li>
+          <li>Vieses sao erros de <em>design</em>, nao de calculo. Nenhum teste estatistico corrige dados enviesados.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="licao-box" style="border-color: var(--odin-blue); background: rgba(88,166,255,0.04);">
+      <div class="licao-title" style="color: var(--odin-blue);">Huginn Challenges &mdash; Perguntas para Reflexao</div>
+
+      <div class="licao-section">
+        <h4 style="color: var(--odin-blue);">Challenges</h4>
+        <ul>
+          <li>No seu projeto de pesquisa, voce sabe exatamente quem e a VI e quem e a VD? E as moderadoras e mediadoras?</li>
+          <li>Suas hipoteses foram formuladas <em>antes</em> de ver os dados &mdash; ou voce esta fazendo HARKing como Thorment?</li>
+          <li>Qual e a maior ameaca a validade interna do seu estudo? O que voce fez para controla-la?</li>
+          <li>Sua amostra permite generalizacao &mdash; ou voce tem um estudo de caso disfarcado de survey?</li>
+          <li>Seus instrumentos tem evidencias de confiabilidade no contexto brasileiro? Alfa de Cronbach nao e suficiente sozinho.</li>
+          <li>Qual vies e mais provavel no seu design? Voce tem uma estrategia para mitiga-lo?</li>
+        </ul>
+      </div>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'A cozinha estatistica e exigente. Os ingredientes precisam de triagem. Os utensilios precisam de calibracao. E o cozinheiro &mdash; voce &mdash; precisa de paciencia.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Ja deu! Vamos pular pra analise de dados!')}
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'No proximo capitulo, vamos abrir o barril de provisoes. Ver o que tem dentro. Checar as validades. Examinar o que esta fresco, o que esta murcho e o que precisa ir pro lixo. <em>Estatistica descritiva</em> &mdash; o diagnostico antes do tratamento.')}
+  `;
+}
+
+// ---- STEP 11: REPORTE FINAL / CHECKLIST ----
+function step11() {
+  return `
+    <div class="step-title">Checklist: What a Good Quantitative Study Needs</div>
+
+    <p>Antes de coletar um unico dado, passe por esta lista. Se respondeu "nao" a mais de dois itens, Thorment esta com o martelo na sua mao. Largue-o.</p>
+
+    <ul class="checklist">
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Teoria:</strong> Tenho uma fundamentacao teorica que justifica minhas hipoteses &mdash; ou estou "pescando" relacoes nos dados como Thorment?</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Hipoteses:</strong> Minhas hipoteses sao especificas, direcionais e falsificaveis?</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Variaveis:</strong> Sei exatamente o tipo de cada variavel (nominal, ordinal, intervalar, razao) e sua natureza (discreta ou continua)?</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Design:</strong> Escolhi o design com base na pergunta &mdash; ou na conveniencia?</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Population and Sample:</strong> Sei qual e minha populacao-alvo e como vou selecionar a amostra? A amostra e representativa?</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Sample Size:</strong> Fiz analise de poder para determinar o n minimo? (Se nao sabe como, leia o Capitulo 14.)</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Instruments:</strong> As escalas que vou usar foram validadas no meu contexto? Tenho evidencia de confiabilidade?</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Internal Validity:</strong> Identifiquei as ameacas ao meu design e tenho estrategias para mitiga-las?</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Validade Externa:</strong> Para quem e em que contexto meus resultados se aplicam? Estou fazendo promessas que minha amostra nao sustenta?</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Vieses:</strong> Qual e o vies mais provavel do meu estudo e o que faco para controla-lo?</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Pre-registration:</strong> Registrei hipoteses e plano de analise antes de coletar? (Se nao, Thorment sorri.)</div>
+      </li>
+      <li>
+        <span class="check-icon">&check;</span>
+        <div><strong>Etica:</strong> Tenho aprovacao do comite de etica? Os participantes deram consentimento informado?</div>
+      </li>
+    </ul>
+
+    ${dialogue('odin', '🧙‍♂️‍♂️ Odinfather', 'Esse checklist nao e burocratico &mdash; e a diferenca entre ciencia e achismo. Cada item que voce pula e uma brecha por onde Thorment entra com o martelo.')}
+
+    <div class="box-historico">
+      <div class="box-title">Ciclo Completo da Quantitative Research</div>
+      <div class="cycle-container">
+        <div class="cycle-step">
+          <div class="cycle-num">1</div>
+          <div class="cycle-label">Theory</div>
+        </div>
+        <span class="cycle-arrow">&rarr;</span>
+        <div class="cycle-step">
+          <div class="cycle-num">2</div>
+          <div class="cycle-label">Hipoteses</div>
+        </div>
+        <span class="cycle-arrow">&rarr;</span>
+        <div class="cycle-step">
+          <div class="cycle-num">3</div>
+          <div class="cycle-label">Design</div>
+        </div>
+        <span class="cycle-arrow">&rarr;</span>
+        <div class="cycle-step">
+          <div class="cycle-num">4</div>
+          <div class="cycle-label">Collection</div>
+        </div>
+        <span class="cycle-arrow">&rarr;</span>
+        <div class="cycle-step">
+          <div class="cycle-num">5</div>
+          <div class="cycle-label">Analysis</div>
+        </div>
+        <span class="cycle-arrow">&rarr;</span>
+        <div class="cycle-step">
+          <div class="cycle-num">6</div>
+          <div class="cycle-label">Inference</div>
+        </div>
+      </div>
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛‍⬛ Muninn whispers:', 'Pesquisa quantitativa e a disciplina de transformar o caos do mundo em informacao estruturada &mdash; variaveis bem definidas, amostras bem selecionadas, designs bem planejados, analises bem fundamentadas.')}
+
+    ${dialogue('huginn', '🐦‍⬛‍⬛ Huginn challenges:', 'E a disciplina de resistir a tentacao de Thorment &mdash; que vai te oferecer atalhos sedutores em <em>cada uma</em> dessas etapas. Nao deixe.')}
+  `;
+}
+
+// ===== STEP MAP =====
+const stepFunctions = [step0, step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11];
+
+const stepNames = [
+  'Introduction',
+  'Quanti vs Quali',
+  'Types of Variables',
+  'Measurement Scales',
+  'Hypotheses',
+  'Internal Validity',
+  'External Validity',
+  'Reliability',
+  'Research Designs',
+  'Biases and Threats',
+  'Lesson of the Ravens',
+  'Final Checklist'
+];
+
+// ===== NAVIGATION =====
+function renderStep() {
+  const content = document.getElementById('stepContent');
+  content.innerHTML = stepFunctions[currentStep]();
+  content.style.animation = 'none';
+  content.offsetHeight;
+  content.style.animation = 'fadeIn 0.4s ease';
+
+  document.getElementById('progressLabel').textContent = `Step ${currentStep} of ${totalSteps - 1} — ${stepNames[currentStep]}`;
+  document.getElementById('progressFill').style.width = `${(currentStep / (totalSteps - 1)) * 100}%`;
+
+  document.getElementById('btnBack').disabled = currentStep === 0;
+  document.getElementById('btnNext').textContent = currentStep === totalSteps - 1 ? 'Start Over ↻' : 'Next ▶';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNext() {
+  if (currentStep >= totalSteps - 1) {
+    currentStep = 0;
+  } else {
+    currentStep++;
+  }
+  renderStep();
+}
+
+function goBack() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goBack(); }
+});
+
+// Initialize
+renderStep();
+</script>
+</body>
+</html>

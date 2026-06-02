@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sampling — Step by Step | Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --bg-panel: #1c2333;
+  --odin-blue: #58a6ff;
+  --thor-red: #f85149;
+  --corvo-purple: #bc8cff;
+  --gold: #f0c040;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --success: #3fb950;
+  --border: #30363d;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 18px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-dark);
+  padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-panel);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* STEP CONTENT */
+.step-content {
+  min-height: 60vh;
+  padding: 30px 0;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+  font-family: 'Bangers', cursive;
+  font-size: 2.2rem;
+  color: var(--gold);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.step-subtitle {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.3rem;
+  color: var(--odin-blue);
+  margin-bottom: 15px;
+}
+
+/* DIALOGUE BOXES */
+.dialogue-box {
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  border-left: 4px solid;
+  position: relative;
+}
+
+.dialogue-box.odin {
+  background: rgba(88,166,255,0.08);
+  border-left-color: var(--odin-blue);
+}
+.dialogue-box.thor {
+  background: rgba(248,81,73,0.08);
+  border-left-color: var(--thor-red);
+}
+.dialogue-box.corvo {
+  background: rgba(188,140,255,0.08);
+  border-left-color: var(--corvo-purple);
+}
+.dialogue-box.huginn {
+  background: rgba(188,140,255,0.08);
+  border-left-color: var(--corvo-purple);
+}
+
+.char-name {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+.char-name.huginn { color: var(--corvo-purple); }
+
+.dialogue-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* DATA TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 1rem;
+}
+
+.data-table th, .data-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.data-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+}
+
+.data-table td {
+  background: var(--bg-card);
+  transition: background 0.2s;
+}
+
+.data-table tr:hover td {
+  background: rgba(88,166,255,0.1);
+}
+
+/* FORMULA */
+.formula {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-size: 1.15rem;
+  text-align: center;
+  font-family: 'Patrick Hand', cursive;
+  color: var(--gold);
+}
+
+.formula-label {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+/* SVG VISUALS */
+.visual-container {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.visual-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* CONCEPT CARD */
+.concept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 14px 0;
+}
+
+.concept-card h3 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  color: var(--odin-blue);
+  margin-bottom: 8px;
+}
+
+/* COMPARISON GRID */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.comparison-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.comparison-card.pro {
+  border-color: var(--success);
+}
+
+.comparison-card.con {
+  border-color: var(--thor-red);
+}
+
+.comparison-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+/* METHOD CARD */
+.method-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin: 14px 0;
+  transition: border-color 0.3s;
+}
+
+.method-card:hover {
+  border-color: var(--odin-blue);
+}
+
+.method-card h3 {
+  font-family: 'Bangers', cursive;
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+
+.method-card .tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-family: 'Permanent Marker', cursive;
+  margin-right: 6px;
+}
+
+.tag.prob { background: rgba(88,166,255,0.2); color: var(--odin-blue); }
+.tag.nprob { background: rgba(248,81,73,0.2); color: var(--thor-red); }
+
+/* BIAS CARD */
+.bias-card {
+  background: rgba(248,81,73,0.05);
+  border: 1px solid var(--thor-red);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 14px 0;
+}
+
+.bias-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--thor-red);
+  margin-bottom: 6px;
+}
+
+/* NAVIGATION */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 40px;
+  gap: 12px;
+}
+
+.nav-btn {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover {
+  border-color: var(--odin-blue);
+  background: rgba(88,166,255,0.1);
+}
+
+.nav-btn.primary {
+  background: var(--odin-blue);
+  color: var(--bg-dark);
+  border-color: var(--odin-blue);
+}
+
+.nav-btn.primary:hover {
+  background: #79bbff;
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* SIGNATURE */
+.signature {
+  text-align: center;
+  padding: 30px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* HIGHLIGHT */
+.hl-gold { color: var(--gold); font-weight: bold; }
+.hl-blue { color: var(--odin-blue); }
+.hl-red { color: var(--thor-red); }
+.hl-green { color: var(--success); }
+.hl-purple { color: var(--corvo-purple); }
+
+/* LICAO DOS CORVOS */
+.licao-box {
+  background: rgba(188,140,255,0.06);
+  border: 2px solid var(--corvo-purple);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.licao-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--corvo-purple);
+  margin-bottom: 12px;
+}
+
+/* TCL ANIMATION */
+.tcl-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.tcl-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+  flex: 1;
+  min-width: 200px;
+  max-width: 280px;
+}
+
+.tcl-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: var(--odin-blue);
+}
+
+/* SUMMARY TABLE */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 0.95rem;
+}
+
+.summary-table th, .summary-table td {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.summary-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.9rem;
+  color: var(--gold);
+}
+
+.summary-table td {
+  background: var(--bg-card);
+}
+
+.summary-table tr:hover td {
+  background: rgba(88,166,255,0.08);
+}
+
+/* INFO BOX */
+.info-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+
+.info-box h4 {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container { padding: 12px; }
+  .step-title { font-size: 1.6rem; }
+  .comparison-grid { grid-template-columns: 1fr; }
+  .nav-btn { padding: 10px 18px; font-size: 0.95rem; }
+  body { font-size: 16px; }
+  .tcl-row { flex-direction: column; align-items: center; }
+  .tcl-card { max-width: 100%; }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease both;
+}
+
+.fade-in-delay {
+  animation: fadeIn 0.6s ease 0.3s both;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="progress-bar-container">
+    <div class="progress-label" id="progressLabel">Step 0 of 10</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="step-content" id="stepContent"></div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" id="btnBack" onclick="goBack()" disabled>&#9664; Back</button>
+    <button class="nav-btn primary" id="btnNext" onclick="goNext()">Next &#9654;</button>
+  </div>
+
+  <div class="signature">
+    Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026
+  </div>
+</div>
+
+<script>
+// ===== DIALOGUE HELPER =====
+function dialogue(character, name, text) {
+  return `<div class="dialogue-box ${character}">
+    <div class="char-name ${character}">${name}</div>
+    <div class="dialogue-text">${text}</div>
+  </div>`;
+}
+
+// ===== STEP FUNCTIONS =====
+const totalSteps = 11; // 0..10
+let currentStep = 0;
+
+// ============================================================
+// STEP 0 — INTRO: O DESAFIO DA SAMPLEGEM
+// ============================================================
+function step0() {
+  return `
+    <div class="step-title">Sampling: The Impossible Census of the Nine Realms</div>
+
+    <p>O Grande Conselho de Asgard precisa saber o nível de satisfação dos guerreiros viking com a distribuição de espólios após as batalhas. O problema? Existem <span class="hl-gold">1.000 clãs</span> espalhados pelos Nove Reinos &mdash; de Midgard a Niflheim.</p>
+
+    <p>Visitar todos? Meses de navegação, centenas de longships, provisões infinitas. O censo completo é um luxo que nem Odin pode pagar.</p>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Não precisamos ouvir <em>todos</em> os 1.000 clãs. Precisamos de uma <strong>amostra</strong> &mdash; um subconjunto que represente bem a população inteira. A questão é: <em>como escolher</em>?')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Fácil! Pergunta pros clãs que moram aqui perto de Asgard. São os mais acessíveis, e pronto &mdash; economizamos tempo e hidromel!')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'E é exatamente assim que nasce o <strong>viés amostral</strong>, Thorment. Os clãs próximos a Asgard são mais ricos, mais favorecidos. A opinião deles não representa Niflheim nem Jötunheim.')}
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling</strong> é o processo de selecionar um subconjunto (amostra) de uma população para estimar características do todo. A qualidade da amostra determina a qualidade da inferência.')}
+
+    <div class="info-box">
+      <h4>Why sample?</h4>
+      <ul style="margin-left: 20px; margin-top: 8px;">
+        <li><span class="hl-blue">Custo</span> &mdash; censos são caríssimos (longships não são baratas)</li>
+        <li><span class="hl-blue">Tempo</span> &mdash; enquanto o censo termina, a guerra já mudou</li>
+        <li><span class="hl-blue">Praticidade</span> &mdash; nem sempre é possível acessar todos os elementos</li>
+        <li><span class="hl-blue">Destrutividade</span> &mdash; testar a qualidade de <em>todas</em> as espadas significaria quebrá-las</li>
+      </ul>
+    </div>
+
+    <p>Nos próximos passos, Odinfather vai guiar você pelos métodos de amostragem &mdash; dos mais rigorosos aos mais perigosos. Thorment vai tentar atalhos. Os corvos vão lembrar as definições.</p>
+  `;
+}
+
+// ============================================================
+// STEP 1 — POPULAÇÃO vs SAMPLE
+// ============================================================
+function step1() {
+  return `
+    <div class="step-title">Population vs. Sample</div>
+
+    <p>Antes de qualquer método, precisamos separar dois conceitos fundamentais que confundem até guerreiros experientes.</p>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>População (N)</strong>: conjunto completo de todos os elementos de interesse. No nosso caso, todos os 1.000 clãs viking. <br><strong>Amostra (n)</strong>: subconjunto selecionado da população para estudo.')}
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
+        <!-- Population circle -->
+        <ellipse cx="220" cy="160" rx="180" ry="140" fill="none" stroke="#58a6ff" stroke-width="2.5" stroke-dasharray="8,4" opacity="0.7"/>
+        <text x="220" y="40" text-anchor="middle" fill="#58a6ff" font-family="Bangers" font-size="22">POPULATION (N = 1.000)</text>
+
+        <!-- Dots representing population -->
+        <g fill="#8b949e" opacity="0.4">
+          <circle cx="140" cy="100" r="3"/><circle cx="180" cy="85" r="3"/><circle cx="220" cy="95" r="3"/>
+          <circle cx="260" cy="80" r="3"/><circle cx="300" cy="100" r="3"/><circle cx="120" cy="130" r="3"/>
+          <circle cx="160" cy="120" r="3"/><circle cx="200" cy="115" r="3"/><circle cx="240" cy="125" r="3"/>
+          <circle cx="280" cy="110" r="3"/><circle cx="320" cy="130" r="3"/><circle cx="100" cy="160" r="3"/>
+          <circle cx="340" cy="160" r="3"/><circle cx="130" cy="190" r="3"/><circle cx="310" cy="190" r="3"/>
+          <circle cx="150" cy="220" r="3"/><circle cx="290" cy="220" r="3"/><circle cx="180" cy="240" r="3"/>
+          <circle cx="260" cy="240" r="3"/><circle cx="220" cy="250" r="3"/>
+          <circle cx="170" cy="170" r="3"/><circle cx="270" cy="170" r="3"/><circle cx="200" cy="200" r="3"/>
+          <circle cx="240" cy="200" r="3"/><circle cx="210" cy="180" r="3"/>
+        </g>
+
+        <!-- Sample circle inside -->
+        <ellipse cx="220" cy="170" rx="70" ry="55" fill="rgba(240,192,64,0.15)" stroke="#f0c040" stroke-width="2.5"/>
+
+        <!-- Sample dots (highlighted) -->
+        <g fill="#f0c040">
+          <circle cx="200" cy="155" r="5"/><circle cx="235" cy="150" r="5"/><circle cx="215" cy="175" r="5"/>
+          <circle cx="250" cy="170" r="5"/><circle cx="190" cy="180" r="5"/><circle cx="230" cy="195" r="5"/>
+          <circle cx="210" cy="200" r="5"/><circle cx="245" cy="190" r="5"/>
+        </g>
+        <text x="220" y="230" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">SAMPLE (n)</text>
+
+        <!-- Arrow -->
+        <line x1="410" y1="120" x2="530" y2="120" stroke="#f0c040" stroke-width="2" marker-end="url(#arrowGold)"/>
+        <defs>
+          <marker id="arrowGold" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#f0c040"/>
+          </marker>
+        </defs>
+
+        <!-- Parameters vs Statistics -->
+        <rect x="440" y="60" width="240" height="100" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+        <text x="560" y="85" text-anchor="middle" fill="#58a6ff" font-family="Permanent Marker" font-size="14">Population (Parameters)</text>
+        <text x="560" y="108" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Media: μ (mu)</text>
+        <text x="560" y="130" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Desvio-padrao: σ (sigma)</text>
+        <text x="560" y="150" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Valores fixos (geralmente desconhecidos)</text>
+
+        <rect x="440" y="180" width="240" height="100" rx="10" fill="#161b22" stroke="#f0c040" stroke-width="1.5"/>
+        <text x="560" y="205" text-anchor="middle" fill="#f0c040" font-family="Permanent Marker" font-size="14">Sample (Statistics)</text>
+        <text x="560" y="228" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Media: x&#772; (x-barra)</text>
+        <text x="560" y="250" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Desvio-padrao: s</text>
+        <text x="560" y="270" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Estimativas (variam entre amostras)</text>
+      </svg>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A amostra <strong>estima</strong> a população. O x&#772; da amostra é nossa melhor aposta para adivinhar o μ da população. Entretanto, cada amostra diferente dará um x&#772; ligeiramente diferente &mdash; essa é a <em>variabilidade amostral</em>.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Então cada vez que eu tirar uma amostra, a média muda? Isso é uma bagunça!')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Não é bagunça &mdash; é estatística. E essa variação tem nome: <strong>erro amostral</strong>. A boa notícia? Métodos adequados <em>controlam</em> essa variação. Vamos conhecê-los.')}
+  `;
+}
+
+// ============================================================
+// STEP 2 — SAMPLEGEM ALEATÓRIA SIMPLES
+// ============================================================
+function step2() {
+  return `
+    <div class="step-title">Sampling Simple Random</div>
+    <div class="step-subtitle">The Helmet Draw</div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling Aleatória Simples (AAS)</strong>: cada elemento da população tem <em>igual probabilidade</em> de ser selecionado. É o método de referência &mdash; a "régua de ouro" da amostragem.')}
+
+    <p>Odinfather escreve o nome de cada um dos 1.000 clãs em runas, coloca todos dentro de um grande <span class="hl-gold">elmo cerimonial</span> e draws, sem olhar, os clãs que serão visitados.</p>
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+        <!-- Helmet -->
+        <ellipse cx="350" cy="200" rx="120" ry="40" fill="#1c2333" stroke="#f0c040" stroke-width="2"/>
+        <path d="M230,200 Q230,80 350,60 Q470,80 470,200" fill="#1c2333" stroke="#f0c040" stroke-width="2"/>
+        <text x="350" y="170" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">1.000 RUNAS</text>
+
+        <!-- Flying runes (selected) -->
+        <g>
+          <rect x="520" y="50" width="50" height="35" rx="5" fill="rgba(240,192,64,0.2)" stroke="#f0c040" stroke-width="1.5" transform="rotate(-10, 545, 67)"/>
+          <text x="545" y="73" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="12" transform="rotate(-10, 545, 67)">Clã 47</text>
+        </g>
+        <g>
+          <rect x="540" y="110" width="50" height="35" rx="5" fill="rgba(240,192,64,0.2)" stroke="#f0c040" stroke-width="1.5" transform="rotate(5, 565, 127)"/>
+          <text x="565" y="133" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="12" transform="rotate(5, 565, 127)">Clã 382</text>
+        </g>
+        <g>
+          <rect x="510" y="170" width="50" height="35" rx="5" fill="rgba(240,192,64,0.2)" stroke="#f0c040" stroke-width="1.5" transform="rotate(-3, 535, 187)"/>
+          <text x="535" y="193" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="12" transform="rotate(-3, 535, 187)">Clã 691</text>
+        </g>
+
+        <!-- Arrow from helmet to runes -->
+        <path d="M470,160 Q500,100 515,70" fill="none" stroke="#f0c040" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <path d="M470,180 Q510,150 530,130" fill="none" stroke="#f0c040" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <path d="M470,195 Q500,195 505,190" fill="none" stroke="#f0c040" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+        <!-- Label -->
+        <text x="100" y="50" fill="#58a6ff" font-family="Permanent Marker" font-size="15">Cada runa tem a</text>
+        <text x="100" y="72" fill="#58a6ff" font-family="Permanent Marker" font-size="15">mesma chance: 1/N</text>
+
+        <text x="570" y="240" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="14">Amostra sorteada</text>
+      </svg>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Na prática, usamos <strong>geradores de números aleatórios</strong> ou tabelas de números aleatórios, não elmos. O princípio é o mesmo: cada clã tem probabilidade 1/N de ser escolhido. Sem favoritismo, sem viés.')}
+
+    <div class="comparison-grid">
+      <div class="comparison-card pro">
+        <div class="comparison-title" style="color:var(--success)">✅ Advantages</div>
+        <ul style="margin-left: 16px; font-size: 0.95rem;">
+          <li>Eliminação de viés de seleção</li>
+          <li>Cálculos estatísticos diretos</li>
+          <li>Base para todos os outros métodos</li>
+          <li>Fácil de entender e justificar</li>
+        </ul>
+      </div>
+      <div class="comparison-card con">
+        <div class="comparison-title" style="color:var(--thor-red)">⚠️ Limitações</div>
+        <ul style="margin-left: 16px; font-size: 0.95rem;">
+          <li>Exige lista completa da população</li>
+          <li>Pode ser caro se população é dispersa</li>
+          <li>Pode "perder" subgrupos pequenos</li>
+          <li>Impraticável para populações enormes</li>
+        </ul>
+      </div>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'E se eu não tiver a lista dos 1.000 clãs?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Boa pergunta, Thorment! Quando não temos o <em>cadastro</em> completo da população, a AAS é impossível. Precisamos de outras estratégias. Vamos ver a próxima.')}
+  `;
+}
+
+// ============================================================
+// STEP 3 — SAMPLEGEM ESTRATIFICADA
+// ============================================================
+function step3() {
+  return `
+    <div class="step-title">Sampling Stratified</div>
+    <div class="step-subtitle">Every Realm Has a Voice</div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling Stratified</strong>: divide-se a população em subgrupos homogêneos (<em>estratos</em>) e draws-se elementos de cada estrato. Garante representatividade quando a variável de estratificação é relevante.')}
+
+    <p>Os Nove Reinos têm tamanhos e culturas diferentes. Se simplesmente sortearmos ao acaso, podemos acabar com 80% da amostra de Midgard (o mais populoso) e nenhum representante de Niflheim.</p>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A ideia é dividir os 1.000 clãs por <strong>reino</strong>, depois sortear <em>dentro de cada reino</em>, proporcionalmente ao seu tamanho. Assim, cada pedaço do mapa contribui para a amostra.')}
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg">
+        <text x="350" y="25" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="20">SAMPLEGEM PROPORTIONAL STRATIFIED</text>
+
+        <!-- Strata (realms) -->
+        <g>
+          <rect x="30" y="50" width="140" height="60" rx="8" fill="rgba(88,166,255,0.15)" stroke="#58a6ff" stroke-width="1.5"/>
+          <text x="100" y="75" text-anchor="middle" fill="#58a6ff" font-family="Permanent Marker" font-size="13">Midgard</text>
+          <text x="100" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">300 clas (30%)</text>
+        </g>
+        <g>
+          <rect x="185" y="50" width="140" height="60" rx="8" fill="rgba(63,185,80,0.15)" stroke="#3fb950" stroke-width="1.5"/>
+          <text x="255" y="75" text-anchor="middle" fill="#3fb950" font-family="Permanent Marker" font-size="13">Asgard</text>
+          <text x="255" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">200 clas (20%)</text>
+        </g>
+        <g>
+          <rect x="340" y="50" width="140" height="60" rx="8" fill="rgba(248,81,73,0.15)" stroke="#f85149" stroke-width="1.5"/>
+          <text x="410" y="75" text-anchor="middle" fill="#f85149" font-family="Permanent Marker" font-size="13">Jotunheim</text>
+          <text x="410" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">150 clas (15%)</text>
+        </g>
+        <g>
+          <rect x="495" y="50" width="175" height="60" rx="8" fill="rgba(188,140,255,0.15)" stroke="#bc8cff" stroke-width="1.5"/>
+          <text x="582" y="75" text-anchor="middle" fill="#bc8cff" font-family="Permanent Marker" font-size="13">Outros 6 Reinos</text>
+          <text x="582" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">350 clas (35%)</text>
+        </g>
+
+        <!-- Arrows down -->
+        <line x1="100" y1="110" x2="100" y2="160" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+        <line x1="255" y1="110" x2="255" y2="160" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrGreen)"/>
+        <line x1="410" y1="110" x2="410" y2="160" stroke="#f85149" stroke-width="1.5" marker-end="url(#arrRed)"/>
+        <line x1="582" y1="110" x2="582" y2="160" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#arrPurple)"/>
+        <defs>
+          <marker id="arrBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#58a6ff"/></marker>
+          <marker id="arrGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#3fb950"/></marker>
+          <marker id="arrRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#f85149"/></marker>
+          <marker id="arrPurple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#bc8cff"/></marker>
+        </defs>
+
+        <!-- "Sorteia dentro" labels -->
+        <text x="100" y="145" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="11">draws</text>
+        <text x="255" y="145" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="11">draws</text>
+        <text x="410" y="145" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="11">draws</text>
+        <text x="582" y="145" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="11">draws</text>
+
+        <!-- Sample boxes (proportional) -->
+        <rect x="55" y="165" width="90" height="45" rx="6" fill="rgba(88,166,255,0.3)" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="100" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">30 clas</text>
+
+        <rect x="215" y="165" width="80" height="45" rx="6" fill="rgba(63,185,80,0.3)" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="255" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">20 clas</text>
+
+        <rect x="373" y="165" width="74" height="45" rx="6" fill="rgba(248,81,73,0.3)" stroke="#f85149" stroke-width="1.5"/>
+        <text x="410" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">15 clas</text>
+
+        <rect x="535" y="165" width="94" height="45" rx="6" fill="rgba(188,140,255,0.3)" stroke="#bc8cff" stroke-width="1.5"/>
+        <text x="582" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">35 clas</text>
+
+        <!-- Final sample -->
+        <line x1="100" y1="210" x2="350" y2="280" stroke="#f0c040" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+        <line x1="255" y1="210" x2="350" y2="280" stroke="#f0c040" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+        <line x1="410" y1="210" x2="350" y2="280" stroke="#f0c040" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+        <line x1="582" y1="210" x2="350" y2="280" stroke="#f0c040" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+
+        <rect x="270" y="270" width="160" height="50" rx="10" fill="rgba(240,192,64,0.15)" stroke="#f0c040" stroke-width="2"/>
+        <text x="350" y="295" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="17">SAMPLE: n = 100</text>
+        <text x="350" y="312" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="12">proportion maintained</text>
+
+        <!-- Annotation -->
+        <text x="350" y="360" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="15">Se n = 100 (10% da populacao), cada estrato contribui 10% dos seus clas</text>
+      </svg>
+    </div>
+
+    <div class="info-box">
+      <h4>Proportional vs. Uniform</h4>
+      <p><span class="hl-blue">Proporcional</span>: cada estrato contribui <em>na mesma proporção</em> que tem na população. Se Midgard = 30%, a amostra terá 30% de clãs de Midgard.</p>
+      <p style="margin-top: 8px;"><span class="hl-blue">Uniforme</span>: mesmo número de cada estrato, independente do tamanho. Útil quando se quer comparar estratos com precisão igual.</p>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Estratificação <strong>reduz o erro amostral</strong> quando os estratos são internamente homogêneos. Clãs dentro do mesmo reino compartilham tradições, clima e recursos &mdash; então separar por reino faz sentido.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'E se eu estratificar por cor do elmo? Vai funcionar igual?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Só se a cor do elmo estiver relacionada com a variável de interesse. Estratificar por algo irrelevante é desperdício de esforço &mdash; sem ganho de precisão.')}
+  `;
+}
+
+// ============================================================
+// STEP 4 — SAMPLEGEM POR CLUSTERS
+// ============================================================
+function step4() {
+  return `
+    <div class="step-title">Sampling Cluster</div>
+    <div class="step-subtitle">Entire Villages, Not Isolated Warriors</div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling Cluster (Clusters)</strong>: divide-se a população em grupos naturais (conglomerados), draws-se <em>alguns desses grupos</em> e investiga-se <strong>todos os elementos</strong> dos grupos sorteados.')}
+
+    <p>Digamos que não temos a lista de todos os 1.000 clãs, mas temos a lista das <span class="hl-gold">50 aldeias</span> dos Nove Reinos. Cada aldeia contém ~20 clãs. Sorteamos 5 aldeias e entrevistamos <em>todos</em> os clãs dessas aldeias.</p>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A diferença crucial: na estratificada, pegamos <em>um pouco de cada grupo</em>. Na conglomerada, pegamos <em>alguns grupos inteiros</em>. É como a diferença entre provar uma colherada de cada panela e escolher três panelas para esvaziar.')}
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg">
+        <text x="170" y="25" text-anchor="middle" fill="#58a6ff" font-family="Bangers" font-size="16">ESTRATIFICADA</text>
+        <text x="530" y="25" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="16">CLUSTERS</text>
+
+        <!-- Stratified side -->
+        <g transform="translate(20,35)">
+          <!-- 4 strata -->
+          <rect x="10" y="0" width="280" height="55" rx="6" fill="none" stroke="#58a6ff" stroke-width="1" stroke-dasharray="4,2"/>
+          <rect x="10" y="65" width="280" height="55" rx="6" fill="none" stroke="#3fb950" stroke-width="1" stroke-dasharray="4,2"/>
+          <rect x="10" y="130" width="280" height="55" rx="6" fill="none" stroke="#f85149" stroke-width="1" stroke-dasharray="4,2"/>
+          <rect x="10" y="195" width="280" height="55" rx="6" fill="none" stroke="#bc8cff" stroke-width="1" stroke-dasharray="4,2"/>
+
+          <!-- Dots in each stratum - some highlighted (sampled) -->
+          <!-- Stratum 1 -->
+          <circle cx="40" cy="27" r="5" fill="#8b949e" opacity="0.3"/><circle cx="70" cy="27" r="5" fill="#58a6ff"/>
+          <circle cx="100" cy="27" r="5" fill="#8b949e" opacity="0.3"/><circle cx="130" cy="27" r="5" fill="#58a6ff"/>
+          <circle cx="160" cy="27" r="5" fill="#8b949e" opacity="0.3"/><circle cx="190" cy="27" r="5" fill="#8b949e" opacity="0.3"/>
+          <circle cx="220" cy="27" r="5" fill="#58a6ff"/><circle cx="250" cy="27" r="5" fill="#8b949e" opacity="0.3"/>
+
+          <!-- Stratum 2 -->
+          <circle cx="40" cy="92" r="5" fill="#3fb950"/><circle cx="70" cy="92" r="5" fill="#8b949e" opacity="0.3"/>
+          <circle cx="100" cy="92" r="5" fill="#8b949e" opacity="0.3"/><circle cx="130" cy="92" r="5" fill="#3fb950"/>
+          <circle cx="160" cy="92" r="5" fill="#8b949e" opacity="0.3"/><circle cx="190" cy="92" r="5" fill="#3fb950"/>
+          <circle cx="220" cy="92" r="5" fill="#8b949e" opacity="0.3"/><circle cx="250" cy="92" r="5" fill="#8b949e" opacity="0.3"/>
+
+          <!-- Stratum 3 -->
+          <circle cx="40" cy="157" r="5" fill="#8b949e" opacity="0.3"/><circle cx="70" cy="157" r="5" fill="#f85149"/>
+          <circle cx="100" cy="157" r="5" fill="#8b949e" opacity="0.3"/><circle cx="130" cy="157" r="5" fill="#8b949e" opacity="0.3"/>
+          <circle cx="160" cy="157" r="5" fill="#f85149"/><circle cx="190" cy="157" r="5" fill="#8b949e" opacity="0.3"/>
+          <circle cx="220" cy="157" r="5" fill="#8b949e" opacity="0.3"/><circle cx="250" cy="157" r="5" fill="#f85149"/>
+
+          <!-- Stratum 4 -->
+          <circle cx="40" cy="222" r="5" fill="#8b949e" opacity="0.3"/><circle cx="70" cy="222" r="5" fill="#bc8cff"/>
+          <circle cx="100" cy="222" r="5" fill="#8b949e" opacity="0.3"/><circle cx="130" cy="222" r="5" fill="#bc8cff"/>
+          <circle cx="160" cy="222" r="5" fill="#8b949e" opacity="0.3"/><circle cx="190" cy="222" r="5" fill="#8b949e" opacity="0.3"/>
+          <circle cx="220" cy="222" r="5" fill="#bc8cff"/><circle cx="250" cy="222" r="5" fill="#8b949e" opacity="0.3"/>
+
+          <text x="150" y="275" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Takes A LITTLE from each stratum</text>
+        </g>
+
+        <!-- Divider -->
+        <line x1="350" y1="40" x2="350" y2="300" stroke="#30363d" stroke-width="1" stroke-dasharray="6,4"/>
+
+        <!-- Cluster side -->
+        <g transform="translate(370,35)">
+          <!-- 4 clusters - 2 selected entirely -->
+          <rect x="10" y="0" width="280" height="55" rx="6" fill="rgba(240,192,64,0.15)" stroke="#f0c040" stroke-width="2"/>
+          <rect x="10" y="65" width="280" height="55" rx="6" fill="none" stroke="#30363d" stroke-width="1" stroke-dasharray="4,2"/>
+          <rect x="10" y="130" width="280" height="55" rx="6" fill="rgba(240,192,64,0.15)" stroke="#f0c040" stroke-width="2"/>
+          <rect x="10" y="195" width="280" height="55" rx="6" fill="none" stroke="#30363d" stroke-width="1" stroke-dasharray="4,2"/>
+
+          <!-- Cluster 1 (selected - all highlighted) -->
+          <circle cx="40" cy="27" r="5" fill="#f0c040"/><circle cx="70" cy="27" r="5" fill="#f0c040"/>
+          <circle cx="100" cy="27" r="5" fill="#f0c040"/><circle cx="130" cy="27" r="5" fill="#f0c040"/>
+          <circle cx="160" cy="27" r="5" fill="#f0c040"/><circle cx="190" cy="27" r="5" fill="#f0c040"/>
+          <circle cx="220" cy="27" r="5" fill="#f0c040"/><circle cx="250" cy="27" r="5" fill="#f0c040"/>
+
+          <!-- Cluster 2 (not selected) -->
+          <circle cx="40" cy="92" r="5" fill="#8b949e" opacity="0.2"/><circle cx="70" cy="92" r="5" fill="#8b949e" opacity="0.2"/>
+          <circle cx="100" cy="92" r="5" fill="#8b949e" opacity="0.2"/><circle cx="130" cy="92" r="5" fill="#8b949e" opacity="0.2"/>
+          <circle cx="160" cy="92" r="5" fill="#8b949e" opacity="0.2"/><circle cx="190" cy="92" r="5" fill="#8b949e" opacity="0.2"/>
+          <circle cx="220" cy="92" r="5" fill="#8b949e" opacity="0.2"/><circle cx="250" cy="92" r="5" fill="#8b949e" opacity="0.2"/>
+
+          <!-- Cluster 3 (selected) -->
+          <circle cx="40" cy="157" r="5" fill="#f0c040"/><circle cx="70" cy="157" r="5" fill="#f0c040"/>
+          <circle cx="100" cy="157" r="5" fill="#f0c040"/><circle cx="130" cy="157" r="5" fill="#f0c040"/>
+          <circle cx="160" cy="157" r="5" fill="#f0c040"/><circle cx="190" cy="157" r="5" fill="#f0c040"/>
+          <circle cx="220" cy="157" r="5" fill="#f0c040"/><circle cx="250" cy="157" r="5" fill="#f0c040"/>
+
+          <!-- Cluster 4 (not selected) -->
+          <circle cx="40" cy="222" r="5" fill="#8b949e" opacity="0.2"/><circle cx="70" cy="222" r="5" fill="#8b949e" opacity="0.2"/>
+          <circle cx="100" cy="222" r="5" fill="#8b949e" opacity="0.2"/><circle cx="130" cy="222" r="5" fill="#8b949e" opacity="0.2"/>
+          <circle cx="160" cy="222" r="5" fill="#8b949e" opacity="0.2"/><circle cx="190" cy="222" r="5" fill="#8b949e" opacity="0.2"/>
+          <circle cx="220" cy="222" r="5" fill="#8b949e" opacity="0.2"/><circle cx="250" cy="222" r="5" fill="#8b949e" opacity="0.2"/>
+
+          <text x="20" y="47" fill="#f0c040" font-family="Permanent Marker" font-size="10">SELECTED</text>
+          <text x="20" y="177" fill="#f0c040" font-family="Permanent Marker" font-size="10">SELECTED</text>
+
+          <text x="150" y="275" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Takes ALL from some clusters</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="info-box">
+      <h4>When to use clusters?</h4>
+      <ul style="margin-left: 20px; margin-top: 8px;">
+        <li>Quando <strong>não existe lista</strong> de todos os indivíduos, mas existe lista dos grupos</li>
+        <li>Quando os indivíduos estão <strong>geograficamente dispersos</strong> (ex.: aldeias, escolas, hospitais)</li>
+        <li>Quando é mais <strong>barato</strong> investigar grupos inteiros do que indivíduos espalhados</li>
+      </ul>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Mas e se as aldeias sorteadas forem todas parecidas? Type, só aldeias de pescadores?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Exato risco! A amostragem por conglomerados funciona melhor quando os clusters são <strong>internamente heterogêneos</strong> &mdash; ou seja, cada aldeia é um "microcosmo" da população. Se todas forem parecidas entre si, tudo bem. Se forem muito diferentes entre si, o erro aumenta.')}
+  `;
+}
+
+// ============================================================
+// STEP 5 — SAMPLEGEM SISTEMÁTICA
+// ============================================================
+function step5() {
+  return `
+    <div class="step-title">Sampling Systematic</div>
+    <div class="step-subtitle">Every K-th Warrior</div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling Sistemática</strong>: seleciona-se um ponto de partida aleatório e, a partir dele, seleciona-se a cada <em>k</em> elementos. O intervalo k = N/n.')}
+
+    <p>Os guerreiros entram no grande salão de Valhalla em fila. Odinfather precisa de uma amostra de 100 entre 1.000. O intervalo será <span class="hl-gold">k = 1.000/100 = 10</span>. Sorteia o primeiro entre 1 e 10 (digamos, 3). Depois pega o 3&deg;, 13&deg;, 23&deg;, 33&deg;...</p>
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg">
+        <text x="350" y="20" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">FILA DE GUERREIROS NO GATE OF VALHALLA</text>
+
+        <!-- Warriors in line -->
+        <g>
+          ${Array.from({length: 30}, (_, i) => {
+            const x = 25 + i * 22;
+            const selected = (i + 1) % 5 === 3; // every 5th, starting at 3
+            return `<rect x="${x}" y="40" width="18" height="40" rx="4"
+              fill="${selected ? 'rgba(240,192,64,0.4)' : 'rgba(139,148,158,0.15)'}"
+              stroke="${selected ? '#f0c040' : '#30363d'}"
+              stroke-width="${selected ? 2 : 0.5}"/>
+              <text x="${x+9}" y="65" text-anchor="middle"
+                fill="${selected ? '#f0c040' : '#8b949e'}"
+                font-family="Patrick Hand" font-size="${selected ? 11 : 9}">${i+1}</text>`;
+          }).join('')}
+        </g>
+
+        <!-- Arrows pointing to selected -->
+        ${[3,8,13,18,23,28].map(i => {
+          const x = 25 + (i-1) * 22 + 9;
+          return `<line x1="${x}" y1="85" x2="${x}" y2="100" stroke="#f0c040" stroke-width="1.5" marker-end="url(#arrDown)"/>`;
+        }).join('')}
+
+        <defs>
+          <marker id="arrDown" markerWidth="6" markerHeight="5" refX="3" refY="5" orient="auto">
+            <polygon points="0 0, 6 0, 3 5" fill="#f0c040"/>
+          </marker>
+        </defs>
+
+        <text x="350" y="125" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="15">k = 5 &rarr; draws o 3&deg;, depois cada 5&deg;: 3, 8, 13, 18, 23, 28...</text>
+
+        <text x="350" y="155" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Apenas o primeiro é aleatório. Os demais são determinísticos.</text>
+      </svg>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'É rápido e prático. Entretanto, existe um risco sutil: se a população tem um <strong>padrão cíclico</strong> com período igual a k, a amostra captura sempre o mesmo "pedaço" do ciclo.')}
+
+    <div class="concept-card">
+      <h3>Cycle Trap</h3>
+      <p>Se os guerreiros entram no portão alternando entre <em>arqueiros</em> e <em>espadachins</em> (padrão de período 2), e k = 2, sua amostra terá <strong>só arqueiros</strong> ou <strong>só espadachins</strong>.</p>
+      <p style="margin-top: 8px; color: var(--text-dim);">Na prática: turnos de trabalho, sazonalidade, ordem alfabética &mdash; qualquer padrão periódico pode distorcer a amostra sistemática.</p>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Então é tipo contar de 10 em 10! Moleza! E nem precisa de lista completa, é só ficar no portão e contar.')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Quase certo, Thorment. A sistemática <em>parece</em> simples, mas não é "aleatória" de verdade &mdash; uma vez definido o ponto de partida, todos os demais estão determinados. Por isso funciona <em>quase</em> como AAS, mas não é idêntica.')}
+  `;
+}
+
+// ============================================================
+// STEP 6 — SAMPLEGEM POR CONVENIÊNCIA
+// ============================================================
+function step6() {
+  return `
+    <div class="step-title">Sampling Convenience</div>
+    <div class="step-subtitle">O Atalho Favorito de Thorment</div>
+
+    ${dialogue('thor', '⚡ Thorment', 'FINALMENTE o meu método! Olha, é simples: vai na taverna mais próxima, pergunta pros guerreiros que estão bebendo hidromel e pronto. Sem sorteio, sem lista, sem frescura. Rápido, barato e divertido!')}
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling por Conveniência</strong>: seleciona os elementos mais acessíveis ou disponíveis. <em>Não é probabilística</em> &mdash; não se pode calcular a probabilidade de seleção de cada elemento. É o método mais comum na pesquisa aplicada... e o mais propenso a viés.')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Thorment, os guerreiros na taverna de Asgard são mais ricos, mais jovens e mais ociosos que a média da população. Sua "amostra" não representa ninguém além de bebedores de hidromel da região central!')}
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
+        <!-- Population map -->
+        <ellipse cx="350" cy="130" rx="300" ry="110" fill="none" stroke="#30363d" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="350" y="20" text-anchor="middle" fill="#8b949e" font-family="Permanent Marker" font-size="14">POPULATION DOS NINE REALMS</text>
+
+        <!-- Scattered dots (all clans) -->
+        <g fill="#8b949e" opacity="0.3">
+          <circle cx="120" cy="100" r="4"/><circle cx="160" cy="70" r="4"/><circle cx="90" cy="140" r="4"/>
+          <circle cx="200" cy="50" r="4"/><circle cx="500" cy="60" r="4"/><circle cx="550" cy="100" r="4"/>
+          <circle cx="580" cy="140" r="4"/><circle cx="520" cy="170" r="4"/><circle cx="470" cy="190" r="4"/>
+          <circle cx="150" cy="180" r="4"/><circle cx="200" cy="200" r="4"/><circle cx="250" cy="210" r="4"/>
+          <circle cx="400" cy="200" r="4"/><circle cx="450" cy="210" r="4"/><circle cx="600" cy="170" r="4"/>
+          <circle cx="130" cy="160" r="4"/><circle cx="220" cy="160" r="4"/>
+          <circle cx="480" cy="130" r="4"/><circle cx="440" cy="80" r="4"/><circle cx="300" cy="50" r="4"/>
+        </g>
+
+        <!-- Convenience zone (small area near center) -->
+        <ellipse cx="350" cy="130" rx="70" ry="50" fill="rgba(248,81,73,0.15)" stroke="#f85149" stroke-width="2"/>
+        <text x="350" y="115" text-anchor="middle" fill="#f85149" font-family="Permanent Marker" font-size="12">ZONA DE</text>
+        <text x="350" y="132" text-anchor="middle" fill="#f85149" font-family="Permanent Marker" font-size="12">CONVENIENCIA</text>
+
+        <!-- Only nearby dots are "sampled" -->
+        <circle cx="330" cy="145" r="5" fill="#f85149"/><circle cx="360" cy="150" r="5" fill="#f85149"/>
+        <circle cx="345" cy="160" r="5" fill="#f85149"/><circle cx="370" cy="135" r="5" fill="#f85149"/>
+        <circle cx="320" cy="130" r="5" fill="#f85149"/><circle cx="380" cy="145" r="5" fill="#f85149"/>
+
+        <!-- Label -->
+        <text x="350" y="250" text-anchor="middle" fill="#f85149" font-family="Patrick Hand" font-size="15">Apenas quem esta "por perto" e consultado</text>
+      </svg>
+    </div>
+
+    <div class="concept-card">
+      <h3>When does it happen?</h3>
+      <p>Pesquisas de rua em shopping centers, questionários postados em redes sociais, amostras com alunos de uma universidade, pacientes de um único hospital. Em todos esses casos, quem participa <strong>se auto-seleciona</strong> &mdash; e quem participa é diferente de quem não participa.</p>
+    </div>
+
+    <div class="comparison-grid">
+      <div class="comparison-card pro">
+        <div class="comparison-title" style="color:var(--success)">✅ Por que é tão usada?</div>
+        <ul style="margin-left: 16px; font-size: 0.95rem;">
+          <li>Rápida e barata</li>
+          <li>Não exige lista da população</li>
+          <li>Viável quando acesso é restrito</li>
+          <li>Estudos exploratórios / pilotos</li>
+        </ul>
+      </div>
+      <div class="comparison-card con">
+        <div class="comparison-title" style="color:var(--thor-red)">❌ Real dangers</div>
+        <ul style="margin-left: 16px; font-size: 0.95rem;">
+          <li>Não generaliza para a população</li>
+          <li>Viés de voluntário (quem aceita ≠ quem recusa)</li>
+          <li>Viés de sobrevivente</li>
+          <li>Impossível calcular margem de erro</li>
+        </ul>
+      </div>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Conveniência <em>pode</em> ser aceitável em estudos exploratórios, pilotos, ou quando a generalização não é o objetivo principal. Entretanto, sempre deve ser <strong>declarada e discutida</strong> como limitação. Transparência, não vergonha.')}
+  `;
+}
+
+// ============================================================
+// STEP 7 — VIÉS SAMPLEL
+// ============================================================
+function step7() {
+  return `
+    <div class="step-title">Bias</div>
+    <div class="step-subtitle">When the Sample Lies</div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Viés amostral é o <strong>erro sistemático</strong> que faz a amostra contar uma história diferente da população. Não é variação aleatória &mdash; é distorção. E o pior: aumentar o <em>n</em> não conserta viés. Você só fica mais confiante da resposta errada.')}
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Viés (bias)</strong>: diferença sistemática entre o valor estimado pela amostra e o valor real da população. Diferente do erro amostral (aleatório), o viés <em>não diminui</em> com o aumento de n.')}
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+        <text x="350" y="20" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">ERRO SAMPLEL vs. VIES</text>
+
+        <!-- Target 1: no bias, some error -->
+        <circle cx="170" cy="130" r="70" fill="none" stroke="#30363d" stroke-width="1"/>
+        <circle cx="170" cy="130" r="45" fill="none" stroke="#30363d" stroke-width="0.5"/>
+        <circle cx="170" cy="130" r="20" fill="none" stroke="#30363d" stroke-width="0.5"/>
+        <circle cx="170" cy="130" r="3" fill="#f0c040"/>
+        <!-- Shots scattered around center -->
+        <circle cx="165" cy="120" r="4" fill="#58a6ff" opacity="0.7"/>
+        <circle cx="180" cy="135" r="4" fill="#58a6ff" opacity="0.7"/>
+        <circle cx="160" cy="140" r="4" fill="#58a6ff" opacity="0.7"/>
+        <circle cx="175" cy="125" r="4" fill="#58a6ff" opacity="0.7"/>
+        <circle cx="155" cy="130" r="4" fill="#58a6ff" opacity="0.7"/>
+        <circle cx="178" cy="142" r="4" fill="#58a6ff" opacity="0.7"/>
+        <text x="170" y="218" text-anchor="middle" fill="#3fb950" font-family="Permanent Marker" font-size="13">NO BIAS, SOME ERROR</text>
+        <text x="170" y="50" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="12">Centered on target</text>
+
+        <!-- Target 2: bias + error -->
+        <circle cx="530" cy="130" r="70" fill="none" stroke="#30363d" stroke-width="1"/>
+        <circle cx="530" cy="130" r="45" fill="none" stroke="#30363d" stroke-width="0.5"/>
+        <circle cx="530" cy="130" r="20" fill="none" stroke="#30363d" stroke-width="0.5"/>
+        <circle cx="530" cy="130" r="3" fill="#f0c040"/>
+        <!-- Shots clustered away from center -->
+        <circle cx="565" cy="100" r="4" fill="#f85149" opacity="0.7"/>
+        <circle cx="575" cy="108" r="4" fill="#f85149" opacity="0.7"/>
+        <circle cx="560" cy="95" r="4" fill="#f85149" opacity="0.7"/>
+        <circle cx="570" cy="102" r="4" fill="#f85149" opacity="0.7"/>
+        <circle cx="558" cy="105" r="4" fill="#f85149" opacity="0.7"/>
+        <circle cx="572" cy="95" r="4" fill="#f85149" opacity="0.7"/>
+        <text x="530" y="218" text-anchor="middle" fill="#f85149" font-family="Permanent Marker" font-size="13">WITH BIAS!</text>
+        <text x="530" y="50" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="12">Off target</text>
+
+        <!-- Bias arrow -->
+        <line x1="533" y1="127" x2="562" y2="105" stroke="#f85149" stroke-width="2" marker-end="url(#arrBias)"/>
+        <text x="560" y="125" fill="#f85149" font-family="Permanent Marker" font-size="11">vies</text>
+        <defs>
+          <marker id="arrBias" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#f85149"/></marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="bias-card">
+      <h4>1. Selection Bias</h4>
+      <p>Quando o processo de escolha favorece certos elementos. Exemplo nórdico: perguntar <em>apenas a guerreiros veteranos</em> sobre satisfação com treinamento ignora os recrutas &mdash; que provavelmente têm opinião bem diferente.</p>
+    </div>
+
+    <div class="bias-card">
+      <h4>2. Non-Response Bias</h4>
+      <p>Quando parte da amostra se recusa a participar, e quem recusa é sistematicamente diferente de quem responde. Os clãs de Helheim talvez ignorem o mensageiro de Odin &mdash; e justamente eles podem ser os mais insatisfeitos.</p>
+    </div>
+
+    <div class="bias-card">
+      <h4>3. Coverage Bias</h4>
+      <p>Quando a <em>lista</em> usada para amostragem não cobre toda a população. Se o registro de clãs omite os nômades de Niflheim, eles <strong>nunca</strong> poderão ser selecionados &mdash; mesmo com sorteio perfeito.</p>
+    </div>
+
+    <div class="bias-card">
+      <h4>4. Survivorship Bias</h4>
+      <p>Analisar só quem "sobreviveu" ao processo. Avaliar a qualidade das espadas olhando só as que não quebraram em batalha ignora as que falharam &mdash; e pode gerar uma visão falsamente otimista da forja.</p>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Tá, e como eu <em>elimino</em> o viés?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Nem sempre é possível eliminar completamente. Entretanto, <strong>amostragem probabilística</strong>, boas taxas de resposta e cobertura ampla são as melhores defesas. O primeiro passo é <em>reconhecer</em> que o viés existe.')}
+  `;
+}
+
+// ============================================================
+// STEP 8 — TAMANHO DA SAMPLE
+// ============================================================
+function step8() {
+  return `
+    <div class="step-title">Sample Size</div>
+    <div class="step-subtitle">How Many Clans to Visit?</div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Quanto mais, melhor! Bora entrevistar 999 dos 1.000 clãs!')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Maior nem sempre é melhor, Thorment. Existe um ponto onde o ganho de precisão não justifica o custo adicional. A fórmula nos diz <em>exatamente</em> quantos precisamos.')}
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'A fórmula clássica para estimar proporções com amostragem aleatória simples:')}
+
+    <div class="formula">
+      <div class="formula-label">Sample Size Formula (proporcoes)</div>
+      n = (Z&sup2; &middot; p &middot; q) / E&sup2;
+    </div>
+
+    <div class="info-box">
+      <h4>Where:</h4>
+      <ul style="margin-left: 20px; margin-top: 8px;">
+        <li><span class="hl-gold">n</span> = tamanho da amostra necessário</li>
+        <li><span class="hl-gold">Z</span> = valor crítico da distribuição normal (1,96 para 95% de confiança)</li>
+        <li><span class="hl-gold">p</span> = proporção esperada (se desconhecida, usar 0,50 &mdash; cenário mais conservador)</li>
+        <li><span class="hl-gold">q</span> = 1 &minus; p</li>
+        <li><span class="hl-gold">E</span> = margem de erro desejada (ex.: 0,05 = &plusmn; 5%)</li>
+      </ul>
+    </div>
+
+    <div class="concept-card">
+      <h3>Odin Calcula: Quantos Clas?</h3>
+      <p>Odinfather quer estimar a proporção de clãs satisfeitos com a distribuição de espólios, com 95% de confiança e margem de erro de &plusmn;5%. Não tem ideia da proporção real, então usa p = 0,50.</p>
+
+      <div class="formula" style="margin-top: 12px; text-align: left; font-size: 1rem;">
+        <div class="formula-label">Step-by-step calculation</div>
+        n = (1,96&sup2; &times; 0,50 &times; 0,50) / 0,05&sup2;<br>
+        n = (3,8416 &times; 0,25) / 0,0025<br>
+        n = 0,9604 / 0,0025<br>
+        <span class="hl-gold" style="font-size: 1.2rem;">n = 384,16 &rarr; 385 clas</span>
+      </div>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Com 385 clãs, temos 95% de confiança de que nossa estimativa está a no máximo 5 pontos percentuais do valor real. Nada mau para uma população de 1.000!')}
+
+    <div class="concept-card">
+      <h3>A Raiz Quadrada e a Lei dos Diminishing Returns</h3>
+      <p>A margem de erro cai com <span class="hl-gold">1/&radic;n</span>. Para <strong>cortar a margem de erro pela metade</strong>, você precisa <strong>quadruplicar</strong> a amostra. Isso explica por que pesquisas eleitorais com n=2.000 já alcançam margens de &plusmn;2% &mdash; ir para n=8.000 só baixaria para &plusmn;1%.</p>
+    </div>
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg">
+        <text x="350" y="20" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">MARGIN OF ERROR vs. TAMANHO DA SAMPLE</text>
+
+        <!-- Axes -->
+        <line x1="80" y1="210" x2="650" y2="210" stroke="#30363d" stroke-width="1.5"/>
+        <line x1="80" y1="210" x2="80" y2="40" stroke="#30363d" stroke-width="1.5"/>
+        <text x="365" y="245" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Sample Size (n)</text>
+        <text x="30" y="125" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13" transform="rotate(-90, 30, 125)">Margem de Erro</text>
+
+        <!-- Curve: E = 1.96 * sqrt(0.25/n), scaled -->
+        <!-- n points: 30, 50, 100, 200, 400, 800, 1500 -->
+        <!-- E values: 17.9%, 13.9%, 9.8%, 6.9%, 4.9%, 3.5%, 2.5% -->
+        <polyline points="100,52 140,72 200,100 300,135 430,165 540,185 630,196"
+          fill="none" stroke="#58a6ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- Data points -->
+        <circle cx="100" cy="52" r="5" fill="#58a6ff"/><text x="100" y="45" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="11">17,9%</text>
+        <circle cx="200" cy="100" r="5" fill="#58a6ff"/><text x="200" y="93" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="11">9,8%</text>
+        <circle cx="430" cy="165" r="5" fill="#f0c040"/><text x="430" y="155" text-anchor="middle" fill="#f0c040" font-family="Permanent Marker" font-size="12">4,9%</text>
+        <circle cx="630" cy="196" r="5" fill="#58a6ff"/><text x="630" y="189" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="11">2,5%</text>
+
+        <!-- Annotation for n=400 -->
+        <line x1="430" y1="165" x2="430" y2="210" stroke="#f0c040" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="430" y="225" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="11">n = 400</text>
+
+        <!-- x-axis labels -->
+        <text x="100" y="225" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="10">30</text>
+        <text x="200" y="225" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="10">100</text>
+        <text x="540" y="225" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="10">800</text>
+        <text x="630" y="225" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="10">1500</text>
+      </svg>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Então 385 de 1.000 é quase 40%! Não é mais fácil fazer o censo?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Para populações pequenas, sim &mdash; a amostra fica uma fração grande do todo. Existe até uma <strong>correção para populações finitas</strong>: n<sub>ajustado</sub> = n / (1 + n/N). Com N=1.000 e n=385, isso dá ~278. Quando N é grande (100.000+), a correção é desprezível.')}
+  `;
+}
+
+// ============================================================
+// STEP 9 — TEOREMA CENTRAL DO LIMITE (TCL)
+// ============================================================
+function step9() {
+  return `
+    <div class="step-title">Central Limit Theorem (CLT)</div>
+    <div class="step-subtitle">The Magic of the Normal Distribution</div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Teorema Central do Limite</strong>: independentemente da distribuição original da população, a distribuição das <em>médias amostrais</em> (x&#772;) tende a ser <strong>normal</strong> conforme o tamanho da amostra (n) cresce. É o teorema mais importante da inferência estatística.')}
+
+    <p>Imagine que a distribuição de riqueza dos 1.000 clãs viking é <span class="hl-red">completamente assimétrica</span> &mdash; poucos clãs muito ricos, muitos clãs pobres. Parece impossível usar a curva normal? O TCL diz: <em>não importa</em>.</p>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Se eu tirar 10.000 amostras de tamanho n, calcular a média de cada uma e plotar todas essas médias em um histograma, o resultado será cada vez mais próximo de uma <strong>curva normal</strong>, centrada em μ, com desvio-padrão σ/&radic;n.')}
+
+    <div class="formula">
+      <div class="formula-label">Distribuicao Amostral da Media</div>
+      x&#772; ~ Normal( μ , σ/&radic;n )
+    </div>
+
+    <div class="tcl-row" id="tclRow">
+      <div class="tcl-card">
+        <div class="tcl-title">n = 5</div>
+        <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Rough, asymmetric histogram -->
+          <rect x="20" y="90" width="18" height="10" fill="#f85149" opacity="0.7"/>
+          <rect x="42" y="60" width="18" height="40" fill="#f85149" opacity="0.7"/>
+          <rect x="64" y="30" width="18" height="70" fill="#f85149" opacity="0.7"/>
+          <rect x="86" y="45" width="18" height="55" fill="#f85149" opacity="0.7"/>
+          <rect x="108" y="65" width="18" height="35" fill="#f85149" opacity="0.7"/>
+          <rect x="130" y="80" width="18" height="20" fill="#f85149" opacity="0.7"/>
+          <rect x="152" y="88" width="18" height="12" fill="#f85149" opacity="0.7"/>
+          <line x1="15" y1="100" x2="180" y2="100" stroke="#30363d" stroke-width="1"/>
+          <text x="100" y="115" text-anchor="middle" fill="#f85149" font-family="Patrick Hand" font-size="11">Still irregular</text>
+        </svg>
+      </div>
+      <div class="tcl-card">
+        <div class="tcl-title" style="color: var(--gold);">n = 30</div>
+        <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- More bell-shaped -->
+          <rect x="20" y="88" width="18" height="12" fill="#f0c040" opacity="0.7"/>
+          <rect x="42" y="72" width="18" height="28" fill="#f0c040" opacity="0.7"/>
+          <rect x="64" y="45" width="18" height="55" fill="#f0c040" opacity="0.7"/>
+          <rect x="86" y="25" width="18" height="75" fill="#f0c040" opacity="0.7"/>
+          <rect x="108" y="42" width="18" height="58" fill="#f0c040" opacity="0.7"/>
+          <rect x="130" y="70" width="18" height="30" fill="#f0c040" opacity="0.7"/>
+          <rect x="152" y="86" width="18" height="14" fill="#f0c040" opacity="0.7"/>
+          <line x1="15" y1="100" x2="180" y2="100" stroke="#30363d" stroke-width="1"/>
+          <!-- Bell curve overlay -->
+          <path d="M20,95 Q50,85 70,55 Q90,22 100,22 Q110,22 130,55 Q150,85 175,95" fill="none" stroke="#f0c040" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="100" y="115" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="11">Almost normal!</text>
+        </svg>
+      </div>
+      <div class="tcl-card">
+        <div class="tcl-title" style="color: var(--success);">n = 100</div>
+        <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Clean bell shape -->
+          <rect x="15" y="92" width="14" height="8" fill="#3fb950" opacity="0.7"/>
+          <rect x="32" y="85" width="14" height="15" fill="#3fb950" opacity="0.7"/>
+          <rect x="49" y="70" width="14" height="30" fill="#3fb950" opacity="0.7"/>
+          <rect x="66" y="50" width="14" height="50" fill="#3fb950" opacity="0.7"/>
+          <rect x="83" y="30" width="14" height="70" fill="#3fb950" opacity="0.7"/>
+          <rect x="100" y="22" width="14" height="78" fill="#3fb950" opacity="0.7"/>
+          <rect x="117" y="32" width="14" height="68" fill="#3fb950" opacity="0.7"/>
+          <rect x="134" y="52" width="14" height="48" fill="#3fb950" opacity="0.7"/>
+          <rect x="151" y="72" width="14" height="28" fill="#3fb950" opacity="0.7"/>
+          <rect x="168" y="87" width="14" height="13" fill="#3fb950" opacity="0.7"/>
+          <line x1="10" y1="100" x2="190" y2="100" stroke="#30363d" stroke-width="1"/>
+          <!-- Perfect bell curve overlay -->
+          <path d="M15,97 Q40,90 55,70 Q70,45 85,28 Q95,20 107,20 Q119,20 130,30 Q145,48 160,72 Q170,88 185,97" fill="none" stroke="#3fb950" stroke-width="2"/>
+          <text x="100" y="115" text-anchor="middle" fill="#3fb950" font-family="Patrick Hand" font-size="11">Perfect normal!</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h4>What does the CLT guarantee?</h4>
+      <ul style="margin-left: 20px; margin-top: 8px;">
+        <li><span class="hl-blue">Centro</span>: a média das médias amostrais = μ (a média da população)</li>
+        <li><span class="hl-blue">Dispersão</span>: o desvio-padrão das médias = σ/&radic;n (erro-padrão)</li>
+        <li><span class="hl-blue">Forma</span>: conforme n cresce, a distribuição se aproxima da Normal</li>
+        <li><span class="hl-blue">Regra prática</span>: para a maioria das populações, n &ge; 30 já produz distribuição amostral aproximadamente normal</li>
+      </ul>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Por isso podemos usar testes z, testes t, intervalos de confiança &mdash; todos baseados na distribuição normal. O TCL é a <strong>fundação</strong> da inferência estatística. Sem ele, nada funciona.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Espera &mdash; se funciona pra qualquer distribuição original, então não preciso me preocupar com normalidade?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Para a <em>média amostral</em>, sim &mdash; o TCL te protege com n razoável. Entretanto, alguns testes exigem normalidade dos <em>dados individuais</em>, não das médias. São coisas diferentes! Entenderemos isso nos capítulos de testes de hipótese.')}
+  `;
+}
+
+// ============================================================
+// STEP 10 — LIÇÃO DOS CORVOS (RESUMO FINAL)
+// ============================================================
+function step10() {
+  return `
+    <div class="step-title">Lesson of the Ravens</div>
+
+    <div class="licao-box">
+      <div class="licao-title">🐦‍⬛ Muninn resume os pontos-chave</div>
+
+      <table class="summary-table">
+        <tr>
+          <th>Method</th>
+          <th>Type</th>
+          <th>How it works</th>
+          <th>Advantage</th>
+          <th>Limitation</th>
+          <th>When to use</th>
+        </tr>
+        <tr>
+          <td style="font-family:'Permanent Marker'; color:var(--odin-blue)">Simple Random</td>
+          <td><span class="tag prob">Probabilistic</span></td>
+          <td>Sorteia cada elemento com igual chance</td>
+          <td>Sem vies de selecao</td>
+          <td>Exige lista completa</td>
+          <td>Populacao pequena e acessivel</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Permanent Marker'; color:var(--odin-blue)">Stratified</td>
+          <td><span class="tag prob">Probabilistic</span></td>
+          <td>Divide em estratos, draws de cada</td>
+          <td>Garante representatividade</td>
+          <td>Precisa conhecer a variavel de estratificacao</td>
+          <td>Populacao com subgrupos conhecidos</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Permanent Marker'; color:var(--odin-blue)">Conglomerados</td>
+          <td><span class="tag prob">Probabilistic</span></td>
+          <td>Sorteia grupos inteiros</td>
+          <td>Nao precisa listar individuos</td>
+          <td>Erro maior se clusters sao homogeneos</td>
+          <td>Populacao dispersa geograficamente</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Permanent Marker'; color:var(--odin-blue)">Systematic</td>
+          <td><span class="tag prob">Probabilistic*</span></td>
+          <td>Cada k-esimo elemento</td>
+          <td>Simples e rapida</td>
+          <td>Risco com padroes ciclicos</td>
+          <td>Lista ordenada sem padroes</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Permanent Marker'; color:var(--thor-red)">Conveniencia</td>
+          <td><span class="tag nprob">Nao-Probabilistic</span></td>
+          <td>Seleciona os mais acessiveis</td>
+          <td>Barata e rapida</td>
+          <td>Nao generaliza! Vies alto</td>
+          <td>Estudos exploratorios / pilotos</td>
+        </tr>
+      </table>
+
+      <p style="margin-top: 10px; color: var(--text-dim); font-size: 0.9rem;">* A sistematica so e <em>estritamente</em> probabilistica se o ponto de partida e aleatorio. Alguns autores a classificam como quase-probabilistica.</p>
+    </div>
+
+    <div class="licao-box" style="border-color: var(--gold); margin-top: 20px;">
+      <div class="licao-title" style="color: var(--gold);">Key Formulas</div>
+
+      <div class="formula" style="text-align: left;">
+        <div class="formula-label">Sample Size (proporcoes)</div>
+        n = (Z&sup2; &middot; p &middot; q) / E&sup2;
+      </div>
+
+      <div class="formula" style="text-align: left;">
+        <div class="formula-label">Finite Population Correction</div>
+        n<sub>ajust</sub> = n / (1 + n/N)
+      </div>
+
+      <div class="formula" style="text-align: left;">
+        <div class="formula-label">Standard Error of the Mean (TCL)</div>
+        SE = &sigma; / &radic;n
+      </div>
+
+      <div class="formula" style="text-align: left;">
+        <div class="formula-label">Systematic Interval</div>
+        k = N / n
+      </div>
+    </div>
+
+    ${dialogue('huginn', '🐦‍⬛ Huginn challenges:', '<strong>Desafio para o leitor:</strong> Em que circunstancias a amostragem por conveniencia e <em>aceitavel</em> em pesquisa academica? Pense em tres situacoes concretas antes de continuar. E mais: se 95% das pesquisas em administracao usam conveniencia, o que isso diz sobre a generalizabilidade dos nossos achados?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A amostragem e a <strong>primeira decisao</strong> de qualquer pesquisa quantitativa &mdash; e uma das mais consequentes. Um metodo estatístico sofisticado aplicado a uma amostra enviesada e como uma espada runica afiada cortando o vento: tecnica perfeita, alvo errado.')}
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Lembre-se: o viés nao diminui com n maior. A unica cura para o viés e o <strong>desenho amostral</strong>. O Teorema Central do Limite garante normalidade das medias com n suficiente &mdash; mas nao garante <em>representatividade</em>. Sao coisas distintas.')}
+
+    <div class="info-box" style="border-color: var(--success);">
+      <h4 style="color: var(--success);">Checklist for Sampling</h4>
+      <ul style="margin-left: 20px; margin-top: 8px;">
+        <li>&#9745; Defini claramente a <strong>populacao-alvo</strong>?</li>
+        <li>&#9745; Tenho um <strong>cadastro</strong> (sampling frame) adequado?</li>
+        <li>&#9745; O metodo de selecao e <strong>probabilistico</strong>? Se nao, justifiquei?</li>
+        <li>&#9745; Calculei o <strong>n necessario</strong> antes de coletar?</li>
+        <li>&#9745; Considerei possiveis <strong>vieses</strong> e como mitiga-los?</li>
+        <li>&#9745; Reportei o metodo com <strong>transparencia</strong> no artigo?</li>
+      </ul>
+    </div>
+
+    <p style="text-align: center; margin-top: 30px; font-family: 'Permanent Marker'; color: var(--gold); font-size: 1.2rem;">
+      Fim do guia de Sampling. Que Odinfather guie suas amostras!
+    </p>
+  `;
+}
+
+// ===== STEP REGISTRY =====
+const stepFunctions = [step0, step1, step2, step3, step4, step5, step6, step7, step8, step9, step10];
+
+const stepNames = [
+  'Introduction',
+  'Population vs. Sample',
+  'Simple Random',
+  'Stratified',
+  'Cluster',
+  'Systematic',
+  'Convenience',
+  'Sampling Bias',
+  'Sample Size',
+  'Central Limit Theorem',
+  'Lesson of the Ravens'
+];
+
+// ===== NAVIGATION =====
+function renderStep() {
+  const content = document.getElementById('stepContent');
+  content.innerHTML = stepFunctions[currentStep]();
+  content.style.animation = 'none';
+  content.offsetHeight; // trigger reflow
+  content.style.animation = 'fadeIn 0.4s ease';
+
+  document.getElementById('progressLabel').textContent = `Step ${currentStep} of ${totalSteps - 1} — ${stepNames[currentStep]}`;
+  document.getElementById('progressFill').style.width = `${(currentStep / (totalSteps - 1)) * 100}%`;
+
+  document.getElementById('btnBack').disabled = currentStep === 0;
+  document.getElementById('btnNext').textContent = currentStep === totalSteps - 1 ? 'Start Over ↻' : 'Next ▶';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNext() {
+  if (currentStep >= totalSteps - 1) {
+    currentStep = 0;
+  } else {
+    currentStep++;
+  }
+  renderStep();
+}
+
+function goBack() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goBack(); }
+});
+
+// Initialize
+renderStep();
+</script>
+</body>
+</html>

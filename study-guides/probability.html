@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Probability — Step by Step | Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --bg-panel: #1c2333;
+  --odin-blue: #58a6ff;
+  --thor-red: #f85149;
+  --corvo-purple: #bc8cff;
+  --gold: #f0c040;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --success: #3fb950;
+  --border: #30363d;
+  --norn-teal: #39d2c0;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 18px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-dark);
+  padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-panel);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* STEP CONTENT */
+.step-content {
+  min-height: 60vh;
+  padding: 30px 0;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+  font-family: 'Bangers', cursive;
+  font-size: 2.2rem;
+  color: var(--gold);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.step-subtitle {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.3rem;
+  color: var(--odin-blue);
+  margin-bottom: 15px;
+}
+
+/* DIALOGUE BOXES */
+.dialogue-box {
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  border-left: 4px solid;
+  position: relative;
+}
+
+.dialogue-box.odin {
+  background: rgba(88,166,255,0.08);
+  border-left-color: var(--odin-blue);
+}
+.dialogue-box.thor {
+  background: rgba(248,81,73,0.08);
+  border-left-color: var(--thor-red);
+}
+.dialogue-box.corvo {
+  background: rgba(188,140,255,0.08);
+  border-left-color: var(--corvo-purple);
+}
+.dialogue-box.huginn {
+  background: rgba(188,140,255,0.08);
+  border-left-color: var(--corvo-purple);
+}
+
+.char-name {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+.char-name.huginn { color: var(--corvo-purple); }
+
+.dialogue-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* DATA TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 1rem;
+}
+
+.data-table th, .data-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.data-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+}
+
+.data-table td {
+  background: var(--bg-card);
+  transition: background 0.2s;
+}
+
+.data-table tr:hover td {
+  background: rgba(88,166,255,0.1);
+}
+
+/* FORMULA */
+.formula {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-size: 1.15rem;
+  text-align: center;
+  font-family: 'Patrick Hand', cursive;
+  color: var(--gold);
+}
+
+.formula-label {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+/* CALC TABLE */
+.calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 0.95rem;
+}
+
+.calc-table th, .calc-table td {
+  padding: 8px 10px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.calc-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.calc-table td {
+  background: var(--bg-card);
+}
+
+/* SVG VISUALS */
+.visual-container {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.visual-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* NAVIGATION */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 40px;
+  gap: 12px;
+}
+
+.nav-btn {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover {
+  border-color: var(--odin-blue);
+  background: rgba(88,166,255,0.1);
+}
+
+.nav-btn.primary {
+  background: var(--odin-blue);
+  color: var(--bg-dark);
+  border-color: var(--odin-blue);
+}
+
+.nav-btn.primary:hover {
+  background: #79bbff;
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* SIGNATURE */
+.signature {
+  text-align: center;
+  padding: 30px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* HIGHLIGHTS */
+.hl-gold { color: var(--gold); font-weight: bold; }
+.hl-blue { color: var(--odin-blue); }
+.hl-red { color: var(--thor-red); }
+.hl-green { color: var(--success); }
+.hl-purple { color: var(--corvo-purple); }
+.hl-teal { color: var(--norn-teal); }
+
+/* LICAO DOS CORVOS */
+.licao-box {
+  background: rgba(188,140,255,0.06);
+  border: 2px solid var(--corvo-purple);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.licao-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--corvo-purple);
+  margin-bottom: 12px;
+}
+
+/* ARMADILHA BOX */
+.armadilha-box {
+  background: rgba(248,81,73,0.06);
+  border: 2px solid var(--thor-red);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.armadilha-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--thor-red);
+  margin-bottom: 12px;
+}
+
+/* EXAMPLE BLOCK */
+.example-block {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 16px 0;
+}
+
+.example-label {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--norn-teal);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+/* TREE NODE */
+.tree-container {
+  margin: 20px 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* VENN */
+.venn-container {
+  margin: 20px 0;
+  text-align: center;
+}
+
+/* SUMMARY GRID */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.summary-card-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  color: var(--odin-blue);
+  margin-bottom: 8px;
+}
+
+.summary-card-formula {
+  font-size: 1.1rem;
+  color: var(--gold);
+  text-align: center;
+  padding: 8px 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container { padding: 12px; }
+  .step-title { font-size: 1.6rem; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .nav-btn { padding: 10px 18px; font-size: 0.95rem; }
+  body { font-size: 16px; }
+}
+
+/* ANIMATE */
+.fade-in {
+  animation: fadeIn 0.6s ease both;
+}
+
+.fade-in-delay {
+  animation: fadeIn 0.6s ease 0.3s both;
+}
+
+/* STEP INDICATOR DOTS */
+.step-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.3s;
+}
+
+.step-dot.active {
+  background: var(--odin-blue);
+  transform: scale(1.3);
+}
+
+.step-dot.done {
+  background: var(--gold);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="progress-bar-container">
+    <div class="progress-label" id="progressLabel">Step 0 of 11</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div class="step-dots" id="stepDots"></div>
+  </div>
+
+  <div class="step-content" id="stepContent"></div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" id="btnBack" onclick="goBack()" disabled>&#9664; Back</button>
+    <button class="nav-btn primary" id="btnNext" onclick="goNext()">Next &#9654;</button>
+  </div>
+
+  <div class="signature">
+    Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026
+  </div>
+</div>
+
+<script>
+// ===== HELPERS =====
+function r(v, d=2) { return Number(v).toFixed(d); }
+function pct(v) { return (v * 100).toFixed(1) + '%'; }
+
+// ===== DIALOGUE HELPER =====
+function dialogue(character, name, text) {
+  return `<div class="dialogue-box ${character}">
+    <div class="char-name ${character}">${name}</div>
+    <div class="dialogue-text">${text}</div>
+  </div>`;
+}
+
+// ===== STEP SYSTEM =====
+const totalSteps = 12; // 0..11
+let currentStep = 0;
+
+// ========================
+//  STEP 0 — INTRODUÇÃO
+// ========================
+function step0() {
+  return `
+    <div class="step-title">The Temple of the Norns: The Art of Calculating Destiny</div>
+
+    <p>No coração de Yggdrasil, três Nornas &mdash; <span class="hl-teal">Urd</span> (passado), <span class="hl-teal">Verdandi</span> (presente) e <span class="hl-teal">Skuld</span> (futuro) &mdash; tecem os fios do destino. Cada fio carrega uma <strong>probabilidade</strong>. Antes de cada investida viking, um guerreiro sábio calcula as chances.</p>
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Yggdrasil trunk -->
+        <rect x="335" y="40" width="30" height="120" rx="8" fill="#2d5016" opacity="0.5"/>
+        <!-- branches -->
+        <path d="M350 40 Q350 10 280 15" stroke="#3fb950" stroke-width="3" fill="none" opacity="0.5"/>
+        <path d="M350 40 Q350 5 350 5" stroke="#3fb950" stroke-width="3" fill="none" opacity="0.5"/>
+        <path d="M350 40 Q350 10 420 15" stroke="#3fb950" stroke-width="3" fill="none" opacity="0.5"/>
+        <!-- roots -->
+        <path d="M350 160 Q330 185 280 190" stroke="#6b4e2a" stroke-width="3" fill="none" opacity="0.5"/>
+        <path d="M350 160 Q370 185 420 190" stroke="#6b4e2a" stroke-width="3" fill="none" opacity="0.5"/>
+        <!-- Three Norns -->
+        <circle cx="180" cy="100" r="32" fill="none" stroke="var(--norn-teal)" stroke-width="2"/>
+        <text x="180" y="95" fill="var(--norn-teal)" font-size="11" text-anchor="middle" font-family="Permanent Marker">Urd</text>
+        <text x="180" y="110" fill="var(--text-dim)" font-size="9" text-anchor="middle">Past</text>
+
+        <circle cx="350" cy="100" r="32" fill="none" stroke="var(--norn-teal)" stroke-width="2"/>
+        <text x="350" y="95" fill="var(--norn-teal)" font-size="11" text-anchor="middle" font-family="Permanent Marker">Verdandi</text>
+        <text x="350" y="110" fill="var(--text-dim)" font-size="9" text-anchor="middle">Present</text>
+
+        <circle cx="520" cy="100" r="32" fill="none" stroke="var(--norn-teal)" stroke-width="2"/>
+        <text x="520" y="95" fill="var(--norn-teal)" font-size="11" text-anchor="middle" font-family="Permanent Marker">Skuld</text>
+        <text x="520" y="110" fill="var(--text-dim)" font-size="9" text-anchor="middle">Future</text>
+
+        <!-- threads connecting -->
+        <line x1="212" y1="100" x2="318" y2="100" stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="4" opacity="0.6"/>
+        <line x1="382" y1="100" x2="488" y2="100" stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="4" opacity="0.6"/>
+        <!-- probability labels on threads -->
+        <text x="265" y="92" fill="var(--gold)" font-size="10" text-anchor="middle" font-family="Patrick Hand">P = ?</text>
+        <text x="435" y="92" fill="var(--gold)" font-size="10" text-anchor="middle" font-family="Patrick Hand">P = ?</text>
+      </svg>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Guerreiro, a sorte favorece quem sabe calcular! Antes de zarpar para um saque, precisamos medir as chances. Probability &mdash; a arte de quantificar a incerteza &mdash; separa o general sábio do tolo que confia na sorte pura.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Pra quê calcular? Sorte é suficiente! Um bom martelo e coragem &mdash; isso é tudo que importa!')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Coragem sem cálculo, Thorment, é suicídio. As Nornas tecem o destino, mas nós podemos <em>ler os fios</em>. Vamos aprender a linguagem delas.')}
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Probability</strong> é a medida numérica da chance de um evento ocorrer. Varia de 0 (impossível) a 1 (certeza). É a base de toda inferência estatística &mdash; sem ela, não temos testes de hipótese, intervalos de confiança, nem regressão.')}
+  `;
+}
+
+// ========================
+//  STEP 1 — ESPAÇO AMOSTRAL
+// ========================
+function step1() {
+  return `
+    <div class="step-title">Passo 1: Sample Space (S)</div>
+
+    <div class="formula">
+      <div class="formula-label">Definition</div>
+      S = conjunto de TODOS os resultados possíveis de um experimento aleatório
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Antes de calcular qualquer probabilidade, primeiro defina o <strong>espaço amostral</strong> &mdash; o universo de possibilidades. Sem saber o todo, não dá pra medir a parte.')}
+
+    <div class="example-block">
+      <div class="example-label">Exemplo 1: Dado Rúnico (6 faces)</div>
+      <p>Um dado rúnico de 6 faces é lançado no Salão de Banquetes:</p>
+      <div class="formula" style="font-size:1.3rem">
+        S = {1, 2, 3, 4, 5, 6}
+      </div>
+      <p style="text-align:center;color:var(--text-dim)">|S| = 6 resultados possíveis</p>
+    </div>
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 120" xmlns="http://www.w3.org/2000/svg">
+        ${[1,2,3,4,5,6].map((v, i) => {
+          const x = 80 + i * 95;
+          return `
+            <rect x="${x-30}" y="20" width="60" height="60" rx="10" fill="var(--bg-card)" stroke="var(--border)" stroke-width="2"/>
+            <text x="${x}" y="60" fill="var(--gold)" font-size="24" text-anchor="middle" font-family="Bangers">${v}</text>
+          `;
+        }).join('')}
+        <text x="350" y="105" fill="var(--text-dim)" font-size="13" text-anchor="middle" font-family="Permanent Marker">S = {1, 2, 3, 4, 5, 6}</text>
+      </svg>
+    </div>
+
+    <div class="example-block">
+      <div class="example-label">Exemplo 2: Dois arcos (acerta ou erra)</div>
+      <p>Um arqueiro dispara duas flechas. Cada flecha: <span class="hl-green">A</span> (acerto) ou <span class="hl-red">E</span> (erro).</p>
+      <div class="formula" style="font-size:1.1rem">
+        S = {(A,A), (A,E), (E,A), (E,E)} &rarr; |S| = 4
+      </div>
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Um <strong>evento</strong> é qualquer subconjunto de S. Exemplo: "tirar número par" = {2, 4, 6} &mdash; um subconjunto de S com 3 elementos.')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Pense no espaço amostral como o mapa completo de um reino. O evento é a região que nos interessa. Não dá pra medir a região sem ter o mapa inteiro.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Fácil! S do dado é 6. Mas e se o dado for viciado?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'O espaço amostral <em>não muda</em> se o dado for viciado &mdash; os resultados possíveis continuam os mesmos. O que muda são as <strong>probabilidades</strong> de cada resultado. Boa pergunta, Thorment.')}
+  `;
+}
+
+// ========================
+//  STEP 2 — PROBABILIDADE CLÁSSICA
+// ========================
+function step2() {
+  return `
+    <div class="step-title">Passo 2: Probability Clássica</div>
+
+    <div class="formula">
+      <div class="formula-label">Laplace Formula</div>
+      P(A) = casos favoráveis / casos possíveis = |A| / |S|
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Esta fórmula assume que todos os resultados do espaço amostral são <strong>igualmente prováveis</strong>. Chamada de probabilidade clássica ou laplaciana &mdash; a base de tudo.')}
+
+    <div class="example-block">
+      <div class="example-label">Exemplo: Bag of Runes</div>
+      <p>Uma sacola contém <strong>10 runas</strong>: 3 runas de <span class="hl-blue">Protection</span>, 4 de <span class="hl-red">Attack</span> e 3 de <span class="hl-green">Cure</span>.</p>
+      <p>Você retira uma runa ao acaso. Qual a probabilidade de sacar uma runa de Protection?</p>
+    </div>
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 150" xmlns="http://www.w3.org/2000/svg">
+        <!-- bag -->
+        <path d="M250 30 Q250 10 350 10 Q450 10 450 30 L470 120 Q470 140 350 140 Q230 140 230 120 Z" fill="var(--bg-panel)" stroke="var(--border)" stroke-width="2"/>
+        <text x="350" y="28" fill="var(--text-dim)" font-size="11" text-anchor="middle" font-family="Permanent Marker">Bag of Runes</text>
+        <!-- runes inside -->
+        ${[
+          {x:280,y:55,c:'var(--odin-blue)',l:'P'},{x:320,y:70,c:'var(--odin-blue)',l:'P'},{x:360,y:55,c:'var(--odin-blue)',l:'P'},
+          {x:290,y:90,c:'var(--thor-red)',l:'A'},{x:330,y:100,c:'var(--thor-red)',l:'A'},{x:370,y:90,c:'var(--thor-red)',l:'A'},{x:410,y:100,c:'var(--thor-red)',l:'A'},
+          {x:300,y:120,c:'var(--success)',l:'C'},{x:350,y:115,c:'var(--success)',l:'C'},{x:400,y:120,c:'var(--success)',l:'C'}
+        ].map(r => `<circle cx="${r.x}" cy="${r.y}" r="14" fill="${r.c}" opacity="0.7"/><text x="${r.x}" y="${r.y+5}" fill="white" font-size="12" text-anchor="middle" font-family="Bangers">${r.l}</text>`).join('')}
+        <!-- legend -->
+        <circle cx="530" cy="50" r="8" fill="var(--odin-blue)" opacity="0.7"/>
+        <text x="545" y="55" fill="var(--text)" font-size="12" font-family="Patrick Hand">= Protection (3)</text>
+        <circle cx="530" cy="80" r="8" fill="var(--thor-red)" opacity="0.7"/>
+        <text x="545" y="85" fill="var(--text)" font-size="12" font-family="Patrick Hand">= Attack (4)</text>
+        <circle cx="530" cy="110" r="8" fill="var(--success)" opacity="0.7"/>
+        <text x="545" y="115" fill="var(--text)" font-size="12" font-family="Patrick Hand">= Cure (3)</text>
+      </svg>
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Calculation Step by Step</div>
+      P(Protection) = |A| / |S| = 3 / 10 = <span class="hl-gold">0,30</span> = <span class="hl-gold">30%</span>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Simples e poderoso! Três runas de proteção em dez totais &mdash; 30% de chance. Agora: a probabilidade de <em>não</em> sacar proteção? P(não Protection) = 1 &minus; 0,30 = <strong>0,70</strong>. A soma sempre dá 1.')}
+
+    <div class="formula">
+      <div class="formula-label">Complement Rule</div>
+      P(A<sup>c</sup>) = 1 &minus; P(A)
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Se a chance de proteção é 30%, é só tirar 3 vezes que uma vem certa!')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Não, Thorment. 30% a cada retirada não garante sucesso em 3 tentativas. Depois vemos como combinar probabilidades de eventos sequenciais. Paciência.')}
+  `;
+}
+
+// ========================
+//  STEP 3 — REGRA DA ADIÇÃO
+// ========================
+function step3() {
+  return `
+    <div class="step-title">Passo 3: Regra da Adição</div>
+
+    <div class="formula">
+      <div class="formula-label">General Addition Rule</div>
+      P(A &cup; B) = P(A) + P(B) &minus; P(A &cap; B)
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'O símbolo &cup; significa "ou" (união). O símbolo &cap; significa "e" (interseção). Subtraímos a interseção porque ela foi contada duas vezes.')}
+
+    <div class="example-block">
+      <div class="example-label">Scenario: Guerreiros no Acampamento</div>
+      <p>No acampamento de 40 guerreiros:</p>
+      <ul style="margin:8px 0 8px 20px">
+        <li><span class="hl-blue">15 são do Clã Fenrir</span></li>
+        <li><span class="hl-red">12 carregam machado</span></li>
+        <li><span class="hl-purple">5 são do Clã Fenrir E carregam machado</span></li>
+      </ul>
+      <p>Qual a probabilidade de sortear um guerreiro que <strong>é do Fenrir OU carrega machado</strong>?</p>
+    </div>
+
+    <!-- VENN DIAGRAM -->
+    <div class="venn-container">
+      <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+        <!-- Universal set -->
+        <rect x="50" y="20" width="600" height="260" rx="16" fill="none" stroke="var(--border)" stroke-width="2"/>
+        <text x="70" y="45" fill="var(--text-dim)" font-size="13" font-family="Permanent Marker">S = 40 guerreiros</text>
+
+        <!-- Circle A (Fenrir) -->
+        <circle cx="280" cy="150" r="110" fill="var(--odin-blue)" opacity="0.15" stroke="var(--odin-blue)" stroke-width="2"/>
+        <text x="210" y="130" fill="var(--odin-blue)" font-size="14" font-family="Permanent Marker">Fenrir</text>
+        <text x="210" y="155" fill="var(--odin-blue)" font-size="22" font-family="Bangers">10</text>
+        <text x="210" y="175" fill="var(--text-dim)" font-size="10">só Fenrir</text>
+
+        <!-- Circle B (Machado) -->
+        <circle cx="420" cy="150" r="110" fill="var(--thor-red)" opacity="0.15" stroke="var(--thor-red)" stroke-width="2"/>
+        <text x="455" y="130" fill="var(--thor-red)" font-size="14" font-family="Permanent Marker">Machado</text>
+        <text x="465" y="155" fill="var(--thor-red)" font-size="22" font-family="Bangers">7</text>
+        <text x="455" y="175" fill="var(--text-dim)" font-size="10">só Machado</text>
+
+        <!-- Intersection -->
+        <text x="345" y="145" fill="var(--corvo-purple)" font-size="22" font-family="Bangers">5</text>
+        <text x="335" y="165" fill="var(--corvo-purple)" font-size="10">Fenrir &amp; Machado</text>
+
+        <!-- Outside -->
+        <text x="560" y="255" fill="var(--text-dim)" font-size="16" font-family="Bangers">18</text>
+        <text x="545" y="272" fill="var(--text-dim)" font-size="9">nenhum dos dois</text>
+      </svg>
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Calculation</div>
+      P(Fenrir &cup; Machado) = 15/40 + 12/40 &minus; 5/40<br>
+      = 0,375 + 0,300 &minus; 0,125 = <span class="hl-gold">0,55</span> = <span class="hl-gold">55%</span>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Veja o diagrama de Venn: 10 são só Fenrir, 7 só Machado, 5 são ambos. Total do evento = 10 + 7 + 5 = 22. E 22/40 = 0,55. Bate com a fórmula!')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Espera, por que não somar direto 15 + 12 = 27? Dá 27/40!')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Porque os 5 guerreiros que são Fenrir <em>e</em> têm machado seriam contados <strong>duas vezes</strong>! A subtração corrige essa dupla contagem. Sem ela, a conta estoura.')}
+  `;
+}
+
+// ========================
+//  STEP 4 — MUTUAMENTE EXCLUDENTES
+// ========================
+function step4() {
+  return `
+    <div class="step-title">Passo 4: Eventos Mutually Exclusive</div>
+
+    <div class="formula">
+      <div class="formula-label">Definition</div>
+      Eventos mutuamente excludentes: P(A &cap; B) = 0 &rarr; não podem ocorrer juntos
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Simplified Rule</div>
+      Se A e B são mutuamente excludentes: P(A &cup; B) = P(A) + P(B)
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Quando dois eventos não podem acontecer ao mesmo tempo, a interseção é vazia. A fórmula da adição perde o termo &minus; P(A &cap; B) porque ele vale zero.')}
+
+    <div class="example-block">
+      <div class="example-label">Scenario: Origem do Guerreiro</div>
+      <p>Um guerreiro vem de <strong>exatamente um</strong> dos três reinos:</p>
+      <ul style="margin:8px 0 8px 20px">
+        <li><span class="hl-blue">Asgard</span>: 20 guerreiros</li>
+        <li><span class="hl-green">Midgard</span>: 50 guerreiros</li>
+        <li><span class="hl-red">Jotunheim</span>: 30 guerreiros</li>
+      </ul>
+      <p>Total: 100 guerreiros. Qual a P(Asgard ou Jotunheim)?</p>
+    </div>
+
+    <!-- VENN NON-OVERLAPPING -->
+    <div class="venn-container">
+      <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
+        <rect x="50" y="20" width="600" height="160" rx="12" fill="none" stroke="var(--border)" stroke-width="2"/>
+        <text x="350" y="42" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="Permanent Marker">S = 100 guerreiros</text>
+
+        <circle cx="170" cy="110" r="60" fill="var(--odin-blue)" opacity="0.2" stroke="var(--odin-blue)" stroke-width="2"/>
+        <text x="170" y="105" fill="var(--odin-blue)" font-size="13" text-anchor="middle" font-family="Permanent Marker">Asgard</text>
+        <text x="170" y="125" fill="var(--odin-blue)" font-size="20" text-anchor="middle" font-family="Bangers">20</text>
+
+        <circle cx="350" cy="110" r="70" fill="var(--success)" opacity="0.2" stroke="var(--success)" stroke-width="2"/>
+        <text x="350" y="105" fill="var(--success)" font-size="13" text-anchor="middle" font-family="Permanent Marker">Midgard</text>
+        <text x="350" y="125" fill="var(--success)" font-size="20" text-anchor="middle" font-family="Bangers">50</text>
+
+        <circle cx="530" cy="110" r="55" fill="var(--thor-red)" opacity="0.2" stroke="var(--thor-red)" stroke-width="2"/>
+        <text x="530" y="105" fill="var(--thor-red)" font-size="13" text-anchor="middle" font-family="Permanent Marker">Jotunheim</text>
+        <text x="530" y="125" fill="var(--thor-red)" font-size="20" text-anchor="middle" font-family="Bangers">30</text>
+      </svg>
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Calculation</div>
+      P(Asgard &cup; Jotunheim) = P(Asgard) + P(Jotunheim)<br>
+      = 20/100 + 30/100 = 0,20 + 0,30 = <span class="hl-gold">0,50</span>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Um guerreiro não pode ser de Asgard <em>e</em> de Jotunheim ao mesmo tempo. São eventos mutuamente excludentes &mdash; sem interseção. Somamos direto.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Mas e se um guerreiro tiver nascido em Asgard e morado em Jotunheim?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Aí os eventos <strong>não seriam</strong> mutuamente excludentes! A definição depende de como categorizamos. Se "origem" é o reino de nascimento, não há sobreposição. Se fosse "já viveu em", aí poderia haver interseção &mdash; e voltaríamos à fórmula completa do Passo 3.')}
+  `;
+}
+
+// ========================
+//  STEP 5 — REGRA DA MULTIPLICAÇÃO
+// ========================
+function step5() {
+  return `
+    <div class="step-title">Passo 5: Regra da Multiplicação</div>
+
+    <div class="formula">
+      <div class="formula-label">General Rule</div>
+      P(A &cap; B) = P(A) &times; P(B|A)
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'A regra da multiplicação responde: qual a probabilidade de A <strong>e</strong> B ocorrerem juntos? Multiplicamos P(A) pela probabilidade de B <em>dado que</em> A já aconteceu.')}
+
+    <div class="example-block">
+      <div class="example-label">Scenario: Bag of Runes (SEM reposição)</div>
+      <p>A sacola tem <strong>10 runas</strong>: 4 de <span class="hl-blue">Gelo</span> e 6 de <span class="hl-red">Fogo</span>.</p>
+      <p>Você retira <strong>duas runas seguidas sem devolver</strong>. Qual a P(as duas serem de Gelo)?</p>
+    </div>
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+        <!-- First draw -->
+        <text x="100" y="25" fill="var(--gold)" font-size="14" text-anchor="middle" font-family="Bangers">1st Draw</text>
+        <rect x="40" y="35" width="120" height="60" rx="10" fill="var(--bg-card)" stroke="var(--odin-blue)" stroke-width="2"/>
+        <text x="100" y="65" fill="var(--odin-blue)" font-size="12" text-anchor="middle" font-family="Permanent Marker">Gelo</text>
+        <text x="100" y="85" fill="var(--odin-blue)" font-size="14" text-anchor="middle" font-family="Bangers">P = 4/10</text>
+
+        <!-- Arrow -->
+        <line x1="170" y1="65" x2="250" y2="65" stroke="var(--gold)" stroke-width="2" marker-end="url(#arrowGold)"/>
+        <defs><marker id="arrowGold" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--gold)"/></marker></defs>
+
+        <!-- Second draw -->
+        <text x="370" y="25" fill="var(--gold)" font-size="14" text-anchor="middle" font-family="Bangers">2nd Draw (without replacement)</text>
+        <rect x="280" y="35" width="180" height="60" rx="10" fill="var(--bg-card)" stroke="var(--odin-blue)" stroke-width="2"/>
+        <text x="370" y="60" fill="var(--odin-blue)" font-size="12" text-anchor="middle" font-family="Permanent Marker">Gelo de novo?</text>
+        <text x="370" y="82" fill="var(--odin-blue)" font-size="14" text-anchor="middle" font-family="Bangers">P = 3/9 (sobram 3 de 9!)</text>
+
+        <!-- Equals -->
+        <line x1="470" y1="65" x2="520" y2="65" stroke="var(--gold)" stroke-width="2"/>
+        <text x="495" y="60" fill="var(--gold)" font-size="16" text-anchor="middle" font-family="Bangers">=</text>
+
+        <!-- Result -->
+        <rect x="520" y="35" width="140" height="60" rx="10" fill="var(--bg-panel)" stroke="var(--gold)" stroke-width="2"/>
+        <text x="590" y="60" fill="var(--gold)" font-size="12" text-anchor="middle" font-family="Permanent Marker">P(Gelo &amp; Gelo)</text>
+        <text x="590" y="82" fill="var(--gold)" font-size="16" text-anchor="middle" font-family="Bangers">= 12/90</text>
+
+        <!-- Detailed calc -->
+        <rect x="100" y="130" width="500" height="70" rx="12" fill="var(--bg-panel)" stroke="var(--border)" stroke-width="1"/>
+        <text x="350" y="155" fill="var(--text)" font-size="14" text-anchor="middle" font-family="Patrick Hand">P(G1 &cap; G2) = P(G1) &times; P(G2 | G1) = 4/10 &times; 3/9</text>
+        <text x="350" y="180" fill="var(--gold)" font-size="18" text-anchor="middle" font-family="Bangers">= 12/90 = 2/15 &asymp; 0,1333 = 13,3%</text>
+      </svg>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Ei, por que na segunda retirada mudou pra 3/9? Não era 4/10?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Porque tiramos uma runa de Gelo e <strong>não devolvemos</strong>! Sobraram 3 de Gelo entre 9 totais. A probabilidade <em>se atualiza</em> conforme o contexto muda. Ignorar isso &mdash; o erro clássico de quem não entende probabilidade condicional.')}
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'P(B|A) lê-se "probabilidade de B dado A". É a probabilidade de B quando sabemos que A ocorreu. A barra "|" é a marca da condicionalidade.')}
+  `;
+}
+
+// ========================
+//  STEP 6 — EVENTOS INDEPENDENTES
+// ========================
+function step6() {
+  return `
+    <div class="step-title">Passo 6: Eventos Independentes</div>
+
+    <div class="formula">
+      <div class="formula-label">Definition</div>
+      A e B são independentes quando P(B|A) = P(B)<br>
+      &rarr; Saber que A ocorreu NÃO muda a probabilidade de B
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Simplified Rule</div>
+      Se A e B são independentes: P(A &cap; B) = P(A) &times; P(B)
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Se dois eventos não se influenciam, são <strong>independentes</strong>. O resultado de um não altera a probabilidade do outro. Exemplo clássico: lançamentos consecutivos de moeda.')}
+
+    <div class="example-block">
+      <div class="example-label">Scenario: Moedas do Mercador</div>
+      <p>Um mercador de Birka joga uma moeda de ouro 3 vezes. Qual a P(3 caras seguidas)?</p>
+      <div class="formula">
+        P(C &cap; C &cap; C) = P(C) &times; P(C) &times; P(C) = 1/2 &times; 1/2 &times; 1/2 = <span class="hl-gold">1/8 = 0,125 = 12,5%</span>
+      </div>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Saíram 5 caras seguidas! A próxima TEM que ser coroa &mdash; é a "lei das compensações"!')}
+
+    <div class="armadilha-box">
+      <div class="armadilha-title">Armadilha: Falácia do Jogador (Gambler's Fallacy)</div>
+      <p>Thorment caiu na armadilha mais antiga do mundo! A moeda <strong>não tem memória</strong>. Cada lançamento é independente do anterior.</p>
+      <p style="margin-top:8px">Após 5 caras seguidas, a probabilidade da 6a ser cara continua sendo <span class="hl-gold">exatamente 50%</span>.</p>
+      <p style="margin-top:8px">A falácia do jogador é acreditar que resultados passados influenciam eventos independentes futuros. O universo não "deve" uma coroa a ninguém.</p>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A moeda não sabe o que aconteceu antes, Thorment! Cada lançamento reinicia do zero. A "lei dos grandes números" diz que proporções convergem no longo prazo &mdash; mas <em>não</em> porque o próximo resultado "compensa" os anteriores.')}
+
+    <div class="example-block">
+      <div class="example-label">Contraexemplo: Quando NÃO é independente?</div>
+      <p>Retirar cartas de um baralho <strong>sem reposição</strong>. A primeira carta retirada muda a composição do baralho &mdash; logo, a segunda retirada <em>depende</em> da primeira. São eventos <strong>dependentes</strong>.</p>
+      <p style="margin-top:6px">Com reposição &rarr; independente. Sem reposição &rarr; dependente.</p>
+    </div>
+  `;
+}
+
+// ========================
+//  STEP 7 — PROBABILIDADE CONDICIONAL
+// ========================
+function step7() {
+  return `
+    <div class="step-title">Passo 7: Probability Conditional</div>
+
+    <div class="formula">
+      <div class="formula-label">Formula</div>
+      P(A|B) = P(A &cap; B) / P(B)
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'P(A|B) significa: "dado que B ocorreu, qual a probabilidade de A?". O evento B redefine nosso universo &mdash; B vira o novo espaço amostral.')}
+
+    <div class="example-block">
+      <div class="example-label">Scenario: Sobrevivência na Batalha</div>
+      <p>Após a Batalha de Svolder, o registro de 200 guerreiros mostra:</p>
+    </div>
+
+    <table class="data-table">
+      <tr>
+        <th></th>
+        <th style="color:var(--success)">Survived</th>
+        <th style="color:var(--thor-red)">Fell</th>
+        <th>Total</th>
+      </tr>
+      <tr>
+        <td style="font-family:'Permanent Marker';color:var(--odin-blue)">With Shield</td>
+        <td>90</td>
+        <td>30</td>
+        <td style="font-family:'Permanent Marker'">120</td>
+      </tr>
+      <tr>
+        <td style="font-family:'Permanent Marker';color:var(--thor-red)">Without Shield</td>
+        <td>40</td>
+        <td>40</td>
+        <td style="font-family:'Permanent Marker'">80</td>
+      </tr>
+      <tr style="background:var(--bg-panel)">
+        <td style="font-family:'Permanent Marker'">Total</td>
+        <td style="font-family:'Permanent Marker'">130</td>
+        <td style="font-family:'Permanent Marker'">70</td>
+        <td style="font-family:'Permanent Marker';color:var(--gold)">200</td>
+      </tr>
+    </table>
+
+    <p style="margin:16px 0"><strong>Pergunta:</strong> Dado que um guerreiro <span class="hl-green">sobreviveu</span>, qual a probabilidade de que ele <span class="hl-blue">usava escudo</span>?</p>
+
+    <div class="formula">
+      <div class="formula-label">Solution</div>
+      P(Escudo | Survived) = P(Escudo &cap; Survived) / P(Survived)<br><br>
+      = (90/200) / (130/200) = 90/130 = <span class="hl-gold">0,6923 &asymp; 69,2%</span>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Veja a lógica: entre os 130 sobreviventes, 90 usavam escudo. O evento "sobreviveu" reduziu nosso universo de 200 para 130. Dentro desse universo menor, calculamos a proporção.')}
+
+    <div class="visual-container">
+      <svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg">
+        <!-- Full rectangle (S) -->
+        <rect x="50" y="30" width="600" height="190" rx="12" fill="none" stroke="var(--border)" stroke-width="2"/>
+        <text x="350" y="25" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="Permanent Marker">S = 200 guerreiros</text>
+
+        <!-- Survived column (highlight) -->
+        <rect x="60" y="40" width="390" height="170" rx="8" fill="var(--success)" opacity="0.08" stroke="var(--success)" stroke-width="2" stroke-dasharray="5"/>
+        <text x="255" y="60" fill="var(--success)" font-size="13" text-anchor="middle" font-family="Permanent Marker">Survived = 130</text>
+
+        <!-- Escudo + Survived -->
+        <rect x="80" y="75" width="200" height="80" rx="8" fill="var(--odin-blue)" opacity="0.15" stroke="var(--odin-blue)" stroke-width="2"/>
+        <text x="180" y="110" fill="var(--odin-blue)" font-size="14" text-anchor="middle" font-family="Permanent Marker">Escudo &amp;</text>
+        <text x="180" y="130" fill="var(--odin-blue)" font-size="14" text-anchor="middle" font-family="Permanent Marker">Survived</text>
+        <text x="180" y="148" fill="var(--odin-blue)" font-size="20" text-anchor="middle" font-family="Bangers">90</text>
+
+        <!-- Without Shield + Survived -->
+        <rect x="300" y="75" width="130" height="80" rx="8" fill="var(--success)" opacity="0.15" stroke="var(--success)" stroke-width="2"/>
+        <text x="365" y="110" fill="var(--success)" font-size="12" text-anchor="middle" font-family="Permanent Marker">Without Shield &amp;</text>
+        <text x="365" y="128" fill="var(--success)" font-size="12" text-anchor="middle" font-family="Permanent Marker">Survived</text>
+        <text x="365" y="148" fill="var(--success)" font-size="20" text-anchor="middle" font-family="Bangers">40</text>
+
+        <!-- Fell section -->
+        <rect x="470" y="75" width="160" height="80" rx="8" fill="var(--thor-red)" opacity="0.1" stroke="var(--thor-red)" stroke-width="1"/>
+        <text x="550" y="110" fill="var(--thor-red)" font-size="12" text-anchor="middle" font-family="Permanent Marker">Fell</text>
+        <text x="550" y="140" fill="var(--thor-red)" font-size="18" text-anchor="middle" font-family="Bangers">70</text>
+
+        <!-- Result arrow -->
+        <text x="350" y="205" fill="var(--gold)" font-size="15" text-anchor="middle" font-family="Bangers">P(Escudo | Survived) = 90 / 130 = 69,2%</text>
+      </svg>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Então escudo muda tudo? A probabilidade geral de escudo é 120/200 = 60%, mas entre sobreviventes pula pra 69%!')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Exato! A informação "sobreviveu" <em>atualiza</em> a probabilidade. É a essência do pensamento condicional &mdash; e a base do Teorema de Bayes, que vem a seguir.')}
+  `;
+}
+
+// ========================
+//  STEP 8 — TEOREMA DE BAYES
+// ========================
+function step8() {
+  return `
+    <div class="step-title">Passo 8: Teorema de Bayes</div>
+
+    <div class="formula">
+      <div class="formula-label">Teorema de Bayes</div>
+      P(A|B) = P(B|A) &times; P(A) / P(B)
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Bayes inverte a direção da condicionalidade: se sei P(B|A) e quero P(A|B), Bayes faz a ponte. A prior P(A) é atualizada pela evidência B para gerar a posterior P(A|B).')}
+
+    <div class="example-block">
+      <div class="example-label">Scenario: Detecção de Veneno</div>
+      <p>O alquimista de Asgard desenvolveu um teste para detectar veneno no hidromel:</p>
+      <ul style="margin:8px 0 8px 20px">
+        <li><strong>Prevalence:</strong> 2% dos barris estão envenenados &rarr; P(Veneno) = 0,02</li>
+        <li><strong>Sensitivity:</strong> Se o barril TEM veneno, o teste detecta em 95% das vezes &rarr; P(+|Veneno) = 0,95</li>
+        <li><strong>Specificity:</strong> Se o barril NÃO tem veneno, o teste dá negativo em 90% das vezes &rarr; P(&minus;|Limpo) = 0,90</li>
+        <li>Logo, <strong>falso positivo</strong>: P(+|Limpo) = 0,10</li>
+      </ul>
+      <p style="margin-top:8px"><strong>O teste deu positivo. Qual a probabilidade REAL de o barril estar envenenado?</strong></p>
+    </div>
+
+    <!-- TREE DIAGRAM -->
+    <div class="tree-container">
+      <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg">
+        <!-- Level 0 -->
+        <circle cx="60" cy="180" r="22" fill="var(--bg-panel)" stroke="var(--gold)" stroke-width="2"/>
+        <text x="60" y="185" fill="var(--gold)" font-size="10" text-anchor="middle" font-family="Bangers">Barril</text>
+
+        <!-- Branch: Veneno -->
+        <line x1="82" y1="168" x2="220" y2="90" stroke="var(--thor-red)" stroke-width="2"/>
+        <text x="140" y="112" fill="var(--thor-red)" font-size="11" text-anchor="middle" font-family="Permanent Marker">0,02</text>
+        <rect x="220" y="68" width="110" height="44" rx="8" fill="var(--bg-card)" stroke="var(--thor-red)" stroke-width="2"/>
+        <text x="275" y="87" fill="var(--thor-red)" font-size="12" text-anchor="middle" font-family="Permanent Marker">Veneno</text>
+        <text x="275" y="103" fill="var(--text-dim)" font-size="9" text-anchor="middle">P = 0,02</text>
+
+        <!-- Branch from Veneno: Teste + -->
+        <line x1="330" y1="78" x2="440" y2="45" stroke="var(--success)" stroke-width="1.5"/>
+        <text x="380" y="52" fill="var(--success)" font-size="10" text-anchor="middle" font-family="Permanent Marker">0,95</text>
+        <rect x="440" y="25" width="120" height="40" rx="8" fill="var(--bg-card)" stroke="var(--success)" stroke-width="2"/>
+        <text x="500" y="42" fill="var(--success)" font-size="11" text-anchor="middle" font-family="Permanent Marker">Teste +</text>
+        <text x="500" y="58" fill="var(--gold)" font-size="10" text-anchor="middle" font-family="Bangers">0,02 x 0,95 = 0,019</text>
+
+        <!-- Branch from Veneno: Teste - -->
+        <line x1="330" y1="100" x2="440" y2="110" stroke="var(--text-dim)" stroke-width="1.5"/>
+        <text x="380" y="115" fill="var(--text-dim)" font-size="10" text-anchor="middle" font-family="Permanent Marker">0,05</text>
+        <rect x="440" y="90" width="120" height="40" rx="8" fill="var(--bg-card)" stroke="var(--text-dim)" stroke-width="1"/>
+        <text x="500" y="107" fill="var(--text-dim)" font-size="11" text-anchor="middle" font-family="Permanent Marker">Teste &minus;</text>
+        <text x="500" y="123" fill="var(--text-dim)" font-size="10" text-anchor="middle">0,02 x 0,05 = 0,001</text>
+
+        <!-- Branch: Limpo -->
+        <line x1="82" y1="192" x2="220" y2="270" stroke="var(--odin-blue)" stroke-width="2"/>
+        <text x="140" y="255" fill="var(--odin-blue)" font-size="11" text-anchor="middle" font-family="Permanent Marker">0,98</text>
+        <rect x="220" y="248" width="110" height="44" rx="8" fill="var(--bg-card)" stroke="var(--odin-blue)" stroke-width="2"/>
+        <text x="275" y="267" fill="var(--odin-blue)" font-size="12" text-anchor="middle" font-family="Permanent Marker">Limpo</text>
+        <text x="275" y="283" fill="var(--text-dim)" font-size="9" text-anchor="middle">P = 0,98</text>
+
+        <!-- Branch from Limpo: Teste + (false positive) -->
+        <line x1="330" y1="258" x2="440" y2="230" stroke="var(--thor-red)" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="380" y="235" fill="var(--thor-red)" font-size="10" text-anchor="middle" font-family="Permanent Marker">0,10</text>
+        <rect x="440" y="210" width="120" height="40" rx="8" fill="var(--bg-card)" stroke="var(--thor-red)" stroke-width="2" stroke-dasharray="4"/>
+        <text x="500" y="227" fill="var(--thor-red)" font-size="11" text-anchor="middle" font-family="Permanent Marker">Teste + (falso!)</text>
+        <text x="500" y="243" fill="var(--thor-red)" font-size="10" text-anchor="middle" font-family="Bangers">0,98 x 0,10 = 0,098</text>
+
+        <!-- Branch from Limpo: Teste - -->
+        <line x1="330" y1="280" x2="440" y2="300" stroke="var(--text-dim)" stroke-width="1.5"/>
+        <text x="380" y="300" fill="var(--text-dim)" font-size="10" text-anchor="middle" font-family="Permanent Marker">0,90</text>
+        <rect x="440" y="280" width="120" height="40" rx="8" fill="var(--bg-card)" stroke="var(--text-dim)" stroke-width="1"/>
+        <text x="500" y="297" fill="var(--text-dim)" font-size="11" text-anchor="middle" font-family="Permanent Marker">Teste &minus;</text>
+        <text x="500" y="313" fill="var(--text-dim)" font-size="10" text-anchor="middle">0,98 x 0,90 = 0,882</text>
+
+        <!-- FINAL RESULT BOX -->
+        <rect x="580" y="100" width="130" height="120" rx="12" fill="var(--bg-panel)" stroke="var(--gold)" stroke-width="2"/>
+        <text x="645" y="125" fill="var(--gold)" font-size="11" text-anchor="middle" font-family="Bangers">P(Veneno | +)</text>
+        <text x="645" y="150" fill="var(--text)" font-size="10" text-anchor="middle" font-family="Patrick Hand">= 0,019 /</text>
+        <text x="645" y="168" fill="var(--text)" font-size="10" text-anchor="middle" font-family="Patrick Hand">(0,019 + 0,098)</text>
+        <text x="645" y="195" fill="var(--gold)" font-size="18" text-anchor="middle" font-family="Bangers">= 16,2%</text>
+
+        <line x1="560" y1="45" x2="580" y2="145" stroke="var(--gold)" stroke-width="1" stroke-dasharray="3" opacity="0.5"/>
+        <line x1="560" y1="230" x2="580" y2="175" stroke="var(--gold)" stroke-width="1" stroke-dasharray="3" opacity="0.5"/>
+      </svg>
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Full Calculation</div>
+      P(Veneno|+) = P(+|Veneno) &times; P(Veneno) / P(+)<br><br>
+      P(+) = P(+|Veneno)&times;P(Veneno) + P(+|Limpo)&times;P(Limpo)<br>
+      = 0,95 &times; 0,02 + 0,10 &times; 0,98 = 0,019 + 0,098 = 0,117<br><br>
+      P(Veneno|+) = 0,019 / 0,117 = <span class="hl-gold">0,162 &asymp; 16,2%</span>
+    </div>
+
+    ${dialogue('thor', '⚡ Thorment', 'Espera &mdash; o teste deu positivo mas a chance real é só 16%?! O teste é inútil?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Não é inútil &mdash; é matemática! A prevalência é muito baixa (2%). Mesmo com 10% de false positives, eles dominam quando quase todos os barris são limpos. De cada 1.000 barris: 20 envenenados (19 detectados) vs. 980 limpos (98 alarmes falsos). O sinal se afoga no ruído.')}
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Esta é a <strong>negligência da taxa base</strong> (base rate neglect). As pessoas ignoram a prevalência e focam só na acurácia do teste. Bayes corrige esse viés.')}
+  `;
+}
+
+// ========================
+//  STEP 9 — DISTRIBUIÇÃO NORMAL
+// ========================
+function step9() {
+  return `
+    <div class="step-title">Passo 9: Distribuição Normal</div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A distribuição normal &mdash; a famosa curva em sino &mdash; é o modelo probabilístico mais importante da estatística. Ela surge naturalmente quando muitos fatores aleatórios independentes se combinam.')}
+
+    <div class="formula">
+      <div class="formula-label">Properties of the Normal Curve</div>
+      Simétrica em torno da média (&mu;) &middot; Formato de sino &middot; &mu; = mediana = moda
+    </div>
+
+    <div class="example-block">
+      <div class="example-label">Scenario: Peso das Espadas Forjadas</div>
+      <p>A forja de Asgard produz espadas com peso médio &mu; = 3,0 kg e desvio padrão &sigma; = 0,4 kg. Os pesos seguem distribuição normal.</p>
+    </div>
+
+    <!-- BELL CURVE SVG -->
+    <div class="visual-container">
+      <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
+        <!-- Axis -->
+        <line x1="50" y1="250" x2="650" y2="250" stroke="var(--text-dim)" stroke-width="2"/>
+
+        <!-- Bell curve path -->
+        <path d="M 50 250
+          Q 100 249 130 248
+          Q 160 244 180 238
+          Q 200 228 220 212
+          Q 240 190 260 160
+          Q 280 125 300 88
+          Q 320 58 350 38
+          Q 380 58 400 88
+          Q 420 125 440 160
+          Q 460 190 480 212
+          Q 500 228 520 238
+          Q 540 244 560 248
+          Q 590 249 650 250"
+          fill="none" stroke="var(--odin-blue)" stroke-width="3"/>
+
+        <!-- Filled areas -->
+        <!-- -1SD to +1SD (68%) -->
+        <path d="M 220 212 Q 240 190 260 160 Q 280 125 300 88 Q 320 58 350 38 Q 380 58 400 88 Q 420 125 440 160 Q 460 190 480 212 L 480 250 L 220 250 Z"
+          fill="var(--odin-blue)" opacity="0.2"/>
+
+        <!-- -2SD to -1SD and +1SD to +2SD (27%) -->
+        <path d="M 130 248 Q 160 244 180 238 Q 200 228 220 212 L 220 250 L 130 250 Z"
+          fill="var(--gold)" opacity="0.15"/>
+        <path d="M 480 212 Q 500 228 520 238 Q 540 244 560 248 L 560 250 L 480 250 Z"
+          fill="var(--gold)" opacity="0.15"/>
+
+        <!-- SD markers -->
+        <line x1="350" y1="35" x2="350" y2="260" stroke="var(--gold)" stroke-width="2" stroke-dasharray="4"/>
+        <text x="350" y="275" fill="var(--gold)" font-size="13" text-anchor="middle" font-family="Bangers">&mu; = 3,0 kg</text>
+
+        <line x1="220" y1="212" x2="220" y2="255" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3"/>
+        <text x="220" y="270" fill="var(--text-dim)" font-size="11" text-anchor="middle" font-family="Patrick Hand">&minus;1&sigma;</text>
+        <text x="220" y="284" fill="var(--text-dim)" font-size="10" text-anchor="middle">2,6 kg</text>
+
+        <line x1="480" y1="212" x2="480" y2="255" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3"/>
+        <text x="480" y="270" fill="var(--text-dim)" font-size="11" text-anchor="middle" font-family="Patrick Hand">+1&sigma;</text>
+        <text x="480" y="284" fill="var(--text-dim)" font-size="10" text-anchor="middle">3,4 kg</text>
+
+        <line x1="130" y1="248" x2="130" y2="255" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3"/>
+        <text x="130" y="270" fill="var(--text-dim)" font-size="11" text-anchor="middle" font-family="Patrick Hand">&minus;2&sigma;</text>
+        <text x="130" y="284" fill="var(--text-dim)" font-size="10" text-anchor="middle">2,2 kg</text>
+
+        <line x1="560" y1="248" x2="560" y2="255" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3"/>
+        <text x="560" y="270" fill="var(--text-dim)" font-size="11" text-anchor="middle" font-family="Patrick Hand">+2&sigma;</text>
+        <text x="560" y="284" fill="var(--text-dim)" font-size="10" text-anchor="middle">3,8 kg</text>
+
+        <!-- Percentage labels -->
+        <text x="350" y="175" fill="var(--odin-blue)" font-size="16" text-anchor="middle" font-family="Bangers">68,3%</text>
+        <text x="175" y="235" fill="var(--gold)" font-size="12" text-anchor="middle" font-family="Bangers">13,6%</text>
+        <text x="520" y="235" fill="var(--gold)" font-size="12" text-anchor="middle" font-family="Bangers">13,6%</text>
+
+        <!-- Bracket for 95% -->
+        <path d="M 130 300 L 130 305 L 560 305 L 560 300" fill="none" stroke="var(--success)" stroke-width="1.5"/>
+        <text x="345" y="318" fill="var(--success)" font-size="13" text-anchor="middle" font-family="Bangers">95,4% dos dados entre &mu; &plusmn; 2&sigma;</text>
+      </svg>
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Empirical Rule (68-95-99,7)</div>
+      &mu; &plusmn; 1&sigma; &rarr; 68,3% dos dados<br>
+      &mu; &plusmn; 2&sigma; &rarr; 95,4% dos dados<br>
+      &mu; &plusmn; 3&sigma; &rarr; 99,7% dos dados
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Z-Score (standardization)</div>
+      Z = (X &minus; &mu;) / &sigma;
+    </div>
+
+    <div class="example-block">
+      <div class="example-label">Calculating with Z-score</div>
+      <p>Uma espada pesa 3,8 kg. Quão incomum ela é?</p>
+      <p style="margin-top:8px">Z = (3,8 &minus; 3,0) / 0,4 = <span class="hl-gold">2,0</span></p>
+      <p style="margin-top:4px">Está a 2 desvios padrão acima da média &mdash; apenas <span class="hl-gold">~2,3%</span> das espadas são mais pesadas.</p>
+    </div>
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'O Z-score traduz qualquer valor para uma escala universal. Um Z de 2 é raro em qualquer distribuição normal &mdash; seja peso de espadas, altura de guerreiros ou lucro de mercadores.')}
+
+    ${dialogue('thor', '⚡ Thorment', 'Mas e se os dados não forem normais?')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Pergunta fundamental! Quando os dados não são normais, usamos testes não-paramétricos ou transformações. Entretanto, pelo <strong>Teorema Central do Limite</strong>, a distribuição das <em>médias amostrais</em> tende à normalidade com amostras grandes &mdash; mesmo que a população original não seja normal.')}
+  `;
+}
+
+// ========================
+//  STEP 10 — LIÇÃO DOS CORVOS
+// ========================
+function step10() {
+  return `
+    <div class="step-title">Passo 10: Lesson of the Ravens</div>
+
+    <div class="licao-box">
+      <div class="licao-title">🐦‍⬛ Muninn summarizes the key points:</div>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-card-title">Sample Space</div>
+          <div class="summary-card-formula">S = todos os resultados possíveis</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">Probability Clássica</div>
+          <div class="summary-card-formula">P(A) = |A| / |S|</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">Complement</div>
+          <div class="summary-card-formula">P(A<sup>c</sup>) = 1 &minus; P(A)</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">Adição (Geral)</div>
+          <div class="summary-card-formula">P(A&cup;B) = P(A)+P(B)&minus;P(A&cap;B)</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">Mutually Exclusive</div>
+          <div class="summary-card-formula">P(A&cap;B)=0 &rarr; P(A&cup;B)=P(A)+P(B)</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">Multiplicação (Geral)</div>
+          <div class="summary-card-formula">P(A&cap;B) = P(A) &times; P(B|A)</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">Independence</div>
+          <div class="summary-card-formula">P(A&cap;B) = P(A) &times; P(B)</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">Conditional</div>
+          <div class="summary-card-formula">P(A|B) = P(A&cap;B) / P(B)</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">Bayes</div>
+          <div class="summary-card-formula">P(A|B) = P(B|A)&times;P(A) / P(B)</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">Z-Score</div>
+          <div class="summary-card-formula">Z = (X &minus; &mu;) / &sigma;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="licao-box" style="border-color: var(--corvo-purple); margin-top: 20px;">
+      <div class="licao-title">🐦‍⬛ Huginn challenges:</div>
+      <div class="example-block" style="border:2px solid var(--corvo-purple);background:var(--bg-card)">
+        <div class="example-label" style="color:var(--corvo-purple)">Desafio de Probability Conditional</div>
+        <p>Na frota viking de 300 navios, 60 carregam ouro e 240 carregam grãos. Os navios com ouro têm 80% de chance de serem atacados por piratas. Os navios com grãos têm 10% de chance de ataque.</p>
+        <p style="margin-top:10px"><strong>Um navio foi atacado. Qual a probabilidade de que carregava ouro?</strong></p>
+        <p style="margin-top:12px;color:var(--text-dim)"><em>Use o Teorema de Bayes. Pause e tente resolver antes de ver a resposta.</em></p>
+
+        <div style="margin-top:16px;background:var(--bg-panel);padding:14px;border-radius:8px">
+          <p style="color:var(--gold);font-family:'Permanent Marker';cursor:pointer" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'; this.textContent = this.textContent.includes('Ver') ? 'Hide Answer' : 'Show Answer';">Show Answer</p>
+          <div style="display:none;margin-top:10px">
+            <p>P(Ouro) = 60/300 = 0,20 &middot; P(Grãos) = 240/300 = 0,80</p>
+            <p>P(Attack|Ouro) = 0,80 &middot; P(Attack|Grãos) = 0,10</p>
+            <p style="margin-top:6px">P(Attack) = 0,80&times;0,20 + 0,10&times;0,80 = 0,16 + 0,08 = <strong>0,24</strong></p>
+            <p style="margin-top:6px;color:var(--gold);font-family:'Bangers';font-size:1.2rem">P(Ouro|Attack) = 0,16 / 0,24 = 0,6667 &asymp; 66,7%</p>
+            <p style="margin-top:6px;color:var(--text-dim)">Apesar de o ouro ser apenas 20% da frota, entre os navios atacados ele representa 67% &mdash; a alta taxa de ataque compensa a baixa prevalência.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ========================
+//  STEP 11 — ARMADILHAS COMUNS
+// ========================
+function step11() {
+  return `
+    <div class="step-title">Passo 11: Armadilhas de Probability</div>
+
+    <p style="margin-bottom:20px">Thorment compilou um catálogo involuntário de erros. Cada um deles é um viés cognitivo documentado &mdash; e cada um tem nome.</p>
+
+    <!-- ARMADILHA 1 -->
+    <div class="armadilha-box">
+      <div class="armadilha-title">Armadilha 1: Falácia do Jogador (Gambler's Fallacy)</div>
+
+      ${dialogue('thor', '⚡ Thorment', 'Saíram 7 coroas seguidas no lançamento de moeda! A próxima TEM que ser cara &mdash; o universo precisa equilibrar!')}
+
+      ${dialogue('odin', '🧙‍♂️ Odinfather', 'Errado. Eventos independentes não têm memória. Cada lançamento recomeça do zero &mdash; a moeda não sabe o que veio antes. P(cara) = 50%, sempre, independentemente do histórico.')}
+
+      <p style="margin-top:8px;color:var(--text-dim)"><strong>Por quê cometemos?</strong> Nosso cérebro busca padrões onde não existem. Confundimos "convergência de proporção no longo prazo" com "compensação no curto prazo".</p>
+    </div>
+
+    <!-- ARMADILHA 2 -->
+    <div class="armadilha-box">
+      <div class="armadilha-title">Armadilha 2: Falácia da Conjunção (Conjunction Fallacy)</div>
+
+      <div class="example-block">
+        <div class="example-label">O Problema de Freyja</div>
+        <p>Freyja é guerreira de Asgard, estudiosa de runas, e luta por igualdade no conselho dos deuses. O que é MAIS provável?</p>
+        <p style="margin:8px 0 0 20px"><strong>A)</strong> Freyja é mercadora.</p>
+        <p style="margin:4px 0 0 20px"><strong>B)</strong> Freyja é mercadora <em>e</em> ativista política.</p>
+      </div>
+
+      ${dialogue('thor', '⚡ Thorment', 'Opção B, claro! Combina mais com o perfil dela!')}
+
+      ${dialogue('odin', '🧙‍♂️ Odinfather', 'Errado de novo! A opção A é <em>sempre</em> mais provável (ou igual) que B. Por quê? B é um subconjunto de A. O conjunto "mercadora" contém todos os casos de "mercadora e ativista". A interseção nunca supera o conjunto maior.')}
+
+      <div class="formula" style="font-size:1rem">
+        <div class="formula-label">Regra Lógica</div>
+        P(A &cap; B) &le; P(A) &mdash; sempre. A interseção cabe dentro de cada parte.
+      </div>
+
+      <p style="margin-top:8px;color:var(--text-dim)"><strong>Por quê cometemos?</strong> A descrição detalhada parece mais "representativa" e nosso cérebro substitui probabilidade por semelhança. Kahneman e Tversky documentaram isso em 1983.</p>
+    </div>
+
+    <!-- ARMADILHA 3 -->
+    <div class="armadilha-box">
+      <div class="armadilha-title">Armadilha 3: Negligência da Taxa Base (Base Rate Neglect)</div>
+
+      ${dialogue('thor', '⚡ Thorment', 'O teste de veneno deu positivo! O barril com certeza está envenenado!')}
+
+      ${dialogue('odin', '🧙‍♂️ Odinfather', 'Vimos no Passo 8: quando a prevalência é baixa, um teste positivo pode ter mais false positives do que verdadeiros. Thorment ignorou a <em>taxa base</em> (2% de barris envenenados) e focou só na acurácia do teste.')}
+
+      <div class="visual-container">
+        <svg viewBox="0 0 700 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- 1000 barris visualization -->
+          <text x="350" y="20" fill="var(--text-dim)" font-size="13" text-anchor="middle" font-family="Permanent Marker">Em 1.000 barris testados:</text>
+
+          <rect x="50" y="35" width="280" height="35" rx="6" fill="var(--thor-red)" opacity="0.3" stroke="var(--thor-red)" stroke-width="1"/>
+          <text x="190" y="58" fill="var(--thor-red)" font-size="12" text-anchor="middle" font-family="Permanent Marker">98 false positives (limpos, teste +)</text>
+
+          <rect x="50" y="78" width="57" height="35" rx="6" fill="var(--success)" opacity="0.3" stroke="var(--success)" stroke-width="2"/>
+          <text x="78" y="101" fill="var(--success)" font-size="11" text-anchor="middle" font-family="Permanent Marker">19 VP</text>
+
+          <text x="400" y="58" fill="var(--text)" font-size="12" text-anchor="start" font-family="Patrick Hand">&larr; Barris limpos com alarme falso</text>
+          <text x="400" y="101" fill="var(--text)" font-size="12" text-anchor="start" font-family="Patrick Hand">&larr; Realmente envenenados e detectados</text>
+
+          <text x="580" y="58" fill="var(--gold)" font-size="13" text-anchor="middle" font-family="Bangers">19 / (19+98) = 16,2%</text>
+        </svg>
+      </div>
+
+      <p style="margin-top:8px;color:var(--text-dim)"><strong>Por quê cometemos?</strong> A prevalência parece "abstrata" e distante. A sensação de "o teste deu positivo!" é visceral. Bayes nos força a integrar as duas informações.</p>
+    </div>
+
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Essas três falácias &mdash; jogador, conjunção e taxa base &mdash; são as mais documentadas em pesquisa comportamental. Tversky, Kahneman e Gigerenzer dedicaram carreiras inteiras a estudá-las. Reconhecer o viés é o primeiro passo para evitá-lo.')}
+
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Probability não é intuição &mdash; é cálculo. Nosso cérebro viking evoluiu para fugir de leões, não para calcular P(A|B). Por isso formalizamos. Por isso estudamos. Por isso as Nornas aprovam quem faz a conta.')}
+  `;
+}
+
+// ========================
+//  RENDER & NAVIGATION
+// ========================
+const stepFunctions = [step0, step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11];
+
+function renderStep() {
+  const content = document.getElementById('stepContent');
+  content.style.animation = 'none';
+  content.offsetHeight; // trigger reflow
+  content.style.animation = 'fadeIn 0.4s ease';
+  content.innerHTML = stepFunctions[currentStep]();
+
+  // Update progress
+  const pct = (currentStep / (totalSteps - 1)) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Step ${currentStep} of ${totalSteps - 1}`;
+
+  // Update buttons
+  document.getElementById('btnBack').disabled = (currentStep === 0);
+  const btnNext = document.getElementById('btnNext');
+  if (currentStep === totalSteps - 1) {
+    btnNext.textContent = 'Done ✓';
+    btnNext.disabled = true;
+    btnNext.classList.remove('primary');
+    btnNext.style.background = 'var(--success)';
+    btnNext.style.borderColor = 'var(--success)';
+    btnNext.style.color = 'white';
+  } else {
+    btnNext.textContent = 'Next ▶';
+    btnNext.disabled = false;
+    btnNext.classList.add('primary');
+    btnNext.style.background = '';
+    btnNext.style.borderColor = '';
+    btnNext.style.color = '';
+  }
+
+  // Update dots
+  renderDots();
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderDots() {
+  const dotsContainer = document.getElementById('stepDots');
+  let html = '';
+  for (let i = 0; i < totalSteps; i++) {
+    let cls = 'step-dot';
+    if (i === currentStep) cls += ' active';
+    else if (i < currentStep) cls += ' done';
+    html += `<div class="${cls}"></div>`;
+  }
+  dotsContainer.innerHTML = html;
+}
+
+function goNext() {
+  if (currentStep < totalSteps - 1) {
+    currentStep++;
+    renderStep();
+  }
+}
+
+function goBack() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    goNext();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    goBack();
+  }
+});
+
+// Initialize
+renderStep();
+</script>
+
+</body>
+</html>
