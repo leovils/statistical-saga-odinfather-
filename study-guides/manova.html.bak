@@ -543,23 +543,23 @@ function getStepHTML(step){
   // ============================================================
   case 0: return `
 <div class="step-title">&#9876; Step 0 &mdash; The Great Hall of Matrices</div>
-<p>Three Viking academies train elite warriors in Asgard. The Council of Jarls wants to know: <span class="highlight">which academy produces the best fighters?</span></p>
-<p>The problem &mdash; there is no SINGLE criterion. Warriors are evaluated on <strong>three</strong> dimensions simultaneously:</p>
+<p>Tr&ecirc;s academys vikings formam warriors de elite em Asgard. The Council of Jarls wants to know: <span class="highlight">qual academy produz os melhores combatentes?</span></p>
+<p>O problema &mdash; n&atilde;o existe UM &uacute;nico crit&eacute;rio. Os warriors s&atilde;o avaliados em <strong>tr&ecirc;s</strong> dimens&otilde;es simult&acirc;neas:</p>
 <ul style="margin:12px 0 12px 24px;">
   <li><strong>Strength &#9876;&#65039;</strong> &mdash; strike impact on the battlefield</li>
   <li><strong>Speed &#127939;</strong> &mdash; reaction time in combat</li>
   <li><strong>Strategy &#129504;</strong> &mdash; tactical ability and enemy reading</li>
 </ul>
 
-${dlg('thor','&#9889; Thorment','Easy! Run three Separate ANOVAs &mdash; one for Strength, one for Speed, one for Strategy. Triple the glory!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Triple the <strong>error</strong>, Thorment. Three tests at &alpha; = 0.05 each yield an overall error rate of 1 &minus; (0.95)&sup3; = <span class="highlight-red">14.3%</span>. Almost 1 in 7 chance of a false positive. Furthermore, you lose the <em>multivariate pattern</em> &mdash; the unique combination of strength + speed + strategy that differentiates the academies.')}
-${dlg('corvo','&#129430; Muninn whispers:','MANOVA = <em>Multivariate Analysis of Variance</em>. It tests whether the mean vectors differ between groups, preserving the correlation between DVs and controlling the Type I error rate.')}
+${dlg('thor','&#9889; Thorment','Easy! Roda tr&ecirc;s Separate ANOVAs &mdash; uma pra Strength, uma pra Speed, uma pra Strategy. Triplica a gl&oacute;ria!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Triplica o <strong>erro</strong>, Thorment. Tr&ecirc;s testes com &alpha; = 0,05 cada um d&atilde;o uma taxa de erro global de 1 &minus; (0,95)&sup3; = <span class="highlight-red">14,3%</span>. Quase 1 em 7 chances de falso positivo. Al&eacute;m disso, voc&ecirc; perde o <em>padr&atilde;o multivariado</em> &mdash; a combina&ccedil;&atilde;o &uacute;nica de for&ccedil;a + velocidade + estrat&eacute;gia que diferencia as academys.')}
+${dlg('corvo','&#129430; Muninn whispers:','MANOVA = <em>Multivariate Analysis of Variance</em>. Testa se os vetores de m&eacute;dias diferem entre grupos, preservando a correla&ccedil;&atilde;o entre as VDs e controlando a taxa de erro Tipo I.')}
 
 <div class="hyp-box">
-  <h4>&#128161; The Problem with Multiple ANOVAs</h4>
-  <p>1. <strong>Type I error inflation</strong> &mdash; each additional test increases the risk of false positives</p>
-  <p>2. <strong>Ignores correlations between DVs</strong> &mdash; Strength and Speed are not independent</p>
-  <p>3. <strong>Misses multidimensional patterns</strong> &mdash; groups may differ in the <em>combination</em>, not in each DV alone</p>
+  <h4>&#128161; O Problema das M&uacute;ltiplas ANOVAs</h4>
+  <p>1. <strong>Infla&ccedil;&atilde;o de erro Tipo I</strong> &mdash; cada teste adicional aumenta o risco de falso positivo</p>
+  <p>2. <strong>Ignora correla&ccedil;&otilde;es entre VDs</strong> &mdash; Strength e Speed n&atilde;o s&atilde;o independentes</p>
+  <p>3. <strong>Perde padr&otilde;es multidimensionais</strong> &mdash; grupos podem diferir na <em>combina&ccedil;&atilde;o</em>, n&atilde;o em cada VD isolada</p>
 </div>`;
 
   // ============================================================
@@ -567,82 +567,82 @@ ${dlg('corvo','&#129430; Muninn whispers:','MANOVA = <em>Multivariate Analysis o
   // ============================================================
   case 1: return `
 <div class="step-title">&#128300; Step 1 &mdash; MANOVA vs. Multiple ANOVAs</div>
-<p>The fundamental difference: ANOVA asks <em>&ldquo;do groups differ on ONE variable?&rdquo;</em>. MANOVA asks <em>&ldquo;do groups differ on the LINEAR COMBINATION of several variables?&rdquo;</em></p>
+<p>A diferen&ccedil;a fundamental: ANOVA pergunta <em>&ldquo;os grupos diferem em UMA vari&aacute;vel?&rdquo;</em>. MANOVA pergunta <em>&ldquo;os grupos diferem na COMBINA&Ccedil;&Atilde;O LINEAR de v&aacute;rias vari&aacute;veis?&rdquo;</em></p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Think of it this way: ANOVA compares groups looking through one window at a time. MANOVA opens <strong>all windows</strong> and sees the complete panorama.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Pense assim: ANOVA compara grupos olhando por uma janela de cada vez. MANOVA abre <strong>todas as janelas</strong> e enxerga o panorama completo.')}
 
 <table class="comp-table">
   <thead>
-    <tr><th>Aspect</th><th style="color:var(--thor-red)">3 Separate ANOVAs</th><th style="color:var(--odin-blue)">MANOVA</th></tr>
+    <tr><th>Aspect</th><th style="color:var(--thor-red)">3 ANOVAs Separadas</th><th style="color:var(--odin-blue)">MANOVA</th></tr>
   </thead>
   <tbody>
-    <tr><td>Type I Error</td><td>Inflated (~14.3% for 3 tests)</td><td>Controlled (&alpha; = 0.05)</td></tr>
-    <tr><td>Correlation between DVs</td><td>&#10060; Completely ignored</td><td>&#9989; Modeled in the covariance matrix</td></tr>
-    <tr><td>Multidimensional patterns</td><td>&#10060; Invisible</td><td>&#9989; Detected via linear combination</td></tr>
-    <tr><td>Statistical power</td><td>Reduced (Bonferroni correction dilutes)</td><td>Potentially higher (uses all information)</td></tr>
-    <tr><td>Complexity</td><td>Simple, but incomplete</td><td>More complex, yet rigorous</td></tr>
-    <tr><td>When to use</td><td>Genuinely independent DVs (rare)</td><td>Correlated + multiple DVs</td></tr>
+    <tr><td>Error Tipo I</td><td>Inflacionado (~14,3% para 3 testes)</td><td>Controlado (&alpha; = 0,05)</td></tr>
+    <tr><td>Correlation between DVs</td><td>&#10060; Ignorada completamente</td><td>&#9989; Modelada na matriz de covariance</td></tr>
+    <tr><td>Padr&otilde;es multidimensionais</td><td>&#10060; Invis&iacute;veis</td><td>&#9989; Detectados via combina&ccedil;&atilde;o linear</td></tr>
+    <tr><td>Poder estat&iacute;stico</td><td>Reduzido (corre&ccedil;&atilde;o de Bonferroni dilui)</td><td>Potencialmente maior (usa toda a informa&ccedil;&atilde;o)</td></tr>
+    <tr><td>Complexidade</td><td>Simples, mas incompleta</td><td>Mais complexa, por&eacute;m rigorosa</td></tr>
+    <tr><td>When usar</td><td>VDs genuinamente independentes (raro)</td><td>VDs correlated + m&uacute;ltiplas</td></tr>
   </tbody>
 </table>
 
-${dlg('thor','&#9889; Thorment','But if I use Bonferroni on the 3 ANOVAs, that fixes it, right?')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Bonferroni controls the error, but <em>brutally reduces power</em>. Moreover, it still ignores the correlation between Strength, Speed, and Strategy. MANOVA uses that correlation to its advantage.')}
+${dlg('thor','&#9889; Thorment','Mas se eu usar Bonferroni nas 3 ANOVAs, resolve, n&atilde;o?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Bonferroni controla o erro, mas <em>reduz brutalmente o poder</em>. Al&eacute;m disso, continua ignorando a correla&ccedil;&atilde;o entre Strength, Speed e Strategy. MANOVA usa essa correla&ccedil;&atilde;o a seu favor.')}
 
 <div class="hyp-box">
-  <h4>&#127919; When to Choose MANOVA</h4>
-  <p>&#9679; Multiple <strong>continuous</strong> and <strong>conceptually related</strong> DVs</p>
-  <p>&#9679; Categorical IV (groups): academies, treatments, conditions</p>
-  <p>&#9679; Interest in the <strong>multidimensional profile</strong>, not each DV in isolation</p>
-  <p>&#9679; Moderate correlation between DVs (|r| between 0.2 and 0.6 = ideal)</p>
+  <h4>&#127919; When Escolher MANOVA</h4>
+  <p>&#9679; M&uacute;ltiplas VDs <strong>cont&iacute;nuas</strong> e <strong>conceitualmente relacionadas</strong></p>
+  <p>&#9679; VI categ&oacute;rica (grupos): academys, tratamentos, condi&ccedil;&otilde;es</p>
+  <p>&#9679; Interesse no <strong>perfil multidimensional</strong>, n&atilde;o em cada VD isolada</p>
+  <p>&#9679; Correlation moderada entre VDs (|r| entre 0,2 e 0,6 = ideal)</p>
 </div>`;
 
   // ============================================================
   // STEP 2 — ASSUMPTIONS
   // ============================================================
   case 2: return `
-<div class="step-title">&#128270; Step 2 &mdash; MANOVA Assumptions</div>
-<p>Before wielding the multivariate sword, make sure the forge meets all requirements.</p>
+<div class="step-title">&#128270; Step 2 &mdash; Assumptions da MANOVA</div>
+<p>Antes de empunhar a espada multivariada, verifique se a forja atende aos requisitos.</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','MANOVA is powerful but demanding. If the assumptions fall apart, the results turn to Helheim mud.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','MANOVA &eacute; poderosa, mas exigente. Se os pressupostos caem, os resultados viram lama de Helheim.')}
 
-<div class="step-subtitle">&#9989; Assumptions Checklist</div>
+<div class="step-subtitle">&#9989; Checklist de Assumptions</div>
 
 <div class="decision-node">
-  <strong>1. Multivariate Normality</strong><br>
-  Each group must follow a multivariate normal distribution. Test: <span class="highlight">Mardia (multivariate skewness and kurtosis)</span> or Shapiro-Wilk per DV (simplified). MANOVA is reasonably robust with n &ge; 20 per group.
+  <strong>1. Normality Multivariada</strong><br>
+  Cada grupo deve seguir distribui&ccedil;&atilde;o normal multivariada. Teste: <span class="highlight">Mardia (assimetria e curtose multivariada)</span> ou Shapiro-Wilk por VD (simplificado). MANOVA &eacute; razoavelmente robusta com n &ge; 20 por grupo.
 </div>
 
 <div class="decision-node warn">
-  <strong>2. Homogeneity of Covariance Matrices (Box\x27s M)</strong><br>
-  The covariance matrices must be similar across groups. Box\x27s M tests this &mdash; but it is <span class="highlight-red">hypersensitive</span>. Use <strong>&alpha; = 0.001</strong> (not 0.05!). If violated, prefer <span class="highlight">Pillai\x27s Trace</span> (more robust).
+  <strong>2. Homogeneidade de Matrizes de Covariance (Box&rsquo;s M)</strong><br>
+  As matrizes de covariance devem ser similares entre grupos. Box&rsquo;s M testa isso &mdash; mas &eacute; <span class="highlight-red">hipersens&iacute;vel</span>. Use <strong>&alpha; = 0,001</strong> (n&atilde;o 0,05!). Se violar, prefira <span class="highlight">Pillai&rsquo;s Trace</span> (mais robusto).
 </div>
 
 <div class="decision-node">
-  <strong>3. Independence of Observations</strong><br>
-  Each warrior evaluated is independent of the others. No repeated measures (for that, use repeated-measures MANOVA).
+  <strong>3. Independence das Observations</strong><br>
+  Cada warrior avaliado &eacute; independente dos demais. Sem medi&ccedil;&otilde;es repetidas (para isso existe MANOVA de medidas repetidas).
 </div>
 
 <div class="decision-node">
-  <strong>4. Absence of Multivariate Outliers</strong><br>
-  Check with <span class="highlight">Mahalanobis distance</span>. Multivariate outliers distort covariance matrices and inflate the tests.
+  <strong>4. Aus&ecirc;ncia de Outliers Multivariados</strong><br>
+  Verifique com <span class="highlight">dist&acirc;ncia de Mahalanobis</span>. Outliers multivariados distorcem matrizes de covariance e inflam os testes.
 </div>
 
 <div class="decision-node">
-  <strong>5. Adequate Sample Size</strong><br>
-  Rule of thumb: n per group &gt; number of DVs. Ideally, n &ge; 20 per group. Our example has n = 6 (pedagogical &mdash; in practice, that would be too few).
+  <strong>5. Tamanho Amostral Adequado</strong><br>
+  Rule of thumb: n por grupo &gt; n&uacute;mero de VDs. Idealmente, n &ge; 20 por grupo. Nosso exemplo tem n = 6 (did&aacute;tico &mdash; na pr&aacute;tica, seria pouco).
 </div>
 
-${dlg('corvo','&#129430; Muninn whispers:','Box\x27s M test compares the matrices &Sigma;&#8321;, &Sigma;&#8322;, ... &Sigma;&#8342; across the k groups. H&#8320;: &Sigma;&#8321; = &Sigma;&#8322; = ... = &Sigma;&#8342;. Rejection indicates multivariate heteroscedasticity.')}
-${dlg('thor','&#9889; Thorment','Box\x27s M significant with p &lt; 0.05? Panic!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Easy there. Box\x27s M is an overly sensitive test. Use &alpha; = 0.001. If it still rejects, switch to Pillai\x27s Trace &mdash; it is the most robust against violations.')}
+${dlg('corvo','&#129430; Muninn whispers:','O teste M de Box compara as matrizes &Sigma;&#8321;, &Sigma;&#8322;, ... &Sigma;&#8342; entre os k grupos. H&#8320;: &Sigma;&#8321; = &Sigma;&#8322; = ... = &Sigma;&#8342;. Rejei&ccedil;&atilde;o indica heterocedasticidade multivariada.')}
+${dlg('thor','&#9889; Thorment','Box&rsquo;s M significant com p &lt; 0,05? Panic!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Calma. Box&rsquo;s M &eacute; um teste sens&iacute;vel demais. Use &alpha; = 0,001. Se rejeitar <em>mesmo assim</em>, migre para Pillai&rsquo;s Trace &mdash; ele &eacute; o mais robusto contra viola&ccedil;&otilde;es.')}
 
 <table class="comp-table" style="margin-top:16px">
-  <thead><tr><th>Assumption</th><th>Test</th><th>If Violated...</th></tr></thead>
+  <thead><tr><th>Assumption</th><th>Teste</th><th>Se Violar...</th></tr></thead>
   <tbody>
-    <tr><td>Normality</td><td>Mardia / Shapiro-Wilk</td><td>n &ge; 20 per group? Proceed (robustness)</td></tr>
-    <tr><td>Box\x27s M</td><td>Box\x27s M (&alpha; = .001)</td><td>Use Pillai\x27s Trace</td></tr>
-    <tr><td>Outliers</td><td>Mahalanobis</td><td>Investigate / remove with justification</td></tr>
-    <tr><td>Independence</td><td>Experimental design</td><td>Use repeated-measures MANOVA</td></tr>
+    <tr><td>Normality</td><td>Mardia / Shapiro-Wilk</td><td>n &ge; 20 por grupo? Siga em frente (robustez)</td></tr>
+    <tr><td>Box&rsquo;s M</td><td>Box&rsquo;s M (&alpha; = .001)</td><td>Use Pillai&rsquo;s Trace</td></tr>
+    <tr><td>Outliers</td><td>Mahalanobis</td><td>Investigue / remova com justificativa</td></tr>
+    <tr><td>Independence</td><td>Design experimental</td><td>Use MANOVA de medidas repetidas</td></tr>
   </tbody>
 </table>`;
 
@@ -651,22 +651,22 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Easy there. Box\x27s 
   // ============================================================
   case 3: return `
 <div class="step-title">&#128202; Step 3 &mdash; SSCP Matrices: The Matrix Logic</div>
-<p>In univariate ANOVA, we decompose variation into scalars: <span class="highlight">SS<sub>T</sub> = SS<sub>B</sub> + SS<sub>W</sub></span>. In MANOVA, we do the same thing &mdash; but with <strong>matrices</strong>.</p>
+<p>Na ANOVA univariada, decompomos a varia&ccedil;&atilde;o em escalares: <span class="highlight">SS<sub>T</sub> = SS<sub>B</sub> + SS<sub>W</sub></span>. Na MANOVA, fazemos a mesma coisa &mdash; mas com <strong>matrizes</strong>.</p>
 
-<div class="step-subtitle">Analogy: Scalar &rarr; Matrix</div>
+<div class="step-subtitle">Analogia: Escalar &rarr; Matriz</div>
 
 <table class="comp-table">
-  <thead><tr><th>ANOVA (1 DV)</th><th>MANOVA (p DVs)</th></tr></thead>
+  <thead><tr><th>ANOVA (1 VD)</th><th>MANOVA (p VDs)</th></tr></thead>
   <tbody>
-    <tr><td>SS<sub>T</sub> (a single number)</td><td><strong>T</strong> &mdash; total SSCP matrix (p &times; p)</td></tr>
-    <tr><td>SS<sub>B</sub> (between groups)</td><td><strong>H</strong> &mdash; hypothesis SSCP matrix (p &times; p)</td></tr>
-    <tr><td>SS<sub>W</sub> (within groups)</td><td><strong>E</strong> &mdash; error SSCP matrix (p &times; p)</td></tr>
+    <tr><td>SS<sub>T</sub> (um n&uacute;mero)</td><td><strong>T</strong> &mdash; matriz SSCP total (p &times; p)</td></tr>
+    <tr><td>SS<sub>B</sub> (entre grupos)</td><td><strong>H</strong> &mdash; matriz SSCP de hip&oacute;tese (p &times; p)</td></tr>
+    <tr><td>SS<sub>W</sub> (dentro dos grupos)</td><td><strong>E</strong> &mdash; matriz SSCP de erro (p &times; p)</td></tr>
     <tr><td>SS<sub>T</sub> = SS<sub>B</sub> + SS<sub>W</sub></td><td><strong>T = H + E</strong></td></tr>
-    <tr><td>F = MS<sub>B</sub> / MS<sub>W</sub></td><td>Eigenvalues of <strong>H &middot; E<sup>&minus;1</sup></strong></td></tr>
+    <tr><td>F = MS<sub>B</sub> / MS<sub>W</sub></td><td>Eigenvalues de <strong>H &middot; E<sup>&minus;1</sup></strong></td></tr>
   </tbody>
 </table>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Each diagonal element of <strong>H</strong> is the SS<sub>B</sub> for that DV. The off-diagonal elements capture the <em>between-group covariance</em> &mdash; the information that separate ANOVAs miss.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Cada elemento da diagonal de <strong>H</strong> &eacute; o SS<sub>B</sub> daquela VD. Os elementos fora da diagonal capturam a <em>covariance entre-grupos</em> &mdash; a informa&ccedil;&atilde;o que Separate ANOVAs perdem.')}
 
 <div class="matrix-box">
   <div class="matrix-label">Matrix H (Hypothesis &mdash; Between Groups) &mdash; 3 &times; 3</div>
@@ -712,7 +712,7 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Each diagonal element
   </div>
 </div>
 
-${dlg('corvo','&#129430; Muninn whispers:','Diagonal of H = between-group SS for each DV. Diagonal of E = within-group SS. Off-diagonal = cross-covariances between DVs. T = H + E, exactly like ANOVA, but in matrix form.')}
+${dlg('corvo','&#129430; Muninn whispers:','Diagonal de H = SS entre-grupos de cada VD. Diagonal de E = SS dentro-grupos. Fora da diagonal = covariances cruzadas entre VDs. T = H + E, exatamente como na ANOVA, mas em forma matricial.')}
 
 <div class="formula">
   <div class="formula-label">Fundamental Decomposition</div>
@@ -725,7 +725,7 @@ ${dlg('corvo','&#129430; Muninn whispers:','Diagonal of H = between-group SS for
   // ============================================================
   case 4: return `
 <div class="step-title">&#9878; Step 4 &mdash; The Four Multivariate Tests</div>
-<p>With the <strong>H</strong> and <strong>E</strong> matrices, we extract the <span class="highlight">eigenvalues</span> of H&middot;E<sup>&minus;1</sup>. Each multivariate test combines these eigenvalues differently.</p>
+<p>Com as matrizes <strong>H</strong> e <strong>E</strong>, extra&iacute;mos os <span class="highlight">autovalores (eigenvalues)</span> de H&middot;E<sup>&minus;1</sup>. Cada teste multivariado combina esses autovalores de forma diferente.</p>
 
 <div class="step-subtitle">Eigenvalues of H&middot;E<sup>&minus;1</sup></div>
 <div class="formula">
@@ -734,65 +734,65 @@ ${dlg('corvo','&#129430; Muninn whispers:','Diagonal of H = between-group SS for
 
 <table class="comp-table">
   <thead>
-    <tr><th>Test</th><th>Formula</th><th>Value</th><th>Character</th></tr>
+    <tr><th>Teste</th><th>Formula</th><th>Value</th><th>Character</th></tr>
   </thead>
   <tbody>
     <tr>
-      <td style="color:var(--success)">Pillai\x27s Trace</td>
+      <td style="color:var(--success)">Pillai&rsquo;s Trace</td>
       <td>&sum; &lambda;<sub>i</sub>/(1+&lambda;<sub>i</sub>)</td>
       <td><span class="highlight-green">${round4(pillaiTrace)}</span></td>
-      <td>&#128170; Most <strong>robust</strong></td>
+      <td>&#128170; Mais <strong>robusto</strong></td>
     </tr>
     <tr>
-      <td style="color:var(--odin-blue)">Wilks\x27 &Lambda;</td>
+      <td style="color:var(--odin-blue)">Wilks&rsquo; &Lambda;</td>
       <td>&prod; 1/(1+&lambda;<sub>i</sub>)</td>
       <td><span class="highlight-blue">${round4(wilksLambda)}</span></td>
-      <td>&#128202; Most <strong>traditional</strong></td>
+      <td>&#128202; Mais <strong>tradicional</strong></td>
     </tr>
     <tr>
-      <td style="color:var(--gold)">Hotelling\x27s T&sup2;</td>
+      <td style="color:var(--gold)">Hotelling&rsquo;s T&sup2;</td>
       <td>&sum; &lambda;<sub>i</sub></td>
       <td><span class="highlight">${round4(hotellingTrace)}</span></td>
-      <td>&#128171; Powerful, but sensitive</td>
+      <td>&#128171; Potente, mas sens&iacute;vel</td>
     </tr>
     <tr>
-      <td style="color:var(--thor-red)">Roy\x27s Largest Root</td>
+      <td style="color:var(--thor-red)">Roy&rsquo;s Largest Root</td>
       <td>max(&lambda;<sub>i</sub>)</td>
       <td><span class="highlight-red">${round4(roysLargest)}</span></td>
-      <td>&#9889; Most <strong>powerful</strong> but fragile</td>
+      <td>&#9889; Mais <strong>poderoso</strong> mas fr&aacute;gil</td>
     </tr>
   </tbody>
 </table>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','When in doubt, <strong>Pillai\x27s Trace</strong> is the safe choice. It is the most robust against assumption violations &mdash; unequal samples, covariance heterogeneity, imperfect normality.')}
-${dlg('thor','&#9889; Thorment','But Roy\x27s is the most powerful! Maximum is maximum!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Roy\x27s looks at <em>only the largest eigenvalue</em>. If the effect is concentrated in a single dimension, it is spectacular. But if there are multiple dimensions or violations, it collapses.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Na d&uacute;vida, <strong>Pillai&rsquo;s Trace</strong> &eacute; a escolha segura. Ele &eacute; o mais robusto contra viola&ccedil;&otilde;es de pressupostos &mdash; amostras desiguais, heterogeneidade de covariance, normality imperfeita.')}
+${dlg('thor','&#9889; Thorment','Mas Roy&rsquo;s &eacute; o mais poderoso! M&aacute;ximo &eacute; m&aacute;ximo!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Roy&rsquo;s olha <em>s&oacute; o maior autovalor</em>. Se o efeito est&aacute; concentrado numa &uacute;nica dimens&atilde;o, &eacute; espetacular. Mas se houver m&uacute;ltiplas dimens&otilde;es ou viola&ccedil;&otilde;es, desmorona.')}
 
 <div class="hyp-box">
-  <h4>&#127919; When to Use Each Test</h4>
-  <p><span class="highlight-green">&#9679; Pillai\x27s Trace</span> &mdash; Safe default. Prefer when samples are unequal or Box\x27s M is significant</p>
-  <p><span class="highlight-blue">&#9679; Wilks\x27 &Lambda;</span> &mdash; Most reported in the literature. Good when assumptions are met</p>
-  <p><span class="highlight">&#9679; Hotelling\x27s T&sup2;</span> &mdash; Good for k = 2 groups (generalizes the t&sup2;)</p>
-  <p><span class="highlight-red">&#9679; Roy\x27s Largest Root</span> &mdash; Maximum power, but <strong>only</strong> when the effect is unidimensional. Fragile.</p>
+  <h4>&#127919; When Usar Cada Teste</h4>
+  <p><span class="highlight-green">&#9679; Pillai&rsquo;s Trace</span> &mdash; Padr&atilde;o seguro. Prefira quando amostras s&atilde;o desiguais ou Box&rsquo;s M significant</p>
+  <p><span class="highlight-blue">&#9679; Wilks&rsquo; &Lambda;</span> &mdash; Mais reportado na literatura. Bom com pressupostos atendidos</p>
+  <p><span class="highlight">&#9679; Hotelling&rsquo;s T&sup2;</span> &mdash; Bom para k = 2 grupos (generaliza o t&sup2;)</p>
+  <p><span class="highlight-red">&#9679; Roy&rsquo;s Largest Root</span> &mdash; M&aacute;ximo poder, mas <strong>s&oacute;</strong> quando o efeito &eacute; unidimensional. Fr&aacute;gil.</p>
 </div>
 
-${dlg('corvo','&#129430; Muninn whispers:','Wilks\x27 &Lambda; ranges from 0 to 1. The <strong>smaller</strong> &Lambda;, the larger the effect (more variance explained by the model). Pillai\x27s ranges from 0 to s (number of eigenvalues): the <strong>larger</strong>, the more effect.')}`;
+${dlg('corvo','&#129430; Muninn whispers:','Wilks&rsquo; &Lambda; varia de 0 a 1. Quanto <strong>menor</strong> &Lambda;, maior o efeito (mais variance explicada pelo modelo). J&aacute; Pillai&rsquo;s varia de 0 a s (n&uacute;mero de autovalores): quanto <strong>maior</strong>, mais efeito.')}`;
 
   // ============================================================
   // STEP 5 — INTERPRETING OUTPUT
   // ============================================================
   case 5: return `
 <div class="step-title">&#128269; Step 5 &mdash; Interpreting Multivariate Output</div>
-<p>The multivariate test is converted into an <span class="highlight">approximate F</span> with specific degrees of freedom. If F is significant, we conclude that the groups differ in the <strong>linear combination</strong> of the DVs.</p>
+<p>O teste multivariado &eacute; convertido em um <span class="highlight">F aproximado</span> com degrees of freedom espec&iacute;ficos. Se o F &eacute; significant, conclu&iacute;mos que os grupos diferem na <strong>combina&ccedil;&atilde;o linear</strong> das VDs.</p>
 
-<div class="step-subtitle">Multivariate Test Results</div>
+<div class="step-subtitle">Results dos Testes Multivariados</div>
 <table class="anova-table">
   <thead>
-    <tr><th>Test</th><th>Value</th><th>Approx. F</th><th>df<sub>1</sub></th><th>df<sub>2</sub></th><th>Decision</th></tr>
+    <tr><th>Teste</th><th>Value</th><th>F aprox.</th><th>gl<sub>1</sub></th><th>gl<sub>2</sub></th><th>Decision</th></tr>
   </thead>
   <tbody>
     <tr>
-      <td>Pillai\x27s Trace</td>
+      <td>Pillai&rsquo;s Trace</td>
       <td>${round4(pillaiTrace)}</td>
       <td>${round2(pillaiF)}</td>
       <td>${df1_display}</td>
@@ -800,7 +800,7 @@ ${dlg('corvo','&#129430; Muninn whispers:','Wilks\x27 &Lambda; ranges from 0 to 
       <td class="sig">Significant</td>
     </tr>
     <tr>
-      <td>Wilks\x27 &Lambda;</td>
+      <td>Wilks&rsquo; &Lambda;</td>
       <td>${round4(wilksLambda)}</td>
       <td>&mdash;</td>
       <td>${df1_display}</td>
@@ -808,7 +808,7 @@ ${dlg('corvo','&#129430; Muninn whispers:','Wilks\x27 &Lambda; ranges from 0 to 
       <td class="sig">Significant</td>
     </tr>
     <tr>
-      <td>Hotelling\x27s T&sup2;</td>
+      <td>Hotelling&rsquo;s T&sup2;</td>
       <td>${round4(hotellingTrace)}</td>
       <td>&mdash;</td>
       <td>${df1_display}</td>
@@ -816,7 +816,7 @@ ${dlg('corvo','&#129430; Muninn whispers:','Wilks\x27 &Lambda; ranges from 0 to 
       <td class="sig">Significant</td>
     </tr>
     <tr>
-      <td>Roy\x27s Largest Root</td>
+      <td>Roy&rsquo;s Largest Root</td>
       <td>${round4(roysLargest)}</td>
       <td>&mdash;</td>
       <td>&mdash;</td>
@@ -825,45 +825,45 @@ ${dlg('corvo','&#129430; Muninn whispers:','Wilks\x27 &Lambda; ranges from 0 to 
     </tr>
   </tbody>
 </table>
-<p style="font-size:0.85rem;color:var(--text-dim)">(Exact F values for Wilks, Hotelling, and Roy require specific transformations &mdash; in software, all are computed automatically.)</p>
+<p style="font-size:0.85rem;color:var(--text-dim)">(Valuees exatos de F para Wilks, Hotelling e Roy requerem transforma&ccedil;&otilde;es espec&iacute;ficas &mdash; em software, todos s&atilde;o calculados automaticamente.)</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','All four tests converge: the academy effect is <strong>significant</strong>. The mean vectors are not equal. But <em>which DVs</em> drive that difference?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Todos os quatro testes convergem: o efeito de academy &eacute; <strong>significant</strong>. Os vetores de m&eacute;dias n&atilde;o s&atilde;o iguais. Mas <em>quais VDs</em> dirigem essa diferen&ccedil;a?')}
 
 <div class="hyp-box">
-  <h4>&#128161; What Does &ldquo;Significant&rdquo; Mean in MANOVA?</h4>
-  <p><strong>H&#8320;:</strong> &mu;&#8321; = &mu;&#8322; = &mu;&#8323; (the mean vectors are equal across academies)</p>
-  <p><strong>H&#8321;:</strong> at least one mean vector differs</p>
-  <p>Rejecting H&#8320; indicates that the academies differ in the <span class="highlight">combination</span> of Strength + Speed + Strategy &mdash; not necessarily in each one individually.</p>
+  <h4>&#128161; O Que Significa &ldquo;Significant&rdquo; na MANOVA?</h4>
+  <p><strong>H&#8320;:</strong> &mu;&#8321; = &mu;&#8322; = &mu;&#8323; (os vetores de m&eacute;dias s&atilde;o iguais entre academys)</p>
+  <p><strong>H&#8321;:</strong> pelo menos um vetor de m&eacute;dias difere</p>
+  <p>Rejeitar H&#8320; indica que as academys diferem na <span class="highlight">combina&ccedil;&atilde;o</span> de Strength + Speed + Strategy &mdash; n&atilde;o necessariamente em cada uma isoladamente.</p>
 </div>
 
-${dlg('thor','&#9889; Thorment','So now I know they are different. Can I stop?')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No! MANOVA is the <strong>omnibus test</strong>. It tells us <em>that</em> a difference exists, but not <em>where</em>. Now we need the follow-up.')}`;
+${dlg('thor','&#9889; Thorment','Ent&atilde;o j&aacute; sei que s&atilde;o diferentes. Posso parar?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No! MANOVA &eacute; o <strong>teste &ocirc;nibus</strong>. Ela diz <em>que</em> existe diferen&ccedil;a, mas n&atilde;o <em>onde</em>. Agora precisamos do follow-up.')}`;
 
   // ============================================================
   // STEP 6 — FOLLOW-UP: OPTIONS
   // ============================================================
   case 6: return `
 <div class="step-title">&#128736; Step 6 &mdash; Follow-up: Where Is the Difference?</div>
-<p>MANOVA significant? Great. Now we need to find out <span class="highlight">which DVs</span> contribute to the separation between groups.</p>
+<p>MANOVA significant? &Oacute;timo. Agora precisamos descobrir <span class="highlight">quais VDs</span> contribuem para a separa&ccedil;&atilde;o dos grupos.</p>
 
-<div class="step-subtitle">Three Follow-up Paths</div>
+<div class="step-subtitle">Tr&ecirc;s Caminhos de Follow-up</div>
 
 <div class="decision-node">
-  <strong>Option 1: Separate Univariate ANOVAs</strong><br>
-  Run one ANOVA per DV, <em>after</em> a significant MANOVA. Apply Bonferroni correction (&alpha;/p = 0.05/3 = 0.0167). It is the simplest and most common method.
+  <strong>Op&ccedil;&atilde;o 1: ANOVAs Univariadas Separadas</strong><br>
+  Rode uma ANOVA para cada VD, <em>ap&oacute;s</em> MANOVA significant. Aplique corre&ccedil;&atilde;o de Bonferroni (&alpha;/p = 0,05/3 = 0,0167). &Eacute; o m&eacute;todo mais simples e comum.
 </div>
 
 <div class="decision-node warn">
-  <strong>Option 2: Descriptive Discriminant Analysis</strong><br>
-  Identifies <em>which linear combinations</em> of DVs best separate the groups. Produces canonical functions with standardized weights. More informative than isolated ANOVAs.
+  <strong>Op&ccedil;&atilde;o 2: An&aacute;lise Discriminante Descritiva</strong><br>
+  Identifica <em>quais combina&ccedil;&otilde;es lineares</em> de VDs melhor separam os grupos. Produz fun&ccedil;&otilde;es can&ocirc;nicas com pesos padronizados. More informative que ANOVAs isoladas.
 </div>
 
 <div class="decision-node">
-  <strong>Option 3: Stepdown Analysis</strong><br>
-  Sequential ANOVAs where each DV is adjusted for the preceding ones (like a cascading ANCOVA). Requires theoretical ordering of DVs. More sophisticated, less commonly used.
+  <strong>Op&ccedil;&atilde;o 3: Stepdown Analysis</strong><br>
+  ANOVAs sequenciais onde cada VD &eacute; ajustada pelas anteriores (como ANCOVA em cascata). Exige ordena&ccedil;&atilde;o te&oacute;rica das VDs. Mais sofisticado, menos usado.
 </div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','In practice, most papers use <strong>Option 1</strong> (ANOVAs with Bonferroni). But if you truly want to understand <em>how</em> groups differ in multivariate space, <strong>Option 2</strong> is superior.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Na pr&aacute;tica, a maioria dos artigos usa a <strong>Op&ccedil;&atilde;o 1</strong> (ANOVAs com Bonferroni). Mas se voc&ecirc; quer realmente entender <em>como</em> os grupos diferem no espa&ccedil;o multivariado, a <strong>Op&ccedil;&atilde;o 2</strong> &eacute; superior.')}
 
 <div class="flowchart-container">
 <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="font-family:'Patrick Hand',cursive">
@@ -874,7 +874,7 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','In practice, most pap
   <line x1="350" y1="60" x2="350" y2="90" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <!-- Yes/No -->
   <rect x="280" y="90" width="140" height="36" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
-  <text x="350" y="114" text-anchor="middle" fill="#3fb950" font-size="15" font-family="Permanent Marker">Yes &rarr; Follow-up</text>
+  <text x="350" y="114" text-anchor="middle" fill="#3fb950" font-size="15" font-family="Permanent Marker">Sim &rarr; Follow-up</text>
   <!-- Three branches -->
   <line x1="250" y1="126" x2="120" y2="170" stroke="#58a6ff" stroke-width="2"/>
   <line x1="350" y1="126" x2="350" y2="170" stroke="#f0c040" stroke-width="2"/>
@@ -886,7 +886,7 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','In practice, most pap
   <text x="120" y="232" text-anchor="middle" fill="#8b949e" font-size="11">&alpha;/p = 0.05/3 = 0.0167</text>
   <!-- Option 2 -->
   <rect x="250" y="170" width="200" height="70" rx="10" fill="#161b22" stroke="#f0c040" stroke-width="2"/>
-  <text x="350" y="195" text-anchor="middle" fill="#f0c040" font-size="14" font-family="Permanent Marker">Descriptive Discriminant</text>
+  <text x="350" y="195" text-anchor="middle" fill="#f0c040" font-size="14" font-family="Permanent Marker">Discriminante Descritiva</text>
   <text x="350" y="215" text-anchor="middle" fill="#8b949e" font-size="12">Canonical functions</text>
   <text x="350" y="232" text-anchor="middle" fill="#8b949e" font-size="11">More informative</text>
   <!-- Option 3 -->
@@ -901,48 +901,48 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','In practice, most pap
   <text x="120" y="310" text-anchor="middle" fill="#8b949e" font-size="11">Which pairs of groups differ?</text>
   <!-- No branch -->
   <rect x="530" y="90" width="140" height="36" rx="8" fill="#161b22" stroke="#f85149" stroke-width="2"/>
-  <text x="600" y="114" text-anchor="middle" fill="#f85149" font-size="15" font-family="Permanent Marker">No &rarr; Stop</text>
+  <text x="600" y="114" text-anchor="middle" fill="#f85149" font-size="15" font-family="Permanent Marker">No &rarr; Pare</text>
   <line x1="420" y1="108" x2="530" y2="108" stroke="#f85149" stroke-width="2"/>
   <!-- Arrow marker -->
   <defs><marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/></marker></defs>
 </svg>
 </div>
 
-${dlg('corvo','&#129430; Muninn whispers:','The univariate ANOVAs after MANOVA are called &ldquo;protected ANOVAs&rdquo; &mdash; they are only legitimate because the omnibus MANOVA already rejected H&#8320;. Without that, it would be p-value hunting.')}`;
+${dlg('corvo','&#129430; Muninn whispers:','As ANOVAs univariadas ap&oacute;s MANOVA s&atilde;o chamadas de &ldquo;protected ANOVAs&rdquo; &mdash; s&oacute; s&atilde;o leg&iacute;timas porque a MANOVA &ocirc;nibus j&aacute; rejeitou H&#8320;. Sem isso, seria ca&ccedil;a ao p-value.')}`;
 
   // ============================================================
   // STEP 7 — DISCRIMINANT ANALYSIS (BRIEF)
   // ============================================================
   case 7: return `
 <div class="step-title">&#128302; Step 7 &mdash; Discriminant Analysis: The Two-Edged Sword</div>
-<p>Descriptive discriminant analysis answers: <span class="highlight">which linear combination of DVs best separates the groups?</span></p>
+<p>A an&aacute;lise discriminante descritiva responde: <span class="highlight">qual combina&ccedil;&atilde;o linear de VDs melhor separa os grupos?</span></p>
 
-<div class="step-subtitle">Canonical Discriminant Functions</div>
-<p>With k = 3 groups and p = 3 DVs, we obtain <strong>s = min(p, k&minus;1) = 2</strong> canonical functions:</p>
+<div class="step-subtitle">Fun&ccedil;&otilde;es Can&ocirc;nicas Discriminantes</div>
+<p>Com k = 3 grupos e p = 3 VDs, obtemos <strong>s = min(p, k&minus;1) = 2</strong> fun&ccedil;&otilde;es can&ocirc;nicas:</p>
 
 <div class="formula">
-  <div class="formula-label">Canonical Function 1</div>
+  <div class="formula-label">Fun&ccedil;&atilde;o Can&ocirc;nica 1</div>
   D&#8321; = w&#8321;&#8321;&middot;Strength + w&#8321;&#8322;&middot;Speed + w&#8321;&#8323;&middot;Strategy
 </div>
 <div class="formula">
-  <div class="formula-label">Canonical Function 2</div>
+  <div class="formula-label">Fun&ccedil;&atilde;o Can&ocirc;nica 2</div>
   D&#8322; = w&#8322;&#8321;&middot;Strength + w&#8322;&#8322;&middot;Speed + w&#8322;&#8323;&middot;Strategy
 </div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','The first function maximizes separation between groups. The second maximizes what remains, orthogonally to the first. Together, they map the academies into a 2D space where we see <em>how</em> and <em>why</em> they differ.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A primeira fun&ccedil;&atilde;o maximiza a separa&ccedil;&atilde;o entre grupos. A segunda maximiza o que sobra, ortogonalmente &agrave; primeira. Juntas, mapeiam as academys num espa&ccedil;o 2D onde vemos <em>como</em> e <em>por qu&ecirc;</em> diferem.')}
 
 <div class="hyp-box">
-  <h4>&#128161; What Each Function Reveals</h4>
-  <p><strong>Function 1</strong> (&lambda;&#8321; = ${round4(eigenvals[0])}): Captures the <strong>largest difference</strong> between academies. Likely pits Strength/Speed vs. Strategy.</p>
-  <p><strong>Function 2</strong> (&lambda;&#8322; = ${round4(eigenvals[1])}): Captures the <strong>residual</strong> difference. A nuance that Function 1 did not pick up.</p>
-  <p>Variance explained: Function 1 = <span class="highlight">${round2(eigenvals[0]/sum(eigenvals)*100)}%</span>, Function 2 = <span class="highlight">${round2(eigenvals[1]/sum(eigenvals)*100)}%</span></p>
+  <h4>&#128161; O Que Cada Fun&ccedil;&atilde;o Revela</h4>
+  <p><strong>Fun&ccedil;&atilde;o 1</strong> (&lambda;&#8321; = ${round4(eigenvals[0])}): Captura a <strong>maior diferen&ccedil;a</strong> entre as academys. Provavelmente opor&aacute; Strength/Speed vs. Strategy.</p>
+  <p><strong>Fun&ccedil;&atilde;o 2</strong> (&lambda;&#8322; = ${round4(eigenvals[1])}): Captura a diferen&ccedil;a <strong>residual</strong>. Uma nuance que a Fun&ccedil;&atilde;o 1 n&atilde;o pegou.</p>
+  <p>Variance explicada: Fun&ccedil;&atilde;o 1 = <span class="highlight">${round2(eigenvals[0]/sum(eigenvals)*100)}%</span>, Fun&ccedil;&atilde;o 2 = <span class="highlight">${round2(eigenvals[1]/sum(eigenvals)*100)}%</span></p>
 </div>
 
 <canvas id="discrimPlot" class="plot" width="600" height="400"></canvas>
 
-${dlg('corvo','&#129430; Muninn whispers:','The <strong>standardized coefficients</strong> of the canonical functions indicate the <em>relative weight</em> of each DV in the separation. Large coefficients = that DV contributes heavily to distinguishing the groups.')}
-${dlg('thor','&#9889; Thorment','So it is like PCA?')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Similar, but different. PCA maximizes <em>total variance</em>. Discriminant analysis maximizes <em>between-group separation</em>. PCA does not know that groups exist &mdash; discriminant analysis is supervised.')}`;
+${dlg('corvo','&#129430; Muninn whispers:','Os <strong>coeficientes padronizados</strong> das fun&ccedil;&otilde;es can&ocirc;nicas indicam o <em>peso relativo</em> de cada VD na separa&ccedil;&atilde;o. Coeficientes grandes = VD contribui muito para distinguir os grupos.')}
+${dlg('thor','&#9889; Thorment','Ent&atilde;o &eacute; tipo PCA?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Parecido, mas diferente. PCA maximiza <em>variance total</em>. Discriminante maximiza <em>separa&ccedil;&atilde;o entre grupos</em>. PCA n&atilde;o sabe que existem grupos &mdash; discriminante &eacute; supervisionada.')}`;
 
   // ============================================================
   // STEP 8 — THE DATA
@@ -959,10 +959,10 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Similar, but differen
       meanRows += `<tr class="mean-row"><td>${a}</td><td>${round2(groupMean[a].Strength)}</td><td>${round2(groupMean[a].Speed)}</td><td>${round2(groupMean[a].Strategy)}</td></tr>`;
     });
     return `
-<div class="step-title">&#128220; Step 8 &mdash; The Data from the Three Academies</div>
-<p>Three academies: <span class="highlight">Ulfhednar</span> (wolf-warriors), <span class="highlight-red">Berserker</span> (battle frenzy) and <span class="highlight-blue">Einherjar</span> (chosen warriors of Valhalla). Each academy with n = 6 warriors, evaluated on 3 dimensions.</p>
+<div class="step-title">&#128220; Step 8 &mdash; The Data das Tr&ecirc;s Academys</div>
+<p>Tr&ecirc;s academys: <span class="highlight">Ulfhednar</span> (warriors-lobo), <span class="highlight-red">Berserker</span> (frenesi de batalha) e <span class="highlight-blue">Einherjar</span> (warriors escolhidos do Valhalla). Cada academy com n = 6 warriors, avaliados em 3 dimens&otilde;es.</p>
 
-<div class="step-subtitle">18 Observations (3 academies &times; 6 warriors)</div>
+<div class="step-subtitle">18 Observations (3 academys &times; 6 warriors)</div>
 <table class="data-table">
   <thead>
     <tr><th>Academy</th><th>Strength &#9876;&#65039;</th><th>Speed &#127939;</th><th>Strategy &#129504;</th></tr>
@@ -983,7 +983,7 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Similar, but differen
   </tbody>
 </table>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Notice the pattern: Berserkers are brute force. Einherjar balance speed and strategy. Ulfhednar sit in the middle. Will the MANOVA confirm this?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Observe o padr&atilde;o: Berserkers s&atilde;o for&ccedil;a bruta. Einherjar equilibram velocidade e estrat&eacute;gia. Ulfhednar ficam no meio. Ser&aacute; que a MANOVA confirma?')}
 
 <div class="step-subtitle">Correlation between DVs (N = 18)</div>
 <table class="data-table">
@@ -997,7 +997,7 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Notice the pattern: B
   </tbody>
 </table>
 
-${dlg('corvo','&#129430; Muninn whispers:','Moderate correlation between DVs is ideal for MANOVA. If the DVs were completely independent (r &asymp; 0), separate ANOVAs would suffice. If highly correlated (r &gt; 0.9), there would be multicollinearity.')}
+${dlg('corvo','&#129430; Muninn whispers:','Correlation moderada entre VDs &eacute; ideal para MANOVA. Se as VDs fossem totalmente independentes (r &asymp; 0), Separate ANOVAs seriam suficientes. Se fossem altamente correlated (r &gt; 0,9), haveria multicolinearidade.')}
 
 <div id="meanBarsContainer" class="bar-container"></div>`;
   }
@@ -1007,9 +1007,9 @@ ${dlg('corvo','&#129430; Muninn whispers:','Moderate correlation between DVs is 
   // ============================================================
   case 9: return `
 <div class="step-title">&#128200; Step 9 &mdash; Follow-up: Univariate ANOVAs</div>
-<p>With a significant MANOVA, we run ANOVAs for each DV separately, with <span class="highlight">Bonferroni: &alpha; = 0.05/3 = 0.0167</span>.</p>
+<p>Com MANOVA significant, rodamos ANOVAs para cada VD separadamente, com <span class="highlight">Bonferroni: &alpha; = 0,05/3 = 0,0167</span>.</p>
 
-<div class="step-subtitle">Univariate ANOVA &mdash; Strength &#9876;&#65039;</div>
+<div class="step-subtitle">ANOVA Univariada &mdash; Strength &#9876;&#65039;</div>
 <table class="anova-table">
   <thead><tr><th>Source</th><th>SS</th><th>gl</th><th>MS</th><th>F</th><th>&eta;&sup2;<sub>p</sub></th></tr></thead>
   <tbody>
@@ -1018,7 +1018,7 @@ ${dlg('corvo','&#129430; Muninn whispers:','Moderate correlation between DVs is 
   </tbody>
 </table>
 
-<div class="step-subtitle">Univariate ANOVA &mdash; Speed &#127939;</div>
+<div class="step-subtitle">ANOVA Univariada &mdash; Speed &#127939;</div>
 <table class="anova-table">
   <thead><tr><th>Source</th><th>SS</th><th>gl</th><th>MS</th><th>F</th><th>&eta;&sup2;<sub>p</sub></th></tr></thead>
   <tbody>
@@ -1027,7 +1027,7 @@ ${dlg('corvo','&#129430; Muninn whispers:','Moderate correlation between DVs is 
   </tbody>
 </table>
 
-<div class="step-subtitle">Univariate ANOVA &mdash; Strategy &#129504;</div>
+<div class="step-subtitle">ANOVA Univariada &mdash; Strategy &#129504;</div>
 <table class="anova-table">
   <thead><tr><th>Source</th><th>SS</th><th>gl</th><th>MS</th><th>F</th><th>&eta;&sup2;<sub>p</sub></th></tr></thead>
   <tbody>
@@ -1036,55 +1036,55 @@ ${dlg('corvo','&#129430; Muninn whispers:','Moderate correlation between DVs is 
   </tbody>
 </table>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','All three DVs show significant differences between academies. But the effect sizes tell the richer story &mdash; <em>where</em> is the largest separation?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Todas as tr&ecirc;s VDs apresentam diferen&ccedil;as significants entre academys. Mas os tamanhos de efeito contam a hist&oacute;ria mais rica &mdash; <em>onde</em> est&aacute; a maior separa&ccedil;&atilde;o?')}
 
 <div class="step-subtitle">Effect Sizes Compared</div>
 <div id="etaBarsContainer" class="bar-container"></div>
 
-${dlg('corvo','&#129430; Muninn whispers:','Partial &eta;&sup2; indicates the proportion of variance explained by the factor, after removing error. Benchmarks: 0.01 = small, 0.06 = medium, 0.14 = large. All our effects are <strong>large</strong>.')}
-${dlg('thor','&#9889; Thorment','All large! So everything matters equally?')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No. Compare the &eta;&sup2; values. Strategy likely shows the <em>largest</em> separation &mdash; Einherjar stand out there. But only MANOVA captures the <em>joint</em> pattern.')}`;
+${dlg('corvo','&#129430; Muninn whispers:','&eta;&sup2; parcial indica a propor&ccedil;&atilde;o de variance explicada pelo fator, descontando o erro. Refer&ecirc;ncia: 0,01 = pequeno, 0,06 = m&eacute;dio, 0,14 = grande. Todos os nossos efeitos s&atilde;o <strong>grandes</strong>.')}
+${dlg('thor','&#9889; Thorment','Tudo grande! Ent&atilde;o tudo importa igual?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No. Compare os &eta;&sup2;. Strategy provavelmente mostra a <em>maior</em> separa&ccedil;&atilde;o &mdash; Einherjar se destacam ali. Mas s&oacute; a MANOVA capta o padr&atilde;o <em>conjunto</em>.')}`;
 
   // ============================================================
   // STEP 10 — APA REPORT
   // ============================================================
   case 10: return `
 <div class="step-title">&#128221; Step 10 &mdash; APA Format Report</div>
-<p>How to report MANOVA in scientific papers, following APA guidelines (7th edition).</p>
+<p>Como reportar MANOVA em artigos cient&iacute;ficos, seguindo as normas da APA (7&ordf; edi&ccedil;&atilde;o).</p>
 
 <div class="apa-box">
-  <div class="apa-label">&#128214; Multivariate Result</div>
-  A one-way MANOVA revealed a significant multivariate effect of training academy on combat outcomes (Strength, Speed, and Strategy), Pillai\x27s Trace = ${round2(pillaiTrace)}, <em>F</em>(${df1_display}, ${df2_display}) = ${round2(pillaiF)}, <em>p</em> &lt; .001.
+  <div class="apa-label">&#128214; Result Multivariado</div>
+  Uma MANOVA one-way revelou efeito multivariado significant da academy de treinamento sobre os resultados de combate (Strength, Speed e Strategy), Pillai&rsquo;s Trace = ${round2(pillaiTrace)}, <em>F</em>(${df1_display}, ${df2_display}) = ${round2(pillaiF)}, <em>p</em> &lt; .001.
 </div>
 
 <div class="apa-box">
-  <div class="apa-label">&#128214; Univariate Follow-ups (with Bonferroni correction, &alpha; = .017)</div>
-  Follow-up univariate ANOVAs indicated significant differences between academies for Strength, <em>F</em>(${uniF.Strength.dfb}, ${uniF.Strength.dfw}) = ${uniF.Strength.f}, <em>p</em> &lt; .001, &eta;<sup>2</sup><sub>p</sub> = ${uniF.Strength.etaSq}; Speed, <em>F</em>(${uniF.Speed.dfb}, ${uniF.Speed.dfw}) = ${uniF.Speed.f}, <em>p</em> &lt; .001, &eta;<sup>2</sup><sub>p</sub> = ${uniF.Speed.etaSq}; and Strategy, <em>F</em>(${uniF.Strategy.dfb}, ${uniF.Strategy.dfw}) = ${uniF.Strategy.f}, <em>p</em> &lt; .001, &eta;<sup>2</sup><sub>p</sub> = ${uniF.Strategy.etaSq}.
+  <div class="apa-label">&#128214; Follow-up Univariados (com corre&ccedil;&atilde;o de Bonferroni, &alpha; = .017)</div>
+  ANOVAs univariadas de acompanhamento indicaram diferen&ccedil;as significants entre academys para Strength, <em>F</em>(${uniF.Strength.dfb}, ${uniF.Strength.dfw}) = ${uniF.Strength.f}, <em>p</em> &lt; .001, &eta;<sup>2</sup><sub>p</sub> = ${uniF.Strength.etaSq}; Speed, <em>F</em>(${uniF.Speed.dfb}, ${uniF.Speed.dfw}) = ${uniF.Speed.f}, <em>p</em> &lt; .001, &eta;<sup>2</sup><sub>p</sub> = ${uniF.Speed.etaSq}; e Strategy, <em>F</em>(${uniF.Strategy.dfb}, ${uniF.Strategy.dfw}) = ${uniF.Strategy.f}, <em>p</em> &lt; .001, &eta;<sup>2</sup><sub>p</sub> = ${uniF.Strategy.etaSq}.
 </div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Always report: (1) the multivariate test used (Pillai preferably), (2) the statistic value, (3) approximate F with df, (4) p-value, and (5) effect size.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Reporte sempre: (1) o teste multivariado usado (Pillai preferencialmente), (2) o valor da estat&iacute;stica, (3) F aproximado com gl, (4) p-value, e (5) tamanho de efeito.')}
 
-<div class="step-subtitle">APA Report Checklist</div>
+<div class="step-subtitle">Checklist do APA Report</div>
 <ul class="checklist">
-  <li>Identify the multivariate test (Pillai\x27s Trace recommended)</li>
-  <li>Report the statistic value with precision (2-4 decimal places)</li>
-  <li>Approximate F with degrees of freedom (df<sub>1</sub>, df<sub>2</sub>)</li>
-  <li>p-value (exact or &lt; .001)</li>
-  <li>Effect size (partial &eta;&sup2; or &eta;&sup2;)</li>
-  <li>Check assumptions (Box\x27s M, normality)</li>
-  <li>Follow-up with ANOVAs + Bonferroni correction</li>
-  <li>Post-hoc for specific pairs (Tukey, Games-Howell)</li>
+  <li>Identificar o teste multivariado (Pillai&rsquo;s Trace recomendado)</li>
+  <li>Reportar valor da estat&iacute;stica com precis&atilde;o (2-4 casas)</li>
+  <li>F aproximado com degrees of freedom (gl<sub>1</sub>, gl<sub>2</sub>)</li>
+  <li>Value de p (exato ou &lt; .001)</li>
+  <li>Effect size (&eta;&sup2; parcial ou &eta;&sup2;)</li>
+  <li>Verificar pressupostos (Box&rsquo;s M, normality)</li>
+  <li>Follow-up com ANOVAs + corre&ccedil;&atilde;o de Bonferroni</li>
+  <li>Post-hoc para pares espec&iacute;ficos (Tukey, Games-Howell)</li>
 </ul>
 
-${dlg('corvo','&#129430; Muninn whispers:','If Box\x27s M was significant, report: &ldquo;Box\x27s M test indicated heterogeneity of covariance matrices (p &lt; .001); therefore, Pillai\x27s Trace was chosen, as it is more robust to this violation (Tabachnick &amp; Fidell, 2019).&rdquo;')}
+${dlg('corvo','&#129430; Muninn whispers:','Se Box&rsquo;s M foi significant, reporte: &ldquo;O teste M de Box indicou heterogeneidade de matrizes de covariance (p &lt; .001); portanto, optou-se por Pillai&rsquo;s Trace, que &eacute; mais robusto a essa viola&ccedil;&atilde;o (Tabachnick &amp; Fidell, 2019).&rdquo;')}
 
 <div class="hyp-box">
-  <h4>&#9888;&#65039; Common Reporting Errors</h4>
-  <p><span class="highlight-red">&#10060;</span> Reporting Wilks\x27 &Lambda; without justification when Box\x27s M is significant</p>
-  <p><span class="highlight-red">&#10060;</span> Running univariate ANOVAs without a significant MANOVA first</p>
-  <p><span class="highlight-red">&#10060;</span> Forgetting Bonferroni correction in follow-ups</p>
-  <p><span class="highlight-red">&#10060;</span> Not reporting effect size</p>
-  <p><span class="highlight-red">&#10060;</span> Confusing &eta;&sup2; with partial &eta;&sup2;</p>
+  <h4>&#9888;&#65039; Errors Comuns no Reporte</h4>
+  <p><span class="highlight-red">&#10060;</span> Reportar Wilks&rsquo; &Lambda; sem justificativa quando Box&rsquo;s M &eacute; significant</p>
+  <p><span class="highlight-red">&#10060;</span> Rodar ANOVAs univariadas sem MANOVA significant primeiro</p>
+  <p><span class="highlight-red">&#10060;</span> Esquecer a corre&ccedil;&atilde;o de Bonferroni nos follow-ups</p>
+  <p><span class="highlight-red">&#10060;</span> No reportar tamanho de efeito</p>
+  <p><span class="highlight-red">&#10060;</span> Confundir &eta;&sup2; com &eta;&sup2; parcial</p>
 </div>`;
 
   // ============================================================
@@ -1095,23 +1095,23 @@ ${dlg('corvo','&#129430; Muninn whispers:','If Box\x27s M was significant, repor
 
 <div class="step-subtitle">Muninn Summarizes: Key Points</div>
 ${dlg('corvo','&#129430; Muninn whispers:',`
-<strong>1.</strong> MANOVA tests whether <em>mean vectors</em> differ between groups &mdash; protecting &alpha; and leveraging correlations between DVs.<br><br>
-<strong>2.</strong> Uses SSCP matrices: <strong>T = H + E</strong>. The eigenvalues of H&middot;E<sup>&minus;1</sup> generate the four multivariate tests.<br><br>
-<strong>3.</strong> <span class="highlight-green">Pillai\x27s Trace</span> is the most robust. Prefer it when there is any doubt about assumptions.<br><br>
-<strong>4.</strong> Box\x27s M tests covariance homogeneity. Use &alpha; = .001 (it is overly sensitive).<br><br>
-<strong>5.</strong> Significant MANOVA &rarr; follow-up with univariate ANOVAs (Bonferroni) or discriminant analysis.<br><br>
-<strong>6.</strong> APA Report: test used + value + F(df1, df2) + p + &eta;&sup2;.
+<strong>1.</strong> MANOVA testa se os <em>vetores de m&eacute;dias</em> diferem entre grupos &mdash; protegendo &alpha; e aproveitando correla&ccedil;&otilde;es entre VDs.<br><br>
+<strong>2.</strong> Usa matrizes SSCP: <strong>T = H + E</strong>. Os autovalores de H&middot;E<sup>&minus;1</sup> geram os quatro testes multivariados.<br><br>
+<strong>3.</strong> <span class="highlight-green">Pillai&rsquo;s Trace</span> &eacute; o mais robusto. Prefira-o quando houver d&uacute;vida sobre pressupostos.<br><br>
+<strong>4.</strong> Box&rsquo;s M testa homogeneidade de covariance. Use &alpha; = .001 (ele &eacute; sens&iacute;vel demais).<br><br>
+<strong>5.</strong> MANOVA significant &rarr; follow-up com ANOVAs univariadas (Bonferroni) ou an&aacute;lise discriminante.<br><br>
+<strong>6.</strong> APA Report: teste usado + valor + F(gl1, gl2) + p + &eta;&sup2;.
 `)}
 
-<div class="step-subtitle" style="color:var(--corvo-purple)">Huginn Challenges</div>
+<div class="step-subtitle" style="color:var(--corvo-purple)">Huginn Provoca: Challenges</div>
 ${dlg('huginn','&#129430; Huginn challenges:',`
-<strong>1.</strong> What if the DVs are completely independent (r &asymp; 0)? <em>MANOVA loses its advantage &mdash; separate ANOVAs with Bonferroni would suffice.</em><br><br>
-<strong>2.</strong> What if you have 10 DVs and n = 15 per group? <em>More DVs than observations per group collapses the E matrix. Reduce DVs or increase n.</em><br><br>
-<strong>3.</strong> Does MANOVA prove causation? <em>No. Like all ANOVAs, it shows <strong>differences</strong> between groups, not causation. Only true experimental designs allow causal inference.</em><br><br>
-<strong>4.</strong> If MANOVA is not significant, can I run ANOVAs &ldquo;just to see&rdquo;? <em>No! That is classic p-hacking. If the omnibus test does not reject H&#8320;, stop there.</em>
+<strong>1.</strong> E se as VDs forem completamente independentes (r &asymp; 0)? <em>MANOVA perde vantagem &mdash; Separate ANOVAs com Bonferroni bastariam.</em><br><br>
+<strong>2.</strong> E se voc&ecirc; tiver 10 VDs e n = 15 por grupo? <em>Mais VDs que observa&ccedil;&otilde;es por grupo colapsa a matriz E. Reduza VDs ou aumente n.</em><br><br>
+<strong>3.</strong> MANOVA prova causa&ccedil;&atilde;o? <em>No. Como toda ANOVA, mostra <strong>diferen&ccedil;a</strong> entre grupos, n&atilde;o causa. S&oacute; delineamento experimental verdadeiro permite infer&ecirc;ncia causal.</em><br><br>
+<strong>4.</strong> Se MANOVA n&atilde;o &eacute; significant, posso rodar ANOVAs &ldquo;s&oacute; pra ver&rdquo;? <em>No! Isso &eacute; p-hacking cl&aacute;ssico. Se o teste &ocirc;nibus n&atilde;o rejeita H&#8320;, pare ali.</em>
 `)}
 
-<div class="step-subtitle">Decision Flowchart: MANOVA or Not?</div>
+<div class="step-subtitle">Flowchart de Decision: MANOVA ou No?</div>
 <div class="flowchart-container">
 <svg viewBox="0 0 700 520" xmlns="http://www.w3.org/2000/svg" style="font-family:'Patrick Hand',cursive">
   <!-- Start -->
@@ -1121,8 +1121,8 @@ ${dlg('huginn','&#129430; Huginn challenges:',`
   <line x1="350" y1="54" x2="350" y2="80" stroke="#58a6ff" stroke-width="2"/>
   <!-- Q2 -->
   <rect x="220" y="80" width="260" height="44" rx="10" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
-  <text x="350" y="108" text-anchor="middle" fill="#58a6ff" font-size="14" font-family="Permanent Marker">DVs correlated (|r| = 0.2-0.6)?</text>
-  <!-- Yes -->
+  <text x="350" y="108" text-anchor="middle" fill="#58a6ff" font-size="14" font-family="Permanent Marker">VDs correlated (|r| = 0.2-0.6)?</text>
+  <!-- Sim -->
   <line x1="350" y1="124" x2="350" y2="155" stroke="#3fb950" stroke-width="2"/>
   <text x="360" y="145" fill="#3fb950" font-size="12">Yes</text>
   <!-- No -->
@@ -1131,13 +1131,13 @@ ${dlg('huginn','&#129430; Huginn challenges:',`
   <text x="625" y="108" text-anchor="middle" fill="#f85149" font-size="12">Separate ANOVAs</text>
   <!-- Q3 -->
   <rect x="220" y="155" width="260" height="44" rx="10" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
-  <text x="350" y="183" text-anchor="middle" fill="#58a6ff" font-size="14" font-family="Permanent Marker">n per group > number of DVs?</text>
+  <text x="350" y="183" text-anchor="middle" fill="#58a6ff" font-size="14" font-family="Permanent Marker">n por grupo > n&ordm; de VDs?</text>
   <line x1="350" y1="199" x2="350" y2="230" stroke="#3fb950" stroke-width="2"/>
   <text x="360" y="220" fill="#3fb950" font-size="12">Yes</text>
   <line x1="480" y1="177" x2="600" y2="177" stroke="#f85149" stroke-width="2"/>
   <rect x="560" y="157" width="130" height="40" rx="8" fill="#161b22" stroke="#f85149" stroke-width="1.5"/>
   <text x="625" y="177" text-anchor="middle" fill="#f85149" font-size="11">Increase n or</text>
-  <text x="625" y="192" text-anchor="middle" fill="#f85149" font-size="11">reduce number of DVs</text>
+  <text x="625" y="192" text-anchor="middle" fill="#f85149" font-size="11">reduce DVs</text>
   <!-- Q4 -->
   <rect x="220" y="230" width="260" height="44" rx="10" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
   <text x="350" y="258" text-anchor="middle" fill="#58a6ff" font-size="14" font-family="Permanent Marker">Assumptions OK?</text>
@@ -1147,7 +1147,7 @@ ${dlg('huginn','&#129430; Huginn challenges:',`
   <line x1="480" y1="252" x2="600" y2="252" stroke="#f0c040" stroke-width="2"/>
   <rect x="555" y="232" width="140" height="40" rx="8" fill="#161b22" stroke="#f0c040" stroke-width="1.5"/>
   <text x="625" y="252" text-anchor="middle" fill="#f0c040" font-size="11">Box M violated?</text>
-  <text x="625" y="267" text-anchor="middle" fill="#f0c040" font-size="11">Use Pillai's Trace</text>
+  <text x="625" y="267" text-anchor="middle" fill="#f0c040" font-size="11">Use Pillai&rsquo;s Trace</text>
   <!-- MANOVA! -->
   <rect x="250" y="310" width="200" height="50" rx="25" fill="#1c2333" stroke="#3fb950" stroke-width="3"/>
   <text x="350" y="342" text-anchor="middle" fill="#3fb950" font-size="20" font-family="Bangers">RUN THE MANOVA!</text>
@@ -1168,12 +1168,12 @@ ${dlg('huginn','&#129430; Huginn challenges:',`
 </svg>
 </div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','MANOVA is the fortress that protects your &alpha; when multiple DVs are at stake. Respect its assumptions, choose the right test (Pillai when in doubt), and always do follow-up after a significant result. That is the discipline of the Great Hall of Matrices.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','MANOVA &eacute; a fortaleza que protege seu &alpha; quando m&uacute;ltiplas VDs est&atilde;o em jogo. Respeite seus pressupostos, esco&ccedil;a o teste certo (Pillai na d&uacute;vida), e sempre fa&ccedil;a follow-up ap&oacute;s resultado significant. Essa &eacute; a disciplina do Grande Sal&atilde;o das Matrizes.')}
 
 <div class="hyp-box">
   <h4>&#128218; Recommended Reading</h4>
   <p>&#9679; Tabachnick, B. G., &amp; Fidell, L. S. (2019). <em>Using Multivariate Statistics</em> (7th ed.) &mdash; Chapters 7-9</p>
-  <p>&#9679; Field, A. (2024). <em>Discovering Statistics</em> (6th ed.) &mdash; MANOVA Chapter</p>
+  <p>&#9679; Field, A. (2024). <em>Discovering Statistics</em> (6th ed.) &mdash; Chapter sobre MANOVA</p>
   <p>&#9679; Hair, J. F. et al. (2019). <em>Multivariate Data Analysis</em> (8th ed.) &mdash; Chapter 6</p>
 </div>`;
 

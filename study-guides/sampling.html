@@ -496,29 +496,29 @@ function step0() {
   return `
     <div class="step-title">Sampling: The Impossible Census of the Nine Realms</div>
 
-    <p>O Grande Conselho de Asgard precisa saber o nível de satisfação dos guerreiros viking com a distribuição de espólios após as batalhas. O problema? Existem <span class="hl-gold">1.000 clãs</span> espalhados pelos Nove Reinos &mdash; de Midgard a Niflheim.</p>
+    <p>The Great Council of Asgard needs to know the satisfaction level of Viking warriors with the distribution of spoils after battles. The problem? There are <span class="hl-gold">1,000 clans</span> scattered across the Nine Realms &mdash; from Midgard to Niflheim.</p>
 
-    <p>Visitar todos? Meses de navegação, centenas de longships, provisões infinitas. O censo completo é um luxo que nem Odin pode pagar.</p>
+    <p>Visit them all? Months of sailing, hundreds of longships, endless provisions. A complete census is a luxury not even Odin can afford.</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Não precisamos ouvir <em>todos</em> os 1.000 clãs. Precisamos de uma <strong>amostra</strong> &mdash; um subconjunto que represente bem a população inteira. A questão é: <em>como escolher</em>?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'We don\x27t need to hear from <em>all</em> 1,000 clans. We need a <strong>sample</strong> &mdash; a subset that represents the entire population well. The question is: <em>how to choose</em>?')}
 
-    ${dialogue('thor', '⚡ Thorment', 'Fácil! Pergunta pros clãs que moram aqui perto de Asgard. São os mais acessíveis, e pronto &mdash; economizamos tempo e hidromel!')}
+    ${dialogue('thor', '⚡ Thorment', 'Easy! Just ask the clans that live near Asgard. They\x27re the most accessible, and done &mdash; we save time and mead!')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'E é exatamente assim que nasce o <strong>viés amostral</strong>, Thorment. Os clãs próximos a Asgard são mais ricos, mais favorecidos. A opinião deles não representa Niflheim nem Jötunheim.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'And that is exactly how <strong>sampling bias</strong> is born, Thorment. The clans near Asgard are richer, more favored. Their opinion does not represent Niflheim or J\xf6tunheim.')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling</strong> é o processo de selecionar um subconjunto (amostra) de uma população para estimar características do todo. A qualidade da amostra determina a qualidade da inferência.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling</strong> is the process of selecting a subset (sample) from a population to estimate characteristics of the whole. The quality of the sample determines the quality of the inference.')}
 
     <div class="info-box">
       <h4>Why sample?</h4>
       <ul style="margin-left: 20px; margin-top: 8px;">
-        <li><span class="hl-blue">Custo</span> &mdash; censos são caríssimos (longships não são baratas)</li>
-        <li><span class="hl-blue">Tempo</span> &mdash; enquanto o censo termina, a guerra já mudou</li>
-        <li><span class="hl-blue">Praticidade</span> &mdash; nem sempre é possível acessar todos os elementos</li>
-        <li><span class="hl-blue">Destrutividade</span> &mdash; testar a qualidade de <em>todas</em> as espadas significaria quebrá-las</li>
+        <li><span class="hl-blue">Cost</span> &mdash; censuses are extremely expensive (longships aren\x27t cheap)</li>
+        <li><span class="hl-blue">Time</span> &mdash; by the time the census ends, the war has already changed</li>
+        <li><span class="hl-blue">Practicality</span> &mdash; it is not always possible to access all elements</li>
+        <li><span class="hl-blue">Destructiveness</span> &mdash; testing the quality of <em>all</em> swords would mean breaking them</li>
       </ul>
     </div>
 
-    <p>Nos próximos passos, Odinfather vai guiar você pelos métodos de amostragem &mdash; dos mais rigorosos aos mais perigosos. Thorment vai tentar atalhos. Os corvos vão lembrar as definições.</p>
+    <p>In the next steps, Odinfather will guide you through sampling methods &mdash; from the most rigorous to the most dangerous. Thorment will try shortcuts. The ravens will remember the definitions.</p>
   `;
 }
 
@@ -529,9 +529,9 @@ function step1() {
   return `
     <div class="step-title">Population vs. Sample</div>
 
-    <p>Antes de qualquer método, precisamos separar dois conceitos fundamentais que confundem até guerreiros experientes.</p>
+    <p>Before any method, we need to separate two fundamental concepts that confuse even experienced warriors.</p>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>População (N)</strong>: conjunto completo de todos os elementos de interesse. No nosso caso, todos os 1.000 clãs viking. <br><strong>Amostra (n)</strong>: subconjunto selecionado da população para estudo.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Population (N)</strong>: the complete set of all elements of interest. In our case, all 1,000 Viking clans. <br><strong>Sample (n)</strong>: a subset selected from the population for study.')}
 
     <div class="visual-container">
       <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
@@ -574,23 +574,23 @@ function step1() {
         <!-- Parameters vs Statistics -->
         <rect x="440" y="60" width="240" height="100" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
         <text x="560" y="85" text-anchor="middle" fill="#58a6ff" font-family="Permanent Marker" font-size="14">Population (Parameters)</text>
-        <text x="560" y="108" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Media: μ (mu)</text>
-        <text x="560" y="130" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Desvio-padrao: σ (sigma)</text>
-        <text x="560" y="150" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Valores fixos (geralmente desconhecidos)</text>
+        <text x="560" y="108" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Mean: \u03bc (mu)</text>
+        <text x="560" y="130" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Std. Dev.: \u03c3 (sigma)</text>
+        <text x="560" y="150" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Fixed values (usually unknown)</text>
 
         <rect x="440" y="180" width="240" height="100" rx="10" fill="#161b22" stroke="#f0c040" stroke-width="1.5"/>
         <text x="560" y="205" text-anchor="middle" fill="#f0c040" font-family="Permanent Marker" font-size="14">Sample (Statistics)</text>
-        <text x="560" y="228" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Media: x&#772; (x-barra)</text>
-        <text x="560" y="250" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Desvio-padrao: s</text>
-        <text x="560" y="270" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Estimativas (variam entre amostras)</text>
+        <text x="560" y="228" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Mean: x\u0304 (x-bar)</text>
+        <text x="560" y="250" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="16">Std. Dev.: s</text>
+        <text x="560" y="270" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Estimates (vary between samples)</text>
       </svg>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A amostra <strong>estima</strong> a população. O x&#772; da amostra é nossa melhor aposta para adivinhar o μ da população. Entretanto, cada amostra diferente dará um x&#772; ligeiramente diferente &mdash; essa é a <em>variabilidade amostral</em>.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The sample <strong>estimates</strong> the population. The sample x\u0304 is our best bet for guessing the population \u03bc. However, each different sample will give a slightly different x\u0304 &mdash; that is <em>sampling variability</em>.')}
 
-    ${dialogue('thor', '⚡ Thorment', 'Então cada vez que eu tirar uma amostra, a média muda? Isso é uma bagunça!')}
+    ${dialogue('thor', '⚡ Thorment', 'So every time I draw a sample, the mean changes? That\x27s a mess!')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Não é bagunça &mdash; é estatística. E essa variação tem nome: <strong>erro amostral</strong>. A boa notícia? Métodos adequados <em>controlam</em> essa variação. Vamos conhecê-los.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'It\x27s not a mess &mdash; it\x27s statistics. And this variation has a name: <strong>sampling error</strong>. The good news? Proper methods <em>control</em> this variation. Let\x27s learn about them.')}
   `;
 }
 
@@ -602,9 +602,9 @@ function step2() {
     <div class="step-title">Sampling Simple Random</div>
     <div class="step-subtitle">The Helmet Draw</div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling Aleatória Simples (AAS)</strong>: cada elemento da população tem <em>igual probabilidade</em> de ser selecionado. É o método de referência &mdash; a "régua de ouro" da amostragem.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Simple Random Sampling (SRS)</strong>: each element of the population has an <em>equal probability</em> of being selected. It is the reference method &mdash; the "gold standard" of sampling.')}
 
-    <p>Odinfather escreve o nome de cada um dos 1.000 clãs em runas, coloca todos dentro de um grande <span class="hl-gold">elmo cerimonial</span> e draws, sem olhar, os clãs que serão visitados.</p>
+    <p>Odinfather writes the name of each of the 1,000 clans on runes, places them all inside a large <span class="hl-gold">ceremonial helmet</span>, and draws, without looking, the clans that will be visited.</p>
 
     <div class="visual-container">
       <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
@@ -616,15 +616,15 @@ function step2() {
         <!-- Flying runes (selected) -->
         <g>
           <rect x="520" y="50" width="50" height="35" rx="5" fill="rgba(240,192,64,0.2)" stroke="#f0c040" stroke-width="1.5" transform="rotate(-10, 545, 67)"/>
-          <text x="545" y="73" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="12" transform="rotate(-10, 545, 67)">Clã 47</text>
+          <text x="545" y="73" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="12" transform="rotate(-10, 545, 67)">Clan 47</text>
         </g>
         <g>
           <rect x="540" y="110" width="50" height="35" rx="5" fill="rgba(240,192,64,0.2)" stroke="#f0c040" stroke-width="1.5" transform="rotate(5, 565, 127)"/>
-          <text x="565" y="133" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="12" transform="rotate(5, 565, 127)">Clã 382</text>
+          <text x="565" y="133" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="12" transform="rotate(5, 565, 127)">Clan 382</text>
         </g>
         <g>
           <rect x="510" y="170" width="50" height="35" rx="5" fill="rgba(240,192,64,0.2)" stroke="#f0c040" stroke-width="1.5" transform="rotate(-3, 535, 187)"/>
-          <text x="535" y="193" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="12" transform="rotate(-3, 535, 187)">Clã 691</text>
+          <text x="535" y="193" text-anchor="middle" fill="#f0c040" font-family="Patrick Hand" font-size="12" transform="rotate(-3, 535, 187)">Clan 691</text>
         </g>
 
         <!-- Arrow from helmet to runes -->
@@ -633,80 +633,80 @@ function step2() {
         <path d="M470,195 Q500,195 505,190" fill="none" stroke="#f0c040" stroke-width="1.5" stroke-dasharray="5,3"/>
 
         <!-- Label -->
-        <text x="100" y="50" fill="#58a6ff" font-family="Permanent Marker" font-size="15">Cada runa tem a</text>
-        <text x="100" y="72" fill="#58a6ff" font-family="Permanent Marker" font-size="15">mesma chance: 1/N</text>
+        <text x="100" y="50" fill="#58a6ff" font-family="Permanent Marker" font-size="15">Each rune has the</text>
+        <text x="100" y="72" fill="#58a6ff" font-family="Permanent Marker" font-size="15">same chance: 1/N</text>
 
-        <text x="570" y="240" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="14">Amostra sorteada</text>
+        <text x="570" y="240" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="14">Drawn sample</text>
       </svg>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Na prática, usamos <strong>geradores de números aleatórios</strong> ou tabelas de números aleatórios, não elmos. O princípio é o mesmo: cada clã tem probabilidade 1/N de ser escolhido. Sem favoritismo, sem viés.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'In practice, we use <strong>random number generators</strong> or random number tables, not helmets. The principle is the same: each clan has a 1/N probability of being chosen. No favoritism, no bias.')}
 
     <div class="comparison-grid">
       <div class="comparison-card pro">
         <div class="comparison-title" style="color:var(--success)">✅ Advantages</div>
         <ul style="margin-left: 16px; font-size: 0.95rem;">
-          <li>Eliminação de viés de seleção</li>
-          <li>Cálculos estatísticos diretos</li>
-          <li>Base para todos os outros métodos</li>
-          <li>Fácil de entender e justificar</li>
+          <li>Eliminates selection bias</li>
+          <li>Straightforward statistical calculations</li>
+          <li>Foundation for all other methods</li>
+          <li>Easy to understand and justify</li>
         </ul>
       </div>
       <div class="comparison-card con">
-        <div class="comparison-title" style="color:var(--thor-red)">⚠️ Limitações</div>
+        <div class="comparison-title" style="color:var(--thor-red)">⚠️ Limitations</div>
         <ul style="margin-left: 16px; font-size: 0.95rem;">
-          <li>Exige lista completa da população</li>
-          <li>Pode ser caro se população é dispersa</li>
-          <li>Pode "perder" subgrupos pequenos</li>
-          <li>Impraticável para populações enormes</li>
+          <li>Requires a complete population list</li>
+          <li>Can be expensive if population is dispersed</li>
+          <li>May "miss" small subgroups</li>
+          <li>Impractical for huge populations</li>
         </ul>
       </div>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'E se eu não tiver a lista dos 1.000 clãs?')}
+    ${dialogue('thor', '⚡ Thorment', 'What if I don\x27t have the list of 1,000 clans?')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Boa pergunta, Thorment! Quando não temos o <em>cadastro</em> completo da população, a AAS é impossível. Precisamos de outras estratégias. Vamos ver a próxima.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Good question, Thorment! When we don\x27t have the complete population <em>registry</em>, SRS is impossible. We need other strategies. Let\x27s see the next one.')}
   `;
 }
 
 // ============================================================
-// STEP 3 — SAMPLEGEM ESTRATIFICADA
+// STEP 3 — SAMPLEGEM STRATIFIED
 // ============================================================
 function step3() {
   return `
     <div class="step-title">Sampling Stratified</div>
     <div class="step-subtitle">Every Realm Has a Voice</div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling Stratified</strong>: divide-se a população em subgrupos homogêneos (<em>estratos</em>) e draws-se elementos de cada estrato. Garante representatividade quando a variável de estratificação é relevante.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Stratified Sampling</strong>: the population is divided into homogeneous subgroups (<em>strata</em>) and elements are drawn from each stratum. Guarantees representativeness when the stratification variable is relevant.')}
 
-    <p>Os Nove Reinos têm tamanhos e culturas diferentes. Se simplesmente sortearmos ao acaso, podemos acabar com 80% da amostra de Midgard (o mais populoso) e nenhum representante de Niflheim.</p>
+    <p>The Nine Realms have different sizes and cultures. If we simply draw at random, we may end up with 80% of the sample from Midgard (the most populous) and no representative from Niflheim.</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A ideia é dividir os 1.000 clãs por <strong>reino</strong>, depois sortear <em>dentro de cada reino</em>, proporcionalmente ao seu tamanho. Assim, cada pedaço do mapa contribui para a amostra.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The idea is to divide the 1,000 clans by <strong>realm</strong>, then draw <em>within each realm</em>, proportional to its size. This way, each piece of the map contributes to the sample.')}
 
     <div class="visual-container">
       <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg">
-        <text x="350" y="25" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="20">SAMPLEGEM PROPORTIONAL STRATIFIED</text>
+        <text x="350" y="25" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="20">PROPORTIONAL STRATIFIED SAMPLING</text>
 
         <!-- Strata (realms) -->
         <g>
           <rect x="30" y="50" width="140" height="60" rx="8" fill="rgba(88,166,255,0.15)" stroke="#58a6ff" stroke-width="1.5"/>
           <text x="100" y="75" text-anchor="middle" fill="#58a6ff" font-family="Permanent Marker" font-size="13">Midgard</text>
-          <text x="100" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">300 clas (30%)</text>
+          <text x="100" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">300 clans (30%)</text>
         </g>
         <g>
           <rect x="185" y="50" width="140" height="60" rx="8" fill="rgba(63,185,80,0.15)" stroke="#3fb950" stroke-width="1.5"/>
           <text x="255" y="75" text-anchor="middle" fill="#3fb950" font-family="Permanent Marker" font-size="13">Asgard</text>
-          <text x="255" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">200 clas (20%)</text>
+          <text x="255" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">200 clans (20%)</text>
         </g>
         <g>
           <rect x="340" y="50" width="140" height="60" rx="8" fill="rgba(248,81,73,0.15)" stroke="#f85149" stroke-width="1.5"/>
           <text x="410" y="75" text-anchor="middle" fill="#f85149" font-family="Permanent Marker" font-size="13">Jotunheim</text>
-          <text x="410" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">150 clas (15%)</text>
+          <text x="410" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">150 clans (15%)</text>
         </g>
         <g>
           <rect x="495" y="50" width="175" height="60" rx="8" fill="rgba(188,140,255,0.15)" stroke="#bc8cff" stroke-width="1.5"/>
-          <text x="582" y="75" text-anchor="middle" fill="#bc8cff" font-family="Permanent Marker" font-size="13">Outros 6 Reinos</text>
-          <text x="582" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">350 clas (35%)</text>
+          <text x="582" y="75" text-anchor="middle" fill="#bc8cff" font-family="Permanent Marker" font-size="13">Other 6 Realms</text>
+          <text x="582" y="98" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">350 clans (35%)</text>
         </g>
 
         <!-- Arrows down -->
@@ -729,16 +729,16 @@ function step3() {
 
         <!-- Sample boxes (proportional) -->
         <rect x="55" y="165" width="90" height="45" rx="6" fill="rgba(88,166,255,0.3)" stroke="#58a6ff" stroke-width="1.5"/>
-        <text x="100" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">30 clas</text>
+        <text x="100" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">30 clans</text>
 
         <rect x="215" y="165" width="80" height="45" rx="6" fill="rgba(63,185,80,0.3)" stroke="#3fb950" stroke-width="1.5"/>
-        <text x="255" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">20 clas</text>
+        <text x="255" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">20 clans</text>
 
         <rect x="373" y="165" width="74" height="45" rx="6" fill="rgba(248,81,73,0.3)" stroke="#f85149" stroke-width="1.5"/>
-        <text x="410" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">15 clas</text>
+        <text x="410" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">15 clans</text>
 
         <rect x="535" y="165" width="94" height="45" rx="6" fill="rgba(188,140,255,0.3)" stroke="#bc8cff" stroke-width="1.5"/>
-        <text x="582" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">35 clas</text>
+        <text x="582" y="192" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="14">35 clans</text>
 
         <!-- Final sample -->
         <line x1="100" y1="210" x2="350" y2="280" stroke="#f0c040" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
@@ -751,21 +751,21 @@ function step3() {
         <text x="350" y="312" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="12">proportion maintained</text>
 
         <!-- Annotation -->
-        <text x="350" y="360" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="15">Se n = 100 (10% da populacao), cada estrato contribui 10% dos seus clas</text>
+        <text x="350" y="360" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="15">Se n = 100 (10% da populacao), cada estrato contribui 10% dos seus clans</text>
       </svg>
     </div>
 
     <div class="info-box">
       <h4>Proportional vs. Uniform</h4>
-      <p><span class="hl-blue">Proporcional</span>: cada estrato contribui <em>na mesma proporção</em> que tem na população. Se Midgard = 30%, a amostra terá 30% de clãs de Midgard.</p>
-      <p style="margin-top: 8px;"><span class="hl-blue">Uniforme</span>: mesmo número de cada estrato, independente do tamanho. Útil quando se quer comparar estratos com precisão igual.</p>
+      <p><span class="hl-blue">Proportional</span>: each stratum contributes <em>in the same proportion</em> it holds in the population. If Midgard = 30%, the sample will have 30% Midgard clans.</p>
+      <p style="margin-top: 8px;"><span class="hl-blue">Uniform</span>: same number from each stratum, regardless of size. Useful when comparing strata with equal precision.</p>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Estratificação <strong>reduz o erro amostral</strong> quando os estratos são internamente homogêneos. Clãs dentro do mesmo reino compartilham tradições, clima e recursos &mdash; então separar por reino faz sentido.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Stratification <strong>reduces sampling error</strong> when strata are internally homogeneous. Clans within the same realm share traditions, climate, and resources &mdash; so separating by realm makes sense.')}
 
-    ${dialogue('thor', '⚡ Thorment', 'E se eu estratificar por cor do elmo? Vai funcionar igual?')}
+    ${dialogue('thor', '⚡ Thorment', 'What if I stratify by helmet color? Will it work the same?')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Só se a cor do elmo estiver relacionada com a variável de interesse. Estratificar por algo irrelevante é desperdício de esforço &mdash; sem ganho de precisão.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Only if the helmet color is related to the variable of interest. Stratifying by something irrelevant is a waste of effort &mdash; no precision gain.')}
   `;
 }
 
@@ -777,15 +777,15 @@ function step4() {
     <div class="step-title">Sampling Cluster</div>
     <div class="step-subtitle">Entire Villages, Not Isolated Warriors</div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling Cluster (Clusters)</strong>: divide-se a população em grupos naturais (conglomerados), draws-se <em>alguns desses grupos</em> e investiga-se <strong>todos os elementos</strong> dos grupos sorteados.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Cluster Sampling</strong>: the population is divided into natural groups (clusters), <em>some of those groups</em> are drawn, and <strong>all elements</strong> of the selected groups are investigated.')}
 
-    <p>Digamos que não temos a lista de todos os 1.000 clãs, mas temos a lista das <span class="hl-gold">50 aldeias</span> dos Nove Reinos. Cada aldeia contém ~20 clãs. Sorteamos 5 aldeias e entrevistamos <em>todos</em> os clãs dessas aldeias.</p>
+    <p>Suppose we don\x27t have the list of all 1,000 clans, but we have the list of <span class="hl-gold">50 villages</span> across the Nine Realms. Each village contains ~20 clans. We draw 5 villages and survey <em>all</em> clans in those villages.</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A diferença crucial: na estratificada, pegamos <em>um pouco de cada grupo</em>. Na conglomerada, pegamos <em>alguns grupos inteiros</em>. É como a diferença entre provar uma colherada de cada panela e escolher três panelas para esvaziar.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The crucial difference: in stratified, we take <em>a little from each group</em>. In cluster, we take <em>some whole groups</em>. It\x27s like the difference between tasting a spoonful from each pot and choosing three pots to empty.')}
 
     <div class="visual-container">
       <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg">
-        <text x="170" y="25" text-anchor="middle" fill="#58a6ff" font-family="Bangers" font-size="16">ESTRATIFICADA</text>
+        <text x="170" y="25" text-anchor="middle" fill="#58a6ff" font-family="Bangers" font-size="16">STRATIFIED</text>
         <text x="530" y="25" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="16">CLUSTERS</text>
 
         <!-- Stratified side -->
@@ -870,15 +870,15 @@ function step4() {
     <div class="info-box">
       <h4>When to use clusters?</h4>
       <ul style="margin-left: 20px; margin-top: 8px;">
-        <li>Quando <strong>não existe lista</strong> de todos os indivíduos, mas existe lista dos grupos</li>
-        <li>Quando os indivíduos estão <strong>geograficamente dispersos</strong> (ex.: aldeias, escolas, hospitais)</li>
-        <li>Quando é mais <strong>barato</strong> investigar grupos inteiros do que indivíduos espalhados</li>
+        <li>When there is <strong>no list</strong> of all individuals, but there is a list of groups</li>
+        <li>When individuals are <strong>geographically dispersed</strong> (e.g., villages, schools, hospitals)</li>
+        <li>When it is <strong>cheaper</strong> to investigate whole groups than scattered individuals</li>
       </ul>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Mas e se as aldeias sorteadas forem todas parecidas? Type, só aldeias de pescadores?')}
+    ${dialogue('thor', '⚡ Thorment', 'But what if the selected villages are all similar? Like, only fishing villages?')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Exato risco! A amostragem por conglomerados funciona melhor quando os clusters são <strong>internamente heterogêneos</strong> &mdash; ou seja, cada aldeia é um "microcosmo" da população. Se todas forem parecidas entre si, tudo bem. Se forem muito diferentes entre si, o erro aumenta.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Exactly the risk! Cluster sampling works best when clusters are <strong>internally heterogeneous</strong> &mdash; that is, each village is a "microcosm" of the population. If they are all similar to each other, fine. If they are very different from each other, error increases.')}
   `;
 }
 
@@ -890,13 +890,13 @@ function step5() {
     <div class="step-title">Sampling Systematic</div>
     <div class="step-subtitle">Every K-th Warrior</div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling Sistemática</strong>: seleciona-se um ponto de partida aleatório e, a partir dele, seleciona-se a cada <em>k</em> elementos. O intervalo k = N/n.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Systematic Sampling</strong>: a random starting point is selected, and from it, every <em>k</em>-th element is selected. The interval k = N/n.')}
 
-    <p>Os guerreiros entram no grande salão de Valhalla em fila. Odinfather precisa de uma amostra de 100 entre 1.000. O intervalo será <span class="hl-gold">k = 1.000/100 = 10</span>. Sorteia o primeiro entre 1 e 10 (digamos, 3). Depois pega o 3&deg;, 13&deg;, 23&deg;, 33&deg;...</p>
+    <p>The warriors enter the great hall of Valhalla in a line. Odinfather needs a sample of 100 from 1,000. The interval will be <span class="hl-gold">k = 1,000/100 = 10</span>. He draws the first between 1 and 10 (say, 3). Then takes the 3rd, 13th, 23rd, 33rd...</p>
 
     <div class="visual-container">
       <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg">
-        <text x="350" y="20" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">FILA DE GUERREIROS NO GATE OF VALHALLA</text>
+        <text x="350" y="20" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">LINE OF WARRIORS AT THE GATE OF VALHALLA</text>
 
         <!-- Warriors in line -->
         <g>
@@ -925,23 +925,23 @@ function step5() {
           </marker>
         </defs>
 
-        <text x="350" y="125" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="15">k = 5 &rarr; draws o 3&deg;, depois cada 5&deg;: 3, 8, 13, 18, 23, 28...</text>
+        <text x="350" y="125" text-anchor="middle" fill="#e6edf3" font-family="Patrick Hand" font-size="15">k = 5 &rarr; draws the 3rd, then every 5th: 3, 8, 13, 18, 23, 28...</text>
 
-        <text x="350" y="155" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Apenas o primeiro é aleatório. Os demais são determinísticos.</text>
+        <text x="350" y="155" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Only the first is random. The rest are deterministic.</text>
       </svg>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'É rápido e prático. Entretanto, existe um risco sutil: se a população tem um <strong>padrão cíclico</strong> com período igual a k, a amostra captura sempre o mesmo "pedaço" do ciclo.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'It\x27s fast and practical. However, there is a subtle risk: if the population has a <strong>cyclical pattern</strong> with period equal to k, the sample always captures the same "piece" of the cycle.')}
 
     <div class="concept-card">
       <h3>Cycle Trap</h3>
-      <p>Se os guerreiros entram no portão alternando entre <em>arqueiros</em> e <em>espadachins</em> (padrão de período 2), e k = 2, sua amostra terá <strong>só arqueiros</strong> ou <strong>só espadachins</strong>.</p>
-      <p style="margin-top: 8px; color: var(--text-dim);">Na prática: turnos de trabalho, sazonalidade, ordem alfabética &mdash; qualquer padrão periódico pode distorcer a amostra sistemática.</p>
+      <p>If warriors enter the gate alternating between <em>archers</em> and <em>swordsmen</em> (period-2 pattern), and k = 2, your sample will have <strong>only archers</strong> or <strong>only swordsmen</strong>.</p>
+      <p style="margin-top: 8px; color: var(--text-dim);">In practice: work shifts, seasonality, alphabetical order &mdash; any periodic pattern can distort the systematic sample.</p>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Então é tipo contar de 10 em 10! Moleza! E nem precisa de lista completa, é só ficar no portão e contar.')}
+    ${dialogue('thor', '⚡ Thorment', 'So it\x27s like counting every 10th! Easy! And you don\x27t even need a complete list, just stand at the gate and count.')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Quase certo, Thorment. A sistemática <em>parece</em> simples, mas não é "aleatória" de verdade &mdash; uma vez definido o ponto de partida, todos os demais estão determinados. Por isso funciona <em>quase</em> como AAS, mas não é idêntica.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Almost right, Thorment. Systematic sampling <em>seems</em> simple, but it\x27s not truly "random" &mdash; once the starting point is set, all the rest are determined. That\x27s why it works <em>almost</em> like SRS, but it\x27s not identical.')}
   `;
 }
 
@@ -951,19 +951,19 @@ function step5() {
 function step6() {
   return `
     <div class="step-title">Sampling Convenience</div>
-    <div class="step-subtitle">O Atalho Favorito de Thorment</div>
+    <div class="step-subtitle">Thorment\x27s Favorite Shortcut</div>
 
-    ${dialogue('thor', '⚡ Thorment', 'FINALMENTE o meu método! Olha, é simples: vai na taverna mais próxima, pergunta pros guerreiros que estão bebendo hidromel e pronto. Sem sorteio, sem lista, sem frescura. Rápido, barato e divertido!')}
+    ${dialogue('thor', '⚡ Thorment', 'FINALLY my method! Look, it\x27s simple: go to the nearest tavern, ask the warriors who are drinking mead and done. No drawing, no list, no fuss. Fast, cheap, and fun!')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Sampling por Conveniência</strong>: seleciona os elementos mais acessíveis ou disponíveis. <em>Não é probabilística</em> &mdash; não se pode calcular a probabilidade de seleção de cada elemento. É o método mais comum na pesquisa aplicada... e o mais propenso a viés.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Convenience Sampling</strong>: selects the most accessible or available elements. <em>It is not probabilistic</em> &mdash; you cannot calculate the selection probability of each element. It is the most common method in applied research... and the most prone to bias.')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Thorment, os guerreiros na taverna de Asgard são mais ricos, mais jovens e mais ociosos que a média da população. Sua "amostra" não representa ninguém além de bebedores de hidromel da região central!')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Thorment, the warriors at the Asgard tavern are richer, younger, and more idle than the population average. Your "sample" represents no one beyond central-region mead drinkers!')}
 
     <div class="visual-container">
       <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
         <!-- Population map -->
         <ellipse cx="350" cy="130" rx="300" ry="110" fill="none" stroke="#30363d" stroke-width="1.5" stroke-dasharray="6,3"/>
-        <text x="350" y="20" text-anchor="middle" fill="#8b949e" font-family="Permanent Marker" font-size="14">POPULATION DOS NINE REALMS</text>
+        <text x="350" y="20" text-anchor="middle" fill="#8b949e" font-family="Permanent Marker" font-size="14">POPULATION OF THE NINE REALMS</text>
 
         <!-- Scattered dots (all clans) -->
         <g fill="#8b949e" opacity="0.3">
@@ -978,8 +978,8 @@ function step6() {
 
         <!-- Convenience zone (small area near center) -->
         <ellipse cx="350" cy="130" rx="70" ry="50" fill="rgba(248,81,73,0.15)" stroke="#f85149" stroke-width="2"/>
-        <text x="350" y="115" text-anchor="middle" fill="#f85149" font-family="Permanent Marker" font-size="12">ZONA DE</text>
-        <text x="350" y="132" text-anchor="middle" fill="#f85149" font-family="Permanent Marker" font-size="12">CONVENIENCIA</text>
+        <text x="350" y="115" text-anchor="middle" fill="#f85149" font-family="Permanent Marker" font-size="12">CONVENIENCE</text>
+        <text x="350" y="132" text-anchor="middle" fill="#f85149" font-family="Permanent Marker" font-size="12">ZONE</text>
 
         <!-- Only nearby dots are "sampled" -->
         <circle cx="330" cy="145" r="5" fill="#f85149"/><circle cx="360" cy="150" r="5" fill="#f85149"/>
@@ -987,37 +987,37 @@ function step6() {
         <circle cx="320" cy="130" r="5" fill="#f85149"/><circle cx="380" cy="145" r="5" fill="#f85149"/>
 
         <!-- Label -->
-        <text x="350" y="250" text-anchor="middle" fill="#f85149" font-family="Patrick Hand" font-size="15">Apenas quem esta "por perto" e consultado</text>
+        <text x="350" y="250" text-anchor="middle" fill="#f85149" font-family="Patrick Hand" font-size="15">Only those who are "nearby" are consulted</text>
       </svg>
     </div>
 
     <div class="concept-card">
       <h3>When does it happen?</h3>
-      <p>Pesquisas de rua em shopping centers, questionários postados em redes sociais, amostras com alunos de uma universidade, pacientes de um único hospital. Em todos esses casos, quem participa <strong>se auto-seleciona</strong> &mdash; e quem participa é diferente de quem não participa.</p>
+      <p>Street surveys in shopping malls, questionnaires posted on social media, samples from students at one university, patients from a single hospital. In all these cases, those who participate <strong>self-select</strong> &mdash; and those who participate are different from those who don\x27t.</p>
     </div>
 
     <div class="comparison-grid">
       <div class="comparison-card pro">
-        <div class="comparison-title" style="color:var(--success)">✅ Por que é tão usada?</div>
+        <div class="comparison-title" style="color:var(--success)">\u2705 Why is it so widely used?</div>
         <ul style="margin-left: 16px; font-size: 0.95rem;">
-          <li>Rápida e barata</li>
-          <li>Não exige lista da população</li>
-          <li>Viável quando acesso é restrito</li>
-          <li>Estudos exploratórios / pilotos</li>
+          <li>Fast and cheap</li>
+          <li>Does not require a population list</li>
+          <li>Feasible when access is restricted</li>
+          <li>Exploratory / pilot studies</li>
         </ul>
       </div>
       <div class="comparison-card con">
         <div class="comparison-title" style="color:var(--thor-red)">❌ Real dangers</div>
         <ul style="margin-left: 16px; font-size: 0.95rem;">
-          <li>Não generaliza para a população</li>
-          <li>Viés de voluntário (quem aceita ≠ quem recusa)</li>
-          <li>Viés de sobrevivente</li>
-          <li>Impossível calcular margem de erro</li>
+          <li>Does not generalize to the population</li>
+          <li>Volunteer bias (those who accept \u2260 those who refuse)</li>
+          <li>Survivorship bias</li>
+          <li>Impossible to calculate margin of error</li>
         </ul>
       </div>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Conveniência <em>pode</em> ser aceitável em estudos exploratórios, pilotos, ou quando a generalização não é o objetivo principal. Entretanto, sempre deve ser <strong>declarada e discutida</strong> como limitação. Transparência, não vergonha.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Convenience <em>can</em> be acceptable in exploratory studies, pilots, or when generalization is not the main goal. However, it must always be <strong>declared and discussed</strong> as a limitation. Transparency, not shame.')}
   `;
 }
 
@@ -1029,13 +1029,13 @@ function step7() {
     <div class="step-title">Bias</div>
     <div class="step-subtitle">When the Sample Lies</div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Viés amostral é o <strong>erro sistemático</strong> que faz a amostra contar uma história diferente da população. Não é variação aleatória &mdash; é distorção. E o pior: aumentar o <em>n</em> não conserta viés. Você só fica mais confiante da resposta errada.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Sampling bias is the <strong>systematic error</strong> that makes the sample tell a different story than the population. It\x27s not random variation &mdash; it\x27s distortion. And the worst part: increasing <em>n</em> does not fix bias. You just become more confident of the wrong answer.')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Viés (bias)</strong>: diferença sistemática entre o valor estimado pela amostra e o valor real da população. Diferente do erro amostral (aleatório), o viés <em>não diminui</em> com o aumento de n.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Bias</strong>: a systematic difference between the value estimated by the sample and the true population value. Unlike sampling error (random), bias <em>does not decrease</em> with increasing n.')}
 
     <div class="visual-container">
       <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
-        <text x="350" y="20" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">ERRO SAMPLEL vs. VIES</text>
+        <text x="350" y="20" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">SAMPLING ERROR vs. BIAS</text>
 
         <!-- Target 1: no bias, some error -->
         <circle cx="170" cy="130" r="70" fill="none" stroke="#30363d" stroke-width="1"/>
@@ -1069,7 +1069,7 @@ function step7() {
 
         <!-- Bias arrow -->
         <line x1="533" y1="127" x2="562" y2="105" stroke="#f85149" stroke-width="2" marker-end="url(#arrBias)"/>
-        <text x="560" y="125" fill="#f85149" font-family="Permanent Marker" font-size="11">vies</text>
+        <text x="560" y="125" fill="#f85149" font-family="Permanent Marker" font-size="11">bias</text>
         <defs>
           <marker id="arrBias" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#f85149"/></marker>
         </defs>
@@ -1078,27 +1078,27 @@ function step7() {
 
     <div class="bias-card">
       <h4>1. Selection Bias</h4>
-      <p>Quando o processo de escolha favorece certos elementos. Exemplo nórdico: perguntar <em>apenas a guerreiros veteranos</em> sobre satisfação com treinamento ignora os recrutas &mdash; que provavelmente têm opinião bem diferente.</p>
+      <p>When the selection process favors certain elements. Norse example: asking <em>only veteran warriors</em> about training satisfaction ignores recruits &mdash; who probably have very different opinions.</p>
     </div>
 
     <div class="bias-card">
       <h4>2. Non-Response Bias</h4>
-      <p>Quando parte da amostra se recusa a participar, e quem recusa é sistematicamente diferente de quem responde. Os clãs de Helheim talvez ignorem o mensageiro de Odin &mdash; e justamente eles podem ser os mais insatisfeitos.</p>
+      <p>When part of the sample refuses to participate, and those who refuse are systematically different from those who respond. The clans of Helheim may ignore Odin\x27s messenger &mdash; and they may be the most dissatisfied.</p>
     </div>
 
     <div class="bias-card">
       <h4>3. Coverage Bias</h4>
-      <p>Quando a <em>lista</em> usada para amostragem não cobre toda a população. Se o registro de clãs omite os nômades de Niflheim, eles <strong>nunca</strong> poderão ser selecionados &mdash; mesmo com sorteio perfeito.</p>
+      <p>When the <em>list</em> used for sampling does not cover the entire population. If the clan registry omits the nomads of Niflheim, they can <strong>never</strong> be selected &mdash; even with perfect randomization.</p>
     </div>
 
     <div class="bias-card">
       <h4>4. Survivorship Bias</h4>
-      <p>Analisar só quem "sobreviveu" ao processo. Avaliar a qualidade das espadas olhando só as que não quebraram em batalha ignora as que falharam &mdash; e pode gerar uma visão falsamente otimista da forja.</p>
+      <p>Analyzing only those who "survived" the process. Evaluating sword quality by looking only at those that didn\x27t break in battle ignores those that failed &mdash; and can create a falsely optimistic view of the forge.</p>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Tá, e como eu <em>elimino</em> o viés?')}
+    ${dialogue('thor', '⚡ Thorment', 'OK, and how do I <em>eliminate</em> bias?')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Nem sempre é possível eliminar completamente. Entretanto, <strong>amostragem probabilística</strong>, boas taxas de resposta e cobertura ampla são as melhores defesas. O primeiro passo é <em>reconhecer</em> que o viés existe.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'It\x27s not always possible to eliminate it completely. However, <strong>probabilistic sampling</strong>, good response rates, and broad coverage are the best defenses. The first step is to <em>recognize</em> that bias exists.')}
   `;
 }
 
@@ -1110,57 +1110,57 @@ function step8() {
     <div class="step-title">Sample Size</div>
     <div class="step-subtitle">How Many Clans to Visit?</div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Quanto mais, melhor! Bora entrevistar 999 dos 1.000 clãs!')}
+    ${dialogue('thor', '⚡ Thorment', 'The more the better! Let\x27s interview 999 of the 1,000 clans!')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Maior nem sempre é melhor, Thorment. Existe um ponto onde o ganho de precisão não justifica o custo adicional. A fórmula nos diz <em>exatamente</em> quantos precisamos.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Bigger is not always better, Thorment. There is a point where the precision gain doesn\x27t justify the additional cost. The formula tells us <em>exactly</em> how many we need.')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'A fórmula clássica para estimar proporções com amostragem aleatória simples:')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The classic formula for estimating proportions with simple random sampling:')}
 
     <div class="formula">
-      <div class="formula-label">Sample Size Formula (proporcoes)</div>
+      <div class="formula-label">Sample Size Formula (proportions)</div>
       n = (Z&sup2; &middot; p &middot; q) / E&sup2;
     </div>
 
     <div class="info-box">
       <h4>Where:</h4>
       <ul style="margin-left: 20px; margin-top: 8px;">
-        <li><span class="hl-gold">n</span> = tamanho da amostra necessário</li>
-        <li><span class="hl-gold">Z</span> = valor crítico da distribuição normal (1,96 para 95% de confiança)</li>
-        <li><span class="hl-gold">p</span> = proporção esperada (se desconhecida, usar 0,50 &mdash; cenário mais conservador)</li>
+        <li><span class="hl-gold">n</span> = required sample size</li>
+        <li><span class="hl-gold">Z</span> = critical value of the normal distribution (1.96 for 95% confidence)</li>
+        <li><span class="hl-gold">p</span> = expected proportion (if unknown, use 0.50 &mdash; most conservative scenario)</li>
         <li><span class="hl-gold">q</span> = 1 &minus; p</li>
         <li><span class="hl-gold">E</span> = margem de erro desejada (ex.: 0,05 = &plusmn; 5%)</li>
       </ul>
     </div>
 
     <div class="concept-card">
-      <h3>Odin Calcula: Quantos Clas?</h3>
-      <p>Odinfather quer estimar a proporção de clãs satisfeitos com a distribuição de espólios, com 95% de confiança e margem de erro de &plusmn;5%. Não tem ideia da proporção real, então usa p = 0,50.</p>
+      <h3>Odinfather Calculates: How Many Clans?</h3>
+      <p>Odinfather wants to estimate the proportion of clans satisfied with the spoils distribution, with 95% confidence and a &plusmn;5% margin of error. He has no idea of the true proportion, so he uses p = 0.50.</p>
 
       <div class="formula" style="margin-top: 12px; text-align: left; font-size: 1rem;">
         <div class="formula-label">Step-by-step calculation</div>
         n = (1,96&sup2; &times; 0,50 &times; 0,50) / 0,05&sup2;<br>
         n = (3,8416 &times; 0,25) / 0,0025<br>
         n = 0,9604 / 0,0025<br>
-        <span class="hl-gold" style="font-size: 1.2rem;">n = 384,16 &rarr; 385 clas</span>
+        <span class="hl-gold" style="font-size: 1.2rem;">n = 384,16 &rarr; 385 clans</span>
       </div>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Com 385 clãs, temos 95% de confiança de que nossa estimativa está a no máximo 5 pontos percentuais do valor real. Nada mau para uma população de 1.000!')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'With 385 clans, we have 95% confidence that our estimate is at most 5 percentage points from the true value. Not bad for a population of 1,000!')}
 
     <div class="concept-card">
-      <h3>A Raiz Quadrada e a Lei dos Diminishing Returns</h3>
-      <p>A margem de erro cai com <span class="hl-gold">1/&radic;n</span>. Para <strong>cortar a margem de erro pela metade</strong>, você precisa <strong>quadruplicar</strong> a amostra. Isso explica por que pesquisas eleitorais com n=2.000 já alcançam margens de &plusmn;2% &mdash; ir para n=8.000 só baixaria para &plusmn;1%.</p>
+      <h3>The Square Root and the Law of Diminishing Returns</h3>
+      <p>The margin of error drops with <span class="hl-gold">1/&radic;n</span>. To <strong>cut the margin of error in half</strong>, you need to <strong>quadruple</strong> the sample. This explains why election polls with n=2,000 already achieve margins of &plusmn;2% &mdash; going to n=8,000 would only bring it down to &plusmn;1%.</p>
     </div>
 
     <div class="visual-container">
       <svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg">
-        <text x="350" y="20" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">MARGIN OF ERROR vs. TAMANHO DA SAMPLE</text>
+        <text x="350" y="20" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="18">MARGIN OF ERROR vs. SAMPLE SIZE</text>
 
         <!-- Axes -->
         <line x1="80" y1="210" x2="650" y2="210" stroke="#30363d" stroke-width="1.5"/>
         <line x1="80" y1="210" x2="80" y2="40" stroke="#30363d" stroke-width="1.5"/>
         <text x="365" y="245" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13">Sample Size (n)</text>
-        <text x="30" y="125" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13" transform="rotate(-90, 30, 125)">Margem de Erro</text>
+        <text x="30" y="125" text-anchor="middle" fill="#8b949e" font-family="Patrick Hand" font-size="13" transform="rotate(-90, 30, 125)">Margin of Error</text>
 
         <!-- Curve: E = 1.96 * sqrt(0.25/n), scaled -->
         <!-- n points: 30, 50, 100, 200, 400, 800, 1500 -->
@@ -1186,9 +1186,9 @@ function step8() {
       </svg>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Então 385 de 1.000 é quase 40%! Não é mais fácil fazer o censo?')}
+    ${dialogue('thor', '⚡ Thorment', 'So 385 out of 1,000 is almost 40%! Wouldn\x27t it be easier to do a census?')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Para populações pequenas, sim &mdash; a amostra fica uma fração grande do todo. Existe até uma <strong>correção para populações finitas</strong>: n<sub>ajustado</sub> = n / (1 + n/N). Com N=1.000 e n=385, isso dá ~278. Quando N é grande (100.000+), a correção é desprezível.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'For small populations, yes &mdash; the sample becomes a large fraction of the whole. There is even a <strong>finite population correction</strong>: n<sub>adjusted</sub> = n / (1 + n/N). With N=1,000 and n=385, this gives ~278. When N is large (100,000+), the correction is negligible.')}
   `;
 }
 
@@ -1200,14 +1200,14 @@ function step9() {
     <div class="step-title">Central Limit Theorem (CLT)</div>
     <div class="step-subtitle">The Magic of the Normal Distribution</div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Teorema Central do Limite</strong>: independentemente da distribuição original da população, a distribuição das <em>médias amostrais</em> (x&#772;) tende a ser <strong>normal</strong> conforme o tamanho da amostra (n) cresce. É o teorema mais importante da inferência estatística.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Central Limit Theorem</strong>: regardless of the original distribution of the population, the distribution of <em>sample means</em> (x\u0304) tends to be <strong>normal</strong> as the sample size (n) increases. It is the most important theorem in statistical inference.')}
 
-    <p>Imagine que a distribuição de riqueza dos 1.000 clãs viking é <span class="hl-red">completamente assimétrica</span> &mdash; poucos clãs muito ricos, muitos clãs pobres. Parece impossível usar a curva normal? O TCL diz: <em>não importa</em>.</p>
+    <p>Imagine the wealth distribution of the 1,000 Viking clans is <span class="hl-red">completely asymmetric</span> &mdash; few very rich clans, many poor clans. Seems impossible to use the normal curve? The CLT says: <em>it doesn\x27t matter</em>.</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Se eu tirar 10.000 amostras de tamanho n, calcular a média de cada uma e plotar todas essas médias em um histograma, o resultado será cada vez mais próximo de uma <strong>curva normal</strong>, centrada em μ, com desvio-padrão σ/&radic;n.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'If I draw 10,000 samples of size n, calculate the mean of each one and plot all those means in a histogram, the result will be increasingly close to a <strong>normal curve</strong>, centered at \u03bc, with standard deviation \u03c3/&radic;n.')}
 
     <div class="formula">
-      <div class="formula-label">Distribuicao Amostral da Media</div>
+      <div class="formula-label">Sampling Distribution of the Mean</div>
       x&#772; ~ Normal( μ , σ/&radic;n )
     </div>
 
@@ -1269,18 +1269,18 @@ function step9() {
     <div class="info-box">
       <h4>What does the CLT guarantee?</h4>
       <ul style="margin-left: 20px; margin-top: 8px;">
-        <li><span class="hl-blue">Centro</span>: a média das médias amostrais = μ (a média da população)</li>
-        <li><span class="hl-blue">Dispersão</span>: o desvio-padrão das médias = σ/&radic;n (erro-padrão)</li>
-        <li><span class="hl-blue">Forma</span>: conforme n cresce, a distribuição se aproxima da Normal</li>
-        <li><span class="hl-blue">Regra prática</span>: para a maioria das populações, n &ge; 30 já produz distribuição amostral aproximadamente normal</li>
+        <li><span class="hl-blue">Center</span>: the mean of sample means = \u03bc (the population mean)</li>
+        <li><span class="hl-blue">Spread</span>: the standard deviation of means = \u03c3/&radic;n (standard error)</li>
+        <li><span class="hl-blue">Shape</span>: as n increases, the distribution approaches the Normal</li>
+        <li><span class="hl-blue">Rule of thumb</span>: for most populations, n &ge; 30 already produces an approximately normal sampling distribution</li>
       </ul>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Por isso podemos usar testes z, testes t, intervalos de confiança &mdash; todos baseados na distribuição normal. O TCL é a <strong>fundação</strong> da inferência estatística. Sem ele, nada funciona.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'That\x27s why we can use z-tests, t-tests, confidence intervals &mdash; all based on the normal distribution. The CLT is the <strong>foundation</strong> of statistical inference. Without it, nothing works.')}
 
-    ${dialogue('thor', '⚡ Thorment', 'Espera &mdash; se funciona pra qualquer distribuição original, então não preciso me preocupar com normalidade?')}
+    ${dialogue('thor', '⚡ Thorment', 'Wait &mdash; if it works for any original distribution, then I don\x27t need to worry about normality?')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Para a <em>média amostral</em>, sim &mdash; o TCL te protege com n razoável. Entretanto, alguns testes exigem normalidade dos <em>dados individuais</em>, não das médias. São coisas diferentes! Entenderemos isso nos capítulos de testes de hipótese.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'For the <em>sample mean</em>, yes &mdash; the CLT protects you with a reasonable n. However, some tests require normality of the <em>individual data</em>, not of the means. These are different things! We\x27ll understand this in the hypothesis testing chapters.')}
   `;
 }
 
@@ -1292,7 +1292,7 @@ function step10() {
     <div class="step-title">Lesson of the Ravens</div>
 
     <div class="licao-box">
-      <div class="licao-title">🐦‍⬛ Muninn resume os pontos-chave</div>
+      <div class="licao-title">🐦‍⬛ Muninn summarizes the key points</div>
 
       <table class="summary-table">
         <tr>
@@ -1306,53 +1306,53 @@ function step10() {
         <tr>
           <td style="font-family:'Permanent Marker'; color:var(--odin-blue)">Simple Random</td>
           <td><span class="tag prob">Probabilistic</span></td>
-          <td>Sorteia cada elemento com igual chance</td>
-          <td>Sem vies de selecao</td>
-          <td>Exige lista completa</td>
-          <td>Populacao pequena e acessivel</td>
+          <td>Draws each element with equal chance</td>
+          <td>Sem bias de selecao</td>
+          <td>Requires complete list</td>
+          <td>Small and accessible population</td>
         </tr>
         <tr>
           <td style="font-family:'Permanent Marker'; color:var(--odin-blue)">Stratified</td>
           <td><span class="tag prob">Probabilistic</span></td>
-          <td>Divide em estratos, draws de cada</td>
-          <td>Garante representatividade</td>
-          <td>Precisa conhecer a variavel de estratificacao</td>
-          <td>Populacao com subgrupos conhecidos</td>
+          <td>Divides into strata, draws from each</td>
+          <td>Guarantees representativeness</td>
+          <td>Requires knowledge of stratification variable</td>
+          <td>Population with known subgroups</td>
         </tr>
         <tr>
-          <td style="font-family:'Permanent Marker'; color:var(--odin-blue)">Conglomerados</td>
+          <td style="font-family:'Permanent Marker'; color:var(--odin-blue)">Clusters</td>
           <td><span class="tag prob">Probabilistic</span></td>
-          <td>Sorteia grupos inteiros</td>
-          <td>Nao precisa listar individuos</td>
-          <td>Erro maior se clusters sao homogeneos</td>
-          <td>Populacao dispersa geograficamente</td>
+          <td>Draws entire groups</td>
+          <td>No need to list individuals</td>
+          <td>Higher error if clusters are homogeneous</td>
+          <td>Geographically dispersed population</td>
         </tr>
         <tr>
           <td style="font-family:'Permanent Marker'; color:var(--odin-blue)">Systematic</td>
           <td><span class="tag prob">Probabilistic*</span></td>
-          <td>Cada k-esimo elemento</td>
-          <td>Simples e rapida</td>
-          <td>Risco com padroes ciclicos</td>
-          <td>Lista ordenada sem padroes</td>
+          <td>Every k-th element</td>
+          <td>Simple and fast</td>
+          <td>Risk with cyclical patterns</td>
+          <td>Ordered list without patterns</td>
         </tr>
         <tr>
-          <td style="font-family:'Permanent Marker'; color:var(--thor-red)">Conveniencia</td>
-          <td><span class="tag nprob">Nao-Probabilistic</span></td>
-          <td>Seleciona os mais acessiveis</td>
-          <td>Barata e rapida</td>
-          <td>Nao generaliza! Vies alto</td>
-          <td>Estudos exploratorios / pilotos</td>
+          <td style="font-family:'Permanent Marker'; color:var(--thor-red)">Convenience</td>
+          <td><span class="tag nprob">Non-Probabilistic</span></td>
+          <td>Selects the most accessible</td>
+          <td>Cheap and fast</td>
+          <td>Does not generalize! High bias</td>
+          <td>Exploratory / pilot studies</td>
         </tr>
       </table>
 
-      <p style="margin-top: 10px; color: var(--text-dim); font-size: 0.9rem;">* A sistematica so e <em>estritamente</em> probabilistica se o ponto de partida e aleatorio. Alguns autores a classificam como quase-probabilistica.</p>
+      <p style="margin-top: 10px; color: var(--text-dim); font-size: 0.9rem;">* A sistematica so e <em>estritamente</em> probabilistica se o ponto de partida e aleatorio. Alguns autores a clanssificam como quase-probabilistica.</p>
     </div>
 
     <div class="licao-box" style="border-color: var(--gold); margin-top: 20px;">
       <div class="licao-title" style="color: var(--gold);">Key Formulas</div>
 
       <div class="formula" style="text-align: left;">
-        <div class="formula-label">Sample Size (proporcoes)</div>
+        <div class="formula-label">Sample Size (proportions)</div>
         n = (Z&sup2; &middot; p &middot; q) / E&sup2;
       </div>
 
@@ -1372,26 +1372,26 @@ function step10() {
       </div>
     </div>
 
-    ${dialogue('huginn', '🐦‍⬛ Huginn challenges:', '<strong>Desafio para o leitor:</strong> Em que circunstancias a amostragem por conveniencia e <em>aceitavel</em> em pesquisa academica? Pense em tres situacoes concretas antes de continuar. E mais: se 95% das pesquisas em administracao usam conveniencia, o que isso diz sobre a generalizabilidade dos nossos achados?')}
+    ${dialogue('huginn', '🐦‍⬛ Huginn challenges:', '<strong>Challenge for the reader:</strong> Under what circumstances is convenience sampling <em>acceptable</em> in academic research? Think of three concrete situations before moving on. Furthermore: if 95% of studies in business research use convenience sampling, what does that say about the generalizability of our findings?')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A amostragem e a <strong>primeira decisao</strong> de qualquer pesquisa quantitativa &mdash; e uma das mais consequentes. Um metodo estatístico sofisticado aplicado a uma amostra enviesada e como uma espada runica afiada cortando o vento: tecnica perfeita, alvo errado.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Sampling is the <strong>first decision</strong> of any quantitative research &mdash; and one of the most consequential. A sophisticated statistical method applied to a biased sample is like a sharp runic sword cutting the wind: perfect technique, wrong target.')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Lembre-se: o viés nao diminui com n maior. A unica cura para o viés e o <strong>desenho amostral</strong>. O Teorema Central do Limite garante normalidade das medias com n suficiente &mdash; mas nao garante <em>representatividade</em>. Sao coisas distintas.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Remember: bias does not decrease with larger n. The only cure for bias is <strong>sampling design</strong>. The Central Limit Theorem guarantees normality of means with sufficient n &mdash; but does not guarantee <em>representativeness</em>. These are distinct things.')}
 
     <div class="info-box" style="border-color: var(--success);">
       <h4 style="color: var(--success);">Checklist for Sampling</h4>
       <ul style="margin-left: 20px; margin-top: 8px;">
-        <li>&#9745; Defini claramente a <strong>populacao-alvo</strong>?</li>
-        <li>&#9745; Tenho um <strong>cadastro</strong> (sampling frame) adequado?</li>
-        <li>&#9745; O metodo de selecao e <strong>probabilistico</strong>? Se nao, justifiquei?</li>
-        <li>&#9745; Calculei o <strong>n necessario</strong> antes de coletar?</li>
-        <li>&#9745; Considerei possiveis <strong>vieses</strong> e como mitiga-los?</li>
-        <li>&#9745; Reportei o metodo com <strong>transparencia</strong> no artigo?</li>
+        <li>&#9745; Clearly defined the <strong>target population</strong>?</li>
+        <li>&#9745; Do I have an adequate <strong>sampling frame</strong>?</li>
+        <li>&#9745; Is the selection method <strong>probabilistic</strong>? If not, did I justify it?</li>
+        <li>&#9745; Did I calculate the <strong>required n</strong> before collecting?</li>
+        <li>&#9745; Considerei possiveis <strong>biases</strong> e como mitiga-los?</li>
+        <li>&#9745; Did I report the method with <strong>transparency</strong> in the paper?</li>
       </ul>
     </div>
 
     <p style="text-align: center; margin-top: 30px; font-family: 'Permanent Marker'; color: var(--gold); font-size: 1.2rem;">
-      Fim do guia de Sampling. Que Odinfather guie suas amostras!
+      End of the Sampling guide. May Odinfather guide your samples!
     </p>
   `;
 }

@@ -338,7 +338,7 @@ const groupMeanXP = groupData.map(g => mean(g.map(r => r.xp)));
 const grandMeanSkill = mean(RAW.map(r => r.skill));
 const grandMeanXP = mean(RAW.map(r => r.xp));
 
-// ---------- Simple ANOVA (without covariate) ----------
+// ---------- ANOVA simples (sem covariate) ----------
 const SS_between_anova = groupData.reduce((s, g, i) =>
   s + g.length * (groupMeanSkill[i] - grandMeanSkill) ** 2, 0);
 const SS_within_anova = RAW.reduce((s, r) =>
@@ -440,51 +440,51 @@ function getStepHTML(step) {
   // ==== STEP 0: INTRO ====
   case 0: return `
 <div class="step-title">&#128214; Step 0 &mdash; The Problem: Unequal Groups at the Starting Line</div>
-<p>In the <span class="highlight">Library of the Sages of Asgard</span>, three great fencing schools compete for the title of best warrior training program:</p>
+<p>Na <span class="highlight">Biblioteca dos S&aacute;bios de Asgard</span>, tr&ecirc;s grandes schools de esgrima competem pelo t&iacute;tulo de melhor forma&ccedil;&atilde;o de warriors:</p>
 <ul style="margin:12px 0 12px 24px;">
-  <li><span class="highlight-blue">${SCHOOL_ICONS[0]} Einherjar</span> &mdash; School of the Fallen Heroes</li>
-  <li><span class="highlight-red">${SCHOOL_ICONS[1]} Berserker</span> &mdash; School of Controlled Fury</li>
-  <li><span class="highlight-purple">${SCHOOL_ICONS[2]} Valkyrie</span> &mdash; School of the Celestial Warriors</li>
+  <li><span class="highlight-blue">${SCHOOL_ICONS[0]} Einherjar</span> &mdash; School dos Her&oacute;is Ca&iacute;dos</li>
+  <li><span class="highlight-red">${SCHOOL_ICONS[1]} Berserker</span> &mdash; School da F&uacute;ria Controlada</li>
+  <li><span class="highlight-purple">${SCHOOL_ICONS[2]} Valkyrie</span> &mdash; School das Guerreiras Celestes</li>
 </ul>
-<p>Five students from each school took a final sword skill test. The problem? Some students arrived with <span class="highlight">years of prior experience</span> &mdash; and that\x27s not a credit to the school!</p>
+<p>Cinco alunos de cada school fizeram um teste final de skill com espada. O problema? Alguns alunos j&aacute; chegaram com <span class="highlight">anos de experience pr&eacute;via</span> &mdash; e isso n&atilde;o &eacute; m&eacute;rito da school!</p>
 
-${dlg('thor','&#9889; Thorment','Simple! Compare the final means and done. Einherjar crushes it &mdash; look at the numbers!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Easy, Thorment. The Einherjar already had more experience <em>before</em> entering the school. Comparing raw means would be like comparing runners who started from different points. We need <strong>ANCOVA</strong> &mdash; it removes the initial advantage and shows the <em>pure</em> effect of each school.')}
-${dlg('corvo','&#129429; Muninn whispers:','<strong>ANCOVA</strong> = Analysis of Covariance. It combines ANOVA with regression to control pre-existing variables (covariates), revealing the net effect of the treatment.')}
+${dlg('thor','&#9889; Thorment','Simple! Compara as m&eacute;dias finais e pronto. Einherjar arrebenta &mdash; olha os n&uacute;meros!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Easy, Thorment. Os Einherjar j&aacute; tinham mais experience <em>antes</em> de entrar na school. Comparar m&eacute;dias brutas seria como comparar corredores que largaram de pontos diferentes. Precisamos de <strong>ANCOVA</strong> &mdash; ela remove a vantagem inicial e mostra o efeito <em>puro</em> de cada school.')}
+${dlg('corvo','&#129429; Muninn whispers:','<strong>ANCOVA</strong> = Analysis of Covariance. Combina ANOVA com regress&atilde;o para controlar vari&aacute;veis pr&eacute;-existentes (covari&aacute;veis), revelando o efeito l&iacute;quido do tratamento.')}
 
-<p style="margin-top:16px;">DV: <span class="highlight">Final skill score</span> (0&ndash;100)<br>
-IV: <span class="highlight">School</span> (3 groups)<br>
-Covariate: <span class="highlight">Years of prior experience</span></p>
+<p style="margin-top:16px;">VD: <span class="highlight">Score final de skill</span> (0&ndash;100)<br>
+VI: <span class="highlight">School</span> (3 grupos)<br>
+Covariate: <span class="highlight">Anos de experience pr&eacute;via</span></p>
 `;
 
   // ==== STEP 1: WHAT IS ANCOVA ====
   case 1: return `
 <div class="step-title">&#128300; Step 1 &mdash; What Is ANCOVA?</div>
-<p><strong>ANCOVA = ANOVA + Regression.</strong> The idea is ingeniously simple: before comparing the groups, ANCOVA <em>removes</em> the influence of a continuous variable (the covariate) on the DV.</p>
+<p><strong>ANCOVA = ANOVA + Regress&atilde;o.</strong> A ideia &eacute; engenhosamente simples: antes de comparar os grupos, a ANCOVA <em>remove</em> a influ&ecirc;ncia de uma vari&aacute;vel cont&iacute;nua (a covariate) sobre a VD.</p>
 
 <div class="concept-box">
   <h4>&#127859; The Recipe Metaphor</h4>
-  <p>Imagine you want to compare three mead recipes. However, each brewer used honey of different quality. ANCOVA &ldquo;equalizes&rdquo; the honey &mdash; as if everyone started with the same ingredient &mdash; and then compares the recipes for real.</p>
+  <p>Imagine que voc&ecirc; quer comparar tr&ecirc;s receitas de hidromel. Por&eacute;m, cada cervejeiro usou mel de qualidade diferente. A ANCOVA &ldquo;equaliza&rdquo; o mel &mdash; como se todos tivessem partido do mesmo ingrediente &mdash; e a&iacute; compara as receitas de verdade.</p>
 </div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','ANCOVA is the <strong>purification of variance</strong>. It extracts from the DV everything that the covariate explains, and only then tests whether the groups differ in what remains &mdash; the clean part.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','ANCOVA &eacute; a <strong>purifica&ccedil;&atilde;o da variance</strong>. Ela extrai da VD tudo que a covariate explica, e s&oacute; ent&atilde;o testa se os grupos diferem no que sobrou &mdash; a parte limpa.')}
 
 <div class="formula">
   <div class="formula-label">Conceptual Model</div>
   Y<sub>ij</sub> = &mu; + &tau;<sub>j</sub> + &beta;(X<sub>ij</sub> &minus; X&#772;) + &epsilon;<sub>ij</sub>
 </div>
 
-<p>Where:</p>
+<p>Onde:</p>
 <ul style="margin:8px 0 8px 24px;">
-  <li><strong>Y<sub>ij</sub></strong> = score of student <em>i</em> in group <em>j</em></li>
-  <li><strong>&mu;</strong> = grand mean</li>
-  <li><strong>&tau;<sub>j</sub></strong> = group effect (school)</li>
-  <li><strong>&beta;</strong> = covariate slope (regression)</li>
-  <li><strong>X<sub>ij</sub> &minus; X&#772;</strong> = centered covariate</li>
-  <li><strong>&epsilon;<sub>ij</sub></strong> = residual error</li>
+  <li><strong>Y<sub>ij</sub></strong> = pontua&ccedil;&atilde;o do aluno <em>i</em> no grupo <em>j</em></li>
+  <li><strong>&mu;</strong> = m&eacute;dia geral</li>
+  <li><strong>&tau;<sub>j</sub></strong> = efeito do grupo (school)</li>
+  <li><strong>&beta;</strong> = slope da covariate (regress&atilde;o)</li>
+  <li><strong>X<sub>ij</sub> &minus; X&#772;</strong> = covariate centrada</li>
+  <li><strong>&epsilon;<sub>ij</sub></strong> = erro residual</li>
 </ul>
 
-${dlg('corvo','&#129429; Muninn whispers:','ANCOVA partitions the variance into three sources: (1) variance explained by the covariate, (2) between-group variance after adjustment, and (3) residual error. The covariate &ldquo;steals&rdquo; variance from the error, increasing the test\x27s power.')}
+${dlg('corvo','&#129429; Muninn whispers:','A ANCOVA particiona a variance em tr&ecirc;s fontes: (1) variance explicada pela covariate, (2) variance entre grupos ap&oacute;s ajuste, e (3) erro residual. A covariate &ldquo;rouba&rdquo; variance do erro, aumentando o poder do teste.')}
 `;
 
   // ==== STEP 2: WHEN TO USE ====
@@ -492,58 +492,58 @@ ${dlg('corvo','&#129429; Muninn whispers:','ANCOVA partitions the variance into 
 <div class="step-title">&#128204; Step 2 &mdash; When to Use ANCOVA?</div>
 
 <div class="concept-box">
-  <h4>&#9989; Use ANCOVA when:</h4>
+  <h4>&#9989; Use ANCOVA quando:</h4>
   <ul class="checklist">
-    <li>Groups differ on a pre-existing variable (e.g., experience, age, pre-test)</li>
-    <li>You want to <strong>increase statistical power</strong> by reducing error variance</li>
-    <li>The covariate is continuous and measured <em>before</em> the treatment</li>
-    <li>The covariate&ndash;DV relationship is linear</li>
+    <li>Os grupos diferem em uma vari&aacute;vel pr&eacute;-existente (ex: experience, idade, pr&eacute;-teste)</li>
+    <li>Quer <strong>aumentar o poder estat&iacute;stico</strong> reduzindo a variance de erro</li>
+    <li>A covariate &eacute; cont&iacute;nua e medida <em>antes</em> do tratamento</li>
+    <li>A rela&ccedil;&atilde;o covariate&ndash;VD &eacute; linear</li>
   </ul>
 </div>
 
-${dlg('thor','&#9889; Thorment','If randomization failed, ANCOVA saves the day, right? I throw the covariate in and done!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','<strong>Careful!</strong> ANCOVA is not a band-aid for failed randomization. If the groups differ systematically on unmeasured variables, ANCOVA does not fix that. It controls <em>only</em> what you include as a covariate.')}
+${dlg('thor','&#9889; Thorment','Se a randomiza&ccedil;&atilde;o falhou, ANCOVA salva, certo? Jogo a covariate l&aacute; e pronto!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','<strong>Careful!</strong> ANCOVA n&atilde;o &eacute; band-aid para randomiza&ccedil;&atilde;o falha. Se os grupos diferem sistematicamente em vari&aacute;veis n&atilde;o medidas, a ANCOVA n&atilde;o corrige isso. Ela controla <em>apenas</em> o que voc&ecirc; inclui como covariate.')}
 
 <div class="concept-box">
   <h4>&#9888;&#65039; Important Caveats</h4>
   <ul>
-    <li style="margin-bottom:8px;"><strong>Does not fix failed randomization</strong> &mdash; unmeasured variables keep confounding</li>
-    <li style="margin-bottom:8px;"><strong>Covariate must be measured before the treatment</strong> &mdash; if affected by the treatment, it becomes a mediator, not a covariate</li>
-    <li style="margin-bottom:8px;"><strong>Covariate must not be an effect of the treatment</strong> &mdash; otherwise, you remove part of the effect you want to measure!</li>
+    <li style="margin-bottom:8px;"><strong>No corrige randomiza&ccedil;&atilde;o falha</strong> &mdash; vari&aacute;veis n&atilde;o medidas continuam confundindo</li>
+    <li style="margin-bottom:8px;"><strong>Covariate deve ser medida antes do tratamento</strong> &mdash; se afetada pelo tratamento, vira mediadora, n&atilde;o covariate</li>
+    <li style="margin-bottom:8px;"><strong>Covariate n&atilde;o deve ser efeito do tratamento</strong> &mdash; caso contr&aacute;rio, voc&ecirc; remove parte do efeito que quer medir!</li>
   </ul>
 </div>
 
-${dlg('corvo','&#129429; Muninn whispers:','ANCOVA in true experiments (with randomization): increases power. ANCOVA in quasi-experiments (without randomization): offers partial statistical control, but is not equivalent to experimental control.')}
+${dlg('corvo','&#129429; Muninn whispers:','ANCOVA em experimentos verdadeiros (com randomiza&ccedil;&atilde;o): aumenta poder. ANCOVA em quasi-experimentos (sem randomiza&ccedil;&atilde;o): oferece controle estat&iacute;stico parcial, mas n&atilde;o equivale a controle experimental.')}
 
-<p style="margin-top:16px;"><span class="highlight">Odin\x27s rule of thumb:</span> If the covariate correlates strongly with the DV (r &gt; 0.30), ANCOVA will substantially increase power. If the correlation is weak, the gain is minimal &mdash; and you lose 1 degree of freedom.</p>
+<p style="margin-top:16px;"><span class="highlight">Rule of thumb de Odin:</span> Se a covariate correlaciona fortemente com a VD (r &gt; 0.30), ANCOVA vai aumentar poder substancialmente. Se a correla&ccedil;&atilde;o &eacute; fraca, o ganho &eacute; m&iacute;nimo &mdash; e voc&ecirc; perde 1 grau de liberdade.</p>
 `;
 
   // ==== STEP 3: ASSUMPTIONS ====
   case 3: return `
-<div class="step-title">&#128220; Step 3 &mdash; ANCOVA Assumptions</div>
-<p>ANCOVA inherits all the assumptions of ANOVA <em>and</em> adds its own assumptions from regression:</p>
+<div class="step-title">&#128220; Step 3 &mdash; Assumptions da ANCOVA</div>
+<p>ANCOVA herda todos os pressupostos da ANOVA <em>e</em> adiciona pressupostos pr&oacute;prios da regress&atilde;o:</p>
 
 <div class="concept-box">
-  <h4>Assumptions inherited from ANOVA</h4>
+  <h4>Assumptions herdados da ANOVA</h4>
   <ul class="checklist">
-    <li>Independence of observations</li>
-    <li>Normality of residuals (within each group)</li>
-    <li>Homogeneity of variances (Levene)</li>
+    <li>Independence das observa&ccedil;&otilde;es</li>
+    <li>Normality dos residuals (dentro de cada grupo)</li>
+    <li>Homogeneidade de variances (Levene)</li>
   </ul>
 </div>
 
 <div class="concept-box" style="border-color: var(--gold);">
-  <h4 style="color: var(--thor-red);">&#9889; Assumptions EXCLUSIVE to ANCOVA</h4>
+  <h4 style="color: var(--thor-red);">&#9889; Assumptions EXCLUSIVOS da ANCOVA</h4>
   <ul class="checklist">
-    <li><strong>Linearity</strong> &mdash; The relationship between covariate and DV must be linear</li>
-    <li><strong>Homogeneity of regression slopes</strong> &mdash; The regression lines must be <em>parallel</em> across groups (CRUCIAL!)</li>
-    <li><strong>Covariate measured without error</strong> &mdash; Measurement errors bias the correction</li>
-    <li><strong>Covariate independent of the treatment</strong> &mdash; The treatment must not affect the covariate</li>
+    <li><strong>Linearity</strong> &mdash; Rela&ccedil;&atilde;o entre covariate e VD deve ser linear</li>
+    <li><strong>Homogeneidade de slopes de regress&atilde;o</strong> &mdash; As retas de regress&atilde;o devem ser <em>paralelas</em> entre grupos (CRUCIAL!)</li>
+    <li><strong>Covariate medida sem erro</strong> &mdash; Errors de medi&ccedil;&atilde;o enviesam a corre&ccedil;&atilde;o</li>
+    <li><strong>Covariate independente do tratamento</strong> &mdash; O tratamento n&atilde;o deve afetar a covariate</li>
   </ul>
 </div>
 
-${dlg('thor','&#9889; Thorment','Too many assumptions! I\x27ll ignore them all and just run the test.')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Violating <strong>homogeneity of slopes</strong> is fatal. If the lines are not parallel, the covariate adjustment works differently for each group &mdash; and the adjusted means become meaningless. We will see this in detail in the next step.')}
+${dlg('thor','&#9889; Thorment','Assumptions demais! Ignoro todos e rodo logo o teste.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Violar a <strong>homogeneidade de slopes</strong> &eacute; fatal. Se as retas n&atilde;o s&atilde;o paralelas, o ajuste da covariate funciona diferente para cada grupo &mdash; e as m&eacute;dias ajustadas ficam sem sentido. Vamos ver isso em detalhe no pr&oacute;ximo passo.')}
 
 <p><strong>How to verify?</strong></p>
 <table class="calc-table">
@@ -551,28 +551,28 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Violating <strong>hom
     <tr><th>Assumption</th><th>Test / Verification</th></tr>
   </thead>
   <tbody>
-    <tr><td>Linearity</td><td>Scatterplot covariate &times; DV per group</td></tr>
-    <tr><td>Homogeneity of slopes</td><td>Group &times; Covariate interaction (must be n.s.)</td></tr>
-    <tr><td>Normality</td><td>Shapiro-Wilk on residuals</td></tr>
-    <tr><td>Homogeneity of variances</td><td>Levene\x27s Test</td></tr>
-    <tr><td>Covariate independence</td><td>ANOVA of the covariate across groups (ideally n.s. in experiments)</td></tr>
+    <tr><td>Linearity</td><td>Scatterplot covariate &times; VD por grupo</td></tr>
+    <tr><td>Homogeneidade de slopes</td><td>Intera&ccedil;&atilde;o Grupo &times; Covariate (deve ser n.s.)</td></tr>
+    <tr><td>Normality</td><td>Shapiro-Wilk nos residuals</td></tr>
+    <tr><td>Homogeneidade de variances</td><td>Levene's Test</td></tr>
+    <tr><td>Independence da covariate</td><td>ANOVA da covariate entre grupos (idealmente n.s. em experimentos)</td></tr>
   </tbody>
 </table>
 
-${dlg('corvo','&#129429; Muninn whispers:','If the covariate already differs between groups (as in our case &mdash; quasi-experiment), ANCOVA still works, but causal interpretation is weaker. In true experiments with randomization, the covariate should not differ significantly between groups.')}
+${dlg('corvo','&#129429; Muninn whispers:','Se a covariate j&aacute; difere entre os grupos (como no nosso caso &mdash; quasi-experimento), ANCOVA ainda funciona, mas a interpreta&ccedil;&atilde;o causal &eacute; mais fr&aacute;gil. Em experimentos verdadeiros com randomiza&ccedil;&atilde;o, a covariate deveria n&atilde;o diferir significantmente entre grupos.')}
 `;
 
   // ==== STEP 4: HOMOGENEITY OF SLOPES ====
   case 4: return `
 <div class="step-title">&#128208; Step 4 &mdash; Homogeneity of Slopes</div>
-<p>This is the <strong>most critical</strong> and exclusive assumption of ANCOVA. If the regression slopes differ between groups, ANCOVA is inappropriate.</p>
+<p>Este &eacute; o pressuposto <strong>mais cr&iacute;tico</strong> e exclusivo da ANCOVA. Se as slopes das retas de regress&atilde;o diferem entre os grupos, a ANCOVA &eacute; inapropriada.</p>
 
-<div class="step-subtitle">What does &ldquo;homogeneous slopes&rdquo; mean?</div>
-<p>The relationship between the covariate (experience) and the DV (skill) must be <strong>the same across all groups</strong>. Each extra year of experience should &ldquo;be worth&rdquo; the same skill gain, regardless of the school.</p>
+<div class="step-subtitle">O que significa &ldquo;slopes homog&ecirc;neas&rdquo;?</div>
+<p>A rela&ccedil;&atilde;o entre a covariate (experience) e a VD (skill) deve ser <strong>a mesma em todos os grupos</strong>. Cada ano extra de experience deve &ldquo;valer&rdquo; o mesmo ganho de skill, n&atilde;o importa a school.</p>
 
 <div class="svg-container" id="slopeSVG"></div>
 
-<p><strong>Estimated slopes by group:</strong></p>
+<p><strong>Slopes estimadas por grupo:</strong></p>
 <table class="calc-table">
   <thead>
     <tr><th>School</th><th>Slope (b)</th></tr>
@@ -585,25 +585,25 @@ ${dlg('corvo','&#129429; Muninn whispers:','If the covariate already differs bet
   </tbody>
 </table>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','The slopes are reasonably similar &mdash; the lines are nearly parallel. Good sign! If they were very different, each school would &ldquo;leverage&rdquo; experience differently, and ANCOVA would not make sense.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','As slopes s&atilde;o razoavelmente parecidas &mdash; as retas s&atilde;o quase paralelas. Bom sinal! Se fossem muito diferentes, cada school &ldquo;aproveitaria&rdquo; a experience de forma distinta, e a ANCOVA n&atilde;o faria sentido.')}
 
 <div class="concept-box" style="border-color: var(--thor-red);">
-  <h4 style="color: var(--thor-red);">&#9888;&#65039; If the slopes are NOT homogeneous:</h4>
+  <h4 style="color: var(--thor-red);">&#9888;&#65039; Se as slopes N&Atilde;O forem homog&ecirc;neas:</h4>
   <ul>
-    <li>The Group &times; Covariate interaction is significant</li>
-    <li>ANCOVA is inappropriate &mdash; the adjusted means are meaningless</li>
-    <li>Alternative: use <strong>moderation analysis</strong> (the covariate moderates the group effect)</li>
-    <li>Or: Johnson-Neyman procedure to identify regions of significance</li>
+    <li>A intera&ccedil;&atilde;o Grupo &times; Covariate &eacute; significant</li>
+    <li>ANCOVA &eacute; inapropriada &mdash; as m&eacute;dias ajustadas n&atilde;o t&ecirc;m sentido</li>
+    <li>Alternativa: usar <strong>an&aacute;lise de modera&ccedil;&atilde;o</strong> (a covariate modera o efeito do grupo)</li>
+    <li>Ou: Johnson-Neyman procedure para identificar regi&otilde;es de signific&acirc;ncia</li>
   </ul>
 </div>
 
-${dlg('corvo','&#129429; Muninn whispers:','Formal test: include the Group &times; Covariate interaction in the model. If the interaction F is n.s. (p &gt; .05), the assumption is upheld. Some authors use a more liberal criterion (p &gt; .10).')}
+${dlg('corvo','&#129429; Muninn whispers:','Teste formal: inclua a intera&ccedil;&atilde;o Grupo &times; Covariate no modelo. Se F da intera&ccedil;&atilde;o for n.s. (p &gt; .05), o pressuposto &eacute; sustentado. Alguns autores usam crit&eacute;rio mais liberal (p &gt; .10).')}
 `;
 
   // ==== STEP 5: THE DATA ====
   case 5: return `
 <div class="step-title">&#128202; Step 5 &mdash; The Data</div>
-<p>Here are the 15 apprentice warriors with their schools, years of prior experience (covariate), and final skill score (DV):</p>
+<p>Aqui est&atilde;o os 15 warriors-aprendizes com suas schools, anos de experience pr&eacute;via (covariate) e pontua&ccedil;&atilde;o final de skill (VD):</p>
 
 <table class="data-table">
   <thead>
@@ -613,7 +613,7 @@ ${dlg('corvo','&#129429; Muninn whispers:','Formal test: include the Group &time
     ${RAW.map((r,i) => `<tr>
       <td>${i+1}</td>
       <td style="color:${SCHOOL_COLORS[r.school]};">${SCHOOL_ICONS[r.school]} ${SCHOOLS[r.school]}</td>
-      <td>${r.xp} yrs</td>
+      <td>${r.xp} anos</td>
       <td>${r.skill}</td>
     </tr>`).join('')}
   </tbody>
@@ -627,54 +627,54 @@ ${dlg('corvo','&#129429; Muninn whispers:','Formal test: include the Group &time
   <tbody>
     ${SCHOOLS.map((s,i) => `<tr>
       <td style="color:${SCHOOL_COLORS[i]};">${SCHOOL_ICONS[i]} ${s}</td>
-      <td>${round2(groupMeanXP[i])} yrs</td>
+      <td>${round2(groupMeanXP[i])} anos</td>
       <td>${round2(groupMeanSkill[i])}</td>
     </tr>`).join('')}
     <tr class="mean-row">
       <td>Grand Mean</td>
-      <td>${round2(grandMeanXP)} yrs</td>
+      <td>${round2(grandMeanXP)} anos</td>
       <td>${round2(grandMeanSkill)}</td>
     </tr>
   </tbody>
 </table>
 
-${dlg('thor','&#9889; Thorment','Look at that! Einherjar with a mean of ${round2(groupMeanSkill[0])} versus Valkyrie with ${round2(groupMeanSkill[2])}. Case closed!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Look at the experience, Thorment: Einherjar have <strong>${round2(groupMeanXP[0])} years</strong> on average versus <strong>${round2(groupMeanXP[2])}</strong> for the Valkyries. Is the school good, or did the students arrive already prepared? ANCOVA will separate these effects.')}
+${dlg('thor','&#9889; Thorment','Olha a&iacute;! Einherjar com m&eacute;dia ${round2(groupMeanSkill[0])} contra Valkyrie com ${round2(groupMeanSkill[2])}. Caso encerrado!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Repara na experience, Thorment: Einherjar t&ecirc;m <strong>${round2(groupMeanXP[0])} anos</strong> de m&eacute;dia contra <strong>${round2(groupMeanXP[2])}</strong> das Valkyries. Ser&aacute; que a school &eacute; boa, ou os alunos j&aacute; chegaram prontos? A ANCOVA vai separar esses efeitos.')}
 
 <div class="svg-container" id="scatterRawSVG"></div>
 `;
 
   // ==== STEP 6: CONCEPTUAL CALCULATION ====
   case 6: return `
-<div class="step-title">&#9881;&#65039; Step 6 &mdash; Conceptual Calculation</div>
-<p>ANCOVA operates through three conceptual steps:</p>
+<div class="step-title">&#9881;&#65039; Step 6 &mdash; Calculation Conceitual</div>
+<p>A ANCOVA opera em tr&ecirc;s movimentos conceituais:</p>
 
 <div class="concept-box">
   <h4>Step 1: Pooled Regression (within-groups)</h4>
-  <p>Calculate the regression line Y &sim; X <strong>within each group</strong>, using a common (pooled) slope.</p>
+  <p>Calcula a reta de regress&atilde;o Y &sim; X <strong>dentro de cada grupo</strong>, usando uma slope comum (pooled).</p>
   <div class="formula">
     b<sub>within</sub> = SP<sub>within</sub> / SS<sub>X(within)</sub> = ${round2(Sxy_w)} / ${round2(Sxx_w)} = <span class="highlight">${round2(b_within)}</span>
   </div>
-  <p>Interpretation: for each extra year of experience, skill increases by <span class="highlight">${round2(b_within)} points</span>.</p>
+  <p>Interpreta&ccedil;&atilde;o: para cada ano extra de experience, a skill sobe <span class="highlight">${round2(b_within)} pontos</span>.</p>
 </div>
 
 <div class="concept-box">
-  <h4>Step 2: Compute Adjusted Residuals</h4>
-  <p>Remove from the DV the portion explained by the covariate:</p>
+  <h4>Movimento 2: Calcular Residuals Ajustados</h4>
+  <p>Remove da VD a parte que a covariate explica:</p>
   <div class="formula">
-    Y<sub>adjusted</sub> = Y<sub>observed</sub> &minus; b<sub>within</sub> &times; (X<sub>i</sub> &minus; X&#772;)
+    Y<sub>ajustado</sub> = Y<sub>observado</sub> &minus; b<sub>within</sub> &times; (X<sub>i</sub> &minus; X&#772;)
   </div>
-  <p>It is as if all warriors had the <em>same</em> experience (${round2(grandMeanXP)} years). The playing field is now level.</p>
+  <p>&Eacute; como se todos os warriors tivessem a <em>mesma</em> experience (${round2(grandMeanXP)} anos). O campo agora &eacute; nivelado.</p>
 </div>
 
 <div class="concept-box">
   <h4>Step 3: ANOVA on Adjusted Values</h4>
-  <p>Compare the groups using the <strong>adjusted means</strong>, not the raw ones.</p>
+  <p>Compara os grupos usando as <strong>m&eacute;dias ajustadas</strong>, n&atilde;o as brutas.</p>
 </div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Think of it this way: the covariate is like extra weight in some runners\x27 backpacks. ANCOVA removes the weight from everyone and sends them running again &mdash; then you see who is truly fast.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Pense assim: a covariate &eacute; como um peso extra na mochila de alguns corredores. A ANCOVA tira o peso de todos e manda correr de novo &mdash; a&iacute; voc&ecirc; v&ecirc; quem &eacute; r&aacute;pido de verdade.')}
 
-<div class="step-subtitle">Sums of Squares</div>
+<div class="step-subtitle">Somas de Quadrados</div>
 <table class="calc-table">
   <thead>
     <tr><th>Component</th><th>Formula</th><th>Value</th></tr>
@@ -682,27 +682,27 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Think of it this way:
   <tbody>
     <tr><td>SS<sub>Total</sub></td><td>&Sigma;(Y<sub>i</sub> &minus; Y&#772;)&sup2;</td><td>${round2(SS_total)}</td></tr>
     <tr><td>SS<sub>Covariate</sub></td><td>(SP<sub>w</sub>)&sup2; / SS<sub>Xw</sub></td><td>${round2(SS_covariate)}</td></tr>
-    <tr><td>SS<sub>Groups(adj)</sub></td><td>SS<sub>error(reduced)</sub> &minus; SS<sub>error(full)</sub></td><td>${round2(SS_groups_adj)}</td></tr>
+    <tr><td>SS<sub>Grupos(adj)</sub></td><td>SS<sub>erro(reduzido)</sub> &minus; SS<sub>erro(completo)</sub></td><td>${round2(SS_groups_adj)}</td></tr>
     <tr><td>SS<sub>Error(ANCOVA)</sub></td><td>SS<sub>Yw</sub> &minus; (SP<sub>w</sub>)&sup2;/SS<sub>Xw</sub></td><td>${round2(SS_error_ancova)}</td></tr>
   </tbody>
 </table>
 
-${dlg('corvo','&#129429; Muninn whispers:','Note that SS<sub>Error(ANCOVA)</sub> = ${round2(SS_error_ancova)} is <strong>smaller</strong> than SS<sub>Error(ANOVA)</sub> = ${round2(SS_within_anova)}. The covariate &ldquo;absorbed&rdquo; ${round2(SS_within_anova - SS_error_ancova)} points of variance that was previously error. More power!')}
+${dlg('corvo','&#129429; Muninn whispers:','Note que SS<sub>Error(ANCOVA)</sub> = ${round2(SS_error_ancova)} &eacute; <strong>menor</strong> que SS<sub>Error(ANOVA)</sub> = ${round2(SS_within_anova)}. A covariate &ldquo;absorveu&rdquo; ${round2(SS_within_anova - SS_error_ancova)} pontos de variance que antes era erro. Mais poder!')}
 `;
 
   // ==== STEP 7: ADJUSTED MEANS ====
   case 7: return `
 <div class="step-title">&#127942; Step 7 &mdash; Adjusted Means: The Revelation</div>
-<p>The <strong>adjusted means</strong> (adjusted means / estimated marginal means) are the star product of ANCOVA. They show what each group\x27s mean would be <em>if everyone had the same covariate</em>.</p>
+<p>As <strong>m&eacute;dias ajustadas</strong> (adjusted means / estimated marginal means) s&atilde;o o produto-estrela da ANCOVA. Elas mostram qual seria a m&eacute;dia de cada grupo <em>se todos tivessem a mesma covariate</em>.</p>
 
 <div class="formula">
-  <div class="formula-label">Adjusted Mean Formula</div>
+  <div class="formula-label">Formula da Mean Adjusted</div>
   Y&#772;<sub>adj,j</sub> = Y&#772;<sub>j</sub> &minus; b<sub>within</sub> &times; (X&#772;<sub>j</sub> &minus; X&#772;)
 </div>
 
 <table class="data-table">
   <thead>
-    <tr><th>School</th><th>Raw Mean</th><th>Adjustment</th><th>Adjusted Mean</th><th>Change</th></tr>
+    <tr><th>School</th><th>Mean Raw</th><th>Ajuste</th><th>Mean Adjusted</th><th>Change</th></tr>
   </thead>
   <tbody>
     ${SCHOOLS.map((s,i) => {
@@ -722,17 +722,17 @@ ${dlg('corvo','&#129429; Muninn whispers:','Note that SS<sub>Error(ANCOVA)</sub>
 
 <div id="adjustedBars" class="bar-container"></div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','See the reversal! The Valkyries, who had the <em>worst</em> raw mean, move up after adjustment. The Einherjar, with the best raw mean, move down. Their advantage was largely <strong>prior experience</strong>, not the school!')}
-${dlg('thor','&#9889; Thorment','Wait... so the ranking changed?! That\x27s not fair!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','On the contrary &mdash; <em>now</em> it\x27s fair. ANCOVA leveled the playing field.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Veja a invers&atilde;o! As Valkyries, que tinham a <em>pior</em> m&eacute;dia bruta, sobem ap&oacute;s o ajuste. Os Einherjar, com a melhor m&eacute;dia bruta, descem. A vantagem deles era em grande parte a <strong>experience pr&eacute;via</strong>, n&atilde;o a school!')}
+${dlg('thor','&#9889; Thorment','Espera a&iacute;... ent&atilde;o o ranking mudou?! Isso n&atilde;o &eacute; justo!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Pelo contr&aacute;rio &mdash; <em>agora</em> &eacute; justo. A ANCOVA nivelou o campo.')}
 `;
 
   // ==== STEP 8: ANCOVA TABLE ====
   case 8: return `
 <div class="step-title">&#128202; Step 8 &mdash; The ANCOVA Table</div>
-<p>Let\x27s build the full ANCOVA table and compare it with the simple ANOVA:</p>
+<p>Vamos montar a tabela de ANCOVA completa e compar&aacute;-la com a ANOVA simples:</p>
 
-<div class="step-subtitle">ANCOVA Table</div>
+<div class="step-subtitle">Tabela ANCOVA</div>
 <table class="anova-table">
   <thead>
     <tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F</th><th>p</th><th>&eta;<sub>p</sub>&sup2;</th></tr>
@@ -748,7 +748,7 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','On the contrary &mdas
       <td>${round4(eta_p_cov)}</td>
     </tr>
     <tr>
-      <td>School (adjusted)</td>
+      <td>School (ajustada)</td>
       <td>${round2(SS_groups_adj)}</td>
       <td>${df_between}</td>
       <td>${round2(MS_groups_adj)}</td>
@@ -772,7 +772,7 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','On the contrary &mdas
   </tbody>
 </table>
 
-<div class="step-subtitle">Comparison with Simple ANOVA (no covariate)</div>
+<div class="step-subtitle">Comparison com Simple ANOVA (sem covariate)</div>
 <table class="anova-table">
   <thead>
     <tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F</th></tr>
@@ -797,105 +797,105 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','On the contrary &mdas
 
 <div id="ssCompareStack"></div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Compare the two MS<sub>Error</sub> values: ANOVA = ${round2(MS_within_anova)}, ANCOVA = ${round2(MS_error_ancova)}. The covariate reduced the error by ${round2(((MS_within_anova - MS_error_ancova)/MS_within_anova)*100)}%! That is the power of ANCOVA: less noise, more signal.')}
-${dlg('corvo','&#129429; Muninn whispers:','In ANCOVA, the error df drops from ${df_within_anova} to ${df_error_ancova} (loses 1 df for the covariate). But the reduction in MS<sub>Error</sub> more than compensates for that loss.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Compare os dois MS<sub>Error</sub>: ANOVA = ${round2(MS_within_anova)}, ANCOVA = ${round2(MS_error_ancova)}. A covariate reduziu o erro em ${round2(((MS_within_anova - MS_error_ancova)/MS_within_anova)*100)}%! Isso &eacute; o poder da ANCOVA: menos ru&iacute;do, mais sinal.')}
+${dlg('corvo','&#129429; Muninn whispers:','Na ANCOVA, o df do erro cai de ${df_within_anova} para ${df_error_ancova} (perde 1 df pela covariate). Mas a redu&ccedil;&atilde;o no MS<sub>Error</sub> mais que compensa essa perda.')}
 `;
 
   // ==== STEP 9: GLM CONNECTION ====
   case 9: return `
 <div class="step-title">&#128301; Step 9 &mdash; Connection to the GLM</div>
-<p>ANCOVA is not a &ldquo;separate&rdquo; test &mdash; it is a special case of the <strong>General Linear Model</strong> (GLM). ANOVA and Regression are also special cases of the same model.</p>
+<p>ANCOVA n&atilde;o &eacute; um teste &ldquo;&agrave; parte&rdquo; &mdash; &eacute; um caso especial do <strong>Modelo Linear Geral</strong> (GLM). ANOVA e Regress&atilde;o s&atilde;o tamb&eacute;m casos especiais do mesmo modelo.</p>
 
 <div class="glm-box">
-  <div class="formula-label">ANOVA (groups only)</div>
+  <div class="formula-label">ANOVA (s&oacute; grupos)</div>
   <div class="glm-eq">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>D<sub>1</sub> + &beta;<sub>2</sub>D<sub>2</sub> + &epsilon;</div>
-  <div class="glm-desc">D<sub>1</sub>, D<sub>2</sub> = group dummies (k&minus;1 = 2)</div>
+  <div class="glm-desc">D<sub>1</sub>, D<sub>2</sub> = dummies de grupo (k&minus;1 = 2)</div>
 </div>
 
 <div class="glm-box" style="border-color: var(--gold);">
-  <div class="formula-label">Regression (covariate only)</div>
+  <div class="formula-label">Regress&atilde;o (s&oacute; covariate)</div>
   <div class="glm-eq">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>X + &epsilon;</div>
-  <div class="glm-desc">X = continuous covariate</div>
+  <div class="glm-desc">X = covariate cont&iacute;nua</div>
 </div>
 
 <div class="glm-box" style="border-color: var(--success);">
-  <div class="formula-label" style="color: var(--success);">ANCOVA (groups + covariate)</div>
+  <div class="formula-label" style="color: var(--success);">ANCOVA (grupos + covariate)</div>
   <div class="glm-eq" style="font-size:1.4rem;">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>X + &beta;<sub>2</sub>D<sub>1</sub> + &beta;<sub>3</sub>D<sub>2</sub> + &epsilon;</div>
-  <div class="glm-desc">Combines continuous regression with categorical factors</div>
+  <div class="glm-desc">Combina regress&atilde;o cont&iacute;nua com fatores categ&oacute;ricos</div>
 </div>
 
 <div class="svg-container" id="glmDiagramSVG"></div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','At the core, ANOVA, regression, and ANCOVA are the <em>same model</em>. The difference is the type of predictor: categorical (ANOVA), continuous (regression), or both (ANCOVA). The GLM unifies everything.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No fundo, ANOVA, regress&atilde;o e ANCOVA s&atilde;o o <em>mesmo modelo</em>. A diferen&ccedil;a &eacute; o tipo de preditor: categ&oacute;rico (ANOVA), cont&iacute;nuo (regress&atilde;o), ou ambos (ANCOVA). O GLM unifica tudo.')}
 
 <div class="concept-box">
-  <h4>In our example:</h4>
+  <h4>No nosso exemplo:</h4>
   <div class="formula">
     Skill = &beta;<sub>0</sub> + ${round2(b_within)} &times; Experience + &beta;<sub>2</sub> &times; D<sub>Einherjar</sub> + &beta;<sub>3</sub> &times; D<sub>Berserker</sub> + &epsilon;
   </div>
-  <p style="margin-top:8px;">Where D<sub>Einherjar</sub> = 1 if Einherjar, 0 otherwise (Valkyrie is the reference group).</p>
-  <p>The coefficients &beta;<sub>2</sub> and &beta;<sub>3</sub> represent the <strong>adjusted</strong> difference of each school relative to Valkyries, controlling for experience.</p>
+  <p style="margin-top:8px;">Onde D<sub>Einherjar</sub> = 1 se Einherjar, 0 caso contr&aacute;rio (Valkyrie &eacute; o grupo de refer&ecirc;ncia).</p>
+  <p>Os coeficientes &beta;<sub>2</sub> e &beta;<sub>3</sub> representam a diferen&ccedil;a <strong>ajustada</strong> de cada school em rela&ccedil;&atilde;o &agrave;s Valkyries, controlando a experience.</p>
 </div>
 
-${dlg('corvo','&#129429; Muninn whispers:','Thinking in GLM terms helps understand extensions: MANCOVA (multiple DVs), ANCOVA with multiple covariates, or models with group &times; covariate interactions. It is all the same framework.')}
+${dlg('corvo','&#129429; Muninn whispers:','Pensar em termos de GLM ajuda a entender extens&otilde;es: MANCOVA (m&uacute;ltiplas VDs), ANCOVA com m&uacute;ltiplas covari&aacute;veis, ou modelos com intera&ccedil;&otilde;es grupo &times; covariate. Tudo &eacute; o mesmo framework.')}
 
-${dlg('thor','&#9889; Thorment','If everything is the same thing, why so many names?')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','History, Thorment. Fisher developed ANOVA for agricultural experiments, Galton did regression for heredity. Only later did they realize it was the same math. The GLM unifies it all.')}
+${dlg('thor','&#9889; Thorment','Se tudo &eacute; a mesma coisa, por que tantos nomes?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Hist&oacute;ria, Thorment. Fisher desenvolveu ANOVA para experimentos agr&iacute;colas, Galton fez regress&atilde;o para hereditariedade. S&oacute; depois perceberam que eram a mesma matem&aacute;tica. O GLM unifica.')}
 `;
 
   // ==== STEP 10: APA REPORT ====
   case 10: return `
 <div class="step-title">&#128221; Step 10 &mdash; APA Format Report</div>
-<p>Reporting ANCOVA in a paper demands precision. The reader needs to know: (1) the covariate and its relationship with the DV, (2) that assumptions were verified, (3) the main result with adjusted means.</p>
+<p>Relatar ANCOVA em um paper exige precis&atilde;o. O leitor precisa saber: (1) a covariate e sua rela&ccedil;&atilde;o com a VD, (2) que os pressupostos foram verificados, (3) o resultado principal com m&eacute;dias ajustadas.</p>
 
 <div class="apa-box">
   <div class="apa-label">&#128221; APA Report &mdash; Covariate</div>
-  <p>An ANCOVA was conducted to compare sword skill across three schools (Einherjar, Berserker, Valkyrie), controlling for years of prior experience as a covariate. The assumption of homogeneity of regression slopes was upheld, <em>F</em>(2, 9) &lt; 1, <em>p</em> &gt; .05.</p>
+  <p>Uma ANCOVA foi conduzida para comparar a skill com espada entre tr&ecirc;s schools (Einherjar, Berserker, Valkyrie), controlando para anos de experience pr&eacute;via como covariate. O pressuposto de homogeneidade das slopes de regress&atilde;o foi sustentado, <em>F</em>(2, 9) &lt; 1, <em>p</em> &gt; .05.</p>
 </div>
 
 <div class="apa-box">
-  <div class="apa-label">&#128221; APA Report &mdash; Significant Covariate</div>
-  <p>The covariate (experience) was significantly related to skill, <em>F</em>(1, ${df_error_ancova}) = ${round2(F_covariate)}, <em>p</em> &lt; .001, <em>&eta;</em><sub>p</sub><sup>2</sup> = ${round4(eta_p_cov)}.</p>
+  <div class="apa-label">&#128221; APA Report &mdash; Covariate Significativa</div>
+  <p>A covariate (experience) foi significantmente relacionada &agrave; skill, <em>F</em>(1, ${df_error_ancova}) = ${round2(F_covariate)}, <em>p</em> &lt; .001, <em>&eta;</em><sub>p</sub><sup>2</sup> = ${round4(eta_p_cov)}.</p>
 </div>
 
 <div class="apa-box">
-  <div class="apa-label">&#128221; APA Report &mdash; Main Effect</div>
-  <p>After controlling for prior experience, ${F_ancova > Fcrit_2_11 ? 'there was a significant effect of school on skill' : 'there was no significant effect of school on skill'}, <em>F</em>(${df_between}, ${df_error_ancova}) = ${round2(F_ancova)}, <em>p</em> ${F_ancova > Fcrit_2_11 ? '< .05' : '> .05'}, <em>&eta;</em><sub>p</sub><sup>2</sup> = ${round4(eta_p_groups)}.</p>
+  <div class="apa-label">&#128221; APA Report &mdash; Efeito Principal</div>
+  <p>Ap&oacute;s controlar para a experience pr&eacute;via, ${F_ancova > Fcrit_2_11 ? 'houve um efeito significant da school sobre a skill' : 'n&atilde;o houve efeito significant da school sobre a skill'}, <em>F</em>(${df_between}, ${df_error_ancova}) = ${round2(F_ancova)}, <em>p</em> ${F_ancova > Fcrit_2_11 ? '< .05' : '> .05'}, <em>&eta;</em><sub>p</sub><sup>2</sup> = ${round4(eta_p_groups)}.</p>
 </div>
 
 <div class="apa-box">
   <div class="apa-label">&#128221; APA Report &mdash; Adjusted Means</div>
-  <p>The adjusted means were: Einherjar, <em>M</em><sub>adj</sub> = ${round2(adjMeans[0])}; Berserker, <em>M</em><sub>adj</sub> = ${round2(adjMeans[1])}; Valkyrie, <em>M</em><sub>adj</sub> = ${round2(adjMeans[2])}.</p>
+  <p>As m&eacute;dias ajustadas foram: Einherjar, <em>M</em><sub>adj</sub> = ${round2(adjMeans[0])}; Berserker, <em>M</em><sub>adj</sub> = ${round2(adjMeans[1])}; Valkyrie, <em>M</em><sub>adj</sub> = ${round2(adjMeans[2])}.</p>
 </div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Always report the <strong>adjusted</strong> means (adjusted / estimated marginal means), not the raw ones. And mention exactly which covariate was controlled. Without this, the reader cannot interpret the results.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Sempre reporte as m&eacute;dias <strong>ajustadas</strong> (adjusted / estimated marginal means), n&atilde;o as brutas. E mencione exatamente qual covariate foi controlada. Sem isso, o leitor n&atilde;o consegue interpretar.')}
 
 <div class="concept-box">
   <h4>Report Checklist</h4>
   <ul class="checklist">
-    <li>Identify the covariate and justify its inclusion</li>
-    <li>Mention verification of homogeneity of slopes</li>
-    <li>Report F and p for the covariate</li>
-    <li>Report F, df, p, and &eta;<sub>p</sub><sup>2</sup> for the main effect</li>
-    <li>Present adjusted means (with SE or 95% CI)</li>
-    <li>If significant: post-hoc with Bonferroni correction on adjusted means</li>
+    <li>Identificar a covariate e justificar sua inclus&atilde;o</li>
+    <li>Mencionar verifica&ccedil;&atilde;o da homogeneidade de slopes</li>
+    <li>Reportar F e p da covariate</li>
+    <li>Reportar F, df, p e &eta;<sub>p</sub><sup>2</sup> do efeito principal</li>
+    <li>Apresentar m&eacute;dias ajustadas (com EP ou IC 95%)</li>
+    <li>Se significant: post-hoc com corre&ccedil;&atilde;o de Bonferroni nas m&eacute;dias ajustadas</li>
   </ul>
 </div>
 
-${dlg('thor','&#9889; Thorment','I just dump the SPSS output and done.')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','The output is the <em>beginning</em>, not the end. Interpreting and contextualizing the numbers is the researcher\x27s job.')}
+${dlg('thor','&#9889; Thorment','Eu s&oacute; jogo o output do SPSS e pronto.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','O output &eacute; o <em>in&iacute;cio</em>, n&atilde;o o fim. Interpretar e contextualizar os n&uacute;meros &eacute; trabalho do pesquisador.')}
 `;
 
   // ==== STEP 11: LESSON OF THE RAVENS ====
   case 11: return `
 <div class="step-title">&#129429; Step 11 &mdash; Lesson of the Ravens</div>
 
-${dlg('corvo','&#129429; Muninn summarizes:','<strong>Key Points of this recipe:</strong><br><br>' +
-  '&#10003; <strong>ANCOVA = ANOVA + covariate.</strong> Removes from the DV the variance explained by a pre-existing continuous variable.<br><br>' +
-  '&#10003; <strong>Adjusted means</strong> show the &ldquo;pure&rdquo; treatment effect, as if everyone started from the same baseline.<br><br>' +
-  '&#10003; <strong>Homogeneity of slopes</strong> is the most critical assumption &mdash; if the lines are not parallel, ANCOVA is inappropriate.<br><br>' +
-  '&#10003; <strong>Reduces error</strong>: by absorbing covariate variance, MS<sub>Error</sub> decreases and power increases.<br><br>' +
-  '&#10003; <strong>GLM unifies everything</strong>: ANCOVA combines categorical and continuous predictors in the same model.'
+${dlg('corvo','&#129429; Muninn summarizes:','<strong>Key Points desta receita:</strong><br><br>' +
+  '&#10003; <strong>ANCOVA = ANOVA + covariate.</strong> Remove da VD a variance explicada por uma vari&aacute;vel cont&iacute;nua pr&eacute;-existente.<br><br>' +
+  '&#10003; <strong>Means ajustadas</strong> mostram o efeito &ldquo;puro&rdquo; do tratamento, como se todos partissem do mesmo baseline.<br><br>' +
+  '&#10003; <strong>Homogeneidade de slopes</strong> &eacute; o pressuposto mais cr&iacute;tico &mdash; se as retas n&atilde;o s&atilde;o paralelas, ANCOVA &eacute; inadequada.<br><br>' +
+  '&#10003; <strong>Reduz o erro</strong>: ao absorver variance da covariate, MS<sub>Error</sub> diminui e o poder aumenta.<br><br>' +
+  '&#10003; <strong>GLM unifica tudo</strong>: ANCOVA combina preditores categ&oacute;ricos e cont&iacute;nuos no mesmo modelo.'
 )}
 
 <div class="concept-box" style="border-color: var(--corvo-purple);">
@@ -905,12 +905,12 @@ ${dlg('corvo','&#129429; Muninn summarizes:','<strong>Key Points of this recipe:
       <tr><th>Situation</th><th>Use</th></tr>
     </thead>
     <tbody>
-      <tr><td>Groups compared without a relevant covariate</td><td>ANOVA</td></tr>
-      <tr><td>Pre-existing covariate correlates with DV</td><td>ANCOVA</td></tr>
-      <tr><td>Want to increase power in a randomized experiment</td><td>ANCOVA</td></tr>
-      <tr><td>Slopes differ across groups</td><td>Moderation Analysis</td></tr>
-      <tr><td>Multiple DVs</td><td>MANCOVA</td></tr>
-      <tr><td>Multiple covariates + multiple DVs</td><td>MANCOVA</td></tr>
+      <tr><td>Grupos comparados sem covariate relevante</td><td>ANOVA</td></tr>
+      <tr><td>Covariate pr&eacute;-existente correlaciona com VD</td><td>ANCOVA</td></tr>
+      <tr><td>Quer aumentar poder em experimento randomizado</td><td>ANCOVA</td></tr>
+      <tr><td>Slopes diferem entre grupos</td><td>An&aacute;lise de Modera&ccedil;&atilde;o</td></tr>
+      <tr><td>M&uacute;ltiplas VDs</td><td>MANCOVA</td></tr>
+      <tr><td>M&uacute;ltiplas covari&aacute;veis + m&uacute;ltiplas VDs</td><td>MANCOVA</td></tr>
     </tbody>
   </table>
 </div>
@@ -919,16 +919,16 @@ ${dlg('corvo','&#129429; Muninn summarizes:','<strong>Key Points of this recipe:
   <div class="char-name huginn" style="color: var(--corvo-purple);">&#129429; Huginn challenges:</div>
   <div class="dialogue-text">
     <strong>Challenges for the reader:</strong><br><br>
-    1. <em>What if homogeneity of slopes fails?</em> Standard ANCOVA is not appropriate. You need a model with a group &times; covariate interaction &mdash; and interpret that the treatment effect <strong>depends on</strong> the covariate value. This is not a problem, it is a finding!<br><br>
-    2. <em>Can I use more than one covariate?</em> Yes! But each covariate &ldquo;costs&rdquo; 1 df. With small samples, the cost may not outweigh the gain.<br><br>
-    3. <em>Is ANCOVA equivalent to using difference scores (post &minus; pre)?</em> Not necessarily! Lord\x27s paradox shows that ANCOVA and change scores can yield opposite results. The choice depends on the research question.<br><br>
-    4. <em>If the covariate is not significant, does it still help?</em> If the covariate does not correlate with the DV, you lose 1 df without gaining anything. In that case, simple ANOVA is preferable.
+    1. <em>E se a homogeneidade de slopes falhar?</em> A ANCOVA padr&atilde;o n&atilde;o serve. Voc&ecirc; precisa de um modelo com intera&ccedil;&atilde;o grupo &times; covariate &mdash; e interpretar que o efeito do tratamento <strong>depende</strong> do valor da covariate. Isso n&atilde;o &eacute; um problema, &eacute; um achado!<br><br>
+    2. <em>Posso usar mais de uma covariate?</em> Sim! Mas cada covariate &ldquo;custa&rdquo; 1 df. Com amostras pequenas, o custo pode n&atilde;o compensar o ganho.<br><br>
+    3. <em>ANCOVA &eacute; equivalente a usar scores de diferen&ccedil;a (p&oacute;s &minus; pr&eacute;)?</em> No necessariamente! Lord&rsquo;s paradox mostra que ANCOVA e scores de mudan&ccedil;a podem dar resultados opostos. A escolha depende da pergunta de pesquisa.<br><br>
+    4. <em>Se a covariate n&atilde;o for significant, ainda ajuda?</em> Se a covariate n&atilde;o correlaciona com a VD, voc&ecirc; perde 1 df sem ganhar nada. Nesse caso, ANOVA simples &eacute; prefer&iacute;vel.
   </div>
 </div>
 
 <div class="svg-container" id="variancePartitionSVG"></div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','ANCOVA is one of the most useful &mdash; and most misused &mdash; techniques in statistics. Use it wisely: check the assumptions, report the adjusted means, and remember that statistical control <strong>is not equivalent</strong> to experimental control.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A ANCOVA &eacute; uma das t&eacute;cnicas mais &uacute;teis &mdash; e mais mal utilizadas &mdash; da estat&iacute;stica. Use com sabedoria: verifique os pressupostos, reporte as m&eacute;dias ajustadas, e lembre-se de que controlar estatisticamente <strong>n&atilde;o equivale</strong> a controlar experimentalmente.')}
 
 <p style="text-align:center; margin-top:24px; font-family:'Bangers',cursive; font-size:1.8rem; color:var(--gold);">&#127942; ANCOVA Recipe Complete! &#127942;</p>
 `;
@@ -1018,7 +1018,7 @@ function drawSlopesSVG() {
 
   // Axis labels
   svg += `<text x="${W/2}" y="${H-10}" text-anchor="middle" fill="#8b949e" font-family="Permanent Marker,cursive" font-size="14">Years of Experience (Covariate)</text>`;
-  svg += `<text x="16" y="${H/2}" text-anchor="middle" fill="#8b949e" font-family="Permanent Marker,cursive" font-size="14" transform="rotate(-90,16,${H/2})">Skill (DV)</text>`;
+  svg += `<text x="16" y="${H/2}" text-anchor="middle" fill="#8b949e" font-family="Permanent Marker,cursive" font-size="14" transform="rotate(-90,16,${H/2})">Skill (VD)</text>`;
 
   // Points and regression lines per group
   groupData.forEach((g, gi) => {
@@ -1188,7 +1188,7 @@ function drawSSCompare() {
     <span><span class="dot" style="background:var(--thor-red); opacity:0.6;"></span>SS<sub>Error</sub></span>
   </div>
 
-  <p style="font-family:'Permanent Marker',cursive; font-size:0.9rem; color:var(--text-dim); margin:12px 0 8px;">ANCOVA (with covariate)</p>
+  <p style="font-family:'Permanent Marker',cursive; font-size:0.9rem; color:var(--text-dim); margin:12px 0 8px;">ANCOVA (com covariate)</p>
   <div class="ss-stack">
     <div style="width:${ancovaCovPct}%; background:var(--gold);">${ancovaCovPct}%</div>
     <div style="width:${ancovaGrpPct}%; background:var(--odin-blue);">${ancovaGrpPct}%</div>
@@ -1199,7 +1199,7 @@ function drawSSCompare() {
     <span><span class="dot" style="background:var(--odin-blue);"></span>SS<sub>School(adj)</sub></span>
     <span><span class="dot" style="background:var(--thor-red); opacity:0.6;"></span>SS<sub>Error</sub></span>
   </div>
-  <p style="margin-top:10px; font-size:0.95rem;">The covariate absorbed <span class="highlight">${ancovaCovPct}%</span> of the total variance &mdash; variance that previously inflated the error!</p>
+  <p style="margin-top:10px; font-size:0.95rem;">A covariate absorveu <span class="highlight">${ancovaCovPct}%</span> da variance total — variance que antes inchava o erro!</p>
   `;
 
   container.innerHTML = html;
@@ -1227,12 +1227,12 @@ function drawGLMDiagram() {
 
   // Group box
   svg += `<rect x="40" y="140" width="160" height="50" rx="8" fill="none" stroke="#58a6ff" stroke-width="2"/>`;
-  svg += `<text x="120" y="162" text-anchor="middle" fill="#58a6ff" font-family="Permanent Marker,cursive" font-size="14">Factor (School)</text>`;
+  svg += `<text x="120" y="162" text-anchor="middle" fill="#58a6ff" font-family="Permanent Marker,cursive" font-size="14">Fator (School)</text>`;
   svg += `<text x="120" y="180" text-anchor="middle" fill="#8b949e" font-size="12">(D₁, D₂ dummies)</text>`;
 
   // Y box
   svg += `<rect x="460" y="100" width="180" height="50" rx="8" fill="none" stroke="#3fb950" stroke-width="2"/>`;
-  svg += `<text x="550" y="122" text-anchor="middle" fill="#3fb950" font-family="Permanent Marker,cursive" font-size="14">DV: Skill</text>`;
+  svg += `<text x="550" y="122" text-anchor="middle" fill="#3fb950" font-family="Permanent Marker,cursive" font-size="14">VD: Skill</text>`;
   svg += `<text x="550" y="140" text-anchor="middle" fill="#8b949e" font-size="12">(Y)</text>`;
 
   // Arrows

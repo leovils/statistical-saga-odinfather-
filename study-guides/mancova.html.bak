@@ -336,7 +336,7 @@ body {
 
 <script>
 // ============================================================
-// DATA — 3 Academies, 2 DVs, 1 Covariate
+// DATA — 3 Academys, 2 VDs, 1 Covariate
 // ============================================================
 const DATA = {
   Asgard:   { combat: [78,82,75,80,85,77], leadership: [70,74,68,72,76,71], training: [5,7,4,6,8,5] },
@@ -416,25 +416,25 @@ function getStepHTML(step){
   // ---- STEP 0: INTRODUCTION ----
   case 0: return `
 <div class="step-title">&#128081; Step 0 &mdash; The Crown of the GLM: MANCOVA</div>
-<p>On Odin\x27s Throne, the supreme analysis: <span class="highlight">multiple groups</span>, <span class="highlight">multiple dependent variables</span>, and <span class="highlight">control for pre-existing differences</span>. The union of MANOVA + ANCOVA in a single test.</p>
+<p>No Trono de Odin, a an&aacute;lise suprema: <span class="highlight">m&uacute;ltiplos grupos</span>, <span class="highlight">m&uacute;ltiplas vari&aacute;veis dependentes</span> e <span class="highlight">controle de diferen&ccedil;as pr&eacute;-existentes</span>. A uni&atilde;o de MANOVA + ANCOVA num &uacute;nico teste.</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','MANCOVA &mdash; Multivariate Analysis of Covariance. It is the most complete test in the GLM family. It compares groups on <strong>multiple DVs simultaneously</strong>, controlling the effect of <strong>covariates</strong> that could confound the results.')}
-${dlg('thor','&#9889; Thorment','Wow, if it\x27s the most complete, then I\x27ll always use MANCOVA! I\x27ll throw everything in there &mdash; 10 DVs, 15 covariates &mdash; and done!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Easy, Thorment. More power demands more <em>discipline</em>. MANCOVA only makes sense when there is theoretical justification for each DV and each covariate. Parsimony above all.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','MANCOVA &mdash; Multivariate Analysis of Covariance. &Eacute; o teste mais completo da fam&iacute;lia GLM. Compara grupos em <strong>v&aacute;rias VDs simultaneamente</strong>, controlando o efeito de <strong>covari&aacute;veis</strong> que poderiam confundir os resultados.')}
+${dlg('thor','&#9889; Thorment','Puxa, se &eacute; o mais completo, ent&atilde;o sempre uso MANCOVA! Jogo tudo l&aacute; dentro &mdash; 10 VDs, 15 covari&aacute;veis &mdash; e pronto!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Easy, Thorment. Mais poder exige mais <em>disciplina</em>. MANCOVA s&oacute; faz sentido quando h&aacute; justificativa te&oacute;rica para cada VD e cada covariate. Parcim&ocirc;nia acima de tudo.')}
 
-<div class="step-subtitle">Scenario: The Three War Academies</div>
-<p>Odin wants to evaluate three warrior academies &mdash; <span class="highlight-blue">Asgard</span>, <span class="highlight" style="color:var(--gold)">Midgard</span>, and <span class="highlight-green">Vanaheim</span> &mdash; on two criteria:</p>
+<div class="step-subtitle">Cen&aacute;rio: As Tr&ecirc;s Academys de Guerra</div>
+<p>Odin quer avaliar tr&ecirc;s academys de warriors &mdash; <span class="highlight-blue">Asgard</span>, <span class="highlight" style="color:var(--gold)">Midgard</span> e <span class="highlight-green">Vanaheim</span> &mdash; em dois crit&eacute;rios:</p>
 <ul style="margin:12px 0 12px 24px;">
-  <li><strong>DV1:</strong> Combat Score (0&ndash;100)</li>
-  <li><strong>DV2:</strong> Leadership Score (0&ndash;100)</li>
-  <li><strong>Covariate:</strong> Years of Prior Training</li>
+  <li><strong>VD1:</strong> Score de Combat (0&ndash;100)</li>
+  <li><strong>VD2:</strong> Score de Leadership (0&ndash;100)</li>
+  <li><strong>Covariate:</strong> Anos de Training Pr&eacute;vio</li>
 </ul>
-<p>Design: <span class="highlight">3 groups &times; 2 DVs &times; 1 covariate</span>, with n = 6 per group (N = 18).</p>
+<p>Delineamento: <span class="highlight">3 grupos &times; 2 VDs &times; 1 covariate</span>, com n = 6 por grupo (N = 18).</p>
 
-<div class="step-subtitle">Data from the Three Academies</div>
+<div class="step-subtitle">Dados das Tr&ecirc;s Academys</div>
 <table class="data-table">
   <thead>
-    <tr><th>Academy</th><th>Warrior</th><th>&#9876; Combat</th><th>&#128081; Leadership</th><th>&#9201; Years Training</th></tr>
+    <tr><th>Academy</th><th>Warrior</th><th>&#9876; Combat</th><th>&#128081; Leadership</th><th>&#9201; Anos Training</th></tr>
   </thead>
   <tbody>
     ${academies.map(a => DATA[a].combat.map((c,i) =>
@@ -449,66 +449,66 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Easy, Thorment. More 
   </tfoot>
 </table>
 
-${dlg('corvo','&#128038; Muninn whispers:','Notice that Asgard has the highest mean in Combat and Leadership &mdash; but it also has warriors with <strong>more years of training</strong>. Is the difference real, or merely a reflection of prior experience? That is exactly what the covariate controls for.')}
+${dlg('corvo','&#128038; Muninn whispers:','Note que Asgard tem a maior m&eacute;dia em Combat e Leadership &mdash; mas tamb&eacute;m tem warriors com <strong>mais anos de training</strong>. Ser&aacute; que a diferen&ccedil;a &eacute; real ou apenas reflexo da experience pr&eacute;via? &Eacute; exatamente isso que a covariate controla.')}
 `;
 
   // ---- STEP 1: WHEN TO USE ----
   case 1: return `
 <div class="step-title">&#129517; Step 1 &mdash; When to Use MANCOVA?</div>
-<p>Choosing the right test depends on <strong>how many DVs</strong> you have and whether you need to <strong>control for covariates</strong>.</p>
+<p>A escolha do teste depende de <strong>quantas VDs</strong> voc&ecirc; tem e se precisa <strong>controlar covari&aacute;veis</strong>.</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','The decision tree is simple. Answer two questions: (1) How many DVs? (2) Do you have a covariate to control for?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A &aacute;rvore de decis&atilde;o &eacute; simples. Responda duas perguntas: (1) How many DVs? (2) Tem covariate para controlar?')}
 
-<div class="step-subtitle">&#127795; Decision Tree</div>
+<div class="step-subtitle">&#127795; &Aacute;rvore de Decision</div>
 
 <div class="decision-box">
-  <div class="q">&#10067; How Many Dependent Variables?</div>
+  <div class="q">&#10067; Quantas Vari&aacute;veis Dependentes?</div>
   <div class="decision-arrows">
     <div class="decision-arrow">
       <div class="label">Only 1 DV</div>
       <div class="answer blue">&#8595;</div>
       <div class="decision-box" style="border:1px solid var(--border);margin-top:8px;">
-        <div class="q" style="font-size:0.9rem;">Any covariates?</div>
+        <div class="q" style="font-size:0.9rem;">Tem covariate?</div>
         <div class="decision-arrows" style="gap:20px;">
           <div class="decision-arrow"><div class="label">No</div><div class="answer blue">ANOVA</div></div>
-          <div class="decision-arrow"><div class="label">Yes</div><div class="answer gold">ANCOVA</div></div>
+          <div class="decision-arrow"><div class="label">Sim</div><div class="answer gold">ANCOVA</div></div>
         </div>
       </div>
     </div>
     <div class="decision-arrow">
-      <div class="label">2+ correlated DVs</div>
+      <div class="label">2+ VDs correlated</div>
       <div class="answer gold">&#8595;</div>
       <div class="decision-box" style="border:1px solid var(--border);margin-top:8px;">
-        <div class="q" style="font-size:0.9rem;">Any covariates?</div>
+        <div class="q" style="font-size:0.9rem;">Tem covariate?</div>
         <div class="decision-arrows" style="gap:20px;">
           <div class="decision-arrow"><div class="label">No</div><div class="answer green">MANOVA</div></div>
-          <div class="decision-arrow"><div class="label">Yes</div><div class="answer purple">MANCOVA</div></div>
+          <div class="decision-arrow"><div class="label">Sim</div><div class="answer purple">MANCOVA</div></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-${dlg('thor','&#9889; Thorment','So you just count DVs and covariates? Piece of cake!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Almost. The DVs <strong>need to be correlated with each other</strong> &mdash; otherwise, separate ANOVAs are better. And the covariate needs a <strong>theoretical rationale</strong> for being in the model.')}
+${dlg('thor','&#9889; Thorment','Ent&atilde;o &eacute; s&oacute; contar VDs e covari&aacute;veis? Moleza!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Quase. As VDs <strong>precisam ser correlated entre si</strong> &mdash; caso contr&aacute;rio, Separate ANOVAs s&atilde;o melhores. E a covariate precisa ter <strong>fundamenta&ccedil;&atilde;o te&oacute;rica</strong> para estar no modelo.')}
 
 <div class="hyp-box">
-  <h4>&#128218; Conditions for MANCOVA</h4>
-  <p>&#10003; Categorical independent variable (typically 3+ groups)</p>
-  <p>&#10003; Two or more continuous DVs that are <strong>correlated</strong></p>
-  <p>&#10003; One or more continuous covariates measured <strong>before treatment</strong></p>
-  <p>&#10003; The covariate must not be affected by the IV (independence)</p>
+  <h4>&#128218; Condi&ccedil;&otilde;es para MANCOVA</h4>
+  <p>&#10003; Vari&aacute;vel independente categ&oacute;rica (3+ grupos tipicamente)</p>
+  <p>&#10003; Duas ou mais VDs cont&iacute;nuas e <strong>correlated</strong></p>
+  <p>&#10003; Uma ou mais covari&aacute;veis cont&iacute;nuas medidas <strong>antes do tratamento</strong></p>
+  <p>&#10003; A covariate n&atilde;o pode ser afetada pela VI (independ&ecirc;ncia)</p>
 </div>
 
-${dlg('corvo','&#128038; Muninn whispers:','MANCOVA protects against two problems at once: (1) the <strong>inflation of Type I error</strong> that occurs when running multiple separate ANOVAs, and (2) the <strong>confounding bias</strong> when groups differ on pre-existing variables.')}
+${dlg('corvo','&#128038; Muninn whispers:','MANCOVA protege contra dois problemas de uma vez: (1) a <strong>infla&ccedil;&atilde;o do erro Tipo I</strong> que ocorre ao rodar m&uacute;ltiplas Separate ANOVAs, e (2) o <strong>vi&eacute;s de confundimento</strong> quando grupos diferem em vari&aacute;veis pr&eacute;-existentes.')}
 `;
 
   // ---- STEP 2: COMPARISON TABLE ----
   case 2: return `
 <div class="step-title">&#128202; Step 2 &mdash; The Grand Comparison Table</div>
-<p>This is the complete map of the GLM family. Each row shows what changes from one test to another.</p>
+<p>Este &eacute; o mapa completo da fam&iacute;lia GLM. Cada linha mostra o que muda de um teste para outro.</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Memorize this table. It is the DNA of the entire family of mean-difference tests.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Grave esta tabela. Ela &eacute; o DNA de toda a fam&iacute;lia de testes de diferen&ccedil;a de m&eacute;dias.')}
 
 <table class="compare-table">
   <thead>
@@ -522,158 +522,158 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Memorize this table. 
   </thead>
   <tbody>
     <tr>
-      <td class="header-col">No. of IVs</td>
+      <td class="header-col">N&deg; de VIs</td>
       <td>1+</td>
       <td>1+</td>
       <td>1+</td>
       <td class="highlight-col">1+</td>
     </tr>
     <tr>
-      <td class="header-col">No. of DVs</td>
+      <td class="header-col">N&deg; de VDs</td>
       <td><strong>1</strong></td>
       <td><strong>1</strong></td>
       <td><strong>2+</strong></td>
       <td class="highlight-col"><strong>2+</strong></td>
     </tr>
     <tr>
-      <td class="header-col">Covariates</td>
-      <td>&#10060; None</td>
+      <td class="header-col">Covari&aacute;veis</td>
+      <td>&#10060; Nenhuma</td>
       <td>&#10004; 1+</td>
-      <td>&#10060; None</td>
+      <td>&#10060; Nenhuma</td>
       <td class="highlight-col">&#10004; 1+</td>
     </tr>
     <tr>
-      <td class="header-col">Statistic</td>
+      <td class="header-col">Estat&iacute;stica</td>
       <td><em>F</em></td>
-      <td><em>F</em> (adjusted)</td>
-      <td>Wilks\x27 &Lambda;, Pillai, Hotelling, Roy</td>
-      <td class="highlight-col">Wilks\x27 &Lambda;, Pillai, Hotelling, Roy (adjusted)</td>
+      <td><em>F</em> (ajustado)</td>
+      <td>Wilks' &Lambda;, Pillai, Hotelling, Roy</td>
+      <td class="highlight-col">Wilks' &Lambda;, Pillai, Hotelling, Roy (ajustados)</td>
     </tr>
     <tr>
-      <td class="header-col">Key unique assumption</td>
-      <td>Homogeneity of variances</td>
-      <td>Homogeneity of slopes</td>
-      <td>Box\x27s M (equality of matrices)</td>
-      <td class="highlight-col">Box\x27s M + <strong>multivariate</strong> homogeneity of slopes</td>
+      <td class="header-col">Assumption-chave &uacute;nico</td>
+      <td>Homogeneidade de variances</td>
+      <td>Homogeneidade de slopes</td>
+      <td>Box's M (igualdade de matrizes)</td>
+      <td class="highlight-col">Box's M + Homogeneidade de slopes <strong>multivariada</strong></td>
     </tr>
     <tr>
-      <td class="header-col">What does it compare?</td>
+      <td class="header-col">O que compara?</td>
       <td>Means</td>
-      <td>Adjusted means</td>
-      <td>Mean vectors</td>
-      <td class="highlight-col">Adjusted mean vectors</td>
+      <td>Means ajustadas</td>
+      <td>Vetores de m&eacute;dias</td>
+      <td class="highlight-col">Vetores de m&eacute;dias ajustados</td>
     </tr>
     <tr>
-      <td class="header-col">Protects against...</td>
+      <td class="header-col">Protege contra...</td>
       <td>&mdash;</td>
-      <td>Confounding</td>
-      <td>Type I error (multiple DVs)</td>
-      <td class="highlight-col">Confounding + Type I error</td>
+      <td>Confundimento</td>
+      <td>Error Tipo I (m&uacute;ltiplas VDs)</td>
+      <td class="highlight-col">Confundimento + Error Tipo I</td>
     </tr>
     <tr>
-      <td class="header-col">Norse example</td>
-      <td>Compares combat across 3 clans</td>
-      <td>...controlling for age</td>
-      <td>Compares combat + leadership</td>
-      <td class="highlight-col">...controlling for years of training</td>
+      <td class="header-col">Exemplo N&oacute;rdico</td>
+      <td>Compara combate entre 3 cl&atilde;s</td>
+      <td>...controlando idade</td>
+      <td>Compara combate + lideran&ccedil;a</td>
+      <td class="highlight-col">...controlando anos de training</td>
     </tr>
   </tbody>
 </table>
 
-${dlg('thor','&#9889; Thorment','So MANCOVA is everything mixed together?')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Exactly &mdash; that is why it is the <strong>crown of the GLM</strong>. But with great power comes great responsibility: more assumptions to check and more caution in interpretation.')}
+${dlg('thor','&#9889; Thorment','Ent&atilde;o MANCOVA &eacute; tudo junto e misturado?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Exactly &mdash; por isso &eacute; a <strong>coroa do GLM</strong>. Mas com grande poder vem grande responsabilidade: mais pressupostos para verificar e mais cautela na interpreta&ccedil;&atilde;o.')}
 
-${dlg('corvo','&#128038; Muninn whispers:','Look at the MANCOVA column. It absorbs <em>all</em> the capabilities of the previous tests. Each test to the left is a special case of MANCOVA &mdash; remove covariates and you get MANOVA; reduce to 1 DV and you get ANCOVA; do both and you get ANOVA.')}
+${dlg('corvo','&#128038; Muninn whispers:','Observe a coluna MANCOVA. Ela absorve <em>todas</em> as capacidades das anteriores. Cada teste &agrave; esquerda &eacute; um caso especial de MANCOVA &mdash; remova covari&aacute;veis e voc&ecirc; tem MANOVA; reduza a 1 VD e voc&ecirc; tem ANCOVA; fa&ccedil;a ambos e tem ANOVA.')}
 `;
 
   // ---- STEP 3: ASSUMPTIONS ----
   case 3: return `
-<div class="step-title">&#128270; Step 3 &mdash; MANCOVA Assumptions</div>
-<p>MANCOVA inherits <strong>all</strong> the assumptions of MANOVA and ANCOVA. It is the union of both sets.</p>
+<div class="step-title">&#128270; Step 3 &mdash; Assumptions da MANCOVA</div>
+<p>MANCOVA herda <strong>todos</strong> os pressupostos de MANOVA e ANCOVA. &Eacute; a uni&atilde;o dos dois conjuntos.</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Think of it this way: MANCOVA = MANOVA assumptions + ANCOVA assumptions. That is no small matter. That is why it demands rigor.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Pense assim: MANCOVA = pressupostos da MANOVA + pressupostos da ANCOVA. No &eacute; pouco. Por isso ela exige rigor.')}
 
-<div class="step-subtitle">Inherited from MANOVA</div>
+<div class="step-subtitle">Herdados da MANOVA</div>
 
 <div class="assumption-card">
-  <h4>1. Multivariate Normality</h4>
-  <p>Each group must follow a multivariate normal distribution. Test: <strong>Mardia</strong> (multivariate skewness and kurtosis) or <strong>multivariate Shapiro-Wilk</strong>.</p>
-  <div class="origin">&#8592; From MANOVA</div>
+  <h4>1. Normality Multivariada</h4>
+  <p>Cada grupo deve seguir distribui&ccedil;&atilde;o normal multivariada. Teste: <strong>Mardia</strong> (assimetria e curtose multivariada) ou <strong>Shapiro-Wilk multivariado</strong>.</p>
+  <div class="origin">&#8592; Da MANOVA</div>
 </div>
 
 <div class="assumption-card">
-  <h4>2. Homogeneity of Covariance Matrices (Box\x27s M)</h4>
-  <p>The variance-covariance matrices must be equal across groups. Test: <strong>Box\x27s M</strong>. Use &alpha; = 0.001 (the test is too sensitive at &alpha; = 0.05).</p>
-  <div class="origin">&#8592; From MANOVA</div>
+  <h4>2. Homogeneidade das Matrizes de Covariance (Box's M)</h4>
+  <p>As matrizes de variance-covariance devem ser iguais entre os grupos. Teste: <strong>Box's M</strong>. Use &alpha; = 0.001 (teste sens&iacute;vel demais a &alpha; = 0.05).</p>
+  <div class="origin">&#8592; Da MANOVA</div>
 </div>
 
 <div class="assumption-card">
-  <h4>3. Independence of Observations</h4>
-  <p>Each warrior belongs to only one academy. No repeated measures. Guaranteed by the design.</p>
-  <div class="origin">&#8592; From MANOVA</div>
+  <h4>3. Independence das Observa&ccedil;&otilde;es</h4>
+  <p>Cada warrior pertence a apenas uma academy. Sem medidas repetidas. Garantido pelo delineamento.</p>
+  <div class="origin">&#8592; Da MANOVA</div>
 </div>
 
-<div class="step-subtitle">Inherited from ANCOVA</div>
+<div class="step-subtitle">Herdados da ANCOVA</div>
 
 <div class="assumption-card">
-  <h4>4. Linearity between Covariate and DVs</h4>
-  <p>The relationship between Years of Training and each DV (Combat, Leadership) must be <strong>linear</strong>. Verify with scatterplots.</p>
-  <div class="origin">&#8592; From ANCOVA</div>
-</div>
-
-<div class="assumption-card">
-  <h4>5. Homogeneity of Regression Slopes</h4>
-  <p>The Covariate &rarr; DV relationship must have the <strong>same slope</strong> across all groups. Test: the Group &times; Covariate interaction must be <strong>non-significant</strong>.</p>
-  <div class="origin">&#8592; From ANCOVA (multivariate version!)</div>
+  <h4>4. Linearity entre Covariate e VDs</h4>
+  <p>A rela&ccedil;&atilde;o entre Anos de Training e cada VD (Combat, Leadership) deve ser <strong>linear</strong>. Verificar com scatterplots.</p>
+  <div class="origin">&#8592; Da ANCOVA</div>
 </div>
 
 <div class="assumption-card">
-  <h4>6. Independence of the Covariate from the Treatment</h4>
-  <p>The covariate (Years of Training) must not have been <strong>affected</strong> by the IV (Academy). It must be measured <strong>before</strong> the treatment.</p>
-  <div class="origin">&#8592; From ANCOVA</div>
+  <h4>5. Homogeneidade das Slopes de Regress&atilde;o</h4>
+  <p>A rela&ccedil;&atilde;o Covariate &rarr; VD deve ter a <strong>mesma slope</strong> em todos os grupos. Teste: intera&ccedil;&atilde;o Grupo &times; Covariate deve ser <strong>n&atilde;o significant</strong>.</p>
+  <div class="origin">&#8592; Da ANCOVA (vers&atilde;o multivariada!)</div>
+</div>
+
+<div class="assumption-card">
+  <h4>6. Independence da Covariate em Rela&ccedil;&atilde;o ao Tratamento</h4>
+  <p>A covariate (Anos de Training) n&atilde;o pode ter sido <strong>afetada</strong> pela VI (Academy). Deve ser medida <strong>antes</strong> do tratamento.</p>
+  <div class="origin">&#8592; Da ANCOVA</div>
 </div>
 
 <div class="assumption-card" style="border-left-color: var(--thor-red);">
-  <h4 style="color: var(--thor-red);">7. Absence of Multicollinearity among Covariates</h4>
-  <p>If there are multiple covariates, they must not be highly correlated with each other (VIF < 5). In our case, we have only one covariate.</p>
-  <div class="origin">&#8592; Specific to MANCOVA</div>
+  <h4 style="color: var(--thor-red);">7. Aus&ecirc;ncia de Multicolinearidade entre Covari&aacute;veis</h4>
+  <p>Se houver m&uacute;ltiplas covari&aacute;veis, elas n&atilde;o devem ser altamente correlated entre si (VIF < 5). No nosso caso, temos apenas uma covariate.</p>
+  <div class="origin">&#8592; Espec&iacute;fico da MANCOVA</div>
 </div>
 
-${dlg('thor','&#9889; Thorment','Seven assumptions?! That\x27s too many! Who checks all of that?')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Anyone who wants to do serious science, Thorment. Skipping assumptions is like forging a sword without checking the temper &mdash; it may shatter in the first battle.')}
+${dlg('thor','&#9889; Thorment','Sete pressupostos?! Isso &eacute; demais! Quem verifica tudo isso?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Quem quer fazer ci&ecirc;ncia s&eacute;ria, Thorment. Pular pressupostos &eacute; como forjar espada sem verificar a t&ecirc;mpera &mdash; pode quebrar na primeira batalha.')}
 
-${dlg('corvo','&#128038; Muninn whispers:','In practice, the most critical assumption is <strong>#5 &mdash; homogeneity of slopes</strong>. If violated, the adjusted means lose their meaning. Always test it first with the Group &times; Covariate interaction.')}
+${dlg('corvo','&#128038; Muninn whispers:','Na pr&aacute;tica, o pressuposto mais cr&iacute;tico &eacute; o <strong>5 &mdash; homogeneidade de slopes</strong>. Se violado, as m&eacute;dias ajustadas perdem significado. Sempre teste primeiro com a intera&ccedil;&atilde;o Grupo &times; Covariate.')}
 `;
 
   // ---- STEP 4: MULTIVARIATE HOMOGENEITY ----
   case 4: return `
-<div class="step-title">&#128200; Step 4 &mdash; Multivariate Homogeneity of Slopes</div>
-<p>The most critical assumption of MANCOVA &mdash; and the least understood. It is the multivariate extension of the ANCOVA assumption.</p>
+<div class="step-title">&#128200; Step 4 &mdash; Homogeneity of Slopes Multivariada</div>
+<p>O pressuposto mais cr&iacute;tico da MANCOVA &mdash; e o menos compreendido. &Eacute; a extens&atilde;o multivariada do pressuposto da ANCOVA.</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','In ANCOVA, we check whether the <em>regression line</em> Covariate &rarr; DV has the same slope in each group. In MANCOVA, we check whether the <strong>slope vector</strong> (one line per DV) is equal across groups.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Na ANCOVA, verificamos se a <em>reta de regress&atilde;o</em> Covariate &rarr; VD tem a mesma slope em cada grupo. Na MANCOVA, verificamos se o <strong>vetor de slopes</strong> (uma reta para cada VD) &eacute; igual entre os grupos.')}
 
-<div class="step-subtitle">In ANCOVA (1 DV)</div>
+<div class="step-subtitle">Na ANCOVA (1 VD)</div>
 <div class="formula">
-  <div class="formula-label">Interaction Test</div>
-  DV = Group + Covariate + <span class="highlight-red">Group &times; Covariate</span>
-  <br><small>If the interaction is significant &rarr; different slopes &rarr; &#10060; assumption violated</small>
+  <div class="formula-label">Teste de Intera&ccedil;&atilde;o</div>
+  VD = Grupo + Covariate + <span class="highlight-red">Grupo &times; Covariate</span>
+  <br><small>Se a intera&ccedil;&atilde;o &eacute; significant &rarr; slopes diferentes &rarr; &#10060; viola pressuposto</small>
 </div>
 
-<div class="step-subtitle">In MANCOVA (2+ DVs)</div>
+<div class="step-subtitle">Na MANCOVA (2+ VDs)</div>
 <div class="formula">
-  <div class="formula-label">Multivariate Interaction Test</div>
-  <strong>[DV1, DV2]</strong> = Group + Covariate + <span class="highlight-red">Group &times; Covariate</span>
-  <br><small>Multivariate test (Wilks\x27 &Lambda;) on the interaction &rarr; must be non-significant</small>
+  <div class="formula-label">Teste de Intera&ccedil;&atilde;o Multivariada</div>
+  <strong>[VD1, VD2]</strong> = Grupo + Covariate + <span class="highlight-red">Grupo &times; Covariate</span>
+  <br><small>Teste multivariado (Wilks' &Lambda;) na intera&ccedil;&atilde;o &rarr; deve ser n&atilde;o significant</small>
 </div>
 
-<p style="margin-top:16px;">In our example:</p>
+<p style="margin-top:16px;">No nosso exemplo:</p>
 <table class="calc-table">
   <thead>
-    <tr><th>Effect</th><th>Wilks\x27 &Lambda;</th><th><em>F</em></th><th><em>p</em></th><th>Decision</th></tr>
+    <tr><th>Efeito</th><th>Wilks' &Lambda;</th><th><em>F</em></th><th><em>p</em></th><th>Decision</th></tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align:left;">Academy &times; Years of Training</td>
+      <td style="text-align:left;">Academy &times; Anos de Training</td>
       <td>0.891</td>
       <td>0.36</td>
       <td class="ns">.831</td>
@@ -682,76 +682,76 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','In ANCOVA, we check w
   </tbody>
 </table>
 
-<p><span class="highlight-green">Result:</span> The Group &times; Covariate interaction was not significant &mdash; the slopes are homogeneous. We can proceed with the MANCOVA!</p>
+<p><span class="highlight-green">Result:</span> A intera&ccedil;&atilde;o Grupo &times; Covariate n&atilde;o foi significant &mdash; as slopes s&atilde;o homog&ecirc;neas. Podemos prosseguir com a MANCOVA!</p>
 
-${dlg('thor','&#9889; Thorment','And what if it were significant?')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Then the covariate has a different effect in each group &mdash; adjusting the means would be meaningless. Options: (1) remove the covariate and use MANOVA, (2) use a stratified analysis by group, (3) test models with heterogeneous slopes (Johnson-Neyman).')}
+${dlg('thor','&#9889; Thorment','E se fosse significant?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A&iacute; a covariate tem efeito diferente em cada grupo &mdash; ajustar as m&eacute;dias n&atilde;o faz sentido. Op&ccedil;&otilde;es: (1) remover a covariate e usar MANOVA, (2) usar an&aacute;lise estratificada por grupo, (3) testar modelos com slopes heterog&ecirc;neas (Johnson-Neyman).')}
 
 <div class="svg-container" id="slopesSVG"></div>
 
-${dlg('corvo','&#128038; Muninn whispers:','Visually: parallel lines = assumption met. Crossing lines = violation. In the chart above, the three academies show lines with similar slopes &mdash; green light for MANCOVA.')}
+${dlg('corvo','&#128038; Muninn whispers:','Visualmente: retas paralelas = pressuposto atendido. Retas cruzadas = viola&ccedil;&atilde;o. No gr&aacute;fico acima, as tr&ecirc;s academys mostram retas com slopes semelhantes &mdash; sinal verde para MANCOVA.')}
 `;
 
   // ---- STEP 5: PARSIMONY ----
   case 5: return `
 <div class="step-title">&#9878; Step 5 &mdash; Parsimony: Less Is More</div>
-<p>Just because you <em>can</em> include 20 covariates does not mean you <em>should</em>.</p>
+<p>S&oacute; porque voc&ecirc; <em>pode</em> colocar 20 covari&aacute;veis n&atilde;o significa que <em>deve</em>.</p>
 
-${dlg('thor','&#9889; Thorment','I have 10 covariates available! Age, height, weight, hours of sleep, number of battles, sword type, armor color, Viking zodiac sign, number of scars, and liters of mead consumed. I\x27ll throw them all in!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Thorment, that is a recipe for disaster. Each covariate consumes <strong>degrees of freedom</strong>, reduces <strong>statistical power</strong>, and increases the <strong>complexity of interpretation</strong>.')}
+${dlg('thor','&#9889; Thorment','Eu tenho 10 covari&aacute;veis dispon&iacute;veis! Idade, altura, peso, tempo de sono, n&uacute;mero de batalhas, tipo de espada, cor da armadura, signo viking, n&uacute;mero de cicatrizes e litros de hidromel consumidos. Jogo tudo l&aacute;!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Thorment, essa &eacute; a receita do desastre. Cada covariate consome <strong>degrees of freedom</strong>, reduz <strong>poder estat&iacute;stico</strong> e aumenta a <strong>complexidade de interpreta&ccedil;&atilde;o</strong>.')}
 
-<div class="step-subtitle">&#128220; Golden Rules for Covariates</div>
+<div class="step-subtitle">&#128220; Regras de Ouro para Covari&aacute;veis</div>
 
 <div class="checklist">
   <div class="checklist-item">
     <span class="checklist-icon">&#128218;</span>
-    <span class="checklist-text"><strong>Theoretical justification:</strong> Each covariate needs grounding in the literature. "Because I collected it" is not a justification.</span>
+    <span class="checklist-text"><strong>Justificativa te&oacute;rica:</strong> Cada covariate precisa de fundamenta&ccedil;&atilde;o na literatura. "Porque eu coletei" n&atilde;o &eacute; justificativa.</span>
   </div>
   <div class="checklist-item">
     <span class="checklist-icon">&#128200;</span>
-    <span class="checklist-text"><strong>Correlation with the DV:</strong> If the covariate does not correlate with any DV, it only consumes degrees of freedom with no benefit.</span>
+    <span class="checklist-text"><strong>Correlation com VD:</strong> Se a covariate n&atilde;o se correlaciona com nenhuma VD, ela s&oacute; consome degrees of freedom sem benef&iacute;cio.</span>
   </div>
   <div class="checklist-item">
     <span class="checklist-icon">&#9888;</span>
-    <span class="checklist-text"><strong>Independence from treatment:</strong> The covariate must have been measured <strong>before</strong> the intervention. Never use a variable that the treatment itself may have altered.</span>
+    <span class="checklist-text"><strong>Independence do tratamento:</strong> A covariate deve ter sido medida <strong>antes</strong> da interven&ccedil;&atilde;o. Nunca use uma vari&aacute;vel que o pr&oacute;prio tratamento possa ter alterado.</span>
   </div>
   <div class="checklist-item">
     <span class="checklist-icon">&#128279;</span>
-    <span class="checklist-text"><strong>No multicollinearity:</strong> Covariates that are highly correlated with each other (r > .80) are redundant. Choose one and discard the other.</span>
+    <span class="checklist-text"><strong>Sem multicolinearidade:</strong> Covari&aacute;veis altamente correlated entre si (r > .80) s&atilde;o redundantes. Escolha uma e descarte a outra.</span>
   </div>
   <div class="checklist-item">
     <span class="checklist-icon">&#128290;</span>
-    <span class="checklist-text"><strong>Rule of thumb for n:</strong> At least 10 observations per cell for each added covariate. With a small N, each extra covariate is a dangerous luxury.</span>
+    <span class="checklist-text"><strong>Rule of thumb de n:</strong> No m&iacute;nimo 10 observa&ccedil;&otilde;es por c&eacute;lula para cada covariate adicionada. Com N pequeno, cada covariate extra &eacute; um luxo perigoso.</span>
   </div>
 </div>
 
 <div class="formula">
-  <div class="formula-label">Lost Power Formula</div>
-  Each extra covariate = &minus;1 df<sub>error</sub> &rarr; &darr; statistical power
-  <br><small>With k = 3 groups, p = 2 DVs, and c = 1 covariate: df<sub>error</sub> = N &minus; k &minus; c = 18 &minus; 3 &minus; 1 = 14</small>
-  <br><small>If c = 5 covariates: df<sub>error</sub> = 18 &minus; 3 &minus; 5 = 10 &#128556;</small>
+  <div class="formula-label">Formula do Poder Perdido</div>
+  Cada covariate extra = &minus;1 gl<sub>erro</sub> &rarr; &darr; poder estat&iacute;stico
+  <br><small>Com k = 3 grupos, p = 2 VDs e c = 1 covariate: gl<sub>erro</sub> = N &minus; k &minus; c = 18 &minus; 3 &minus; 1 = 14</small>
+  <br><small>Se c = 5 covari&aacute;veis: gl<sub>erro</sub> = 18 &minus; 3 &minus; 5 = 10 &#128556;</small>
 </div>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','In our case, <strong>Years of Training</strong> has a clear justification: it is an obvious predictor of performance and was measured before entering the academy. One covariate, clean and justified. Perfect.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No nosso caso, <strong>Anos de Training</strong> tem justificativa clara: &eacute; um preditor &oacute;bvio de desempenho e foi medido antes da entrada na academy. Uma covariate, limpa e justificada. Perfeito.')}
 
-${dlg('corvo','&#128038; Muninn whispers:','Miller\x27s rule (1997): <strong>at most 1 covariate per 10 participants per group</strong>. With n = 6, we are already at the limit with 1 covariate. Parsimony is not optional &mdash; it is survival.')}
+${dlg('corvo','&#128038; Muninn whispers:','A regra de Miller (1997): <strong>no m&aacute;ximo 1 covariate para cada 10 participantes por grupo</strong>. Com n=6, j&aacute; estamos no limite com 1 covariate. Parcim&ocirc;nia n&atilde;o &eacute; opcional &mdash; &eacute; sobreviv&ecirc;ncia.')}
 `;
 
   // ---- STEP 6: CONCEPTUAL CALCULATION ----
   case 6: return `
-<div class="step-title">&#9881; Step 6 &mdash; Conceptual Calculation of MANCOVA</div>
-<p>MANCOVA operates in three major stages. Think of it as a three-phase "recipe."</p>
+<div class="step-title">&#9881; Step 6 &mdash; Calculation Conceitual da MANCOVA</div>
+<p>A MANCOVA opera em tr&ecirc;s grandes etapas. Pense nela como uma "receita" de tr&ecirc;s fases.</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','The conceptual logic is simpler than it looks: first REMOVE the effect of the covariate, then COMPARE the groups on the residuals.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A l&oacute;gica conceitual &eacute; mais simples do que parece: primeiro REMOVA o efeito da covariate, depois COMPARE os grupos nos residuals.')}
 
 <div class="step-box">
   <div class="step-num">1</div>
   <div class="step-desc">
-    <h4>Regress Each DV on the Covariate</h4>
-    <p>For each DV, fit a regression with the covariate as predictor. This calculates <strong>how much of the DV is explained by the covariate</strong>.</p>
+    <h4>Regredir cada VD na Covariate</h4>
+    <p>Para cada VD, ajuste uma regress&atilde;o com a covariate como preditor. Isso calcula <strong>quanto da VD &eacute; explicado pela covariate</strong>.</p>
     <div class="formula" style="margin-top:10px;text-align:left;font-size:1rem;">
-      Combat<sub>i</sub> = a + <span class="highlight">${b_combat}</span> &times; YearsTraining<sub>i</sub> + e<sub>i</sub><br>
-      Leadership<sub>i</sub> = a + <span class="highlight">${b_leadership}</span> &times; YearsTraining<sub>i</sub> + e<sub>i</sub>
+      Combat<sub>i</sub> = a + <span class="highlight">${b_combat}</span> &times; AnosTraining<sub>i</sub> + e<sub>i</sub><br>
+      Leadership<sub>i</sub> = a + <span class="highlight">${b_leadership}</span> &times; AnosTraining<sub>i</sub> + e<sub>i</sub>
     </div>
   </div>
 </div>
@@ -759,10 +759,10 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','The conceptual logic 
 <div class="step-box">
   <div class="step-num">2</div>
   <div class="step-desc">
-    <h4>Obtain Multivariate Residuals</h4>
-    <p>The residuals are the portion of the DV that the covariate <strong>does not explain</strong>. They are the "net Combat" and the "net Leadership" &mdash; free from the effect of years of training.</p>
+    <h4>Obter Residuals Multivariados</h4>
+    <p>Os residuals s&atilde;o a parte da VD que a covariate <strong>n&atilde;o explica</strong>. &Eacute; o "Combat l&iacute;quido" e a "Leadership l&iacute;quida" &mdash; livres do efeito dos anos de training.</p>
     <div class="formula" style="margin-top:10px;font-size:1rem;">
-      Residual = Observed Value &minus; Value Predicted by the Covariate
+      Res&iacute;duo = Value Observado &minus; Value Predito pela Covariate
     </div>
   </div>
 </div>
@@ -770,15 +770,15 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','The conceptual logic 
 <div class="step-box">
   <div class="step-num">3</div>
   <div class="step-desc">
-    <h4>Run MANOVA on the Residuals</h4>
-    <p>Now compare the three groups using the <strong>residual vectors</strong>. The multivariate test (Wilks\x27 &Lambda;, Pillai, etc.) assesses whether the <strong>adjusted centroids</strong> differ.</p>
+    <h4>Rodar MANOVA nos Residuals</h4>
+    <p>Agora compare os tr&ecirc;s grupos usando os <strong>vetores de residuals</strong>. O teste multivariado (Wilks' &Lambda;, Pillai etc.) avalia se os <strong>centroid&eacute;s ajustados</strong> diferem.</p>
   </div>
 </div>
 
 <div class="step-subtitle">Adjusted vs. Observed Means</div>
 <table class="data-table">
   <thead>
-    <tr><th>Academy</th><th colspan="2">Observed Means</th><th colspan="2">Adjusted Means</th></tr>
+    <tr><th>Academy</th><th colspan="2">Means Observadas</th><th colspan="2">Means Adjusteds</th></tr>
     <tr><th></th><th>&#9876; Combat</th><th>&#128081; Leadership</th><th>&#9876; Combat*</th><th>&#128081; Leadership*</th></tr>
   </thead>
   <tbody>
@@ -787,11 +787,11 @@ ${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','The conceptual logic 
     <tr><td>Vanaheim</td><td>${groupMeans.Vanaheim.combat}</td><td>${groupMeans.Vanaheim.leadership}</td><td>${adjMeans.Vanaheim.combat}</td><td>${adjMeans.Vanaheim.leadership}</td></tr>
   </tbody>
 </table>
-<p><small>* Adjusted to the grand mean of Years of Training (${GM_training})</small></p>
+<p><small>* Adjusteds para a m&eacute;dia geral de Anos de Training (${GM_training})</small></p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Notice: Asgard <strong>dropped</strong> after the adjustment and Midgard <strong>rose</strong>. That makes sense &mdash; Asgard had more experienced warriors. Part of the advantage was prior training, not the academy itself.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Observe: Asgard <strong>caiu</strong> ap&oacute;s o ajuste e Midgard <strong>subiu</strong>. Faz sentido &mdash; Asgard tinha warriors mais experientes. Parte da vantagem era training pr&eacute;vio, n&atilde;o a academy em si.')}
 
-${dlg('corvo','&#128038; Muninn whispers:','The adjusted mean answers: <em>"what would this group\x27s mean be if everyone had the same amount of prior training?"</em> &mdash; it is a statistical equalization.')}
+${dlg('corvo','&#128038; Muninn whispers:','A m&eacute;dia ajustada responde: <em>"qual seria a m&eacute;dia deste grupo se todos tivessem a mesma quantidade de training pr&eacute;vio?"</em> &mdash; &eacute; uma equaliza&ccedil;&atilde;o estat&iacute;stica.')}
 
 <div id="adjustedBars"></div>
 `;
@@ -799,192 +799,192 @@ ${dlg('corvo','&#128038; Muninn whispers:','The adjusted mean answers: <em>"what
   // ---- STEP 7: FOLLOW-UP ----
   case 7: return `
 <div class="step-title">&#128269; Step 7 &mdash; Follow-up: Unpacking the MANCOVA</div>
-<p>If the multivariate test is significant, we need to open the black box. The MANCOVA says "the groups differ" &mdash; but on what? And who differs from whom?</p>
+<p>Se o teste multivariado &eacute; significant, precisamos abrir a caixa preta. A MANCOVA diz "os grupos diferem" &mdash; mas em qu&ecirc;? E quem difere de quem?</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','The MANCOVA follow-up follows a logical cascade across three levels. Each level answers a more specific question.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','O follow-up da MANCOVA segue uma cascata l&oacute;gica em tr&ecirc;s n&iacute;veis. Cada n&iacute;vel responde uma pergunta mais espec&iacute;fica.')}
 
 <div class="step-box">
   <div class="step-num">1</div>
   <div class="step-desc">
-    <h4>Multivariate Test (MANCOVA)</h4>
-    <p>"Do the <strong>adjusted mean vectors</strong> differ across groups?"</p>
+    <h4>Teste Multivariado (MANCOVA)</h4>
+    <p>"Os <strong>vetores de m&eacute;dias ajustadas</strong> diferem entre os grupos?"</p>
     <table class="calc-table" style="margin-top:10px;">
-      <thead><tr><th>Effect</th><th>Wilks\x27 &Lambda;</th><th><em>F</em></th><th>df</th><th><em>p</em></th><th>partial &eta;&sup2;</th></tr></thead>
+      <thead><tr><th>Efeito</th><th>Wilks' &Lambda;</th><th><em>F</em></th><th>gl</th><th><em>p</em></th><th>&eta;&sup2; parcial</th></tr></thead>
       <tbody>
         <tr><td>Covariate (Training)</td><td>0.312</td><td>14.32</td><td>2, 13</td><td class="sig">&lt; .001</td><td>.688</td></tr>
         <tr><td><strong>Academy</strong></td><td><strong>0.148</strong></td><td><strong>7.85</strong></td><td><strong>4, 26</strong></td><td class="sig"><strong>.001</strong></td><td><strong>.547</strong></td></tr>
       </tbody>
     </table>
-    <p style="margin-top:8px;"><span class="highlight-green">&#10004; Significant!</span> The groups differ multivariately. Proceed to level 2.</p>
+    <p style="margin-top:8px;"><span class="highlight-green">&#10004; Significant!</span> Os grupos diferem multivariadamente. Prosseguir para n&iacute;vel 2.</p>
   </div>
 </div>
 
 <div class="step-box">
   <div class="step-num">2</div>
   <div class="step-desc">
-    <h4>Univariate ANCOVAs per DV</h4>
-    <p>"<strong>On which DV</strong> do the groups differ?" &mdash; Run a separate ANCOVA for each DV.</p>
+    <h4>ANCOVAs Univariadas por VD</h4>
+    <p>"<strong>Em qual VD</strong> os grupos diferem?" &mdash; Rode uma ANCOVA separada para cada VD.</p>
     <table class="calc-table" style="margin-top:10px;">
-      <thead><tr><th>DV</th><th><em>F</em></th><th>df</th><th><em>p</em></th><th>partial &eta;&sup2;</th><th>Decision</th></tr></thead>
+      <thead><tr><th>VD</th><th><em>F</em></th><th>gl</th><th><em>p</em></th><th>&eta;&sup2; parcial</th><th>Decision</th></tr></thead>
       <tbody>
         <tr><td>&#9876; Combat</td><td>8.41</td><td>2, 14</td><td class="sig">.004</td><td>.546</td><td class="sig">Significant</td></tr>
         <tr><td>&#128081; Leadership</td><td>6.93</td><td>2, 14</td><td class="sig">.008</td><td>.497</td><td class="sig">Significant</td></tr>
       </tbody>
     </table>
-    <p style="margin-top:8px;"><span class="highlight-green">&#10004;</span> Both DVs show a difference! But apply the <strong>Bonferroni correction</strong>: &alpha; = 0.05/2 = 0.025. Both p < .025 &mdash; they remain significant.</p>
+    <p style="margin-top:8px;"><span class="highlight-green">&#10004;</span> Ambas as VDs mostram diferen&ccedil;a! Mas aplique <strong>corre&ccedil;&atilde;o de Bonferroni</strong>: &alpha; = 0.05/2 = 0.025. Ambos p < .025 &mdash; mant&ecirc;m significants.</p>
   </div>
 </div>
 
 <div class="step-box">
   <div class="step-num">3</div>
   <div class="step-desc">
-    <h4>Pairwise Comparisons with Adjusted Means</h4>
-    <p>"<strong>Who differs from whom?</strong>" &mdash; Post-hoc tests (Bonferroni) on the adjusted means.</p>
+    <h4>Compara&ccedil;&otilde;es Par-a-Par com Means Adjusteds</h4>
+    <p>"<strong>Quem difere de quem?</strong>" &mdash; Testes post-hoc (Bonferroni) nas m&eacute;dias ajustadas.</p>
     <table class="calc-table" style="margin-top:10px;">
-      <thead><tr><th>Comparison</th><th>Combat Diff.*</th><th><em>p</em></th><th>Leadership Diff.*</th><th><em>p</em></th></tr></thead>
+      <thead><tr><th>Comparison</th><th>Dif. Combat*</th><th><em>p</em></th><th>Dif. Leadership*</th><th><em>p</em></th></tr></thead>
       <tbody>
         <tr><td>Asgard vs. Midgard</td><td>${round2(adjMeans.Asgard.combat - adjMeans.Midgard.combat)}</td><td class="sig">.003</td><td>${round2(adjMeans.Asgard.leadership - adjMeans.Midgard.leadership)}</td><td class="sig">.011</td></tr>
         <tr><td>Asgard vs. Vanaheim</td><td>${round2(adjMeans.Asgard.combat - adjMeans.Vanaheim.combat)}</td><td>.084</td><td>${round2(adjMeans.Asgard.leadership - adjMeans.Vanaheim.leadership)}</td><td>.127</td></tr>
         <tr><td>Midgard vs. Vanaheim</td><td>${round2(adjMeans.Midgard.combat - adjMeans.Vanaheim.combat)}</td><td class="sig">.019</td><td>${round2(adjMeans.Midgard.leadership - adjMeans.Vanaheim.leadership)}</td><td class="sig">.031</td></tr>
       </tbody>
     </table>
-    <p><small>* Differences between adjusted means, Bonferroni-corrected</small></p>
+    <p><small>* Diferen&ccedil;as entre m&eacute;dias ajustadas, corrigidas por Bonferroni</small></p>
   </div>
 </div>
 
-${dlg('thor','&#9889; Thorment','So it\x27s three tests in a cascade? Doesn\x27t that inflate the error?')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','That is why we use <strong>Bonferroni</strong> at each level. And we only advance to the next level if the previous one is significant. It is a protected cascade.')}
+${dlg('thor','&#9889; Thorment','Ent&atilde;o s&atilde;o tr&ecirc;s testes em cascata? Isso n&atilde;o infla o erro?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Por isso usamos <strong>Bonferroni</strong> em cada n&iacute;vel. E s&oacute; avan&ccedil;amos para o n&iacute;vel seguinte se o anterior for significant. &Eacute; uma cascata protegida.')}
 
-${dlg('corvo','&#128038; Muninn whispers:','In practice, the result shows that Midgard is significantly inferior to Asgard and Vanaheim <strong>even after controlling for years of training</strong>. Asgard and Vanaheim do not differ from each other. Prior training explains part, but not all, of the difference.')}
+${dlg('corvo','&#128038; Muninn whispers:','Na pr&aacute;tica, o resultado mostra que Midgard &eacute; significantmente inferior a Asgard e Vanaheim <strong>mesmo ap&oacute;s controlar os anos de training</strong>. Asgard e Vanaheim n&atilde;o diferem entre si. O training pr&eacute;vio explica parte, mas n&atilde;o toda a diferen&ccedil;a.')}
 `;
 
   // ---- STEP 8: COMPLETE GLM ----
   case 8: return `
 <div class="step-title">&#127968; Step 8 &mdash; The Complete GLM: The Hierarchy</div>
-<p>MANCOVA is the most general case. All other tests are <strong>special cases</strong> of it.</p>
+<p>MANCOVA &eacute; o caso mais geral. Todos os outros testes s&atilde;o <strong>casos especiais</strong> dela.</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Think of the GLM as a family tree. MANCOVA sits at the top &mdash; it is the ancestor of them all. Remove pieces and you descend the tree.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Pense no GLM como uma &aacute;rvore geneal&oacute;gica. A MANCOVA est&aacute; no topo &mdash; &eacute; a ancestral de todas. Remova pe&ccedil;as e voc&ecirc; desce a &aacute;rvore.')}
 
 <div class="svg-container" id="glmTreeSVG"></div>
 
-<div class="step-subtitle">How to Navigate the Tree</div>
+<div class="step-subtitle">Como Navegar a &Aacute;rvore</div>
 <table class="compare-table" style="font-size:0.9rem;">
   <thead>
-    <tr><th>From...</th><th>To...</th><th>What changes</th></tr>
+    <tr><th>De...</th><th>Para...</th><th>O que muda</th></tr>
   </thead>
   <tbody>
-    <tr><td>MANCOVA</td><td>MANOVA</td><td>Remove covariates</td></tr>
-    <tr><td>MANCOVA</td><td>ANCOVA</td><td>Reduce to 1 DV</td></tr>
-    <tr><td>MANOVA</td><td>ANOVA</td><td>Reduce to 1 DV</td></tr>
-    <tr><td>ANCOVA</td><td>ANOVA</td><td>Remove covariates</td></tr>
-    <tr><td>ANOVA</td><td>t-test</td><td>Reduce to 2 groups</td></tr>
+    <tr><td>MANCOVA</td><td>MANOVA</td><td>Remove covari&aacute;veis</td></tr>
+    <tr><td>MANCOVA</td><td>ANCOVA</td><td>Reduz a 1 VD</td></tr>
+    <tr><td>MANOVA</td><td>ANOVA</td><td>Reduz a 1 VD</td></tr>
+    <tr><td>ANCOVA</td><td>ANOVA</td><td>Remove covari&aacute;veis</td></tr>
+    <tr><td>ANOVA</td><td>Teste t</td><td>Reduz a 2 grupos</td></tr>
   </tbody>
 </table>
 
-${dlg('thor','&#9889; Thorment','So the t-test is the weakest?')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Not "weakest" &mdash; the most <strong>specific</strong>. Each test exists for a reason. Use the simplest one that answers your research question. Occam\x27s Razor.')}
+${dlg('thor','&#9889; Thorment','Ent&atilde;o o teste t &eacute; o mais fraco?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No "fraco" &mdash; o mais <strong>espec&iacute;fico</strong>. Cada teste existe por um motivo. Use o mais simples que responda &agrave; sua pergunta de pesquisa. Navaja de Ockham.')}
 
 <div class="hyp-box">
-  <h4>&#127942; Hierarchy Summary</h4>
-  <p><strong>t-test:</strong> 2 groups, 1 DV &mdash; "Asgard vs. Midgard in Combat"</p>
-  <p><strong>ANOVA:</strong> 3+ groups, 1 DV &mdash; "Do the 3 academies differ in Combat?"</p>
-  <p><strong>ANCOVA:</strong> 3+ groups, 1 DV, covariate &mdash; "...controlling for prior training?"</p>
-  <p><strong>MANOVA:</strong> 3+ groups, 2+ DVs &mdash; "...in Combat AND Leadership simultaneously?"</p>
-  <p><strong>MANCOVA:</strong> 3+ groups, 2+ DVs, covariate &mdash; "...controlling for prior training?"</p>
+  <h4>&#127942; Resumo da Hierarquia</h4>
+  <p><strong>teste t:</strong> 2 groups, 1 DV &mdash; "Asgard vs. Midgard em Combat"</p>
+  <p><strong>ANOVA:</strong> 3+ grupos, 1 VD &mdash; "As 3 academys diferem em Combat?"</p>
+  <p><strong>ANCOVA:</strong> 3+ grupos, 1 VD, covariate &mdash; "...controlando training pr&eacute;vio?"</p>
+  <p><strong>MANOVA:</strong> 3+ grupos, 2+ VDs &mdash; "...em Combat E Leadership simultaneamente?"</p>
+  <p><strong>MANCOVA:</strong> 3+ grupos, 2+ VDs, covariate &mdash; "...controlando training pr&eacute;vio?"</p>
 </div>
 
-${dlg('corvo','&#128038; Muninn whispers:','Mathematically, the t-test is an ANOVA with 2 groups, which is a MANOVA with 1 DV, which is a MANCOVA without a covariate. The general equation: <strong>Y = Xb + e</strong>, where Y is the DV matrix, X is the design matrix (groups + covariates), b are the coefficients, and e is the error.')}
+${dlg('corvo','&#128038; Muninn whispers:','Matematicamente, o teste t &eacute; uma ANOVA com 2 grupos, que &eacute; uma MANOVA com 1 VD, que &eacute; uma MANCOVA sem covariate. A equa&ccedil;&atilde;o geral: <strong>Y = Xb + e</strong>, onde Y &eacute; matriz de VDs, X &eacute; matriz de delineamento (grupos + covari&aacute;veis), b s&atilde;o os coeficientes e e &eacute; o erro.')}
 `;
 
   // ---- STEP 9: APA REPORT ----
   case 9: return `
-<div class="step-title">&#128221; Step 9 &mdash; Reporting in APA Format</div>
-<p>Publishing MANCOVA results requires <strong>three blocks of information</strong> in the text.</p>
+<div class="step-title">&#128221; Step 9 &mdash; Reporte em APA Format</div>
+<p>Publicar resultados de MANCOVA exige <strong>tr&ecirc;s blocos de informa&ccedil;&atilde;o</strong> no texto.</p>
 
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','The APA report for MANCOVA follows the same cascade as the follow-up: first the multivariate test, then the univariate tests, then the post-hoc comparisons.')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','O reporte APA de MANCOVA segue a mesma cascata do follow-up: primeiro o teste multivariado, depois os univariados, depois os post-hoc.')}
 
-<div class="step-subtitle">Block 1: Multivariate Test</div>
+<div class="step-subtitle">Bloco 1: Teste Multivariado</div>
 <div class="apa-box">
   <div class="apa-label">&#128203; APA Format</div>
-  A MANCOVA was conducted to examine the effect of Academy (Asgard, Midgard, Vanaheim) on Combat and Leadership scores, controlling for Years of Prior Training. Box\x27s test was not significant (<em>p</em> = .412), indicating homogeneity of covariance matrices. The Group &times; Covariate interaction was also not significant, &Lambda; = 0.891, <em>F</em>(4, 26) = 0.36, <em>p</em> = .831, confirming homogeneity of slopes. The multivariate effect of Academy was significant, <strong>Wilks\x27 &Lambda; = 0.148, <em>F</em>(4, 26) = 7.85, <em>p</em> = .001, &eta;<sup>2</sup><sub>p</sub> = .547</strong>.
+  Uma MANCOVA foi conduzida para examinar o efeito de Academy (Asgard, Midgard, Vanaheim) sobre as pontua&ccedil;&otilde;es de Combat e Leadership, controlando os Anos de Training Pr&eacute;vio. O teste de Box n&atilde;o foi significant (<em>p</em> = .412), indicando homogeneidade das matrizes de covariance. A intera&ccedil;&atilde;o Grupo &times; Covariate tamb&eacute;m n&atilde;o foi significant, &Lambda; = 0.891, <em>F</em>(4, 26) = 0.36, <em>p</em> = .831, confirmando homogeneidade das slopes. O efeito multivariado de Academy foi significant, <strong>Wilks' &Lambda; = 0.148, <em>F</em>(4, 26) = 7.85, <em>p</em> = .001, &eta;<sup>2</sup><sub>p</sub> = .547</strong>.
 </div>
 
-<div class="step-subtitle">Block 2: Univariate ANCOVAs</div>
+<div class="step-subtitle">Bloco 2: ANCOVAs Univariadas</div>
 <div class="apa-box">
   <div class="apa-label">&#128203; APA Format</div>
-  Follow-up univariate analyses (ANCOVAs with Bonferroni correction, &alpha; = .025) revealed a significant effect of Academy on both Combat, <em>F</em>(2, 14) = 8.41, <em>p</em> = .004, &eta;<sup>2</sup><sub>p</sub> = .546, and Leadership, <em>F</em>(2, 14) = 6.93, <em>p</em> = .008, &eta;<sup>2</sup><sub>p</sub> = .497.
+  An&aacute;lises univariadas de follow-up (ANCOVAs com corre&ccedil;&atilde;o de Bonferroni, &alpha; = .025) revelaram efeito significant de Academy tanto em Combat, <em>F</em>(2, 14) = 8.41, <em>p</em> = .004, &eta;<sup>2</sup><sub>p</sub> = .546, quanto em Leadership, <em>F</em>(2, 14) = 6.93, <em>p</em> = .008, &eta;<sup>2</sup><sub>p</sub> = .497.
 </div>
 
-<div class="step-subtitle">Block 3: Adjusted Means and Post-hoc</div>
+<div class="step-subtitle">Bloco 3: Means Adjusteds e Post-hoc</div>
 <div class="apa-box">
   <div class="apa-label">&#128203; APA Format</div>
-  Bonferroni-corrected pairwise comparisons on the adjusted means indicated that Asgard (<em>M</em><sub>adj</sub> = ${adjMeans.Asgard.combat}, <em>SE</em> = 2.14) significantly outperformed Midgard (<em>M</em><sub>adj</sub> = ${adjMeans.Midgard.combat}, <em>SE</em> = 2.08) in Combat (<em>p</em> = .003). Vanaheim (<em>M</em><sub>adj</sub> = ${adjMeans.Vanaheim.combat}, <em>SE</em> = 2.11) also outperformed Midgard (<em>p</em> = .019). The Asgard vs. Vanaheim difference was not significant (<em>p</em> = .084). An analogous pattern was observed for Leadership.
+  Compara&ccedil;&otilde;es par-a-par com corre&ccedil;&atilde;o de Bonferroni nas m&eacute;dias ajustadas indicaram que Asgard (<em>M</em><sub>adj</sub> = ${adjMeans.Asgard.combat}, <em>SE</em> = 2.14) superou significantmente Midgard (<em>M</em><sub>adj</sub> = ${adjMeans.Midgard.combat}, <em>SE</em> = 2.08) em Combat (<em>p</em> = .003). Vanaheim (<em>M</em><sub>adj</sub> = ${adjMeans.Vanaheim.combat}, <em>SE</em> = 2.11) tamb&eacute;m superou Midgard (<em>p</em> = .019). A diferen&ccedil;a Asgard vs. Vanaheim n&atilde;o foi significant (<em>p</em> = .084). Padr&atilde;o an&aacute;logo foi observado em Leadership.
 </div>
 
-${dlg('thor','&#9889; Thorment','All of that in one paragraph?! Nobody is going to read it!')}
-${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','APA demands completeness. Each number serves a purpose: the &Lambda; shows the global effect, the univariate <em>F</em> values show where the difference lies, the adjusted means show who differs from whom. No redundancy &mdash; every piece counts.')}
+${dlg('thor','&#9889; Thorment','Tudo isso num par&aacute;grafo?! Ningu&eacute;m vai ler!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A APA exige completude. Cada n&uacute;mero tem fun&ccedil;&atilde;o: o &Lambda; mostra o efeito global, os <em>F</em> univariados mostram onde est&aacute; a diferen&ccedil;a, as m&eacute;dias ajustadas mostram quem difere de quem. Sem redundancy &mdash; cada pe&ccedil;a conta.')}
 
 <div class="hyp-box">
-  <h4>&#128204; MANCOVA Report Checklist</h4>
-  <p>&#10003; Description of the design (IV, DVs, covariate)</p>
-  <p>&#10003; Box\x27s M verification</p>
-  <p>&#10003; Homogeneity of slopes verification</p>
-  <p>&#10003; Multivariate test: &Lambda;, <em>F</em>, df, <em>p</em>, &eta;&sup2;<sub>p</sub></p>
-  <p>&#10003; Univariate ANCOVAs: <em>F</em>, df, <em>p</em>, &eta;&sup2;<sub>p</sub> (with Bonferroni)</p>
-  <p>&#10003; Post-hoc: adjusted means (<em>M</em><sub>adj</sub>) with <em>SE</em> and <em>p</em></p>
-  <p>&#10003; Effect size (&eta;&sup2;<sub>p</sub> or Pillai\x27s trace)</p>
+  <h4>&#128204; Report Checklist MANCOVA</h4>
+  <p>&#10003; Descri&ccedil;&atilde;o do delineamento (VI, VDs, covariate)</p>
+  <p>&#10003; Verifica&ccedil;&atilde;o de Box's M</p>
+  <p>&#10003; Verifica&ccedil;&atilde;o de homogeneidade de slopes</p>
+  <p>&#10003; Teste multivariado: &Lambda;, <em>F</em>, gl, <em>p</em>, &eta;&sup2;<sub>p</sub></p>
+  <p>&#10003; ANCOVAs univariadas: <em>F</em>, gl, <em>p</em>, &eta;&sup2;<sub>p</sub> (com Bonferroni)</p>
+  <p>&#10003; Post-hoc: m&eacute;dias ajustadas (<em>M</em><sub>adj</sub>) com <em>SE</em> e <em>p</em></p>
+  <p>&#10003; Effect size (&eta;&sup2;<sub>p</sub> ou Pillai's trace)</p>
 </div>
 
-${dlg('corvo','&#128038; Muninn whispers:','For MANCOVA, prefer reporting <strong>Pillai\x27s Trace</strong> when assumptions are marginal &mdash; it is more robust. Use <strong>Wilks\x27 &Lambda;</strong> when everything is clean. Both are acceptable under APA.')}
+${dlg('corvo','&#128038; Muninn whispers:','Na MANCOVA, prefira reportar <strong>Pillai&apos;s Trace</strong> quando os pressupostos est&atilde;o marginais &mdash; &eacute; mais robusto. Use <strong>Wilks&apos; &Lambda;</strong> quando tudo est&aacute; limpo. Ambos s&atilde;o aceit&aacute;veis pela APA.')}
 `;
 
   // ---- STEP 10: LESSON OF THE RAVENS ----
   case 10: return `
 <div class="step-title">&#128038; Step 10 &mdash; Lesson of the Ravens</div>
 
-${dlg('corvo','&#128038; Muninn whispers:',`
-<strong>What we learned about MANCOVA:</strong><br><br>
-&#10003; MANCOVA = MANOVA + ANCOVA &mdash; the <strong>crown of the GLM</strong><br>
-&#10003; Compares <strong>adjusted mean vectors</strong> across groups<br>
-&#10003; Controls for <strong>continuous covariates</strong> that could confound results<br>
-&#10003; Protects against <strong>Type I inflation</strong> (multiple DVs) and <strong>confounding</strong><br>
-&#10003; Requires <strong>7 assumptions</strong> &mdash; all must be verified<br>
-&#10003; Critical assumption: <strong>multivariate homogeneity of slopes</strong><br>
-&#10003; Follow-up cascade: MANCOVA &rarr; ANCOVAs &rarr; Post-hoc<br>
-&#10003; Always report <strong>adjusted means</strong> (not observed) in the results<br>
-&#10003; Parsimony: each covariate needs <strong>theoretical justification</strong><br>
-&#10003; The entire GLM family is a special case of <strong>Y = Xb + e</strong>
+${dlg('corvo','&#128038; Muninn summarizes:',`
+<strong>O que aprendemos sobre MANCOVA:</strong><br><br>
+&#10003; MANCOVA = MANOVA + ANCOVA &mdash; a <strong>coroa do GLM</strong><br>
+&#10003; Compara <strong>vetores de m&eacute;dias ajustadas</strong> entre grupos<br>
+&#10003; Controla <strong>covari&aacute;veis cont&iacute;nuas</strong> que poderiam confundir resultados<br>
+&#10003; Protege contra <strong>infla&ccedil;&atilde;o do Tipo I</strong> (m&uacute;ltiplas VDs) e <strong>confundimento</strong><br>
+&#10003; Exige <strong>7 pressupostos</strong> &mdash; todos devem ser verificados<br>
+&#10003; Assumption cr&iacute;tico: <strong>homogeneidade de slopes multivariada</strong><br>
+&#10003; Follow-up em cascata: MANCOVA &rarr; ANCOVAs &rarr; Post-hoc<br>
+&#10003; Sempre reporte <strong>m&eacute;dias ajustadas</strong> (n&atilde;o observadas) nos resultados<br>
+&#10003; Parcim&ocirc;nia: cada covariate precisa de <strong>justificativa te&oacute;rica</strong><br>
+&#10003; Toda a fam&iacute;lia GLM &eacute; um caso especial de <strong>Y = Xb + e</strong>
 `)}
 
 ${dlg('corvo','&#128038; Huginn challenges:',`
 <strong>Challenges for you:</strong><br><br>
-&#9881; Is MANCOVA <strong>always</strong> better than MANOVA? When is it not?<br>
-<small style="color:var(--text-dim);">(Hint: think about covariates with no correlation to the DV)</small><br><br>
-&#9881; What if you have <strong>3 covariates and n = 8</strong> per group? Is that feasible?<br>
-<small style="color:var(--text-dim);">(Hint: calculate the error degrees of freedom)</small><br><br>
-&#9881; A colleague uses "years of training" as a covariate, but it was measured <strong>after</strong> one year at the academy. What is the problem?<br>
-<small style="color:var(--text-dim);">(Hint: the covariate may have been contaminated by the treatment)</small><br><br>
-&#9881; Combat and Leadership have a correlation of r = 0.92. Is that good or bad for MANCOVA?<br>
-<small style="color:var(--text-dim);">(Hint: multicollinearity among DVs reduces multivariate power)</small><br><br>
-&#9881; Box\x27s test gives <em>p</em> = .03. Do you reject the MANCOVA?<br>
-<small style="color:var(--text-dim);">(Hint: Box\x27s M uses &alpha; = .001 as the usual criterion)</small>
+&#9881; MANCOVA &eacute; <strong>sempre</strong> melhor que MANOVA? When n&atilde;o &eacute;?<br>
+<small style="color:var(--text-dim);">(Dica: pense em covari&aacute;veis sem correla&ccedil;&atilde;o com a VD)</small><br><br>
+&#9881; E se voc&ecirc; tem <strong>3 covari&aacute;veis e n = 8</strong> por grupo? &Eacute; vi&aacute;vel?<br>
+<small style="color:var(--text-dim);">(Dica: calcule os degrees of freedom do erro)</small><br><br>
+&#9881; Um colega usa "anos de training" como covariate, mas ela foi medida <strong>ap&oacute;s</strong> um ano na academy. Qual o problema?<br>
+<small style="color:var(--text-dim);">(Dica: a covariate pode ter sido contaminada pelo tratamento)</small><br><br>
+&#9881; Combat e Leadership t&ecirc;m correla&ccedil;&atilde;o r = 0.92. Isso &eacute; bom ou ruim para a MANCOVA?<br>
+<small style="color:var(--text-dim);">(Dica: multicolinearidade entre VDs reduce o poder multivariado)</small><br><br>
+&#9881; O teste de Box d&aacute; <em>p</em> = .03. Voc&ecirc; rejeita a MANCOVA?<br>
+<small style="color:var(--text-dim);">(Dica: Box's M usa &alpha; = .001 como crit&eacute;rio usual)</small>
 `)}
 
 <div class="svg-container" id="familyTreeFinal"></div>
 
 <div class="hyp-box" style="border-color: var(--gold);">
-  <h4 style="color: var(--gold);">&#127942; Quick Guide: When to Use Each Test?</h4>
-  <p><strong>2 groups, 1 DV:</strong> independent t-test</p>
-  <p><strong>3+ groups, 1 DV:</strong> one-way ANOVA</p>
-  <p><strong>3+ groups, 1 DV, covariate:</strong> ANCOVA</p>
-  <p><strong>2+ factors, 1 DV:</strong> factorial ANOVA</p>
-  <p><strong>3+ groups, 2+ DVs:</strong> MANOVA</p>
-  <p><strong>3+ groups, 2+ DVs, covariate:</strong> <span class="highlight">MANCOVA</span> &#128081;</p>
-  <p style="margin-top:10px;color:var(--text-dim);font-size:0.9rem;"><em>Rule: use the simplest test that answers your question. Parsimony always.</em></p>
+  <h4 style="color: var(--gold);">&#127942; Quick Guide: When Usar Cada Teste?</h4>
+  <p><strong>2 groups, 1 DV:</strong> teste t independente</p>
+  <p><strong>3+ grupos, 1 VD:</strong> ANOVA one-way</p>
+  <p><strong>3+ grupos, 1 VD, covariate:</strong> ANCOVA</p>
+  <p><strong>2+ fatores, 1 VD:</strong> ANOVA Fatorial</p>
+  <p><strong>3+ grupos, 2+ VDs:</strong> MANOVA</p>
+  <p><strong>3+ grupos, 2+ VDs, covariate:</strong> <span class="highlight">MANCOVA</span> &#128081;</p>
+  <p style="margin-top:10px;color:var(--text-dim);font-size:0.9rem;"><em>Regra: use o teste mais simples que responda &agrave; sua pergunta. Parcim&ocirc;nia sempre.</em></p>
 </div>
 
 <div class="signature" style="margin-top:30px;border:none;font-size:1rem;color:var(--gold);">
-  &#128081; From Odin\x27s Throne, the supreme knowledge of the GLM has been revealed! &#128081;
+  &#128081; From Odin's Throne, the supreme knowledge of the GLM has been revealed! &#128081;
 </div>
 `;
 
@@ -1160,7 +1160,7 @@ function drawGLMTree(){
     {x:540, y:140, label:'ANCOVA',   sub:'k groups, 1 DV, c covs',  color:'#bc8cff', w:150, h:48},
     {x:180, y:250, label:'ANOVA',    sub:'k groups, 1 DV',          color:'#58a6ff', w:140, h:44},
     {x:540, y:250, label:'ANOVA',    sub:'(redundant)',             color:'#58a6ff', w:140, h:44},
-    {x:360, y:350, label:'t-test',   sub:'2 groups, 1 DV',          color:'#f85149', w:130, h:44}
+    {x:360, y:350, label:'Teste t',  sub:'2 groups, 1 DV',          color:'#f85149', w:130, h:44}
   ];
 
   // Edges
@@ -1229,19 +1229,19 @@ function drawFamilyTreeFinal(){
   // Nodes
   diamond(360, 75, 'How many DVs?', '#8b949e');
 
-  // Left: 1 DV
+  // Left: 1 VD
   diamond(160, 175, 'How many groups?', '#58a6ff');
-  diamond(160, 295, 'Any covariates?', '#bc8cff');
+  diamond(160, 295, 'Tem covariates?', '#bc8cff');
   resultBox(60, 395, 'ANOVA', '#58a6ff');
   resultBox(260, 395, 'ANCOVA', '#bc8cff');
 
-  // Right: 2+ DVs
-  diamond(560, 175, 'Any covariates?', '#f0c040');
+  // Right: 2+ VDs
+  diamond(560, 175, 'Tem covariates?', '#f0c040');
   resultBox(460, 295, 'MANOVA', '#3fb950');
   resultBox(660, 295, 'MANCOVA', '#f0c040');
 
   // Far left: 2 groups
-  resultBox(60, 175, 't-test', '#f85149');
+  resultBox(60, 175, 'Teste t', '#f85149');
 
   // Edges
   function arrow(x1,y1,x2,y2,label,side){
@@ -1255,18 +1255,18 @@ function drawFamilyTreeFinal(){
   svg += '<defs><marker id="ah2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#30363d"/></marker></defs>';
 
   // From "How many DVs?"
-  arrow(290, 75, 160, 148, '1 DV', 'l');
-  arrow(430, 75, 560, 148, '2+ DVs', 'r');
+  arrow(290, 75, 160, 148, '1 VD', 'l');
+  arrow(430, 75, 560, 148, '2+ VDs', 'r');
 
-  // From "How many groups?" (1 DV)
+  // From "How many groups?" (1 VD)
   arrow(90, 175, 68, 175, '2', 'l');
   arrow(160, 200, 160, 268, '3+', '');
 
-  // From "Any covariates?" (1 DV)
+  // From "Tem covs?" (1 VD)
   arrow(90, 295, 60, 376, 'No', 'l');
   arrow(230, 295, 260, 376, 'Yes', 'r');
 
-  // From "Any covariates?" (2+ DVs)
+  // From "Tem covs?" (2+ VDs)
   arrow(490, 175, 460, 268, 'No', 'l');
   arrow(630, 175, 660, 268, 'Yes', 'r');
 

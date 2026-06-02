@@ -566,11 +566,11 @@ function step0() {
 
   return `
     <h2 class="step-title">The Treasure of Five Viking Raids</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Jovem guerreiro, temos os registros de cinco saques vikings. Cada expedição trouxe uma quantidade diferente de moedas de ouro. Antes de tomar qualquer decisão sobre o butim, precisamos <strong>descrever</strong> esses dados com rigor.')}
-    <p style="margin:14px 0;">Os exploradores retornaram com os seguintes tesouros (em moedas de ouro):</p>
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Young warrior, we have the records of five Viking raids. Each expedition brought back a different amount of gold coins. Before making any decision about the spoils, we must <strong>describe</strong> this data with rigor.')}
+    <p style="margin:14px 0;">The explorers returned with the following treasures (in gold coins):</p>
     <table class="data-table">
       <tr><th>Expedition</th>${raids.map(r => `<th style="color:var(--odin-blue)">${r}</th>`).join('')}</tr>
-      <tr><td style="font-family:'Permanent Marker',cursive;">Moedas</td>${data.map(v => `<td class="hl-gold">${v}</td>`).join('')}</tr>
+      <tr><td style="font-family:'Permanent Marker',cursive;">Coins</td>${data.map(v => `<td class="hl-gold">${v}</td>`).join('')}</tr>
     </table>
     <div class="visual-container">
       <svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
@@ -579,8 +579,8 @@ function step0() {
         ${barsSVG}
       </svg>
     </div>
-    ${dialogue('thor', '⚡ Thorment', 'Bah, para que tantos cálculos? Olha o gráfico – dá pra ver de relance que Jómsborg foi o melhor saque. Bora dividir logo e ir beber hidromel!')}
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Olhar de relance é receita para desastre. Estatística descritiva nos dá ferramentas precisas para resumir, comparar e entender distribuições. Vamos passo a passo.')}
+    ${dialogue('thor', '⚡ Thorment', 'Bah, why so many calculations? Look at the chart \x96 you can tell at a glance that J\xf3msborg was the best raid. Let\x27s just split it up and go drink mead!')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Eyeballing it is a recipe for disaster. Descriptive statistics gives us precise tools to summarize, compare, and understand distributions. Let\x27s go step by step.')}
   `;
 }
 
@@ -588,50 +588,50 @@ function step1() {
   return `
     <h2 class="step-title">Measures of Central Tendency</h2>
     <p class="step-subtitle">Mean, Median, and Mode</p>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'As medidas de tendência central respondem a pergunta: <strong>qual valor representa o "centro" dos dados?</strong> Temos três ferramentas clássicas.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Measures of central tendency answer the question: <strong>what value represents the "center" of the data?</strong> We have three classic tools.')}
 
     <div class="info-panel" style="margin-top:14px;">
-      <div class="info-panel-title">1. Média Aritmética (x̄)</div>
+      <div class="info-panel-title">1. Arithmetic Mean (x\u0304)</div>
       <div class="formula-label">Formula</div>
       <div class="formula">x̄ = Σxᵢ / n</div>
-      <p>Somamos todos os valores e dividimos pelo total de observações.</p>
+      <p>We add all the values and divide by the total number of observations.</p>
       <table class="calc-table" style="margin-top:10px;">
-        <tr><th>Passo</th><th>Calculation</th></tr>
-        <tr><td>Soma (Σxᵢ)</td><td>${data.join(' + ')} = <span class="hl-gold">${soma}</span></td></tr>
-        <tr><td>Dividir por n</td><td>${soma} / ${n} = <span class="hl-gold">${fmt(media)}</span></td></tr>
+        <tr><th>Step</th><th>Calculation</th></tr>
+        <tr><td>Sum (\u03a3x\u1d62)</td><td>${data.join(' + ')} = <span class="hl-gold">${soma}</span></td></tr>
+        <tr><td>Divide by n</td><td>${soma} / ${n} = <span class="hl-gold">${fmt(media)}</span></td></tr>
       </table>
     </div>
 
     <div class="info-panel">
-      <div class="info-panel-title">2. Mediana (Md)</div>
-      <p>Valor que divide os dados ordenados ao meio. Com n ímpar, é o valor central.</p>
+      <div class="info-panel-title">2. Median (Md)</div>
+      <p>The value that divides the sorted data in half. With odd n, it is the middle value.</p>
       <table class="calc-table">
-        <tr><th>Dados ordenados</th><td>${sorted.join(', ')}</td></tr>
-        <tr><th>Posição central</th><td>(${n}+1)/2 = posição ${(n+1)/2} → <span class="hl-gold">${mediana}</span></td></tr>
+        <tr><th>Sorted data</th><td>${sorted.join(', ')}</td></tr>
+        <tr><th>Central position</th><td>(${n}+1)/2 = position ${(n+1)/2} → <span class="hl-gold">${mediana}</span></td></tr>
       </table>
     </div>
 
     <div class="info-panel">
-      <div class="info-panel-title">3. Moda (Mo)</div>
-      <p>Valor que aparece com maior frequência. Neste dataset, <strong>nenhum valor se repete</strong> — logo, <span class="hl-red">não há moda</span> (distribuição amodal).</p>
+      <div class="info-panel-title">3. Mode (Mo)</div>
+      <p>The value that appears most frequently. In this dataset, <strong>no value repeats</strong> \x96 therefore, <span class="hl-red">there is no mode</span> (amodal distribution).</p>
     </div>
 
     <div class="concept-grid" style="margin-top:20px;">
       <div class="concept-card active">
-        <div class="concept-title">Média</div>
+        <div class="concept-title">Mean</div>
         <div class="concept-value">${fmt(media)}</div>
       </div>
       <div class="concept-card active">
-        <div class="concept-title">Mediana</div>
+        <div class="concept-title">Median</div>
         <div class="concept-value">${mediana}</div>
       </div>
       <div class="concept-card">
-        <div class="concept-title">Moda</div>
+        <div class="concept-title">Mode</div>
         <div class="concept-value" style="color:var(--thor-red);">—</div>
       </div>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'A <strong>média</strong> considera todos os valores; a <strong>mediana</strong> resiste a valores extremos; a <strong>moda</strong> identifica o valor mais frequente. Cada uma conta uma história diferente.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The <strong>mean</strong> considers all values; the <strong>median</strong> resists extreme values; the <strong>mode</strong> identifies the most frequent value. Each tells a different story.')}
   `;
 }
 
@@ -643,35 +643,35 @@ function step2() {
 
   return `
     <h2 class="step-title">When to Use Each Measure?</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A média é a mais usada, mas tem um calcanhar de Aquiles: é <strong>sensível a valores extremos</strong>. Imagina que Jómsborg não trouxe 33, mas sim 100 moedas de ouro. Olha o estrago:')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The mean is the most used, but it has an Achilles\x27 heel: it is <strong>sensitive to extreme values</strong>. Imagine J\xf3msborg brought not 33 but 100 gold coins. Look at the damage:')}
 
     <table class="data-table">
       <tr><th></th><th>Original Data</th><th>Data with Outlier</th></tr>
-      <tr><td style="font-family:'Permanent Marker',cursive;">Valores</td>
+      <tr><td style="font-family:'Permanent Marker',cursive;">Values</td>
         <td>${data.join(', ')}</td>
         <td>${dataOutlier.join(', ')}</td></tr>
-      <tr><td style="font-family:'Permanent Marker',cursive;">Média</td>
+      <tr><td style="font-family:'Permanent Marker',cursive;">Mean</td>
         <td class="hl-gold">${fmt(media)}</td>
         <td class="hl-red">${fmt(mediaOutlier)}</td></tr>
-      <tr><td style="font-family:'Permanent Marker',cursive;">Mediana</td>
+      <tr><td style="font-family:'Permanent Marker',cursive;">Median</td>
         <td class="hl-gold">${mediana}</td>
         <td class="hl-green">${medianaOutlier}</td></tr>
     </table>
 
-    ${dialogue('thor', '⚡ Thorment', 'Putz! A média pulou de 20 para ${fmt(mediaOutlier)}! O Jarl vai achar que somos ricos!')}
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Exato. A mediana mal se mexeu – continuou ${medianaOutlier}. Por isso, em dados com distribuição assimétrica ou outliers, a mediana é mais robusta.')}
+    ${dialogue('thor', '⚡ Thorment', 'Wow! The mean jumped from 20 to ${fmt(mediaOutlier)}! The Jarl will think we\x27re rich!')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Exactly. The median barely moved \x96 it stayed at ${medianaOutlier}. That\x27s why, with skewed data or outliers, the median is more robust.')}
 
     <div class="info-panel">
       <div class="info-panel-title">Quick Guide</div>
       <table class="calc-table">
-        <tr><th>Measure</th><th>Use quando...</th><th>Evite quando...</th></tr>
-        <tr><td class="hl-blue">Média</td><td>Distribuição simétrica, sem outliers</td><td>Dados com valores extremos</td></tr>
-        <tr><td class="hl-blue">Mediana</td><td>Dados assimétricos, com outliers</td><td>Precisa de cálculos algébricos posteriores</td></tr>
-        <tr><td class="hl-blue">Moda</td><td>Dados categóricos ou multimodais</td><td>Dados contínuos sem repetição</td></tr>
+        <tr><th>Measure</th><th>Use when...</th><th>Avoid when...</th></tr>
+        <tr><td class="hl-blue">Mean</td><td>Symmetric distribution, no outliers</td><td>Data with extreme values</td></tr>
+        <tr><td class="hl-blue">Median</td><td>Skewed data with outliers</td><td>Need further algebraic calculations</td></tr>
+        <tr><td class="hl-blue">Mode</td><td>Categorical or multimodal data</td><td>Continuous data without repetition</td></tr>
       </table>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Regra dos corvos: se média ≈ mediana, a distribuição é razoavelmente simétrica. Se divergem muito, investigue a assimetria e possíveis outliers.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Raven\x27s rule: if mean \u2248 median, the distribution is reasonably symmetric. If they diverge a lot, investigate skewness and possible outliers.')}
   `;
 }
 
@@ -698,18 +698,18 @@ function step3() {
 
   return `
     <h2 class="step-title">Outliers — Suspicious Treasures</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'O valor 33 salta aos olhos. Será um outlier? Vamos usar o <strong>método do IQR</strong> (Intervalo Interquartil) para verificar.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The value 33 jumps out. Could it be an outlier? Let\x27s use the <strong>IQR method</strong> (Interquartile Range) to check.')}
 
     <div class="info-panel">
-      <div class="info-panel-title">Step by Step: Método IQR</div>
+      <div class="info-panel-title">Step by Step: IQR Method</div>
       <table class="calc-table">
         <tr><th>Stage</th><th>Calculation</th><th>Result</th></tr>
-        <tr><td>Dados Ordenados</td><td colspan="2">${sorted.join(', ')}</td></tr>
-        <tr><td>Q1 (25° percentil)</td><td>2ª posição</td><td class="hl-blue">${Q1}</td></tr>
-        <tr><td>Q3 (75° percentil)</td><td>4ª posição</td><td class="hl-blue">${Q3}</td></tr>
+        <tr><td>Sorted Data</td><td colspan="2">${sorted.join(', ')}</td></tr>
+        <tr><td>Q1 (25° percentil)</td><td>2ª position</td><td class="hl-blue">${Q1}</td></tr>
+        <tr><td>Q3 (75° percentil)</td><td>4ª position</td><td class="hl-blue">${Q3}</td></tr>
         <tr><td>IQR = Q3 − Q1</td><td>${Q3} − ${Q1}</td><td class="hl-gold">${IQR}</td></tr>
-        <tr><td>Lower Fenceerior</td><td>Q1 − 1.5 × IQR = ${Q1} − ${1.5*IQR}</td><td>${fmt(fenceL)}</td></tr>
-        <tr><td>Upper Fenceerior</td><td>Q3 + 1.5 × IQR = ${Q3} + ${1.5*IQR}</td><td class="hl-red">${fmt(fenceU)}</td></tr>
+        <tr><td>Lower Fence</td><td>Q1 − 1.5 × IQR = ${Q1} − ${1.5*IQR}</td><td>${fmt(fenceL)}</td></tr>
+        <tr><td>Upper Fence</td><td>Q3 + 1.5 × IQR = ${Q3} + ${1.5*IQR}</td><td class="hl-red">${fmt(fenceU)}</td></tr>
       </table>
     </div>
 
@@ -735,12 +735,12 @@ function step3() {
       </svg>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', '33 > ${fmt(fenceU)}... Então é outlier! Bora jogar fora esse dado!')}
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Calma! Um outlier não é automaticamente um erro. Pode ser um saque genuinamente excepcional. Investigamos a causa antes de decidir. Jogar fora dados sem justificativa é uma armadilha de Thorment.')}
+    ${dialogue('thor', '⚡ Thorment', '33 > ${fmt(fenceU)}... So it\x27s an outlier! Let\x27s throw out that data point!')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Hold on! An outlier is not automatically an error. It could be a genuinely exceptional raid. We investigate the cause before deciding. Throwing out data without justification is one of Thorment\x27s traps.')}
 
     <div class="info-panel" style="border-left: 3px solid var(--thor-red);">
       <div class="info-panel-title" style="color:var(--thor-red);">⚠️ Trap</div>
-      <p>O valor <span class="hl-red">33</span> ultrapassa a cerca superior (<span class="hl-red">${fmt(fenceU)}</span>). Pelo critério IQR, é um <strong>outlier leve</strong>. Mas remover outliers sem investigação é p-hacking disfarçado!</p>
+      <p>The value <span class="hl-red">33</span> exceeds the upper fence (<span class="hl-red">${fmt(fenceU)}</span>). By the IQR criterion, it is a <strong>mild outlier</strong>. But removing outliers without investigation is disguised p-hacking!</p>
     </div>
   `;
 }
@@ -748,10 +748,10 @@ function step3() {
 function step4() {
   return `
     <h2 class="step-title">Range and Interval</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A medida mais simples de dispersão: qual a distância entre o menor e o maior valor?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The simplest measure of spread: what is the distance between the smallest and largest value?')}
 
     <div class="formula-label">Formula</div>
-    <div class="formula">Amplitude = x<sub>máx</sub> − x<sub>mín</sub> = ${sorted[n-1]} − ${sorted[0]} = <span style="font-size:1.4em;">${amplitude}</span></div>
+    <div class="formula">Range = x<sub>max</sub> − x<sub>min</sub> = ${sorted[n-1]} − ${sorted[0]} = <span style="font-size:1.4em;">${amplitude}</span></div>
 
     <div class="visual-container">
       <svg viewBox="0 0 600 100" xmlns="http://www.w3.org/2000/svg">
@@ -761,9 +761,9 @@ function step4() {
           return `<circle cx="${x}" cy="50" r="7" fill="#58a6ff" opacity="0.85"/>
             <text x="${x}" y="38" text-anchor="middle" fill="#f0c040" font-family="Bangers" font-size="14">${v}</text>`;
         }).join('')}
-        <!-- Amplitude arrow -->
+        <!-- Range arrow -->
         <line x1="50" y1="75" x2="550" y2="75" stroke="#f0c040" stroke-width="2" marker-start="url(#arrowL)" marker-end="url(#arrowR)"/>
-        <text x="300" y="95" text-anchor="middle" fill="#f0c040" font-family="Permanent Marker" font-size="13">Amplitude = ${amplitude}</text>
+        <text x="300" y="95" text-anchor="middle" fill="#f0c040" font-family="Permanent Marker" font-size="13">Range = ${amplitude}</text>
         <defs>
           <marker id="arrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f0c040"/></marker>
           <marker id="arrowL" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="#f0c040"/></marker>
@@ -771,10 +771,10 @@ function step4() {
       </svg>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Fácil! Amplitude de ${amplitude}. Resolvido, né?')}
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Nada resolvido. A amplitude usa <strong>apenas dois valores</strong> — o menor e o maior. Ignora tudo que acontece no meio. Se trocarmos 15, 18 e 22 por 12, 12 e 12, a amplitude seria a mesma! Precisamos de algo melhor.')}
+    ${dialogue('thor', '⚡ Thorment', 'Easy! Range of ${amplitude}. Done, right?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Not even close. The range uses <strong>only two values</strong> \x96 the smallest and the largest. It ignores everything in between. If we replaced 15, 18, and 22 with 12, 12, and 12, the range would be the same! We need something better.')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'A amplitude é frágil: basta um outlier para inflá-la. Use-a como visão geral rápida, nunca como medida definitiva de dispersão.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The range is fragile: one outlier is enough to inflate it. Use it as a quick overview, never as a definitive measure of spread.')}
   `;
 }
 
@@ -809,13 +809,13 @@ function step5() {
 
   return `
     <h2 class="step-title">Deviations from the Mean</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Para medir dispersão de verdade, calculamos o <strong>desvio</strong> de cada valor em relação à média. Quanto cada saque desviou do "esperado"?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'To measure real spread, we calculate the <strong>deviation</strong> of each value from the mean. How much did each raid deviate from the "expected"?')}
 
-    <div class="formula-label">Formula do Desvio</div>
+    <div class="formula-label">Deviation Formula</div>
     <div class="formula">dᵢ = xᵢ − x̄</div>
 
     <table class="calc-table">
-      <tr><th>Expedition</th><th>Moedas (xᵢ)</th><th>Desvio (xᵢ − ${fmt(media)})</th></tr>
+      <tr><th>Expedition</th><th>Coins (xᵢ)</th><th>Desvio (xᵢ − ${fmt(media)})</th></tr>
       ${rows}
       <tr class="mean-row">
         <td colspan="2" style="text-align:right;">Sum of Deviations:</td>
@@ -827,10 +827,10 @@ function step5() {
       ${devBars}
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Espera... a soma deu ZERO?! Então não tem desvio nenhum?')}
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A soma dos desvios <strong>sempre</strong> dá zero — é uma propriedade matemática da média. Os positivos cancelam os negativos. Por isso precisamos de um truque: elevar ao quadrado.')}
+    ${dialogue('thor', '⚡ Thorment', 'Wait... the sum is ZERO?! So there\x27s no deviation at all?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The sum of deviations <strong>always</strong> equals zero \x96 it\x27s a mathematical property of the mean. The positives cancel the negatives. That\x27s why we need a trick: squaring them.')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Σ(xᵢ − x̄) = 0 <strong>sempre</strong>. É por isso que a variância usa desvios <em>ao quadrado</em> — para eliminar o cancelamento.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '\u03a3(x\u1d62 \u2212 x\u0304) = 0 <strong>always</strong>. That\x27s why variance uses <em>squared</em> deviations \x96 to eliminate the cancellation.')}
   `;
 }
 
@@ -848,14 +848,14 @@ function step6() {
   });
 
   return `
-    <h2 class="step-title">Variância (s²)</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Elevamos cada desvio ao quadrado, somamos tudo e dividimos. Mas dividimos por <strong>n − 1</strong>, não por n. Isso é crucial.')}
+    <h2 class="step-title">Variance (s\xb2)</h2>
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'We square each deviation, add them all up, and divide. But we divide by <strong>n \u2212 1</strong>, not by n. This is crucial.')}
 
-    <div class="formula-label">Formula da Variância Amostral</div>
+    <div class="formula-label">Sample Variance Formula</div>
     <div class="formula">s² = Σ(xᵢ − x̄)² / (n − 1)</div>
 
     <table class="calc-table">
-      <tr><th>Expedition</th><th>xᵢ</th><th>Desvio (dᵢ)</th><th>Desvio²</th></tr>
+      <tr><th>Expedition</th><th>x\u1d62</th><th>Deviation (d\u1d62)</th><th>Deviation\xb2</th></tr>
       ${rows}
       <tr class="mean-row">
         <td colspan="3" style="text-align:right;">Σ(xᵢ − x̄)² =</td>
@@ -867,42 +867,42 @@ function step6() {
       s² = ${fmt(somaDesviosQuad)} / (${n} − 1) = ${fmt(somaDesviosQuad)} / ${n-1} = <span style="font-size:1.3em;">${fmt(variancia)}</span>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Por que n − 1 e não n? Parece frescura!')}
+    ${dialogue('thor', '⚡ Thorment', 'Why n \u2212 1 and not n? Seems like overkill!')}
 
     <div class="info-panel" style="border-left: 3px solid var(--gold);">
-      <div class="info-panel-title">Por que n − 1? Degrees of Freedom</div>
-      ${dialogue('odin', '🧙‍♂️ Odinfather', 'Imagina que você tem 5 guerreiros e sabe que a média das forças é 20. Se eu te disser o valor de 4 guerreiros — digamos 12, 15, 18, 22 — o quinto <strong>não é livre</strong>: ele TEM que ser 33 para a soma dar 100. Só 4 valores são realmente "livres" para variar. Isso é <strong>grau de liberdade</strong>: n − 1 = ${n} − 1 = ${n-1}.')}
-      <p style="margin-top:10px;">Dividir por n subestima a variância real da população. Dividir por n − 1 corrige esse viés — é a chamada <strong>correção de Bessel</strong>.</p>
+      <div class="info-panel-title">Why n \u2212 1? Degrees of Freedom</div>
+      ${dialogue('odin', '🧙‍♂️ Odinfather', 'Imagine you have 5 warriors and you know the mean strength is 20. If I tell you the value of 4 warriors \x96 say 12, 15, 18, 22 \x96 the fifth is <strong>not free</strong>: it HAS to be 33 for the sum to equal 100. Only 4 values are truly "free" to vary. That\x27s <strong>degrees of freedom</strong>: n \u2212 1 = ${n} \u2212 1 = ${n-1}.')}
+      <p style="margin-top:10px;">Dividing by n underestimates the true population variance. Dividing by n - 1 corrects this bias \x96 it\x27s called <strong>Bessel\x27s correction</strong>.</p>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Variância amostral usa n − 1 (correção de Bessel). Variância populacional usa N. Na prática, quase sempre trabalhamos com amostras.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Sample variance uses n \u2212 1 (Bessel\x27s correction). Population variance uses N. In practice, we almost always work with samples.')}
   `;
 }
 
 function step7() {
   return `
-    <h2 class="step-title">Desvio Padrão (s)</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A variância é expressa em unidades ao quadrado — "moedas ao quadrado" não faz sentido prático. A solução? Tirar a raiz quadrada.')}
+    <h2 class="step-title">Standard Deviation (s)</h2>
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Variance is expressed in squared units \x96 "coins squared" makes no practical sense. The solution? Take the square root.')}
 
     <div class="formula-label">Formula</div>
     <div class="formula">s = √s² = √${fmt(variancia)} = <span style="font-size:1.3em;">${fmt(desvioPadrao)}</span></div>
 
-    <p style="margin:14px 0;">O desvio padrão volta à <strong>mesma unidade</strong> dos dados originais: moedas de ouro.</p>
+    <p style="margin:14px 0;">The standard deviation returns to the <strong>same unit</strong> as the original data: gold coins.</p>
 
     <div class="concept-grid" style="grid-template-columns: 1fr 1fr;">
       <div class="concept-card active">
-        <div class="concept-title">Variância (s²)</div>
+        <div class="concept-title">Variance (s\xb2)</div>
         <div class="concept-value">${fmt(variancia)}</div>
-        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;">moedas²</p>
+        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;">coins\xb2</p>
       </div>
       <div class="concept-card active">
-        <div class="concept-title">Desvio Padrão (s)</div>
+        <div class="concept-title">Standard Deviation (s)</div>
         <div class="concept-value">${fmt(desvioPadrao)}</div>
-        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;">moedas</p>
+        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;">coins</p>
       </div>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Interpretação: em média, cada saque desviou cerca de <strong>${fmt(desvioPadrao)} moedas</strong> da média geral de ${fmt(media)}. Quanto maior o DP, mais espalhados os dados.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Interpretation: on average, each raid deviated about <strong>${fmt(desvioPadrao)} coins</strong> from the overall mean of ${fmt(media)}. The larger the SD, the more spread out the data.')}
 
     <div class="info-panel">
       <div class="info-panel-title">Visualizing Spread</div>
@@ -930,10 +930,10 @@ function step7() {
           })()}
         </svg>
       </div>
-      <p style="font-size:0.9rem; color:var(--text-dim); text-align:center;">Faixa azul tracejada = ±1 desvio padrão da média</p>
+      <p style="font-size:0.9rem; color:var(--text-dim); text-align:center;">Blue dashed band = \xb11 standard deviation from the mean</p>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'O desvio padrão é a medida de dispersão mais usada em estatística. Ele alimenta testes t, intervalos de confiança, tamanhos de efeito — praticamente tudo.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The standard deviation is the most widely used measure of spread in statistics. It feeds into t-tests, confidence intervals, effect sizes \x96 virtually everything.')}
   `;
 }
 
@@ -946,20 +946,20 @@ function step8() {
 
   return `
     <h2 class="step-title">Coefficient of Variation (CV)</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'E se quisermos comparar a variabilidade entre coisas com escalas diferentes? Por exemplo: moedas de ouro versus espadas forjadas?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'E se quisermos comparar a variabilidade entre coisas com escalas diferentes? Por exemplo: coins de ouro versus espadas forjadas?')}
 
     <div class="formula-label">Formula</div>
     <div class="formula">CV = (s / x̄) × 100%</div>
 
     <table class="data-table">
       <tr><th></th><th>Gold Coins</th><th>Swords Forged</th></tr>
-      <tr><td style="font-family:'Permanent Marker',cursive;">Dados</td>
+      <tr><td style="font-family:'Permanent Marker',cursive;">Data</td>
         <td>${data.join(', ')}</td>
         <td>${swords.join(', ')}</td></tr>
-      <tr><td style="font-family:'Permanent Marker',cursive;">Média (x̄)</td>
+      <tr><td style="font-family:'Permanent Marker',cursive;">Mean (x̄)</td>
         <td class="hl-gold">${fmt(media)}</td>
         <td class="hl-blue">${fmt(swordsMedia)}</td></tr>
-      <tr><td style="font-family:'Permanent Marker',cursive;">Desvio Padrão (s)</td>
+      <tr><td style="font-family:'Permanent Marker',cursive;">Standard Deviation (s)</td>
         <td class="hl-gold">${fmt(desvioPadrao)}</td>
         <td class="hl-blue">${fmt(swordsDP)}</td></tr>
       <tr><td style="font-family:'Permanent Marker',cursive;">CV</td>
@@ -967,23 +967,23 @@ function step8() {
         <td class="hl-green">${fmt(swordsCV)}%</td></tr>
     </table>
 
-    ${dialogue('thor', '⚡ Thorment', 'O desvio padrão das espadas (${fmt(swordsDP)}) é menor que o das moedas (${fmt(desvioPadrao)}). Então espadas variam menos, né?')}
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Olha o CV! Moedas têm CV de ${fmt(cv)}% e espadas apenas ${fmt(swordsCV)}%. Proporcionalmente, as moedas variam <strong>muito mais</strong>. O DP absoluto engana quando as escalas são diferentes.')}
+    ${dialogue('thor', '⚡ Thorment', 'The standard deviation of swords (${fmt(swordsDP)}) is less than that of coins (${fmt(desvioPadrao)}). So swords vary less, right?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Look at the CV! Coins have a CV of ${fmt(cv)}% and swords only ${fmt(swordsCV)}%. Proportionally, coins vary <strong>much more</strong>. The absolute SD is misleading when scales differ.')}
 
     <div class="concept-grid" style="grid-template-columns: 1fr 1fr;">
       <div class="concept-card" style="border-color:var(--thor-red);">
-        <div class="concept-title">Moedas</div>
+        <div class="concept-title">Coins</div>
         <div class="concept-value" style="color:var(--thor-red);">CV = ${fmt(cv)}%</div>
         <p style="font-size:0.85rem; color:var(--text-dim);">High relative variability</p>
       </div>
       <div class="concept-card" style="border-color:var(--success);">
-        <div class="concept-title">Espadas</div>
+        <div class="concept-title">Swords</div>
         <div class="concept-value" style="color:var(--success);">CV = ${fmt(swordsCV)}%</div>
         <p style="font-size:0.85rem; color:var(--text-dim);">Low relative variability</p>
       </div>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'O CV é adimensional — permite comparar variabilidades de variáveis com unidades e escalas completamente diferentes. Regra prática: CV < 15% = baixa; 15-30% = moderada; > 30% = alta.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The CV is dimensionless \x96 it allows comparing variability of variables with completely different units and scales. Rule of thumb: CV < 15% = low; 15-30% = moderate; > 30% = high.')}
   `;
 }
 
@@ -1022,7 +1022,7 @@ function step9() {
 
   return `
     <h2 class="step-title">Empirical Rule: 68 – 95 – 99.7</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Quando os dados seguem uma distribuição aproximadamente normal (formato de sino), o desvio padrão ganha superpoderes. Odinfather desenha no pergaminho:')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'When data follow an approximately normal distribution (bell shape), the standard deviation gains superpowers. Odinfather draws on the parchment:')}
 
     <div class="visual-container">
       <svg viewBox="0 0 ${bellW} ${bellH}" xmlns="http://www.w3.org/2000/svg">
@@ -1060,15 +1060,15 @@ function step9() {
     <div class="info-panel">
       <div class="info-panel-title">Rule for Normal Distributions</div>
       <table class="calc-table">
-        <tr><th>Faixa</th><th>Contém</th><th>No nosso exemplo</th></tr>
-        <tr><td>x̄ ± 1s</td><td class="hl-gold">~68% dos dados</td><td>${fmt(media - desvioPadrao)} a ${fmt(media + desvioPadrao)}</td></tr>
-        <tr><td>x̄ ± 2s</td><td class="hl-blue">~95% dos dados</td><td>${fmt(media - 2*desvioPadrao)} a ${fmt(media + 2*desvioPadrao)}</td></tr>
-        <tr><td>x̄ ± 3s</td><td class="hl-purple">~99.7% dos dados</td><td>${fmt(media - 3*desvioPadrao)} a ${fmt(media + 3*desvioPadrao)}</td></tr>
+        <tr><th>Range</th><th>Contains</th><th>In our example</th></tr>
+        <tr><td>x̄ ± 1s</td><td class="hl-gold">~68% of the data</td><td>${fmt(media - desvioPadrao)} a ${fmt(media + desvioPadrao)}</td></tr>
+        <tr><td>x̄ ± 2s</td><td class="hl-blue">~95% of the data</td><td>${fmt(media - 2*desvioPadrao)} a ${fmt(media + 2*desvioPadrao)}</td></tr>
+        <tr><td>x̄ ± 3s</td><td class="hl-purple">~99.7% of the data</td><td>${fmt(media - 3*desvioPadrao)} a ${fmt(media + 3*desvioPadrao)}</td></tr>
       </table>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Então se um valor cair fora de 3 desvios padrão, é praticamente impossível?')}
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Apenas 0.3% dos dados ficam fora de ±3s numa distribuição normal. É raro, mas não impossível. E cuidado: a regra só funciona bem para dados <strong>aproximadamente normais</strong>.')}
+    ${dialogue('thor', '⚡ Thorment', 'So if a value falls outside 3 standard deviations, it\x27s practically impossible?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Only 0.3% of data fall outside \xb13s in a normal distribution. It\x27s rare, but not impossible. And be careful: the rule only works well for <strong>approximately normal</strong> data.')}
   `;
 }
 
@@ -1117,11 +1117,11 @@ function step10() {
     <h2 class="step-title">Skewness and Kurtosis</h2>
     <p class="step-subtitle">The Shape of the Distribution</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Média e desvio padrão dizem <em>onde</em> e <em>quão espalhados</em> são os dados. A <strong>assimetria</strong> e a <strong>curtose</strong> descrevem a <em>forma</em>.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Mean and standard deviation tell <em>where</em> and <em>how spread out</em> the data are. <strong>Skewness</strong> and <strong>kurtosis</strong> describe the <em>shape</em>.')}
 
     <div class="info-panel">
-      <div class="info-panel-title">Assimetria (Skewness)</div>
-      <p style="margin-bottom:12px;">Mede se a cauda da distribuição puxa para um lado.</p>
+      <div class="info-panel-title">Skewness</div>
+      <p style="margin-bottom:12px;">Measures whether the tail of the distribution pulls to one side.</p>
       <div class="visual-container">
         <svg viewBox="0 0 620 120" xmlns="http://www.w3.org/2000/svg">
           ${skewCurve(-1, 'Negative (← tail)', '#f85149', 0)}
@@ -1130,27 +1130,27 @@ function step10() {
           <line x1="0" y1="90" x2="620" y2="90" stroke="#30363d" stroke-width="0.5"/>
         </svg>
       </div>
-      <p>Nosso dataset: skewness ≈ <span class="hl-gold">${fmt(skewness)}</span> — assimetria positiva (cauda à direita, puxada pelo 33).</p>
+      <p>Our dataset: skewness \u2248 <span class="hl-gold">${fmt(skewness)}</span> \x96 positive skew (right tail, pulled by 33).</p>
     </div>
 
     <div class="info-panel" style="margin-top:16px;">
-      <div class="info-panel-title">Curtose (Kurtosis)</div>
-      <p style="margin-bottom:12px;">Mede quão "pontuda" ou "achatada" é a distribuição em relação à normal.</p>
+      <div class="info-panel-title">Kurtosis</div>
+      <p style="margin-bottom:12px;">Measures how "peaked" or "flat" the distribution is relative to the normal.</p>
       <div class="visual-container">
         <svg viewBox="0 0 620 120" xmlns="http://www.w3.org/2000/svg">
-          ${kurtCurve('platy', 'Platicúrtica (< 0)', '#f85149', 0)}
-          ${kurtCurve('meso', 'Mesocúrtica (≈ 0)', '#3fb950', 210)}
-          ${kurtCurve('lepto', 'Leptocúrtica (> 0)', '#58a6ff', 420)}
+          ${kurtCurve('platy', 'Platykurtic (< 0)', '#f85149', 0)}
+          ${kurtCurve('meso', 'Mesokurtic (\u2248 0)', '#3fb950', 210)}
+          ${kurtCurve('lepto', 'Leptokurtic (> 0)', '#58a6ff', 420)}
           <line x1="0" y1="90" x2="620" y2="90" stroke="#30363d" stroke-width="0.5"/>
         </svg>
       </div>
-      <p>Nosso dataset: curtose (excesso) ≈ <span class="hl-gold">${fmt(kurtosis)}</span> — ${kurtosis > 0 ? 'leptocúrtica (mais pontuda, caudas pesadas)' : kurtosis < -0.5 ? 'platicúrtica (mais achatada)' : 'próxima de mesocúrtica'}.</p>
+      <p>Our dataset: kurtosis (excess) \u2248 <span class="hl-gold">${fmt(kurtosis)}</span> \x96 ${kurtosis > 0 ? 'leptokurtic (more peaked, heavy tails)' : kurtosis < -0.5 ? 'platykurtic (flatter)' : 'close to mesokurtic'}.</p>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Leptocúrtica? Platicúrtica? Isso é feitiço rúnico?')}
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Pense assim: <strong>leptocúrtica</strong> = pico afiado como lança, caudas pesadas. <strong>Platicúrtica</strong> = plana como o escudo, caudas leves. <strong>Mesocúrtica</strong> = a normal, o meio-termo.')}
+    ${dialogue('thor', '⚡ Thorment', 'Leptokurtic? Platykurtic? Is that a runic spell?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Think of it this way: <strong>leptokurtic</strong> = sharp peak like a spear, heavy tails. <strong>Platykurtic</strong> = flat like the shield, light tails. <strong>Mesokurtic</strong> = normal, the middle ground.')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Valores de referência: |skewness| < 1 = aceitável; |curtose| < 2 = aceitável para maioria das análises paramétricas. Nosso dataset é pequeno (n=5), então esses valores oscilam muito.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Reference values: |skewness| < 1 = acceptable; |kurtosis| < 2 = acceptable for most parametric analyses. Our dataset is small (n=5), so these values fluctuate greatly.')}
   `;
 }
 
@@ -1197,12 +1197,12 @@ function step11() {
 
   return `
     <h2 class="step-title">Frequency Table and Histogram</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Quando temos muitos dados, agrupá-los em classes facilita a visualização. Suponha que expandimos os registros para 20 saques vikings:')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'When we have a lot of data, grouping them into classes makes visualization easier. Suppose we expanded the records to 20 Viking raids:')}
 
-    <p style="margin:8px 0; font-size:0.95rem; color:var(--text-dim);">Dataset expandido: ${expanded.join(', ')}</p>
+    <p style="margin:8px 0; font-size:0.95rem; color:var(--text-dim);">Expanded dataset: ${expanded.join(', ')}</p>
 
     <table class="freq-table">
-      <tr><th>Class</th><th>Frequência (f)</th><th>Freq. Relativa</th><th>Freq. Acumulada</th></tr>
+      <tr><th>Class</th><th>Frequency (f)</th><th>Relative Freq.</th><th>Cumulative Freq.</th></tr>
       ${classes.map((c, i) => `
         <tr>
           <td style="color:${colors[i]}">${c.label}</td>
@@ -1234,10 +1234,10 @@ function step11() {
       </svg>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Agora sim, visual bonito! Mas por que 5 classes?')}
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A regra de Sturges sugere k ≈ 1 + 3.322 × log₁₀(n). Para n=20: k ≈ 1 + 3.322 × 1.301 ≈ 5.3, arredondamos para 5. Poucas classes demais escondem padrões; muitas classes geram ruído.')}
+    ${dialogue('thor', '⚡ Thorment', 'Now that\x27s a nice visual! But why 5 classes?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Sturges\x27 rule suggests k \u2248 1 + 3.322 \xd7 log\u2081\u2080(n). For n=20: k \u2248 1 + 3.322 \xd7 1.301 \u2248 5.3, rounded to 5. Too few classes hide patterns; too many create noise.')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'O histograma é a ponte entre dados brutos e distribuição de probabilidade. É o primeiro passo visual para verificar normalidade, assimetria e outliers.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The histogram bridges raw data and probability distribution. It is the first visual step to check for normality, skewness, and outliers.')}
   `;
 }
 
@@ -1267,21 +1267,21 @@ function step12() {
     <div class="licao-box">
       <div class="licao-title">🐦‍⬛ Lesson of the Ravens</div>
 
-      ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Pontos-chave que você deve gravar:</strong>')}
+      ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Key points you should commit to memory:</strong>')}
 
       <div class="info-panel" style="margin:12px 0;">
         <div class="info-panel-title">Complete Dataset Summary</div>
         <table class="data-table">
-          <tr><th>Measure</th><th>Formula</th><th>Valor</th></tr>
-          <tr><td>Média (x̄)</td><td>Σxᵢ / n</td><td class="hl-gold">${fmt(media)}</td></tr>
-          <tr><td>Mediana (Md)</td><td>Valor central ordenado</td><td class="hl-gold">${mediana}</td></tr>
-          <tr><td>Amplitude</td><td>x<sub>máx</sub> − x<sub>mín</sub></td><td class="hl-gold">${amplitude}</td></tr>
-          <tr><td>Variância (s²)</td><td>Σ(xᵢ−x̄)² / (n−1)</td><td class="hl-gold">${fmt(variancia)}</td></tr>
-          <tr><td>Desvio Padrão (s)</td><td>√s²</td><td class="hl-gold">${fmt(desvioPadrao)}</td></tr>
+          <tr><th>Measure</th><th>Formula</th><th>Value</th></tr>
+          <tr><td>Mean (x̄)</td><td>Σxᵢ / n</td><td class="hl-gold">${fmt(media)}</td></tr>
+          <tr><td>Median (Md)</td><td>Central sorted value</td><td class="hl-gold">${mediana}</td></tr>
+          <tr><td>Range</td><td>x<sub>max</sub> − x<sub>min</sub></td><td class="hl-gold">${amplitude}</td></tr>
+          <tr><td>Variance (s\xb2)</td><td>Σ(xᵢ−x̄)² / (n−1)</td><td class="hl-gold">${fmt(variancia)}</td></tr>
+          <tr><td>Standard Deviation (s)</td><td>√s²</td><td class="hl-gold">${fmt(desvioPadrao)}</td></tr>
           <tr><td>CV</td><td>(s / x̄) × 100%</td><td class="hl-gold">${fmt(cv)}%</td></tr>
           <tr><td>IQR</td><td>Q3 − Q1</td><td class="hl-gold">${IQR}</td></tr>
-          <tr><td>Assimetria</td><td>Skewness</td><td class="hl-gold">${fmt(skewness)}</td></tr>
-          <tr><td>Curtose</td><td>Kurtosis (excesso)</td><td class="hl-gold">${fmt(kurtosis)}</td></tr>
+          <tr><td>Skewness</td><td>Skewness</td><td class="hl-gold">${fmt(skewness)}</td></tr>
+          <tr><td>Kurtosis (excess)</td><td>Kurtosis (excesso)</td><td class="hl-gold">${fmt(kurtosis)}</td></tr>
         </table>
       </div>
 
@@ -1322,7 +1322,7 @@ function step12() {
       </div>
 
       <div style="margin-top:16px;">
-        ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Huginn provoca:</strong> Quando a mediana seria melhor que a média para reportar o "tesouro típico" de uma expedição viking? E se o Jarl perguntasse o tesouro "mais provável" em vez do "tesouro médio", qual medida você usaria? Pense antes de avançar.')}
+        ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Huginn challenges:</strong> When would the median be better than the mean for reporting the "typical treasure" of a Viking expedition? And if the Jarl asked for the "most likely" treasure instead of the "average treasure," which measure would you use? Think before moving on.')}
       </div>
     </div>
   `;
@@ -1331,38 +1331,38 @@ function step12() {
 function step13() {
   return `
     <h2 class="step-title">APA Report — Descriptive Statistics</h2>
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Na hora de reportar estatísticas descritivas num artigo científico, seguimos o formato APA. Nada de firulas — clareza total.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'When reporting descriptive statistics in a scientific paper, we follow APA format. No frills \x96 total clarity.')}
 
     <div class="apa-box">
-      <div class="apa-label">APA Format — Média e Desvio Padrão</div>
+      <div class="apa-label">APA Format — Mean e Standard Deviation</div>
       <p><em>M</em> = ${fmt(media)}, <em>SD</em> = ${fmt(desvioPadrao)}</p>
     </div>
 
     <div class="apa-box">
-      <div class="apa-label">Example Completo em Texto</div>
-      <p>Os cinco saques vikings resultaram em média de ${fmt(media)} moedas de ouro (<em>M</em> = ${fmt(media)}, <em>SD</em> = ${fmt(desvioPadrao)}, <em>Mdn</em> = ${mediana}). O coeficiente de variação foi elevado (CV = ${fmt(cv)}%), indicando alta dispersão relativa. O valor de Jómsborg (33 moedas) foi identificado como outlier pelo método IQR.</p>
+      <div class="apa-label">Full Example in Text</div>
+      <p>The five Viking raids yielded a mean of ${fmt(media)} gold coins (<em>M</em> = ${fmt(media)}, <em>SD</em> = ${fmt(desvioPadrao)}, <em>Mdn</em> = ${mediana}). The coefficient of variation was high (CV = ${fmt(cv)}%), indicating high relative dispersion. The J\xf3msborg value (33 coins) was identified as an outlier by the IQR method.</p>
     </div>
 
     <div class="info-panel">
       <div class="info-panel-title">APA Rules for Descriptives</div>
       <table class="calc-table">
-        <tr><th>Element</th><th>Formato</th><th>Example</th></tr>
-        <tr><td>Média</td><td><em>M</em> = X.XX</td><td><em>M</em> = ${fmt(media)}</td></tr>
-        <tr><td>Desvio Padrão</td><td><em>SD</em> = X.XX</td><td><em>SD</em> = ${fmt(desvioPadrao)}</td></tr>
-        <tr><td>Mediana</td><td><em>Mdn</em> = X.XX</td><td><em>Mdn</em> = ${mediana}</td></tr>
-        <tr><td>Intervalo</td><td>Range: X – Y</td><td>Range: ${sorted[0]} – ${sorted[n-1]}</td></tr>
-        <tr><td>Tamanho amostral</td><td><em>N</em> = X ou <em>n</em> = X</td><td><em>n</em> = ${n}</td></tr>
-        <tr><td>Casas decimais</td><td colspan="2">2 casas para a maioria; coerência dentro do texto</td></tr>
+        <tr><th>Element</th><th>Format</th><th>Example</th></tr>
+        <tr><td>Mean</td><td><em>M</em> = X.XX</td><td><em>M</em> = ${fmt(media)}</td></tr>
+        <tr><td>Standard Deviation</td><td><em>SD</em> = X.XX</td><td><em>SD</em> = ${fmt(desvioPadrao)}</td></tr>
+        <tr><td>Median</td><td><em>Mdn</em> = X.XX</td><td><em>Mdn</em> = ${mediana}</td></tr>
+        <tr><td>Range</td><td>Range: X – Y</td><td>Range: ${sorted[0]} – ${sorted[n-1]}</td></tr>
+        <tr><td>Sample size</td><td><em>N</em> = X ou <em>n</em> = X</td><td><em>n</em> = ${n}</td></tr>
+        <tr><td>Decimal places</td><td colspan="2">2 places for most; consistency within the text</td></tr>
       </table>
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'E se eu só reportar a média sem o desvio padrão?')}
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Média sem desvio padrão é como espada sem bainha — incompleta e perigosa. A média sozinha não conta a história da variabilidade. Sempre reporte <em>M</em> e <em>SD</em> juntos, no mínimo.')}
+    ${dialogue('thor', '⚡ Thorment', 'What if I only report the mean without the standard deviation?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A mean without a standard deviation is like a sword without a scabbard \x96 incomplete and dangerous. The mean alone doesn\x27t tell the story of variability. Always report <em>M</em> and <em>SD</em> together, at minimum.')}
 
     <div class="info-panel" style="border-left: 3px solid var(--success); margin-top:16px;">
       <div class="info-panel-title" style="color:var(--success);">Complete Descriptive Table (Template)</div>
       <table class="data-table" style="font-size:0.95rem;">
-        <tr><th>Variável</th><th><em>n</em></th><th><em>M</em></th><th><em>SD</em></th><th><em>Mdn</em></th><th>Range</th></tr>
+        <tr><th>Variable</th><th><em>n</em></th><th><em>M</em></th><th><em>SD</em></th><th><em>Mdn</em></th><th>Range</th></tr>
         <tr>
           <td>Coins per raid</td>
           <td>${n}</td>
@@ -1374,11 +1374,11 @@ function step13() {
       </table>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Parabéns, guerreiro. Você dominou as ferramentas fundamentais da estatística descritiva. De tendência central a dispersão, de forma a reporte — cada medida é uma peça do pergaminho. Agora vá adiante: inferência estatística te espera nos próximos capítulos.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Congratulations, warrior. You have mastered the fundamental tools of descriptive statistics. From central tendency to spread, from shape to reporting \x96 each measure is a piece of the parchment. Now move forward: inferential statistics awaits you in the coming chapters.')}
 
     <div class="licao-box" style="margin-top:20px; text-align:center;">
       <div class="licao-title">End of Guide: Descriptive Statistics</div>
-      <p style="font-size:1.1rem;">Você completou todos os 14 passos. Revise à vontade clicando "Voltar".</p>
+      <p style="font-size:1.1rem;">You have completed all 14 steps. Review at your leisure by clicking "Back."</p>
     </div>
   `;
 }

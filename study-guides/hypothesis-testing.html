@@ -623,57 +623,57 @@ function step0() {
   return `
     <div class="step-title">The Court of Asgard: The Trial of the Swords</div>
 
-    <p>Na Large Forja de Asgard, um ferreiro chamado <span class="hl-gold">Brokkr</span> afirma ter descoberto uma nova t&eacute;cnica de t&ecirc;mpera que produz espadas mais resistentes. Os guerreiros est&atilde;o empolgados &mdash; mas Odinfather n&atilde;o aceita afirma&ccedil;&otilde;es sem evid&ecirc;ncias.</p>
+    <p>In the Great Forge of Asgard, a blacksmith named <span class="hl-gold">Brokkr</span> claims to have discovered a new tempering technique that produces more resistant swords. The warriors are excited &mdash; but Odinfather does not accept claims without evidence.</p>
 
-    <p>Para resolver a quest&atilde;o, Odin convoca o <strong>Tribunal de Asgard</strong> &mdash; e aplica a l&oacute;gica do <span class="hl-blue">Teste de Hip&oacute;teses</span>.</p>
+    <p>To settle the matter, Odin convenes the <strong>Court of Asgard</strong> &mdash; and applies the logic of <span class="hl-blue">Hypothesis Testing</span>.</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Pensem no teste de hipóteses como um <strong>julgamento</strong>. O réu é a Null Hypothesis — e o réu começa <em>inocente até que se prove o contrário</em>. A evidência são os dados. O júri somos nós.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Think of hypothesis testing as a <strong>trial</strong>. The defendant is the Null Hypothesis \x96 and the defendant starts <em>innocent until proven guilty</em>. The evidence is the data. The jury is us.')}
 
-    ${dialogue('thor', '⚡ Thorment', 'Espera — se o ferreiro diz que a técnica funciona, por que não simplesmente acreditar nele? Ele mostrou umas espadas bem bonitas!')}
+    ${dialogue('thor', '⚡ Thorment', 'Wait \x96 if the blacksmith says the technique works, why not just believe him? He showed some really nice-looking swords!')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Porque "bonita" não é dado, Thorment. Preciso de <strong>evidências sistemáticas</strong>. As espadas novas são realmente mais resistentes, ou a diferença observada é apenas variação natural do processo de forja?')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Because "nice-looking" is not data, Thorment. I need <strong>systematic evidence</strong>. Are the new swords truly more resistant, or is the observed difference just natural variation in the forging process?')}
 
     <div class="concept-grid">
       <div class="concept-card">
         <div class="card-title" style="color:var(--odin-blue)">🛡️ Null Hypothesis (H₀)</div>
-        <p>O "réu" &mdash; presunção de inocência. A técnica nova <strong>não</strong> melhora as espadas.</p>
+        <p>The "defendant" &mdash; presumption of innocence. The new technique does <strong>not</strong> improve the swords.</p>
       </div>
       <div class="concept-card">
         <div class="card-title" style="color:var(--gold)">⚔️ Alternative Hypothesis (H₁)</div>
-        <p>A acusação. A técnica nova produz espadas <strong>diferentes</strong> (melhores ou piores).</p>
+        <p>The prosecution. The new technique produces <strong>different</strong> swords (better or worse).</p>
       </div>
       <div class="concept-card">
         <div class="card-title" style="color:var(--success)">📊 Evidence = Data</div>
-        <p>Testamos várias espadas das duas técnicas e medimos a resistência.</p>
+        <p>We test multiple swords from both techniques and measure resistance.</p>
       </div>
       <div class="concept-card">
         <div class="card-title" style="color:var(--corvo-purple)">⚖️ Verdict</div>
-        <p>Rejeitamos H₀ (culpado) ou <em>falhamos em rejeitar</em> H₀ (não culpado). Nunca "provamos" H₀!</p>
+        <p>We reject H\u2080 (guilty) or <em>fail to reject</em> H\u2080 (not guilty). We never "prove" H\u2080!</p>
       </div>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Atenção à linguagem: nós <strong>nunca aceitamos</strong> H₀. Dizemos que <em>falhamos em rejeitar</em> H₀. Assim como um tribunal que não encontra provas não declara o réu "comprovadamente inocente" — apenas diz "não culpado".')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Pay attention to the language: we <strong>never accept</strong> H\u2080. We say we <em>fail to reject</em> H\u2080. Just as a court that finds no evidence does not declare the defendant "proven innocent" \x96 it simply says "not guilty."')}
   `;
 }
 
 // ------ STEP 1: H0 e H1 ------
 function step1() {
   return `
-    <div class="step-title">Passo 1: H₀ and H₁ — The Hypotheses</div>
+    <div class="step-title">Step 1: H\u2080 and H\u2081 \x96 The Hypotheses</div>
 
-    <p>Toda investigação científica começa com hipóteses formais. No Tribunal de Asgard, precisamos declarar a acusação e a defesa <em>antes</em> de olhar as evidências.</p>
+    <p>Every scientific investigation begins with formal hypotheses. In the Court of Asgard, we must declare the prosecution and the defense <em>before</em> looking at the evidence.</p>
 
-    ${dialogue('thor', '⚡ Thorment', 'Fácil! Minha hipótese: "A técnica nova de Brokkr É melhor." Pronto, começa o teste!')}
+    ${dialogue('thor', '⚡ Thorment', 'Easy! My hypothesis: "Brokkr\x27s new technique IS better." Done, start the test!')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Errado, Thorment. O que você escreveu é a hipótese de pesquisa, não a estrutura formal do teste. No NHST, a hipótese nula afirma que <strong>não há diferença</strong>. A alternativa é que <strong>há diferença</strong>.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Wrong, Thorment. What you wrote is the research hypothesis, not the formal structure of the test. In NHST, the null hypothesis states there is <strong>no difference</strong>. The alternative is that there <strong>is a difference</strong>.')}
 
     <div class="formula">
-      <div class="formula-label">Null Hypothesis (o "réu")</div>
+      <div class="formula-label">Null Hypothesis (the "defendant")</div>
       H₀: μ<sub>nova</sub> = μ<sub>tradicional</sub>
     </div>
 
     <div class="formula">
-      <div class="formula-label">Alternative Hypothesis Bilateral (não-direcional)</div>
+      <div class="formula-label">Alternative Hypothesis Bilateral (non-directional)</div>
       H₁: μ<sub>nova</sub> ≠ μ<sub>tradicional</sub>
     </div>
 
@@ -683,85 +683,85 @@ function step1() {
       <div class="concept-card">
         <div class="card-title" style="color:var(--odin-blue)">Two-Tailed (bilateral)</div>
         <p>H₁: μ<sub>nova</sub> ≠ μ<sub>trad</sub><br>
-        "A técnica nova produz resultado <strong>diferente</strong> — para mais OU para menos."<br>
-        <em>Mais conservador. Geralmente recomendado.</em></p>
+        "The new technique produces a <strong>different</strong> result \x96 for better OR worse."<br>
+        <em>More conservative. Generally recommended.</em></p>
       </div>
       <div class="concept-card">
         <div class="card-title" style="color:var(--gold)">One-Tailed (unilateral)</div>
         <p>H₁: μ<sub>nova</sub> &gt; μ<sub>trad</sub><br>
-        "A técnica nova produz espadas <strong>mais resistentes</strong>."<br>
-        <em>Mais poder, mas assume direção a priori.</em></p>
+        "The new technique produces <strong>more resistant</strong> swords."<br>
+        <em>More power, but assumes a priori direction.</em></p>
       </div>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'A escolha entre unilateral e bilateral deve ser feita <strong>antes</strong> de coletar dados. Trocar depois de ver os resultados é uma forma de <em>p-hacking</em> — Thorment adoraria, mas é proibido no Tribunal de Asgard.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The choice between one-tailed and two-tailed must be made <strong>before</strong> collecting data. Switching after seeing the results is a form of <em>p-hacking</em> \x96 Thorment would love it, but it\x27s forbidden in the Court of Asgard.')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Vamos usar o teste <strong>bilateral</strong>. Não temos certeza a priori de que a técnica nova é melhor — pode ser pior também. Humildade científica!')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'We\x27ll use the <strong>two-tailed</strong> test. We are not certain a priori that the new technique is better \x96 it could also be worse. Scientific humility!')}
   `;
 }
 
 // ------ STEP 2: ALPHA ------
 function step2() {
   return `
-    <div class="step-title">Passo 2: Significance Level (α)</div>
+    <div class="step-title">Step 2: Significance Level (\u03b1)</div>
 
-    <p>Antes de coletar dados, precisamos definir o critério de decisão: quanta evidência é "suficiente" para condenar o réu?</p>
+    <p>Before collecting data, we need to define the decision criterion: how much evidence is "enough" to convict the defendant?</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'O nível de significância α é o <strong>limiar de raridade</strong>. Se a probabilidade de observar nossos dados (ou mais extremos) for menor que α, consideramos a evidência forte o suficiente para rejeitar H₀.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The significance level \u03b1 is the <strong>rarity threshold</strong>. If the probability of observing our data (or more extreme) is less than \u03b1, we consider the evidence strong enough to reject H\u2080.')}
 
     <div class="formula">
       <div class="formula-label">Most common convention</div>
       α = 0,05 (5%)
     </div>
 
-    <p>Isso significa: aceitamos um risco de <span class="hl-red">5%</span> de condenar um inocente (rejeitar H₀ quando ela é verdadeira).</p>
+    <p>This means: we accept a <span class="hl-red">5%</span> risk of convicting an innocent (rejecting H\u2080 when it is true).</p>
 
-    ${dialogue('thor', '⚡ Thorment', 'Por que 0,05? Parece arbitrário.')}
+    ${dialogue('thor', '⚡ Thorment', 'Why 0.05? Seems arbitrary.')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Boa pergunta, e você tem razão — <strong>é arbitrário</strong>. Fisher sugeriu 0,05 como uma convenção prática nos anos 1920, não como lei da natureza. Em áreas críticas como medicina, usa-se α = 0,01 ou até 0,005. Em estudos exploratórios, 0,10 pode ser aceitável.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Good question, and you\x27re right \x96 <strong>it is arbitrary</strong>. Fisher suggested 0.05 as a practical convention in the 1920s, not as a law of nature. In critical areas like medicine, \u03b1 = 0.01 or even 0.005 is used. In exploratory studies, 0.10 may be acceptable.')}
 
     <div class="concept-grid">
       <div class="concept-card">
         <div class="card-title" style="color:var(--thor-red)">α = 0,10</div>
-        <p>Mais liberal. Mais fácil rejeitar H₀. Maior risco de falso positivo. Estudos exploratórios.</p>
+        <p>More liberal. Easier to reject H\u2080. Higher false positive risk. Exploratory studies.</p>
       </div>
       <div class="concept-card">
         <div class="card-title" style="color:var(--gold)">α = 0,05</div>
-        <p>Convenção padrão. Equilíbrio entre sensibilidade e cautela. A maioria das ciências sociais.</p>
+        <p>Standard convention. Balance between sensitivity and caution. Most social sciences.</p>
       </div>
       <div class="concept-card">
         <div class="card-title" style="color:var(--odin-blue)">α = 0,01</div>
-        <p>Mais rigoroso. Difícil rejeitar H₀. Menor risco de falso positivo. Pesquisas clínicas.</p>
+        <p>More rigorous. Harder to reject H\u2080. Lower false positive risk. Clinical research.</p>
       </div>
       <div class="concept-card">
         <div class="card-title" style="color:var(--success)">α = 0,005</div>
-        <p>Proposta de Benjamin et al. (2018). Muito conservador. Física de partículas usa 5σ!</p>
+        <p>Proposed by Benjamin et al. (2018). Very conservative. Particle physics uses 5\u03c3!</p>
       </div>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'O α deve ser definido <strong>antes</strong> de olhar os dados. Escolher α depois de calcular o p-valor é como mudar as regras do julgamento após ouvir o testemunho — desonesto e inaceitável.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '\u03b1 must be set <strong>before</strong> looking at the data. Choosing \u03b1 after calculating the p-value is like changing the rules of the trial after hearing the testimony \x96 dishonest and unacceptable.')}
   `;
 }
 
 // ------ STEP 3: ESTATISTICA DE TESTE ------
 function step3() {
   return `
-    <div class="step-title">Passo 3: Test Statistic</div>
+    <div class="step-title">Step 3: Test Statistic</div>
 
-    <p>Coletamos os dados: 15 espadas forjadas com a técnica nova e 15 com a tradicional. Agora precisamos transformar esses dados brutos em um <strong>número único</strong> que resuma a evidência.</p>
+    <p>We collected the data: 15 swords forged with the new technique and 15 with the traditional. Now we need to transform this raw data into a single <strong>number</strong> that summarizes the evidence.</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A estatística de teste é como uma balança de Asgard. De um lado, colocamos o <strong>sinal</strong> (a diferença observada). Do outro, o <strong>ruído</strong> (a variabilidade esperada por acaso). Quanto maior a razão sinal/ruído, mais forte a evidência.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The test statistic is like a scale of Asgard. On one side, we place the <strong>signal</strong> (the observed difference). On the other, the <strong>noise</strong> (the variability expected by chance). The greater the signal-to-noise ratio, the stronger the evidence.')}
 
     <div class="formula">
-      <div class="formula-label">General logic de qualquer estatística de teste</div>
+      <div class="formula-label">General logic of any test statistic</div>
       Test Statistic = (Observed Effect − Effect under H₀) / Standard Error
     </div>
 
-    <p class="step-subtitle">Exemplos de estatísticas de teste:</p>
+    <p class="step-subtitle">Examples of test statistics:</p>
 
     <table class="data-table">
       <tr>
-        <th>Teste</th><th>Estatística</th><th>When to use</th>
+        <th>Test</th><th>Statistic</th><th>When to use</th>
       </tr>
       <tr>
         <td style="font-family:'Permanent Marker';color:var(--odin-blue)">Teste <em>t</em></td>
@@ -779,13 +779,13 @@ function step3() {
         <td>Compare 3+ means</td>
       </tr>
       <tr>
-        <td style="font-family:'Permanent Marker';color:var(--odin-blue)">Qui-quadrado</td>
+        <td style="font-family:'Permanent Marker';color:var(--odin-blue)">Chi-square</td>
         <td>χ² = Σ(O−E)²/E</td>
         <td>Categorical frequencies</td>
       </tr>
     </table>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Para nosso caso das espadas de Brokkr, vamos usar o <strong>teste <em>t</em> de amostras independentes</strong>. A estatística <em>t</em> mede quantos erros-padrão a diferença observada está longe de zero.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'For our case of Brokkr\x27s swords, we\x27ll use the <strong>independent samples <em>t</em>-test</strong>. The <em>t</em> statistic measures how many standard errors the observed difference is from zero.')}
 
     <div class="visual-container">
       ${buildNormalCurve({
@@ -795,40 +795,40 @@ function step3() {
         critLabelRight: 'z = +1,96',
         critLabelLeft: 'z = −1,96',
         xLabels: ['', '', '−1σ', 'μ=0', '+1σ', '', ''],
-        label: 'Distribuição sob H₀ — áreas vermelhas = rejection regions (α/2 cada)'
+        label: 'Distribution under H\u2080 \x96 red areas = rejection regions (\u03b1/2 each)'
       })}
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'A estatística de teste segue uma <strong>distribuição conhecida</strong> sob H₀ (normal, t, F, χ²). Isso permite calcular a probabilidade de obter um valor tão ou mais extremo que o observado.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The test statistic follows a <strong>known distribution</strong> under H\u2080 (normal, t, F, \u03c7\xb2). This allows us to calculate the probability of obtaining a value as or more extreme than the one observed.')}
   `;
 }
 
 // ------ STEP 4: P-VALOR (CRITICAL STEP) ------
 function step4() {
   return `
-    <div class="step-title">Passo 4: P-value — What It Is and What It Is NOT</div>
+    <div class="step-title">Step 4: P-value \x96 What It Is and What It Is NOT</div>
 
-    <p>Este é o passo mais <strong>incompreendido</strong> de toda a estatística. Preste muita atenção.</p>
+    <p>This is the most <strong>misunderstood</strong> step in all of statistics. Pay close attention.</p>
 
-    <p>Suponha que calculamos nosso teste <em>t</em> e obtivemos <span class="hl-gold">p = 0,03</span>. O que isso significa?</p>
+    <p>Suppose we computed our <em>t</em>-test and obtained <span class="hl-gold">p = 0.03</span>. What does that mean?</p>
 
-    ${dialogue('thor', '⚡ Thorment', 'Óbvio! p = 0,03 significa que há apenas <strong>3% de chance</strong> de que H₀ seja verdadeira. Ou seja, 97% de certeza de que a técnica nova funciona! Caso encerrado!')}
+    ${dialogue('thor', '⚡ Thorment', 'Obvious! p = 0.03 means there\x27s only a <strong>3% chance</strong> that H\u2080 is true. So 97% certainty that the new technique works! Case closed!')}
 
     <div class="warning-box">
       <div class="warning-title">⚠️ INVERSE PROBABILITY FALLACY</div>
-      <p>O que Thorment disse é o <strong>erro mais comum</strong> na interpretação do p-valor. É chamado de <em>inverse probability fallacy</em> ou <em>transposição do condicional</em>.</p>
-      <p style="margin-top:8px">O p-valor <strong>NOT</strong> é P(H₀ | dados).</p>
+      <p>What Thorment said is the <strong>most common error</strong> in interpreting the p-value. It is called the <em>inverse probability fallacy</em> or <em>transposition of the conditional</em>.</p>
+      <p style="margin-top:8px">The p-value <strong>is NOT</strong> P(H\u2080 | data).</p>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', '<strong>NOT, Thorment!</strong> O p-valor não nos diz a probabilidade de H₀ ser verdadeira. Isso seria P(H₀ | dados) — e calcular isso exige Bayes, não NHST. O p-valor é outra coisa completamente diferente.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', '<strong>NOT, Thorment!</strong> The p-value does not tell us the probability that H\u2080 is true. That would be P(H\u2080 | data) \x96 and calculating that requires Bayes, not NHST. The p-value is something completely different.')}
 
     <div class="correct-box">
       <div class="correct-title">✅ CORRECT DEFINITION</div>
-      <p style="font-size:1.15rem"><strong>p-valor</strong> = a probabilidade de observar dados tão ou mais extremos que os obtidos, <span class="hl-gold">assumindo que H₀ é verdadeira</span>.</p>
-      <p style="margin-top:8px;font-family:'Permanent Marker';color:var(--odin-blue)">p = P(dados ≥ observado | H₀ verdadeira)</p>
+      <p style="font-size:1.15rem"><strong>p-value</strong> = the probability of observing data as or more extreme than what was obtained, <span class="hl-gold">assuming H\u2080 is true</span>.</p>
+      <p style="margin-top:8px;font-family:'Permanent Marker';color:var(--odin-blue)">p = P(dados ≥ observado | H\u2080 true)</p>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Pense assim: p = 0,03 significa que, <strong>se H₀ fosse verdadeira</strong> (se a técnica não fizesse diferença nenhuma), haveríamos apenas 3% de chance de obter uma diferença tão grande quanto a que observamos. Isso não é o mesmo que dizer que H₀ tem 3% de chance de ser verdadeira!')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Think of it this way: p = 0.03 means that, <strong>if H\u2080 were true</strong> (if the technique made no difference at all), there would be only a 3% chance of obtaining a difference as large as the one we observed. That is NOT the same as saying H\u2080 has a 3% chance of being true!')}
 
     <div class="visual-container">
       ${(() => {
@@ -881,7 +881,7 @@ function step4() {
         const pLabel = `<text x="${xToSvg(2.9)}" y="${yToSvg(0) - 20}" fill="var(--thor-red)" font-size="12" font-family="Permanent Marker">p/2</text>
           <text x="${xToSvg(-2.9)}" y="${yToSvg(0) - 20}" fill="var(--thor-red)" font-size="12" font-family="Permanent Marker">p/2</text>`;
 
-        const caption = `<text x="${w/2}" y="${h - 4}" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="Permanent Marker">p-valor bilateral = área sombreada em ambas as caudas (assumindo H₀ verdadeira)</text>`;
+        const caption = `<text x="${w/2}" y="${h - 4}" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="Permanent Marker">Two-tailed p-value = shaded area in both tails (assuming H\u2080 is true)</text>`;
 
         return `<svg viewBox="0 0 ${w} ${h}" width="${w}">
           <path d="${shadeR}" fill="var(--thor-red)" opacity="0.4"/>
@@ -893,27 +893,27 @@ function step4() {
       })()}
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>O p-valor NOT nos diz:</strong><br>• A probabilidade de H₀ ser verdadeira<br>• A probabilidade de H₁ ser verdadeira<br>• A probabilidade de replicar o resultado<br>• O tamanho ou a importância do efeito<br><br><strong>O p-valor nos diz APENAS:</strong><br>• Quão compatíveis os dados são com H₀')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>The p-value does NOT tell us:</strong><br>\u2022 The probability that H\u2080 is true<br>\u2022 The probability that H\u2081 is true<br>\u2022 The probability of replicating the result<br>\u2022 The size or importance of the effect<br><br><strong>The p-value tells us ONLY:</strong><br>\u2022 How compatible the data are with H\u2080')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Se p = 0,03 < α = 0,05, <strong>rejeitamos H₀</strong>. Os dados são suficientemente incompatíveis com a hipótese de que a técnica não faz diferença. Mas isso NOT nos diz quanto melhores as espadas são — para isso, precisamos do <em>tamanho de efeito</em>.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'If p = 0.03 < \u03b1 = 0.05, we <strong>reject H\u2080</strong>. The data are sufficiently incompatible with the hypothesis that the technique makes no difference. But this does NOT tell us how much better the swords are \x96 for that, we need the <em>effect size</em>.')}
   `;
 }
 
 // ------ STEP 5: ERRO TIPO I ------
 function step5() {
   return `
-    <div class="step-title">Passo 5: Type I Error (α) — Convicting an Innocent</div>
+    <div class="step-title">Step 5: Type I Error (\u03b1) \x96 Convicting an Innocent</div>
 
-    <p>Mesmo no melhor tribunal, erros acontecem. O <strong>Erro Tipo I</strong> é o mais temido.</p>
+    <p>Even in the best court, errors happen. <strong>Type I Error</strong> is the most feared.</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Erro Tipo I: rejeitamos H₀ quando H₀ é <strong>verdadeira</strong>. No nosso contexto — condenamos o réu inocente. Declaramos que a técnica nova funciona quando, na realidade, <em>não funciona</em>.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Type I Error: we reject H\u2080 when H\u2080 is <strong>true</strong>. In our context \x96 we convict the innocent defendant. We declare the new technique works when, in reality, <em>it does not</em>.')}
 
     <div class="formula">
       <div class="formula-label">Probability of Type I Error</div>
-      P(Reject H₀ | H₀ verdadeira) = α
+      P(Reject H\u2080 | H\u2080 true) = \u03b1
     </div>
 
-    <p>Ao definir α = 0,05, estamos dizendo: "Aceito que, em 5% das vezes que H₀ for verdadeira, vou cometer o erro de rejeitá-la."</p>
+    <p>By setting \u03b1 = 0.05, we are saying: "I accept that, in 5% of the times H\u2080 is true, I will make the error of rejecting it."</p>
 
     <div class="visual-container">
       ${buildNormalCurve({
@@ -922,75 +922,75 @@ function step5() {
         showAlpha: true,
         critLabelRight: '+1,96',
         critLabelLeft: '−1,96',
-        xLabels: ['', '', '', 'H₀ verdadeira', '', '', ''],
-        label: 'Áreas vermelhas = Erro Tipo I (α = 5%)'
+        xLabels: ['', '', '', 'H\u2080 true', '', '', ''],
+        label: 'Red areas = Type I Error (\u03b1 = 5%)'
       })}
     </div>
 
-    ${dialogue('thor', '⚡ Thorment', 'Então é só baixar o α para 0,001 e pronto! Nunca mais erramos!')}
+    ${dialogue('thor', '⚡ Thorment', 'So just lower \u03b1 to 0.001 and done! We\x27ll never make mistakes again!')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Não é tão simples. Reduzir α diminui o Erro Tipo I, mas <strong>aumenta</strong> o Erro Tipo II. É um equilíbrio — como veremos no próximo passo.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'It\x27s not that simple. Reducing \u03b1 decreases Type I Error, but <strong>increases</strong> Type II Error. It\x27s a trade-off \x96 as we\x27ll see in the next step.')}
 
     <div class="concept-grid">
       <div class="concept-card" style="border-color:var(--thor-red)">
         <div class="card-title" style="color:var(--thor-red)">⚠️ False Positive</div>
-        <p>Exemplo nórdico: Odin declara que a técnica de Brokkr <strong>é superior</strong>, mas na verdade as espadas são iguais. Brokkr ganha fama e ouro imerecidos!</p>
+        <p>Norse example: Odin declares Brokkr\x27s technique is <strong>superior</strong>, but in reality the swords are identical. Brokkr gains undeserved fame and gold!</p>
       </div>
       <div class="concept-card" style="border-color:var(--thor-red)">
-        <div class="card-title" style="color:var(--thor-red)">🎯 Na ciência</div>
-        <p>Publicar que um tratamento funciona quando não funciona. Desperdiçar recursos de pesquisa. Informar políticas públicas com achados falsos.</p>
+        <div class="card-title" style="color:var(--thor-red)">🎯 In science</div>
+        <p>Publishing that a treatment works when it doesn\x27t. Wasting research resources. Informing public policies with false findings.</p>
       </div>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Erro Tipo I também é chamado de <strong>falso positivo</strong> ou <strong>alarme falso</strong>. A taxa α é o nível de significância que definimos no Passo 2. Controlamos diretamente essa taxa ao escolher α.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Type I Error is also called a <strong>false positive</strong> or <strong>false alarm</strong>. The \u03b1 rate is the significance level we set in Step 2. We directly control this rate by choosing \u03b1.')}
   `;
 }
 
 // ------ STEP 6: ERRO TIPO II ------
 function step6() {
   return `
-    <div class="step-title">Passo 6: Type II Error (β) — Freeing the Guilty</div>
+    <div class="step-title">Step 6: Type II Error (\u03b2) \x96 Freeing the Guilty</div>
 
-    <p>O segundo tipo de erro é igualmente perigoso, mas menos falado.</p>
+    <p>The second type of error is equally dangerous, but less discussed.</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Erro Tipo II: <strong>falhamos em rejeitar</strong> H₀ quando H₀ é <strong>falsa</strong>. No tribunal — o vilão é culpado, mas não encontramos evidências suficientes e o liberamos.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Type II Error: we <strong>fail to reject</strong> H\u2080 when H\u2080 is <strong>false</strong>. In the court \x96 the villain is guilty, but we didn\x27t find enough evidence and we let him go.')}
 
     <div class="formula">
-      <div class="formula-label">Probability of Type I ErrorI</div>
-      P(Não rejeitar H₀ | H₀ falsa) = β
+      <div class="formula-label">Probability of Type II Error</div>
+      P(Fail to reject H\u2080 | H\u2080 false) = \u03b2
     </div>
 
-    <p>No nosso caso: a técnica de Brokkr <em>realmente</em> produz espadas melhores, mas nosso teste não detectou a diferença. A inovação é descartada injustamente.</p>
+    <p>In our case: Brokkr\x27s technique <em>really</em> produces better swords, but our test failed to detect the difference. The innovation is unjustly discarded.</p>
 
-    ${dialogue('thor', '⚡ Thorment', 'E qual é o valor de β? É 0,05 também?')}
+    ${dialogue('thor', '⚡ Thorment', 'And what is the value of \u03b2? Is it 0.05 too?')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Não! O β não é fixado por convenção como o α. Ele <strong>depende</strong> de três fatores: o tamanho da amostra (n), o tamanho real do efeito (δ), e o próprio α. Quanto maior n e δ, menor o β.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'No! \u03b2 is not fixed by convention like \u03b1. It <strong>depends</strong> on three factors: sample size (n), the true effect size (\u03b4), and \u03b1 itself. The larger n and \u03b4, the smaller \u03b2.')}
 
     <div class="concept-grid">
       <div class="concept-card" style="border-color:var(--success)">
         <div class="card-title" style="color:var(--success)">⬇️ Reduzir β (menos erros Tipo II):</div>
-        <p>• Aumentar tamanho da amostra (n)<br>
-        • Aumentar α (mas aumenta Erro Tipo I)<br>
-        • Efeitos maiores são mais fáceis de detectar</p>
+        <p>\u2022 Increase sample size (n)<br>
+        \u2022 Increase \u03b1 (but increases Type I Error)<br>
+        \u2022 Larger effects are easier to detect</p>
       </div>
       <div class="concept-card" style="border-color:var(--thor-red)">
         <div class="card-title" style="color:var(--thor-red)">⚠️ False Negative</div>
-        <p>A técnica de Brokkr <strong>funciona de verdade</strong>, mas nosso teste falhou em detectá-la. Brokkr perde a fama que merece. A forja de Asgard não evolui.</p>
+        <p>Brokkr\x27s technique <strong>truly works</strong>, but our test failed to detect it. Brokkr loses the fame he deserves. Asgard\x27s forge doesn\x27t evolve.</p>
       </div>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'O Erro Tipo II é o <strong>falso negativo</strong> ou <strong>alarme perdido</strong>. Na prática, β é frequentemente ignorado — pesquisadores fixam α = 0,05 e esquecem de calcular se têm amostra suficiente para detectar o efeito. Isso é um problema gravíssimo.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Type II Error is the <strong>false negative</strong> or <strong>missed alarm</strong>. In practice, \u03b2 is frequently ignored \x96 researchers set \u03b1 = 0.05 and forget to check if they have enough sample to detect the effect. This is a very serious problem.')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'É como ter um detector de mentiras que só funciona metade das vezes. Se o poder do seu teste é baixo, você está basicamente jogando moeda. A convenção mínima é <strong>1 − β ≥ 0,80</strong> — ou seja, pelo menos 80% de chance de detectar um efeito real.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'It\x27s like having a lie detector that only works half the time. If your test\x27s power is low, you\x27re basically flipping a coin. The minimum convention is <strong>1 \u2212 \u03b2 \u2265 0.80</strong> \x96 that is, at least an 80% chance of detecting a real effect.')}
   `;
 }
 
 // ------ STEP 7: PODER ESTATISTICO ------
 function step7() {
   return `
-    <div class="step-title">Passo 7: Statistical Power (1 − β)</div>
+    <div class="step-title">Step 7: Statistical Power (1 \u2212 \u03b2)</div>
 
-    <p>O <strong>poder</strong> de um teste é a probabilidade de rejeitar H₀ quando H₀ é <strong>realmente falsa</strong>. É a capacidade do teste de <em>encontrar o efeito</em> quando ele existe.</p>
+    <p>The <strong>power</strong> of a test is the probability of rejecting H\u2080 when H\u2080 is <strong>truly false</strong>. It is the test\x27s ability to <em>find the effect</em> when it exists.</p>
 
     <div class="formula">
       <div class="formula-label">Statistical Power</div>
@@ -1037,96 +1037,96 @@ function step7() {
       </tr>
     </table>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'O poder depende de <strong>três ingredientes</strong>: o tamanho da amostra (n), o tamanho real do efeito (δ) e o nível α. Aumentar qualquer um deles aumenta o poder.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Power depends on <strong>three ingredients</strong>: sample size (n), the true effect size (\u03b4), and the \u03b1 level. Increasing any one of them increases power.')}
 
     <div class="concept-grid">
       <div class="concept-card">
         <div class="card-title" style="color:var(--odin-blue)">📊 n (Sample Size)</div>
-        <p>Mais espadas testadas = mais precisão = mais poder. É o fator que o pesquisador mais controla.</p>
+        <p>More swords tested = more precision = more power. It\x27s the factor the researcher controls the most.</p>
       </div>
       <div class="concept-card">
-        <div class="card-title" style="color:var(--gold)">δ (Tamanho do Efeito)</div>
-        <p>Efeitos grandes são mais fáceis de detectar. Se a técnica nova é MUITO melhor, n precisa ser menor.</p>
+        <div class="card-title" style="color:var(--gold)">\u03b4 (Effect Size)</div>
+        <p>Large effects are easier to detect. If the new technique is MUCH better, n can be smaller.</p>
       </div>
       <div class="concept-card">
-        <div class="card-title" style="color:var(--thor-red)">α (Nível de Significância)</div>
-        <p>α maior = mais poder, mas mais falsos positivos. O trade-off é inevitável.</p>
+        <div class="card-title" style="color:var(--thor-red)">\u03b1 (Significance Level)</div>
+        <p>Higher \u03b1 = more power, but more false positives. The trade-off is inevitable.</p>
       </div>
       <div class="concept-card">
         <div class="card-title" style="color:var(--success)">σ (Variability)</div>
-        <p>Menos ruído nos dados = mais fácil enxergar o sinal. Medições precisas ajudam.</p>
+        <p>Less noise in the data = easier to see the signal. Precise measurements help.</p>
       </div>
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'A convenção mínima de Cohen (1988) é <strong>poder ≥ 0,80</strong>. Isso significa aceitar no máximo 20% de chance de perder um efeito real. Muitos estudos publicados têm poder muito abaixo disso — é um dos motores da crise de replicação.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Cohen\x27s (1988) minimum convention is <strong>power \u2265 0.80</strong>. This means accepting at most a 20% chance of missing a real effect. Many published studies have power well below this \x96 it\x27s one of the drivers of the replication crisis.')}
   `;
 }
 
 // ------ STEP 8: SIGNIFICANCIA ESTATISTICA VS PRATICA ------
 function step8() {
   return `
-    <div class="step-title">Passo 8: Statistical vs. Practical Significance</div>
+    <div class="step-title">Step 8: Statistical vs. Practical Significance</div>
 
-    <p>Um resultado pode ser <strong>estatisticamente significativo</strong> sem ser <strong>praticamente importante</strong>. E vice-versa.</p>
+    <p>A result can be <strong>statistically significant</strong> without being <strong>practically important</strong>. And vice versa.</p>
 
-    ${dialogue('thor', '⚡ Thorment', 'Como assim? Se p < 0,05, o efeito é significativo! Logo é importante!')}
+    ${dialogue('thor', '⚡ Thorment', 'What do you mean? If p < 0.05, the effect is significant! So it\x27s important!')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Cuidado, Thorment. Imagine que testamos 10.000 espadas de cada técnica e encontramos que a nova técnica produz espadas 0,1 grama mais pesadas, com p = 0,001. Estatisticamente significativo? <strong>Sim.</strong> Relevante para um guerreiro em batalha? <strong>Absolutamente não.</strong>')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Careful, Thorment. Imagine we tested 10,000 swords from each technique and found the new technique produces swords 0.1 grams heavier, with p = 0.001. Statistically significant? <strong>Yes.</strong> Relevant to a warrior in battle? <strong>Absolutely not.</strong>')}
 
     <div class="concept-grid">
       <div class="concept-card" style="border-color:var(--thor-red)">
         <div class="card-title" style="color:var(--thor-red)">⚠️ Large n Trap</div>
-        <p>Com amostras enormes, <strong>qualquer</strong> diferença minúscula se torna "significativa" estatisticamente. O p-valor é sensível ao n!</p>
-        <p style="margin-top:8px;font-family:'Permanent Marker';color:var(--thor-red)">n = 10.000 por grupo: uma diferença de 0,1 grama dá p < 0,001</p>
+        <p>With huge samples, <strong>any</strong> tiny difference becomes statistically "significant." The p-value is sensitive to n!</p>
+        <p style="margin-top:8px;font-family:'Permanent Marker';color:var(--thor-red)">n = 10,000 per group: a difference of 0.1 grams gives p < 0.001</p>
       </div>
       <div class="concept-card" style="border-color:var(--success)">
         <div class="card-title" style="color:var(--success)">✅ Small n Trap</div>
-        <p>Com amostras pequenas, efeitos <strong>grandes e reais</strong> podem não atingir significância. O teste não tem poder suficiente.</p>
-        <p style="margin-top:8px;font-family:'Permanent Marker';color:var(--success)">n = 5 por grupo: uma diferença de 15 pontos pode dar p = 0,08</p>
+        <p>With small samples, <strong>large and real</strong> effects may not reach significance. The test lacks sufficient power.</p>
+        <p style="margin-top:8px;font-family:'Permanent Marker';color:var(--success)">n = 5 per group: a difference of 15 points may give p = 0.08</p>
       </div>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'É por isso que o p-valor responde <strong>SE</strong> existe evidência de efeito, mas não diz <strong>QUANTO</strong> o efeito é grande ou <strong>SE</strong> é relevante na prática. Para isso, precisamos do <em>tamanho de efeito</em>.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'That\x27s why the p-value answers <strong>WHETHER</strong> there is evidence of an effect, but doesn\x27t say <strong>HOW MUCH</strong> the effect is or <strong>WHETHER</strong> it\x27s relevant in practice. For that, we need the <em>effect size</em>.')}
 
     <div class="formula">
-      <div class="formula-label">A pergunta que o p-valor não responde</div>
+      <div class="formula-label">The question the p-value doesn\x27t answer</div>
       p < 0,05 → "Existe efeito?" &nbsp;✔️&nbsp;&nbsp; "Quanto?" &nbsp;❌&nbsp;&nbsp; "Importante?" &nbsp;❌
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Cumming (2014) enfatiza: relatar apenas p < 0,05 sem tamanho de efeito e intervalo de confiança é <strong>insuficiente</strong>. A "nova estatística" exige que digamos não apenas <em>se</em> mas <em>quanto</em>.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Cumming (2014) emphasizes: reporting only p < 0.05 without effect size and confidence interval is <strong>insufficient</strong>. The "new statistics" demands we say not just <em>whether</em> but <em>how much</em>.')}
   `;
 }
 
 // ------ STEP 9: TAMANHO DE EFEITO ------
 function step9() {
   return `
-    <div class="step-title">Passo 9: Effect Size — The "How Much?"</div>
+    <div class="step-title">Step 9: Effect Size \x96 The "How Much?"</div>
 
-    <p>Se o p-valor responde <strong>se</strong> há evidência de efeito, o tamanho de efeito responde <strong>quanto</strong> grande ele é. É a peça que faltava no julgamento.</p>
+    <p>If the p-value answers <strong>whether</strong> there is evidence of an effect, the effect size answers <strong>how</strong> large it is. It\x27s the missing piece in the trial.</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'No nosso caso das espadas de Brokkr, digamos que a resistência média das espadas novas foi 85 e das tradicionais foi 78, com desvio-padrão combinado de 10. Vamos calcular o <strong>Cohen\'s d</strong>.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'In our case of Brokkr\x27s swords, let\x27s say the mean resistance of the new swords was 85 and the traditional was 78, with a pooled standard deviation of 10. Let\x27s calculate <strong>Cohen\x27s d</strong>.')}
 
     <div class="formula">
       <div class="formula-label">Cohen's d</div>
       d = (X̄₁ − X̄₂) / s<sub>pooled</sub> = (85 − 78) / 10 = <span class="hl-gold">0,70</span>
     </div>
 
-    <p class="step-subtitle">Benchmarks de Cohen (1988)</p>
+    <p class="step-subtitle">Cohen\x27s Benchmarks (1988)</p>
 
     <table class="es-table">
       <tr>
-        <th>Medida</th><th>Small</th><th>Medium</th><th>Large</th>
+        <th>Measure</th><th>Small</th><th>Medium</th><th>Large</th>
       </tr>
       <tr>
         <td style="font-family:'Permanent Marker';color:var(--odin-blue)">Cohen's d</td>
         <td>0,20</td><td>0,50</td><td>0,80</td>
       </tr>
       <tr>
-        <td style="font-family:'Permanent Marker';color:var(--odin-blue)">r (correlação)</td>
+        <td style="font-family:'Permanent Marker';color:var(--odin-blue)">r (correlation)</td>
         <td>0,10</td><td>0,30</td><td>0,50</td>
       </tr>
       <tr>
-        <td style="font-family:'Permanent Marker';color:var(--odin-blue)">η² (eta quadrado)</td>
+        <td style="font-family:'Permanent Marker';color:var(--odin-blue)">η² (eta squared)</td>
         <td>0,01</td><td>0,06</td><td>0,14</td>
       </tr>
       <tr>
@@ -1135,29 +1135,29 @@ function step9() {
       </tr>
     </table>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Nosso d = 0,70 é um efeito entre médio e grande. Isso significa que a média das espadas novas está 0,70 desvios-padrão acima das tradicionais. <em>Agora sim</em> temos uma ideia da magnitude!')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Our d = 0.70 is an effect between medium and large. This means the new swords\x27 mean is 0.70 standard deviations above the traditional. <em>Now</em> we have an idea of the magnitude!')}
 
-    ${dialogue('thor', '⚡ Thorment', 'Mas espera — a preferência do curso não é Hedges\' g?')}
+    ${dialogue('thor', '⚡ Thorment', 'But wait \x96 doesn\x27t the course prefer Hedges\x27 g?')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Boa, Thorment! O <strong>Hedges\' g</strong> corrige o viés de amostras pequenas do Cohen\'s d. Para n < 20, a diferença importa. E sempre reporte com <strong>intervalo de confiança</strong>: <em>d</em> = 0,70, 95% CI [0,18; 1,22].')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Good one, Thorment! <strong>Hedges\x27 g</strong> corrects the small-sample bias in Cohen\x27s d. For n < 20, the difference matters. And always report with a <strong>confidence interval</strong>: <em>d</em> = 0.70, 95% CI [0.18; 1.22].')}
 
     <div class="apa-box">
       <div class="apa-label">APA Format</div>
       <em>d</em> = 0,70, 95% CI [0,18; 1,22]
     </div>
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'O tamanho de efeito é <strong>independente</strong> do tamanho da amostra. Diferente do p-valor, que diminui conforme n cresce, o tamanho de efeito captura a <em>magnitude real</em> da diferença. É por isso que Cumming o coloca no centro da "nova estatística".')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Effect size is <strong>independent</strong> of sample size. Unlike the p-value, which decreases as n grows, effect size captures the <em>true magnitude</em> of the difference. That\x27s why Cumming places it at the center of the "new statistics."')}
   `;
 }
 
 // ------ STEP 10: RITUAL DO NHST ------
 function step10() {
   return `
-    <div class="step-title">Passo 10: O Ritual do NHST — Step by Step</div>
+    <div class="step-title">Step 10: The NHST Ritual \x96 Step by Step</div>
 
-    <p>Agora que entendemos cada componente, vamos montar o <strong>fluxo completo</strong> do Teste de Hipóteses.</p>
+    <p>Now that we understand each component, let\x27s build the <strong>complete flow</strong> of Hypothesis Testing.</p>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'O NHST é um <em>ritual</em> com passos precisos. Siga a ordem. Não pule etapas. E defina tudo ANTES de olhar os dados.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'NHST is a <em>ritual</em> with precise steps. Follow the order. Don\x27t skip steps. And define everything BEFORE looking at the data.')}
 
     <div class="flowchart-container">
       <svg viewBox="0 0 700 620" width="700" xmlns="http://www.w3.org/2000/svg">
@@ -1205,7 +1205,7 @@ function step10() {
         <text x="160" y="400" fill="var(--thor-red)" font-size="12" font-family="Permanent Marker">NOT</text>
         <line x1="120" y1="410" x2="120" y2="470" stroke="var(--thor-red)" stroke-width="1.5" marker-end="url(#arrow)"/>
         <rect x="20" y="470" width="200" height="56" rx="10" fill="rgba(248,81,73,0.15)" stroke="var(--thor-red)" stroke-width="2"/>
-        <text x="120" y="493" fill="var(--thor-red)" font-size="13" text-anchor="middle" font-family="Permanent Marker">Não rejeitar H₀</text>
+        <text x="120" y="493" fill="var(--thor-red)" font-size="13" text-anchor="middle" font-family="Permanent Marker">Fail to reject H\u2080</text>
         <text x="120" y="515" fill="var(--text-dim)" font-size="11" text-anchor="middle" font-family="Patrick Hand">"Non-significant result"</text>
 
         <!-- Step 7: Effect size (both branches merge) -->
@@ -1225,103 +1225,103 @@ function step10() {
       </svg>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Perceba que o último passo — reportar tamanho de efeito e intervalo de confiança — acontece <strong>independentemente</strong> do resultado. Mesmo se p > 0,05, você precisa dizer qual foi a magnitude observada. Um "resultado não-significativo" com d = 0,45 conta uma história muito diferente de um com d = 0,02.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Notice that the last step \x96 reporting effect size and confidence interval \x96 happens <strong>regardless</strong> of the result. Even if p > 0.05, you need to state the observed magnitude. A "non-significant result" with d = 0.45 tells a very different story from one with d = 0.02.')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Os passos 1 a 3 devem ser definidos <strong>antes</strong> de coletar dados. Isso é chamado de pré-registro. Mudar hipóteses, α, ou teste depois de ver os dados é a receita de Thorment para p-hacking.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Steps 1 through 3 must be defined <strong>before</strong> collecting data. This is called pre-registration. Changing hypotheses, \u03b1, or tests after seeing the data is Thorment\x27s recipe for p-hacking.')}
   `;
 }
 
 // ------ STEP 11: ARMADILHAS ------
 function step11() {
   return `
-    <div class="step-title">Passo 11: NHST Traps — O Arsenal de Thorment</div>
+    <div class="step-title">Step 11: NHST Traps \x96 Thorment\x27s Arsenal</div>
 
-    <p>O NHST é uma ferramenta útil, mas vulnerável a abusos. Thorment conhece todos os truques.</p>
+    <p>NHST is a useful tool, but vulnerable to abuse. Thorment knows all the tricks.</p>
 
-    ${dialogue('thor', '⚡ Thorment', 'Hehehe... se o p-valor não der significativo, é só testar de várias formas até achar um que dê! Ou então juntar mais dados até o p baixar. Ou mudar a hipótese depois de ver os resultados. FÁCIL!')}
+    ${dialogue('thor', '⚡ Thorment', 'Hehehe... if the p-value isn\x27t significant, just test it in different ways until you find one that is! Or collect more data until p drops. Or change the hypothesis after seeing the results. EASY!')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'TUDO isso é <strong>proibido</strong> no Tribunal de Asgard. Cada uma dessas práticas infla artificialmente a taxa de falsos positivos. Vamos desmascarar cada uma.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'ALL of that is <strong>forbidden</strong> in the Court of Asgard. Each of these practices artificially inflates the false positive rate. Let\x27s unmask each one.')}
 
     <div class="trap-grid">
       <div class="trap-card">
         <div class="trap-icon">🎣</div>
         <div>
           <div class="trap-title">P-Hacking (Data Dredging)</div>
-          <p>Testar múltiplas análises, variáveis ou subgrupos até encontrar p < 0,05 por acaso. Com 20 testes independentes e α = 0,05, a chance de pelo menos um falso positivo é 1 − (0,95)²⁰ = <span class="hl-red">64%</span>!</p>
+          <p>Testing multiple analyses, variables, or subgroups until finding p < 0.05 by chance. With 20 independent tests and \u03b1 = 0.05, the chance of at least one false positive is 1 \u2212 (0.95)\xb2\u2070 = <span class="hl-red">64%</span>!</p>
         </div>
       </div>
       <div class="trap-card">
         <div class="trap-icon">🔮</div>
         <div>
           <div class="trap-title">HARKing (Hypothesizing After Results are Known)</div>
-          <p>Formular hipóteses <em>depois</em> de ver os dados, fingindo que eram a priori. "Eu SEMPRE achei que seria unicaudal!" — não, Thorment, você não achava.</p>
+          <p>Formulating hypotheses <em>after</em> seeing the data, pretending they were a priori. "I ALWAYS thought it would be one-tailed!" \x96 no, Thorment, you didn\x27t.</p>
         </div>
       </div>
       <div class="trap-card">
         <div class="trap-icon">📈</div>
         <div>
           <div class="trap-title">Optional Stopping</div>
-          <p>Coletar dados, testar, se p > 0,05 coletar mais, testar de novo... repetir até dar "significativo". Cada olhada nos dados infla α real muito além de 0,05.</p>
+          <p>Collect data, test, if p > 0.05 collect more, test again... repeat until it\x27s "significant." Each peek at the data inflates the real \u03b1 well beyond 0.05.</p>
         </div>
       </div>
       <div class="trap-card">
         <div class="trap-icon">✂️</div>
         <div>
           <div class="trap-title">Selective Reporting</div>
-          <p>Publicar apenas os resultados significativos e esconder os não-significativos na gaveta. Gera o <em>file drawer problem</em> — a literatura fica enviesada para efeitos positivos.</p>
+          <p>Publishing only significant results and hiding non-significant ones in the drawer. Creates the <em>file drawer problem</em> \x96 the literature becomes biased toward positive effects.</p>
         </div>
       </div>
       <div class="trap-card">
         <div class="trap-icon">🎯</div>
         <div>
           <div class="trap-title">Multiple Comparisons Without Correction</div>
-          <p>Fazer 10 testes <em>t</em> sem ajustar o α (Bonferroni, Holm, FDR). Cada teste tem 5% de chance de falso positivo — com 10 testes, a taxa real explode.</p>
+          <p>Running 10 <em>t</em>-tests without adjusting \u03b1 (Bonferroni, Holm, FDR). Each test has a 5% false positive chance \x96 with 10 tests, the actual rate explodes.</p>
         </div>
       </div>
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'A defesa contra essas armadilhas: <strong>pré-registro</strong> do estudo (hipóteses, análises, n planejado), <strong>correção</strong> para múltiplas comparações, e <strong>transparência</strong> total nos relatos. O Tribunal de Asgard exige honestidade.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The defense against these traps: <strong>pre-registration</strong> of the study (hypotheses, analyses, planned n), <strong>correction</strong> for multiple comparisons, and complete <strong>transparency</strong> in reporting. The Court of Asgard demands honesty.')}
 
-    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Simmons, Nelson & Simonsohn (2011) mostraram que práticas questionáveis de pesquisa (QRPs) podem produzir p < 0,05 para <em>qualquer</em> hipótese, mesmo as falsas. O paper se chama "<em>False-Positive Psychology</em>" — leitura obrigatória.')}
+    ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Simmons, Nelson & Simonsohn (2011) showed that questionable research practices (QRPs) can produce p < 0.05 for <em>any</em> hypothesis, even false ones. The paper is called "<em>False-Positive Psychology</em>" \x96 required reading.')}
   `;
 }
 
 // ------ STEP 12: LICAO DOS CORVOS ------
 function step12() {
   return `
-    <div class="step-title">Passo 12: Lesson of the Ravens — Final Synthesis</div>
+    <div class="step-title">Step 12: Lesson of the Ravens \x96 Final Synthesis</div>
 
-    <p>O julgamento no Tribunal de Asgard chegou ao fim. Vamos consolidar o que aprendemos.</p>
+    <p>The trial in the Court of Asgard has come to an end. Let\x27s consolidate what we\x27ve learned.</p>
 
     <div class="licao-box">
       <div class="licao-title">📜 Lesson of the Ravens</div>
 
       ${dialogue('corvo', '🐦‍⬛ Muninn whispers:', `<strong>Key points to commit to memory:</strong><br><br>
-        • <strong>H₀</strong> = status quo (sem efeito); <strong>H₁</strong> = existe efeito<br>
-        • <strong>α</strong> = critério de decisão, definido ANTES da coleta (geralmente 0,05)<br>
-        • <strong>p-valor</strong> = P(dados ≥ observado | H₀ verdadeira) — e NADA mais<br>
-        • <strong>p-valor NOT é</strong> P(H₀ verdadeira | dados) — falácia da probabilidade inversa!<br>
-        • <strong>Erro Tipo I (α)</strong> = falso positivo = condenar inocente<br>
-        • <strong>Erro Tipo II (β)</strong> = falso negativo = libertar culpado<br>
-        • <strong>Poder (1−β)</strong> ≥ 0,80 — convenção mínima de Cohen<br>
-        • <strong>Significância estatística ≠ significância prática</strong><br>
-        • <strong>Tamanho de efeito</strong> (d, r, η²) diz QUANTO; p-valor diz apenas SE<br>
-        • <strong>Sempre</strong> reporte ES + IC, mesmo quando p > 0,05`)}
+        \u2022 <strong>H\u2080</strong> = status quo (no effect); <strong>H\u2081</strong> = there is an effect<br>
+        \u2022 <strong>\u03b1</strong> = decision criterion, set BEFORE data collection (usually 0.05)<br>
+        • <strong>p-valor</strong> = P(dados ≥ observado | H\u2080 true) — e NADA mais<br>
+        • <strong>p-value is NOT</strong> P(H\u2080 true | data) \x96 inverse probability fallacy!<br>
+        \u2022 <strong>Type I Error (\u03b1)</strong> = false positive = convicting the innocent<br>
+        \u2022 <strong>Type II Error (\u03b2)</strong> = false negative = freeing the guilty<br>
+        \u2022 <strong>Power (1\u2212\u03b2)</strong> \u2265 0.80 \x96 Cohen\x27s minimum convention<br>
+        \u2022 <strong>Statistical significance \u2260 practical significance</strong><br>
+        \u2022 <strong>Effect size</strong> (d, r, \u03b7\xb2) says HOW MUCH; p-value says only WHETHER<br>
+        \u2022 <strong>Always</strong> report ES + CI, even when p > 0.05`)}
 
       ${dialogue('corvo', '🐦‍⬛ Huginn challenges:', `<strong>Challenges for reflection:</strong><br><br>
-        • Se p = 0,049 e p = 0,051 são tão diferentes assim, por que tratamos como binário?<br>
-        • Quando o NHST <strong>NOT</strong> deveria ser usado?<br>
-        • Se você pudesse escolher entre reportar só p OU só IC, qual escolheria? Por quê?<br>
-        • O que acontece com a taxa real de α quando todo mundo publica apenas p < 0,05?<br>
-        • Bayesianos não usam p-valores. O que eles usam no lugar? Será melhor?<br>
-        • Se 80% dos estudos publicados na sua área têm poder < 0,50, o que isso significa para a literatura?`)}
+        \u2022 If p = 0.049 and p = 0.051 are so different, why do we treat them as binary?<br>
+        \u2022 When should NHST <strong>NOT</strong> be used?<br>
+        \u2022 If you could choose between reporting only p OR only CI, which would you choose? Why?<br>
+        \u2022 What happens to the real \u03b1 rate when everyone publishes only p < 0.05?<br>
+        \u2022 Bayesians don\x27t use p-values. What do they use instead? Is it better?<br>
+        \u2022 If 80% of published studies in your field have power < 0.50, what does that mean for the literature?`)}
     </div>
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'O Teste de Hipóteses é uma ferramenta — não um oráculo. Ele nos ajuda a tomar decisões sob incerteza, mas tem limitações sérias. Use-o com cuidado, sempre acompanhado de tamanho de efeito e intervalo de confiança. E nunca, <em>nunca</em>, trate p = 0,05 como a fronteira entre verdade e mentira.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'Hypothesis Testing is a tool \x96 not an oracle. It helps us make decisions under uncertainty, but has serious limitations. Use it carefully, always accompanied by effect size and confidence interval. And never, <em>never</em>, treat p = 0.05 as the border between truth and falsehood.')}
 
-    ${dialogue('thor', '⚡ Thorment', 'Tá bom, Odin... admito que aprendi algo hoje. Mas ainda acho que meu martelo resolve mais rápido do que esse ritual todo.')}
+    ${dialogue('thor', '⚡ Thorment', 'Fine, Odin... I admit I learned something today. But I still think my hammer solves things faster than all this ritual.')}
 
-    ${dialogue('odin', '🧙‍♂️ Odinfather', 'O martelo quebra espadas, Thorment. O teste de hipóteses <em>forja conhecimento</em>. Prefiro a forja.')}
+    ${dialogue('odin', '🧙‍♂️ Odinfather', 'The hammer breaks swords, Thorment. Hypothesis testing <em>forges knowledge</em>. I prefer the forge.')}
 
     <div style="text-align:center;margin:30px 0">
       <div style="font-family:'Bangers';font-size:2rem;color:var(--gold)">END OF TRIAL!</div>
@@ -1336,7 +1336,7 @@ const stepFunctions = [step0, step1, step2, step3, step4, step5, step6, step7, s
 
 const stepNames = [
   'The Court of Asgard',
-  'H₀ e H₁',
+  'H\u2080 and H\u2081',
   'Significance Level (α)',
   'Test Statistic',
   'P-value: What It Is and What It Is NOT',
