@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANOVA — Step by Step | Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117; --bg-card: #161b22; --bg-panel: #1c2333;
+  --odin-blue: #58a6ff; --thor-red: #f85149; --corvo-purple: #bc8cff;
+  --gold: #f0c040; --silver: #8b949e; --text: #e6edf3; --text-dim: #8b949e;
+  --success: #3fb950; --border: #30363d;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg-dark); color: var(--text);
+  font-family: 'Patrick Hand', cursive; font-size: 18px;
+  line-height: 1.6; min-height: 100vh;
+}
+.container { max-width: 920px; margin: 0 auto; padding: 20px; }
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg-dark); padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+.progress-label {
+  font-family: 'Permanent Marker', cursive; font-size: 14px;
+  color: var(--text-dim); margin-bottom: 6px; text-align: center;
+}
+.progress-track {
+  width: 100%; height: 8px; background: var(--bg-panel);
+  border-radius: 4px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 4px; transition: width 0.5s ease;
+}
+
+/* STEP CONTENT */
+.step-content {
+  min-height: 60vh; padding: 30px 0;
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.step-title {
+  font-family: 'Bangers', cursive; font-size: 2.2rem;
+  color: var(--gold); margin-bottom: 20px; letter-spacing: 1px;
+}
+.step-subtitle {
+  font-family: 'Permanent Marker', cursive; font-size: 1.3rem;
+  color: var(--odin-blue); margin-bottom: 15px;
+}
+
+/* DIALOGUE BOXES */
+.dialogue-box {
+  border-radius: 12px; padding: 16px 20px; margin: 16px 0;
+  border-left: 4px solid; position: relative;
+}
+.dialogue-box.odin { background: rgba(88,166,255,0.08); border-left-color: var(--odin-blue); }
+.dialogue-box.thor { background: rgba(248,81,73,0.08); border-left-color: var(--thor-red); }
+.dialogue-box.corvo { background: rgba(188,140,255,0.08); border-left-color: var(--corvo-purple); }
+.dialogue-box.huginn { background: rgba(188,140,255,0.06); border-left-color: var(--corvo-purple); }
+.char-name {
+  font-family: 'Permanent Marker', cursive; font-size: 1rem; margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+.char-name.huginn { color: var(--corvo-purple); }
+.dialogue-text { font-size: 1.05rem; line-height: 1.5; }
+
+/* DATA TABLE */
+.data-table {
+  width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 1rem;
+}
+.data-table th, .data-table td {
+  padding: 10px 14px; text-align: center; border: 1px solid var(--border);
+}
+.data-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive; font-size: 0.95rem;
+}
+.data-table td { background: var(--bg-card); transition: background 0.2s; }
+.data-table tr:hover td { background: rgba(88,166,255,0.1); }
+.mean-row td, .mean-row th {
+  font-family: 'Permanent Marker', cursive; background: var(--bg-panel) !important;
+  color: var(--gold);
+}
+
+/* FORMULA */
+.formula {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 20px; margin: 16px 0;
+  font-size: 1.15rem; text-align: center;
+  font-family: 'Patrick Hand', cursive; color: var(--gold);
+}
+.formula-label {
+  font-family: 'Permanent Marker', cursive; color: var(--text-dim);
+  font-size: 0.85rem; margin-bottom: 6px;
+}
+
+/* CALC TABLE */
+.calc-table {
+  width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.95rem;
+}
+.calc-table th, .calc-table td {
+  padding: 8px 10px; text-align: center; border: 1px solid var(--border);
+}
+.calc-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive;
+  font-size: 0.85rem; color: var(--text-dim);
+}
+.calc-table td { background: var(--bg-card); }
+
+/* ANIMATED BAR */
+.bar-container { margin: 20px 0; }
+.bar-wrapper { display: flex; align-items: center; margin: 8px 0; }
+.bar-label {
+  width: 130px; font-family: 'Permanent Marker', cursive;
+  font-size: 0.9rem; text-align: right; padding-right: 10px; flex-shrink:0;
+}
+.bar-track {
+  flex: 1; height: 30px; background: var(--bg-panel);
+  border-radius: 6px; overflow: hidden; position: relative;
+}
+.bar-fill {
+  height: 100%; border-radius: 6px;
+  transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
+  width: 0;
+}
+.bar-value {
+  width: 90px; font-size: 0.9rem; padding-left: 10px; color: var(--gold); flex-shrink:0;
+}
+
+/* NAVIGATION */
+.nav-container {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 0; border-top: 1px solid var(--border); margin-top: 30px;
+}
+.nav-btn {
+  font-family: 'Permanent Marker', cursive; font-size: 1.1rem;
+  padding: 12px 28px; border-radius: 10px; border: 2px solid var(--border);
+  background: var(--bg-card); color: var(--text); cursor: pointer;
+  transition: all 0.3s;
+}
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--odin-blue); background: rgba(88,166,255,0.15);
+  transform: translateY(-2px);
+}
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.nav-btn.next { border-color: var(--odin-blue); color: var(--odin-blue); }
+.step-indicator {
+  font-family: 'Permanent Marker', cursive; font-size: 0.9rem; color: var(--text-dim);
+}
+
+/* ANOVA TABLE */
+.anova-table {
+  width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95rem;
+}
+.anova-table th, .anova-table td {
+  padding: 10px 12px; text-align: center; border: 1px solid var(--border);
+}
+.anova-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive;
+  color: var(--gold); font-size: 0.9rem;
+}
+.anova-table td { background: var(--bg-card); }
+.anova-table .sig { color: var(--success); font-weight: bold; }
+.anova-table .ns { color: var(--text-dim); }
+.anova-table .total-row td { background: var(--bg-panel); font-weight: bold; }
+
+/* MATRIX VISUAL */
+.matrix-box {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px; margin: 16px 0; text-align: center;
+  font-family: 'Patrick Hand', cursive;
+}
+.matrix-box .matrix-label {
+  font-family: 'Permanent Marker', cursive; color: var(--odin-blue);
+  font-size: 0.95rem; margin-bottom: 10px;
+}
+.matrix-grid {
+  display: inline-grid; gap: 2px; margin: 8px auto;
+  font-size: 1rem; color: var(--gold);
+}
+.matrix-grid .cell {
+  background: var(--bg-card); border: 1px solid var(--border);
+  padding: 8px 14px; min-width: 70px; text-align: center;
+}
+.matrix-grid .cell-header {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive;
+  color: var(--text-dim); font-size: 0.8rem;
+}
+
+/* HYPOTHESIS BOX */
+.hyp-box {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px; margin: 14px 0;
+}
+.hyp-box h4 {
+  font-family: 'Permanent Marker', cursive; color: var(--odin-blue);
+  margin-bottom: 8px; font-size: 1rem;
+}
+.hyp-box p { font-size: 1rem; margin: 4px 0; }
+
+/* APA BOX */
+.apa-box {
+  background: rgba(63,185,80,0.08); border: 1px solid var(--success);
+  border-radius: 10px; padding: 18px; margin: 16px 0;
+  font-family: 'Patrick Hand', cursive; font-size: 1rem;
+  line-height: 1.7;
+}
+.apa-box .apa-label {
+  font-family: 'Permanent Marker', cursive; color: var(--success);
+  font-size: 0.85rem; margin-bottom: 8px;
+}
+
+/* COMPARISON TABLE */
+.comp-table {
+  width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.95rem;
+}
+.comp-table th, .comp-table td {
+  padding: 10px 12px; text-align: left; border: 1px solid var(--border);
+}
+.comp-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive;
+  color: var(--gold); font-size: 0.9rem; text-align: center;
+}
+.comp-table td { background: var(--bg-card); }
+.comp-table td:first-child {
+  font-family: 'Permanent Marker', cursive; color: var(--odin-blue);
+  font-size: 0.9rem; text-align: center;
+}
+
+/* FLOWCHART SVG */
+.flowchart-container {
+  margin: 20px 0; text-align: center; overflow-x: auto;
+}
+.flowchart-container svg { max-width: 100%; height: auto; }
+
+/* STACKED BAR */
+.ss-stack { display: flex; height: 40px; border-radius: 8px; overflow: hidden; margin: 16px 0; }
+.ss-stack div { display: flex; align-items: center; justify-content: center; font-family: 'Permanent Marker', cursive; font-size: 0.75rem; transition: width 1s ease; }
+.ss-legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 10px 0; font-size: 0.9rem; }
+.ss-legend span { display: flex; align-items: center; gap: 6px; }
+.ss-legend .dot { width: 12px; height: 12px; border-radius: 3px; }
+
+/* HIGHLIGHT */
+.highlight { color: var(--gold); font-weight: bold; }
+.highlight-blue { color: var(--odin-blue); }
+.highlight-red { color: var(--thor-red); }
+.highlight-green { color: var(--success); }
+.highlight-purple { color: var(--corvo-purple); }
+
+/* ANIMATION */
+.anim-number {
+  display: inline-block; transition: all 0.5s;
+  color: var(--gold); font-weight: bold;
+}
+.fade-in { animation: fadeIn 0.6s ease forwards; }
+.slide-up { animation: slideUp 0.6s ease forwards; }
+@keyframes slideUp {
+  from { opacity:0; transform: translateY(20px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+/* CHECKLIST */
+.checklist { list-style: none; margin: 14px 0; padding: 0; }
+.checklist li {
+  padding: 8px 0 8px 30px; position: relative; font-size: 1rem;
+}
+.checklist li::before {
+  content: '✓'; position: absolute; left: 4px; top: 8px;
+  color: var(--success); font-weight: bold; font-size: 1.1rem;
+}
+.checklist li.fail::before { content: '✗'; color: var(--thor-red); }
+
+/* DECISION TREE STEP */
+.decision-node {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 18px; margin: 10px 0;
+  border-left: 3px solid var(--odin-blue);
+}
+.decision-node.warn { border-left-color: var(--gold); }
+.decision-node.danger { border-left-color: var(--thor-red); }
+.decision-node strong { color: var(--gold); }
+
+/* CANVAS */
+canvas.plot { background: var(--bg-panel); border-radius: 10px; border: 1px solid var(--border); display: block; margin: 20px auto; max-width: 100%; }
+
+/* SIGNATURE */
+.signature {
+  text-align: center; padding: 30px 0; color: var(--text-dim);
+  font-family: 'Permanent Marker', cursive; font-size: 0.85rem;
+  border-top: 1px solid var(--border); margin-top: 30px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .step-title { font-size: 1.6rem; }
+  .data-table, .calc-table, .anova-table, .comp-table { font-size: 0.8rem; }
+  .data-table th, .data-table td, .calc-table th, .calc-table td { padding: 6px 4px; }
+  .bar-label { width: 90px; font-size: 0.75rem; }
+  .nav-btn { padding: 10px 18px; font-size: 0.95rem; }
+  .matrix-grid .cell { padding: 5px 8px; min-width: 50px; font-size: 0.85rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- PROGRESS -->
+<div class="progress-bar-container">
+  <div class="progress-label" id="progressLabel">Step 0 of 11</div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<!-- CONTENT -->
+<div id="stepContent" class="step-content"></div>
+
+<!-- NAVIGATION -->
+<div class="nav-container">
+  <button class="nav-btn" id="btnPrev" onclick="prevStep()" disabled>&#9664; Back</button>
+  <span class="step-indicator" id="stepIndicator">0 / 11</span>
+  <button class="nav-btn next" id="btnNext" onclick="nextStep()">Next &#9654;</button>
+</div>
+
+<div class="signature">Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026</div>
+</div>
+
+<script>
+// ============================================================
+// DATA — 3 academys × 3 VDs (Força, Speed, Estratégia), n=6
+// ============================================================
+const DATA = {
+  'Ulfhednar': { Strength: [82,78,85,80,76,83], Speed: [60,65,58,62,64,61], Strategy: [45,50,42,48,46,49] },
+  'Berserker': { Strength: [90,88,92,86,94,91], Speed: [55,52,58,50,54,51], Strategy: [40,38,42,36,44,41] },
+  'Einherjar':  { Strength: [70,74,68,72,75,71], Speed: [78,82,76,80,74,79], Strategy: [72,68,75,70,73,71] }
+};
+const academys = ['Ulfhednar','Berserker','Einherjar'];
+const dvs = ['Strength','Speed','Strategy'];
+const dvLabels = {'Strength':'Força ⚔️','Speed':'Speed 🏃','Strategy':'Estratégia 🧠'};
+const k = 3; // grupos
+const p = 3; // VDs
+const n = 6; // por grupo
+const N = 18;
+
+function mean(arr){ return arr.reduce((s,v)=>s+v,0)/arr.length; }
+function round2(v){ return Math.round(v*100)/100; }
+function round4(v){ return Math.round(v*10000)/10000; }
+function sum(arr){ return arr.reduce((s,v)=>s+v,0); }
+
+// Group means per DV
+const groupMean = {};
+academys.forEach(a => {
+  groupMean[a] = {};
+  dvs.forEach(d => { groupMean[a][d] = mean(DATA[a][d]); });
+});
+
+// Grand mean per DV
+const grandMean = {};
+dvs.forEach(d => {
+  let all = [];
+  academys.forEach(a => all.push(...DATA[a][d]));
+  grandMean[d] = mean(all);
+});
+
+// Grand mean all
+let allVals = [];
+academys.forEach(a => dvs.forEach(d => allVals.push(...DATA[a][d])));
+const GM = mean(allVals);
+
+// Correlation between DVs (across all 18 obs)
+function getAllDV(dv){
+  let r = [];
+  academys.forEach(a => r.push(...DATA[a][dv]));
+  return r;
+}
+function corr(x, y){
+  const mx = mean(x), my = mean(y);
+  let num=0, dx=0, dy=0;
+  for(let i=0;i<x.length;i++){
+    num += (x[i]-mx)*(y[i]-my);
+    dx += (x[i]-mx)**2;
+    dy += (y[i]-my)**2;
+  }
+  return num / Math.sqrt(dx*dy);
+}
+
+const corrMatrix = {};
+dvs.forEach(d1 => {
+  corrMatrix[d1] = {};
+  dvs.forEach(d2 => {
+    corrMatrix[d1][d2] = corr(getAllDV(d1), getAllDV(d2));
+  });
+});
+
+// Univariate F for each DV (for follow-up)
+function univariateF(dv){
+  const gm = grandMean[dv];
+  let ssb = 0, ssw = 0;
+  academys.forEach(a => {
+    ssb += n * (groupMean[a][dv] - gm)**2;
+    DATA[a][dv].forEach(x => { ssw += (x - groupMean[a][dv])**2; });
+  });
+  const dfb = k-1, dfw = N-k;
+  const msb = ssb/dfb, msw = ssw/dfw;
+  const f = msb/msw;
+  const etaSq = ssb/(ssb+ssw);
+  return {ssb:round2(ssb), ssw:round2(ssw), dfb, dfw, msb:round2(msb), msw:round2(msw), f:round2(f), etaSq:round4(etaSq)};
+}
+
+const uniF = {};
+dvs.forEach(d => { uniF[d] = univariateF(d); });
+
+// ============================================================
+// SSCP matrices (simplified demonstration)
+// ============================================================
+// H (hypothesis SSCP) - between groups
+function computeH(){
+  let H = [[0,0,0],[0,0,0],[0,0,0]];
+  for(let i=0;i<p;i++){
+    for(let j=0;j<p;j++){
+      let val = 0;
+      academys.forEach(a => {
+        val += n * (groupMean[a][dvs[i]] - grandMean[dvs[i]]) * (groupMean[a][dvs[j]] - grandMean[dvs[j]]);
+      });
+      H[i][j] = val;
+    }
+  }
+  return H;
+}
+// E (error SSCP) - within groups
+function computeE(){
+  let E = [[0,0,0],[0,0,0],[0,0,0]];
+  for(let i=0;i<p;i++){
+    for(let j=0;j<p;j++){
+      let val = 0;
+      academys.forEach(a => {
+        for(let obs=0;obs<n;obs++){
+          val += (DATA[a][dvs[i]][obs] - groupMean[a][dvs[i]]) * (DATA[a][dvs[j]][obs] - groupMean[a][dvs[j]]);
+        }
+      });
+      E[i][j] = val;
+    }
+  }
+  return E;
+}
+
+const H = computeH();
+const E = computeE();
+const T_mat = H.map((row,i) => row.map((v,j) => v + E[i][j]));
+
+// Pillai's Trace (approximation using eigenvalues of H * E^-1)
+// For demo: we compute s = min(p, df_h) eigenvalues of H*inv(E)
+// Simplified: Pillai = sum(lambda_i / (1 + lambda_i))
+// We'll use a direct numerical approach for 3x3
+function matInverse3(m){
+  const [[a,b,c],[d,e,f],[g,h,i]] = m;
+  const det = a*(e*i-f*h) - b*(d*i-f*g) + c*(d*h-e*g);
+  if(Math.abs(det)<1e-10) return null;
+  return [
+    [(e*i-f*h)/det, (c*h-b*i)/det, (b*f-c*e)/det],
+    [(f*g-d*i)/det, (a*i-c*g)/det, (c*d-a*f)/det],
+    [(d*h-e*g)/det, (b*g-a*h)/det, (a*e-b*d)/det]
+  ];
+}
+function matMul3(A,B){
+  let R = [[0,0,0],[0,0,0],[0,0,0]];
+  for(let i=0;i<3;i++) for(let j=0;j<3;j++) for(let k2=0;k2<3;k2++) R[i][j]+=A[i][k2]*B[k2][j];
+  return R;
+}
+// Eigenvalues of 3x3 via characteristic polynomial
+function eigenvalues3(M){
+  const [[a,b,c],[d,e,f],[g,h,i]] = M;
+  const p1 = -(a+e+i); // -trace
+  const p2 = a*e+a*i+e*i - b*d - c*g - f*h;
+  const p3 = -(a*(e*i-f*h) - b*(d*i-f*g) + c*(d*h-e*g)); // -det
+  // solve x^3 + p1*x^2 + p2*x + p3 = 0
+  const Q = (3*p2 - p1*p1)/9;
+  const R2 = (9*p1*p2 - 27*p3 - 2*p1*p1*p1)/54;
+  const D = Q*Q*Q + R2*R2;
+  if(D < 0){
+    const theta = Math.acos(R2 / Math.sqrt(-Q*Q*Q));
+    const sq = 2*Math.sqrt(-Q);
+    return [
+      sq*Math.cos(theta/3) - p1/3,
+      sq*Math.cos((theta+2*Math.PI)/3) - p1/3,
+      sq*Math.cos((theta+4*Math.PI)/3) - p1/3
+    ].sort((a2,b2)=>b2-a2);
+  } else {
+    const S = Math.cbrt(R2 + Math.sqrt(D));
+    const T2 = Math.cbrt(R2 - Math.sqrt(D));
+    return [S+T2 - p1/3];
+  }
+}
+
+const Einv = matInverse3(E);
+const HEinv = matMul3(H, Einv);
+const eigenvals = eigenvalues3(HEinv);
+
+const pillaiTrace = eigenvals.reduce((s,l) => s + l/(1+l), 0);
+const wilksLambda = eigenvals.reduce((s,l) => s * 1/(1+l), 1);
+const hotellingTrace = eigenvals.reduce((s,l) => s + l, 0);
+const roysLargest = Math.max(...eigenvals);
+
+// Approximate F for Pillai
+const s = Math.min(p, k-1); // s = min(p, df_h) = min(3,2) = 2
+const m_param = (Math.abs(p - (k-1)) - 1) / 2;
+const n_param = (N - k - p - 1) / 2;
+const df1_pillai = s * ((2*m_param + s + 1));  // simplified: p*(k-1) = 6
+const df2_pillai = s * ((2*n_param + s + 1));  // simplified: s*(N-k-p+s) = 2*(18-3-3+2)=28
+// Use standard approx: F = (V/s) / ((1-V/s)) * df2/df1
+const pillaiF = (pillaiTrace / s) / ((1 - pillaiTrace/s)) * (df2_pillai / (p*(k-1)));
+
+// For display we'll use more standard df: df1 = p*(k-1) = 6, df2 ~ 2*(N-k-p+s) = 28
+const df1_display = p * (k-1);  // 6
+const df2_display = 2 * (N - k - p + s); // 28
+
+// ============================================================
+// DIALOGUE HELPER
+// ============================================================
+function dlg(character, name, text){
+  return `<div class="dialogue-box ${character}"><div class="char-name ${character}">${name}</div><div class="dialogue-text">${text}</div></div>`;
+}
+
+// ============================================================
+// STEPS
+// ============================================================
+const TOTAL_STEPS = 12;
+let currentStep = 0;
+
+function getStepHTML(step){
+  switch(step){
+
+  // ============================================================
+  // STEP 0 — INTRODUÇÃO: POR QUE NÃO RODAR 3 ANOVAs?
+  // ============================================================
+  case 0: return `
+<div class="step-title">&#9876; Step 0 &mdash; The Great Hall of Matrices</div>
+<p>Tr&ecirc;s academys vikings formam warriors de elite em Asgard. The Council of Jarls wants to know: <span class="highlight">qual academy produz os melhores combatentes?</span></p>
+<p>O problema &mdash; n&atilde;o existe UM &uacute;nico crit&eacute;rio. Os warriors s&atilde;o avaliados em <strong>tr&ecirc;s</strong> dimens&otilde;es simult&acirc;neas:</p>
+<ul style="margin:12px 0 12px 24px;">
+  <li><strong>Strength &#9876;&#65039;</strong> &mdash; strike impact on the battlefield</li>
+  <li><strong>Speed &#127939;</strong> &mdash; reaction time in combat</li>
+  <li><strong>Strategy &#129504;</strong> &mdash; tactical ability and enemy reading</li>
+</ul>
+
+${dlg('thor','&#9889; Thorment','Easy! Roda tr&ecirc;s Separate ANOVAs &mdash; uma pra Strength, uma pra Speed, uma pra Strategy. Triplica a gl&oacute;ria!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Triplica o <strong>erro</strong>, Thorment. Tr&ecirc;s testes com &alpha; = 0,05 cada um d&atilde;o uma taxa de erro global de 1 &minus; (0,95)&sup3; = <span class="highlight-red">14,3%</span>. Quase 1 em 7 chances de falso positivo. Al&eacute;m disso, voc&ecirc; perde o <em>padr&atilde;o multivariado</em> &mdash; a combina&ccedil;&atilde;o &uacute;nica de for&ccedil;a + velocidade + estrat&eacute;gia que diferencia as academys.')}
+${dlg('corvo','&#129430; Muninn whispers:','MANOVA = <em>Multivariate Analysis of Variance</em>. Testa se os vetores de m&eacute;dias diferem entre grupos, preservando a correla&ccedil;&atilde;o entre as VDs e controlando a taxa de erro Tipo I.')}
+
+<div class="hyp-box">
+  <h4>&#128161; O Problema das M&uacute;ltiplas ANOVAs</h4>
+  <p>1. <strong>Infla&ccedil;&atilde;o de erro Tipo I</strong> &mdash; cada teste adicional aumenta o risco de falso positivo</p>
+  <p>2. <strong>Ignora correla&ccedil;&otilde;es entre VDs</strong> &mdash; Strength e Speed n&atilde;o s&atilde;o independentes</p>
+  <p>3. <strong>Perde padr&otilde;es multidimensionais</strong> &mdash; grupos podem diferir na <em>combina&ccedil;&atilde;o</em>, n&atilde;o em cada VD isolada</p>
+</div>`;
+
+  // ============================================================
+  // STEP 1 — MANOVA vs MÚLTIPLAS ANOVAs
+  // ============================================================
+  case 1: return `
+<div class="step-title">&#128300; Step 1 &mdash; MANOVA vs. Multiple ANOVAs</div>
+<p>A diferen&ccedil;a fundamental: ANOVA pergunta <em>&ldquo;os grupos diferem em UMA vari&aacute;vel?&rdquo;</em>. MANOVA pergunta <em>&ldquo;os grupos diferem na COMBINA&Ccedil;&Atilde;O LINEAR de v&aacute;rias vari&aacute;veis?&rdquo;</em></p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Pense assim: ANOVA compara grupos olhando por uma janela de cada vez. MANOVA abre <strong>todas as janelas</strong> e enxerga o panorama completo.')}
+
+<table class="comp-table">
+  <thead>
+    <tr><th>Aspect</th><th style="color:var(--thor-red)">3 ANOVAs Separadas</th><th style="color:var(--odin-blue)">MANOVA</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Error Tipo I</td><td>Inflacionado (~14,3% para 3 testes)</td><td>Controlado (&alpha; = 0,05)</td></tr>
+    <tr><td>Correlation between DVs</td><td>&#10060; Ignorada completamente</td><td>&#9989; Modelada na matriz de covariance</td></tr>
+    <tr><td>Padr&otilde;es multidimensionais</td><td>&#10060; Invis&iacute;veis</td><td>&#9989; Detectados via combina&ccedil;&atilde;o linear</td></tr>
+    <tr><td>Poder estat&iacute;stico</td><td>Reduzido (corre&ccedil;&atilde;o de Bonferroni dilui)</td><td>Potencialmente maior (usa toda a informa&ccedil;&atilde;o)</td></tr>
+    <tr><td>Complexidade</td><td>Simples, mas incompleta</td><td>Mais complexa, por&eacute;m rigorosa</td></tr>
+    <tr><td>When usar</td><td>VDs genuinamente independentes (raro)</td><td>VDs correlated + m&uacute;ltiplas</td></tr>
+  </tbody>
+</table>
+
+${dlg('thor','&#9889; Thorment','Mas se eu usar Bonferroni nas 3 ANOVAs, resolve, n&atilde;o?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Bonferroni controla o erro, mas <em>reduz brutalmente o poder</em>. Al&eacute;m disso, continua ignorando a correla&ccedil;&atilde;o entre Strength, Speed e Strategy. MANOVA usa essa correla&ccedil;&atilde;o a seu favor.')}
+
+<div class="hyp-box">
+  <h4>&#127919; When Escolher MANOVA</h4>
+  <p>&#9679; M&uacute;ltiplas VDs <strong>cont&iacute;nuas</strong> e <strong>conceitualmente relacionadas</strong></p>
+  <p>&#9679; VI categ&oacute;rica (grupos): academys, tratamentos, condi&ccedil;&otilde;es</p>
+  <p>&#9679; Interesse no <strong>perfil multidimensional</strong>, n&atilde;o em cada VD isolada</p>
+  <p>&#9679; Correlation moderada entre VDs (|r| entre 0,2 e 0,6 = ideal)</p>
+</div>`;
+
+  // ============================================================
+  // STEP 2 — PRESSUPOSTOS
+  // ============================================================
+  case 2: return `
+<div class="step-title">&#128270; Step 2 &mdash; Assumptions da MANOVA</div>
+<p>Antes de empunhar a espada multivariada, verifique se a forja atende aos requisitos.</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','MANOVA &eacute; poderosa, mas exigente. Se os pressupostos caem, os resultados viram lama de Helheim.')}
+
+<div class="step-subtitle">&#9989; Checklist de Assumptions</div>
+
+<div class="decision-node">
+  <strong>1. Normality Multivariada</strong><br>
+  Cada grupo deve seguir distribui&ccedil;&atilde;o normal multivariada. Teste: <span class="highlight">Mardia (assimetria e curtose multivariada)</span> ou Shapiro-Wilk por VD (simplificado). MANOVA &eacute; razoavelmente robusta com n &ge; 20 por grupo.
+</div>
+
+<div class="decision-node warn">
+  <strong>2. Homogeneidade de Matrizes de Covariance (Box&rsquo;s M)</strong><br>
+  As matrizes de covariance devem ser similares entre grupos. Box&rsquo;s M testa isso &mdash; mas &eacute; <span class="highlight-red">hipersens&iacute;vel</span>. Use <strong>&alpha; = 0,001</strong> (n&atilde;o 0,05!). Se violar, prefira <span class="highlight">Pillai&rsquo;s Trace</span> (mais robusto).
+</div>
+
+<div class="decision-node">
+  <strong>3. Independence das Observa&ccedil;&otilde;es</strong><br>
+  Cada warrior avaliado &eacute; independente dos demais. Sem medi&ccedil;&otilde;es repetidas (para isso existe MANOVA de medidas repetidas).
+</div>
+
+<div class="decision-node">
+  <strong>4. Aus&ecirc;ncia de Outliers Multivariados</strong><br>
+  Verifique com <span class="highlight">dist&acirc;ncia de Mahalanobis</span>. Outliers multivariados distorcem matrizes de covariance e inflam os testes.
+</div>
+
+<div class="decision-node">
+  <strong>5. Tamanho Amostral Adequado</strong><br>
+  Rule of thumb: n por grupo &gt; n&uacute;mero de VDs. Idealmente, n &ge; 20 por grupo. Nosso exemplo tem n = 6 (did&aacute;tico &mdash; na pr&aacute;tica, seria pouco).
+</div>
+
+${dlg('corvo','&#129430; Muninn whispers:','O teste M de Box compara as matrizes &Sigma;&#8321;, &Sigma;&#8322;, ... &Sigma;&#8342; entre os k grupos. H&#8320;: &Sigma;&#8321; = &Sigma;&#8322; = ... = &Sigma;&#8342;. Rejei&ccedil;&atilde;o indica heterocedasticidade multivariada.')}
+${dlg('thor','&#9889; Thorment','Box&rsquo;s M significant com p &lt; 0,05? Panic!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Calma. Box&rsquo;s M &eacute; um teste sens&iacute;vel demais. Use &alpha; = 0,001. Se rejeitar <em>mesmo assim</em>, migre para Pillai&rsquo;s Trace &mdash; ele &eacute; o mais robusto contra viola&ccedil;&otilde;es.')}
+
+<table class="comp-table" style="margin-top:16px">
+  <thead><tr><th>Assumption</th><th>Teste</th><th>Se Violar...</th></tr></thead>
+  <tbody>
+    <tr><td>Normality</td><td>Mardia / Shapiro-Wilk</td><td>n &ge; 20 por grupo? Siga em frente (robustez)</td></tr>
+    <tr><td>Box&rsquo;s M</td><td>Box&rsquo;s M (&alpha; = .001)</td><td>Use Pillai&rsquo;s Trace</td></tr>
+    <tr><td>Outliers</td><td>Mahalanobis</td><td>Investigue / remova com justificativa</td></tr>
+    <tr><td>Independence</td><td>Design experimental</td><td>Use MANOVA de medidas repetidas</td></tr>
+  </tbody>
+</table>`;
+
+  // ============================================================
+  // STEP 3 — MATRIZES SSCP
+  // ============================================================
+  case 3: return `
+<div class="step-title">&#128202; Step 3 &mdash; SSCP Matrices: The Matrix Logic</div>
+<p>Na ANOVA univariada, decompomos a varia&ccedil;&atilde;o em escalares: <span class="highlight">SS<sub>T</sub> = SS<sub>B</sub> + SS<sub>W</sub></span>. Na MANOVA, fazemos a mesma coisa &mdash; mas com <strong>matrizes</strong>.</p>
+
+<div class="step-subtitle">Analogia: Escalar &rarr; Matriz</div>
+
+<table class="comp-table">
+  <thead><tr><th>ANOVA (1 VD)</th><th>MANOVA (p VDs)</th></tr></thead>
+  <tbody>
+    <tr><td>SS<sub>T</sub> (um n&uacute;mero)</td><td><strong>T</strong> &mdash; matriz SSCP total (p &times; p)</td></tr>
+    <tr><td>SS<sub>B</sub> (entre grupos)</td><td><strong>H</strong> &mdash; matriz SSCP de hip&oacute;tese (p &times; p)</td></tr>
+    <tr><td>SS<sub>W</sub> (dentro dos grupos)</td><td><strong>E</strong> &mdash; matriz SSCP de erro (p &times; p)</td></tr>
+    <tr><td>SS<sub>T</sub> = SS<sub>B</sub> + SS<sub>W</sub></td><td><strong>T = H + E</strong></td></tr>
+    <tr><td>F = MS<sub>B</sub> / MS<sub>W</sub></td><td>Eigenvalues de <strong>H &middot; E<sup>&minus;1</sup></strong></td></tr>
+  </tbody>
+</table>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Cada elemento da diagonal de <strong>H</strong> &eacute; o SS<sub>B</sub> daquela VD. Os elementos fora da diagonal capturam a <em>covariance entre-grupos</em> &mdash; a informa&ccedil;&atilde;o que Separate ANOVAs perdem.')}
+
+<div class="matrix-box">
+  <div class="matrix-label">Matriz H (Hip&oacute;tese &mdash; Entre Grupos) &mdash; 3 &times; 3</div>
+  <div class="matrix-grid" style="grid-template-columns: auto repeat(3, 1fr);">
+    <div class="cell cell-header"></div>
+    <div class="cell cell-header">Strength</div>
+    <div class="cell cell-header">Veloc.</div>
+    <div class="cell cell-header">Estrat.</div>
+    <div class="cell cell-header">Strength</div>
+    <div class="cell">${round2(H[0][0])}</div>
+    <div class="cell">${round2(H[0][1])}</div>
+    <div class="cell">${round2(H[0][2])}</div>
+    <div class="cell cell-header">Veloc.</div>
+    <div class="cell">${round2(H[1][0])}</div>
+    <div class="cell">${round2(H[1][1])}</div>
+    <div class="cell">${round2(H[1][2])}</div>
+    <div class="cell cell-header">Estrat.</div>
+    <div class="cell">${round2(H[2][0])}</div>
+    <div class="cell">${round2(H[2][1])}</div>
+    <div class="cell">${round2(H[2][2])}</div>
+  </div>
+</div>
+
+<div class="matrix-box">
+  <div class="matrix-label">Matriz E (Error &mdash; Dentro dos Grupos) &mdash; 3 &times; 3</div>
+  <div class="matrix-grid" style="grid-template-columns: auto repeat(3, 1fr);">
+    <div class="cell cell-header"></div>
+    <div class="cell cell-header">Strength</div>
+    <div class="cell cell-header">Veloc.</div>
+    <div class="cell cell-header">Estrat.</div>
+    <div class="cell cell-header">Strength</div>
+    <div class="cell">${round2(E[0][0])}</div>
+    <div class="cell">${round2(E[0][1])}</div>
+    <div class="cell">${round2(E[0][2])}</div>
+    <div class="cell cell-header">Veloc.</div>
+    <div class="cell">${round2(E[1][0])}</div>
+    <div class="cell">${round2(E[1][1])}</div>
+    <div class="cell">${round2(E[1][2])}</div>
+    <div class="cell cell-header">Estrat.</div>
+    <div class="cell">${round2(E[2][0])}</div>
+    <div class="cell">${round2(E[2][1])}</div>
+    <div class="cell">${round2(E[2][2])}</div>
+  </div>
+</div>
+
+${dlg('corvo','&#129430; Muninn whispers:','Diagonal de H = SS entre-grupos de cada VD. Diagonal de E = SS dentro-grupos. Fora da diagonal = covariances cruzadas entre VDs. T = H + E, exatamente como na ANOVA, mas em forma matricial.')}
+
+<div class="formula">
+  <div class="formula-label">Decomposi&ccedil;&atilde;o Fundamental</div>
+  <strong>T</strong> = <strong>H</strong> + <strong>E</strong><br>
+  <span style="font-size:0.9rem;color:var(--text-dim)">Total = Hip&oacute;tese (entre) + Error (dentro)</span>
+</div>`;
+
+  // ============================================================
+  // STEP 4 — OS QUATRO TESTES
+  // ============================================================
+  case 4: return `
+<div class="step-title">&#9878; Step 4 &mdash; The Four Multivariate Tests</div>
+<p>Com as matrizes <strong>H</strong> e <strong>E</strong>, extra&iacute;mos os <span class="highlight">autovalores (eigenvalues)</span> de H&middot;E<sup>&minus;1</sup>. Cada teste multivariado combina esses autovalores de forma diferente.</p>
+
+<div class="step-subtitle">Autovalores de H&middot;E<sup>&minus;1</sup></div>
+<div class="formula">
+  &lambda;&#8321; = ${round4(eigenvals[0])} &nbsp;&nbsp; &lambda;&#8322; = ${round4(eigenvals[1])}${eigenvals.length>2 ? ' &nbsp;&nbsp; &lambda;&#8323; = '+round4(eigenvals[2]) : ''}
+</div>
+
+<table class="comp-table">
+  <thead>
+    <tr><th>Teste</th><th>Formula</th><th>Value</th><th>Car&aacute;ter</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:var(--success)">Pillai&rsquo;s Trace</td>
+      <td>&sum; &lambda;<sub>i</sub>/(1+&lambda;<sub>i</sub>)</td>
+      <td><span class="highlight-green">${round4(pillaiTrace)}</span></td>
+      <td>&#128170; Mais <strong>robusto</strong></td>
+    </tr>
+    <tr>
+      <td style="color:var(--odin-blue)">Wilks&rsquo; &Lambda;</td>
+      <td>&prod; 1/(1+&lambda;<sub>i</sub>)</td>
+      <td><span class="highlight-blue">${round4(wilksLambda)}</span></td>
+      <td>&#128202; Mais <strong>tradicional</strong></td>
+    </tr>
+    <tr>
+      <td style="color:var(--gold)">Hotelling&rsquo;s T&sup2;</td>
+      <td>&sum; &lambda;<sub>i</sub></td>
+      <td><span class="highlight">${round4(hotellingTrace)}</span></td>
+      <td>&#128171; Potente, mas sens&iacute;vel</td>
+    </tr>
+    <tr>
+      <td style="color:var(--thor-red)">Roy&rsquo;s Largest Root</td>
+      <td>max(&lambda;<sub>i</sub>)</td>
+      <td><span class="highlight-red">${round4(roysLargest)}</span></td>
+      <td>&#9889; Mais <strong>poderoso</strong> mas fr&aacute;gil</td>
+    </tr>
+  </tbody>
+</table>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Na d&uacute;vida, <strong>Pillai&rsquo;s Trace</strong> &eacute; a escolha segura. Ele &eacute; o mais robusto contra viola&ccedil;&otilde;es de pressupostos &mdash; amostras desiguais, heterogeneidade de covariance, normality imperfeita.')}
+${dlg('thor','&#9889; Thorment','Mas Roy&rsquo;s &eacute; o mais poderoso! M&aacute;ximo &eacute; m&aacute;ximo!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Roy&rsquo;s olha <em>s&oacute; o maior autovalor</em>. Se o efeito est&aacute; concentrado numa &uacute;nica dimens&atilde;o, &eacute; espetacular. Mas se houver m&uacute;ltiplas dimens&otilde;es ou viola&ccedil;&otilde;es, desmorona.')}
+
+<div class="hyp-box">
+  <h4>&#127919; When Usar Cada Teste</h4>
+  <p><span class="highlight-green">&#9679; Pillai&rsquo;s Trace</span> &mdash; Padr&atilde;o seguro. Prefira quando amostras s&atilde;o desiguais ou Box&rsquo;s M significant</p>
+  <p><span class="highlight-blue">&#9679; Wilks&rsquo; &Lambda;</span> &mdash; Mais reportado na literatura. Bom com pressupostos atendidos</p>
+  <p><span class="highlight">&#9679; Hotelling&rsquo;s T&sup2;</span> &mdash; Bom para k = 2 grupos (generaliza o t&sup2;)</p>
+  <p><span class="highlight-red">&#9679; Roy&rsquo;s Largest Root</span> &mdash; M&aacute;ximo poder, mas <strong>s&oacute;</strong> quando o efeito &eacute; unidimensional. Fr&aacute;gil.</p>
+</div>
+
+${dlg('corvo','&#129430; Muninn whispers:','Wilks&rsquo; &Lambda; varia de 0 a 1. Quanto <strong>menor</strong> &Lambda;, maior o efeito (mais variance explicada pelo modelo). J&aacute; Pillai&rsquo;s varia de 0 a s (n&uacute;mero de autovalores): quanto <strong>maior</strong>, mais efeito.')}`;
+
+  // ============================================================
+  // STEP 5 — INTERPRETANDO A SAÍDA
+  // ============================================================
+  case 5: return `
+<div class="step-title">&#128269; Step 5 &mdash; Interpreting Multivariate Output</div>
+<p>O teste multivariado &eacute; convertido em um <span class="highlight">F aproximado</span> com degrees of freedom espec&iacute;ficos. Se o F &eacute; significant, conclu&iacute;mos que os grupos diferem na <strong>combina&ccedil;&atilde;o linear</strong> das VDs.</p>
+
+<div class="step-subtitle">Results dos Testes Multivariados</div>
+<table class="anova-table">
+  <thead>
+    <tr><th>Teste</th><th>Value</th><th>F aprox.</th><th>gl<sub>1</sub></th><th>gl<sub>2</sub></th><th>Decision</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pillai&rsquo;s Trace</td>
+      <td>${round4(pillaiTrace)}</td>
+      <td>${round2(pillaiF)}</td>
+      <td>${df1_display}</td>
+      <td>${df2_display}</td>
+      <td class="sig">Significant</td>
+    </tr>
+    <tr>
+      <td>Wilks&rsquo; &Lambda;</td>
+      <td>${round4(wilksLambda)}</td>
+      <td>&mdash;</td>
+      <td>${df1_display}</td>
+      <td>&mdash;</td>
+      <td class="sig">Significant</td>
+    </tr>
+    <tr>
+      <td>Hotelling&rsquo;s T&sup2;</td>
+      <td>${round4(hotellingTrace)}</td>
+      <td>&mdash;</td>
+      <td>${df1_display}</td>
+      <td>&mdash;</td>
+      <td class="sig">Significant</td>
+    </tr>
+    <tr>
+      <td>Roy&rsquo;s Largest Root</td>
+      <td>${round4(roysLargest)}</td>
+      <td>&mdash;</td>
+      <td>&mdash;</td>
+      <td>&mdash;</td>
+      <td class="sig">Significant</td>
+    </tr>
+  </tbody>
+</table>
+<p style="font-size:0.85rem;color:var(--text-dim)">(Valuees exatos de F para Wilks, Hotelling e Roy requerem transforma&ccedil;&otilde;es espec&iacute;ficas &mdash; em software, todos s&atilde;o calculados automaticamente.)</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Todos os quatro testes convergem: o efeito de academy &eacute; <strong>significant</strong>. Os vetores de m&eacute;dias n&atilde;o s&atilde;o iguais. Mas <em>quais VDs</em> dirigem essa diferen&ccedil;a?')}
+
+<div class="hyp-box">
+  <h4>&#128161; O Que Significa &ldquo;Significant&rdquo; na MANOVA?</h4>
+  <p><strong>H&#8320;:</strong> &mu;&#8321; = &mu;&#8322; = &mu;&#8323; (os vetores de m&eacute;dias s&atilde;o iguais entre academys)</p>
+  <p><strong>H&#8321;:</strong> pelo menos um vetor de m&eacute;dias difere</p>
+  <p>Rejeitar H&#8320; indica que as academys diferem na <span class="highlight">combina&ccedil;&atilde;o</span> de Strength + Speed + Strategy &mdash; n&atilde;o necessariamente em cada uma isoladamente.</p>
+</div>
+
+${dlg('thor','&#9889; Thorment','Ent&atilde;o j&aacute; sei que s&atilde;o diferentes. Posso parar?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No! MANOVA &eacute; o <strong>teste &ocirc;nibus</strong>. Ela diz <em>que</em> existe diferen&ccedil;a, mas n&atilde;o <em>onde</em>. Agora precisamos do follow-up.')}`;
+
+  // ============================================================
+  // STEP 6 — FOLLOW-UP: OPÇÕES
+  // ============================================================
+  case 6: return `
+<div class="step-title">&#128736; Step 6 &mdash; Follow-up: Where Is the Difference?</div>
+<p>MANOVA significant? &Oacute;timo. Agora precisamos descobrir <span class="highlight">quais VDs</span> contribuem para a separa&ccedil;&atilde;o dos grupos.</p>
+
+<div class="step-subtitle">Tr&ecirc;s Caminhos de Follow-up</div>
+
+<div class="decision-node">
+  <strong>Op&ccedil;&atilde;o 1: ANOVAs Univariadas Separadas</strong><br>
+  Rode uma ANOVA para cada VD, <em>ap&oacute;s</em> MANOVA significant. Aplique corre&ccedil;&atilde;o de Bonferroni (&alpha;/p = 0,05/3 = 0,0167). &Eacute; o m&eacute;todo mais simples e comum.
+</div>
+
+<div class="decision-node warn">
+  <strong>Op&ccedil;&atilde;o 2: An&aacute;lise Discriminante Descritiva</strong><br>
+  Identifica <em>quais combina&ccedil;&otilde;es lineares</em> de VDs melhor separam os grupos. Produz fun&ccedil;&otilde;es can&ocirc;nicas com pesos padronizados. More informative que ANOVAs isoladas.
+</div>
+
+<div class="decision-node">
+  <strong>Op&ccedil;&atilde;o 3: Stepdown Analysis</strong><br>
+  ANOVAs sequenciais onde cada VD &eacute; ajustada pelas anteriores (como ANCOVA em cascata). Exige ordena&ccedil;&atilde;o te&oacute;rica das VDs. Mais sofisticado, menos usado.
+</div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Na pr&aacute;tica, a maioria dos artigos usa a <strong>Op&ccedil;&atilde;o 1</strong> (ANOVAs com Bonferroni). Mas se voc&ecirc; quer realmente entender <em>como</em> os grupos diferem no espa&ccedil;o multivariado, a <strong>Op&ccedil;&atilde;o 2</strong> &eacute; superior.')}
+
+<div class="flowchart-container">
+<svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="font-family:'Patrick Hand',cursive">
+  <!-- MANOVA Box -->
+  <rect x="220" y="10" width="260" height="50" rx="12" fill="#1c2333" stroke="#f0c040" stroke-width="2"/>
+  <text x="350" y="42" text-anchor="middle" fill="#f0c040" font-size="18" font-family="Bangers">MANOVA Significant?</text>
+  <!-- Arrow down -->
+  <line x1="350" y1="60" x2="350" y2="90" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <!-- Yes/No -->
+  <rect x="280" y="90" width="140" height="36" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="350" y="114" text-anchor="middle" fill="#3fb950" font-size="15" font-family="Permanent Marker">Sim &rarr; Follow-up</text>
+  <!-- Three branches -->
+  <line x1="250" y1="126" x2="120" y2="170" stroke="#58a6ff" stroke-width="2"/>
+  <line x1="350" y1="126" x2="350" y2="170" stroke="#f0c040" stroke-width="2"/>
+  <line x1="450" y1="126" x2="580" y2="170" stroke="#bc8cff" stroke-width="2"/>
+  <!-- Option 1 -->
+  <rect x="20" y="170" width="200" height="70" rx="10" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="120" y="195" text-anchor="middle" fill="#58a6ff" font-size="14" font-family="Permanent Marker">ANOVAs + Bonferroni</text>
+  <text x="120" y="215" text-anchor="middle" fill="#8b949e" font-size="12">Simple, most used</text>
+  <text x="120" y="232" text-anchor="middle" fill="#8b949e" font-size="11">&alpha;/p = 0.05/3 = 0.0167</text>
+  <!-- Option 2 -->
+  <rect x="250" y="170" width="200" height="70" rx="10" fill="#161b22" stroke="#f0c040" stroke-width="2"/>
+  <text x="350" y="195" text-anchor="middle" fill="#f0c040" font-size="14" font-family="Permanent Marker">Discriminante Descritiva</text>
+  <text x="350" y="215" text-anchor="middle" fill="#8b949e" font-size="12">Canonical functions</text>
+  <text x="350" y="232" text-anchor="middle" fill="#8b949e" font-size="11">More informative</text>
+  <!-- Option 3 -->
+  <rect x="480" y="170" width="200" height="70" rx="10" fill="#161b22" stroke="#bc8cff" stroke-width="2"/>
+  <text x="580" y="195" text-anchor="middle" fill="#bc8cff" font-size="14" font-family="Permanent Marker">Stepdown Analysis</text>
+  <text x="580" y="215" text-anchor="middle" fill="#8b949e" font-size="12">Cascading ANCOVAs</text>
+  <text x="580" y="232" text-anchor="middle" fill="#8b949e" font-size="11">Requires theoretical order</text>
+  <!-- Post-hoc under Option 1 -->
+  <line x1="120" y1="240" x2="120" y2="270" stroke="#58a6ff" stroke-width="1.5"/>
+  <rect x="20" y="270" width="200" height="50" rx="8" fill="#1c2333" stroke="#30363d" stroke-width="1"/>
+  <text x="120" y="293" text-anchor="middle" fill="#e6edf3" font-size="12">Post-hoc (Tukey, Bonferroni)</text>
+  <text x="120" y="310" text-anchor="middle" fill="#8b949e" font-size="11">Which pairs of groups differ?</text>
+  <!-- No branch -->
+  <rect x="530" y="90" width="140" height="36" rx="8" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="600" y="114" text-anchor="middle" fill="#f85149" font-size="15" font-family="Permanent Marker">No &rarr; Pare</text>
+  <line x1="420" y1="108" x2="530" y2="108" stroke="#f85149" stroke-width="2"/>
+  <!-- Arrow marker -->
+  <defs><marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/></marker></defs>
+</svg>
+</div>
+
+${dlg('corvo','&#129430; Muninn whispers:','As ANOVAs univariadas ap&oacute;s MANOVA s&atilde;o chamadas de &ldquo;protected ANOVAs&rdquo; &mdash; s&oacute; s&atilde;o leg&iacute;timas porque a MANOVA &ocirc;nibus j&aacute; rejeitou H&#8320;. Sem isso, seria ca&ccedil;a ao p-value.')}`;
+
+  // ============================================================
+  // STEP 7 — ANÁLISE DISCRIMINANTE (BREVE)
+  // ============================================================
+  case 7: return `
+<div class="step-title">&#128302; Step 7 &mdash; Discriminant Analysis: The Two-Edged Sword</div>
+<p>A an&aacute;lise discriminante descritiva responde: <span class="highlight">qual combina&ccedil;&atilde;o linear de VDs melhor separa os grupos?</span></p>
+
+<div class="step-subtitle">Fun&ccedil;&otilde;es Can&ocirc;nicas Discriminantes</div>
+<p>Com k = 3 grupos e p = 3 VDs, obtemos <strong>s = min(p, k&minus;1) = 2</strong> fun&ccedil;&otilde;es can&ocirc;nicas:</p>
+
+<div class="formula">
+  <div class="formula-label">Fun&ccedil;&atilde;o Can&ocirc;nica 1</div>
+  D&#8321; = w&#8321;&#8321;&middot;Strength + w&#8321;&#8322;&middot;Speed + w&#8321;&#8323;&middot;Strategy
+</div>
+<div class="formula">
+  <div class="formula-label">Fun&ccedil;&atilde;o Can&ocirc;nica 2</div>
+  D&#8322; = w&#8322;&#8321;&middot;Strength + w&#8322;&#8322;&middot;Speed + w&#8322;&#8323;&middot;Strategy
+</div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A primeira fun&ccedil;&atilde;o maximiza a separa&ccedil;&atilde;o entre grupos. A segunda maximiza o que sobra, ortogonalmente &agrave; primeira. Juntas, mapeiam as academys num espa&ccedil;o 2D onde vemos <em>como</em> e <em>por qu&ecirc;</em> diferem.')}
+
+<div class="hyp-box">
+  <h4>&#128161; O Que Cada Fun&ccedil;&atilde;o Revela</h4>
+  <p><strong>Fun&ccedil;&atilde;o 1</strong> (&lambda;&#8321; = ${round4(eigenvals[0])}): Captura a <strong>maior diferen&ccedil;a</strong> entre as academys. Provavelmente opor&aacute; Strength/Speed vs. Strategy.</p>
+  <p><strong>Fun&ccedil;&atilde;o 2</strong> (&lambda;&#8322; = ${round4(eigenvals[1])}): Captura a diferen&ccedil;a <strong>residual</strong>. Uma nuance que a Fun&ccedil;&atilde;o 1 n&atilde;o pegou.</p>
+  <p>Variance explicada: Fun&ccedil;&atilde;o 1 = <span class="highlight">${round2(eigenvals[0]/sum(eigenvals)*100)}%</span>, Fun&ccedil;&atilde;o 2 = <span class="highlight">${round2(eigenvals[1]/sum(eigenvals)*100)}%</span></p>
+</div>
+
+<canvas id="discrimPlot" class="plot" width="600" height="400"></canvas>
+
+${dlg('corvo','&#129430; Muninn whispers:','Os <strong>coeficientes padronizados</strong> das fun&ccedil;&otilde;es can&ocirc;nicas indicam o <em>peso relativo</em> de cada VD na separa&ccedil;&atilde;o. Coeficientes grandes = VD contribui muito para distinguir os grupos.')}
+${dlg('thor','&#9889; Thorment','Ent&atilde;o &eacute; tipo PCA?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Parecido, mas diferente. PCA maximiza <em>variance total</em>. Discriminante maximiza <em>separa&ccedil;&atilde;o entre grupos</em>. PCA n&atilde;o sabe que existem grupos &mdash; discriminante &eacute; supervisionada.')}`;
+
+  // ============================================================
+  // STEP 8 — OS DADOS
+  // ============================================================
+  case 8: {
+    let tableRows = '';
+    academys.forEach(a => {
+      for(let i=0; i<n; i++){
+        tableRows += `<tr><td>${i===0 ? a : ''}</td><td>${DATA[a].Strength[i]}</td><td>${DATA[a].Speed[i]}</td><td>${DATA[a].Strategy[i]}</td></tr>`;
+      }
+    });
+    let meanRows = '';
+    academys.forEach(a => {
+      meanRows += `<tr class="mean-row"><td>${a}</td><td>${round2(groupMean[a].Strength)}</td><td>${round2(groupMean[a].Speed)}</td><td>${round2(groupMean[a].Strategy)}</td></tr>`;
+    });
+    return `
+<div class="step-title">&#128220; Step 8 &mdash; The Data das Tr&ecirc;s Academys</div>
+<p>Tr&ecirc;s academys: <span class="highlight">Ulfhednar</span> (warriors-lobo), <span class="highlight-red">Berserker</span> (frenesi de batalha) e <span class="highlight-blue">Einherjar</span> (warriors escolhidos do Valhalla). Cada academy com n = 6 warriors, avaliados em 3 dimens&otilde;es.</p>
+
+<div class="step-subtitle">18 Observa&ccedil;&otilde;es (3 academys &times; 6 warriors)</div>
+<table class="data-table">
+  <thead>
+    <tr><th>Academy</th><th>Strength &#9876;&#65039;</th><th>Speed &#127939;</th><th>Strategy &#129504;</th></tr>
+  </thead>
+  <tbody>
+    ${tableRows}
+  </tbody>
+</table>
+
+<div class="step-subtitle">Means por Academy</div>
+<table class="data-table">
+  <thead>
+    <tr><th>Academy</th><th>Strength &#9876;&#65039;</th><th>Speed &#127939;</th><th>Strategy &#129504;</th></tr>
+  </thead>
+  <tbody>
+    ${meanRows}
+    <tr class="mean-row"><td>Mean Geral</td><td>${round2(grandMean.Strength)}</td><td>${round2(grandMean.Speed)}</td><td>${round2(grandMean.Strategy)}</td></tr>
+  </tbody>
+</table>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Observe o padr&atilde;o: Berserkers s&atilde;o for&ccedil;a bruta. Einherjar equilibram velocidade e estrat&eacute;gia. Ulfhednar ficam no meio. Ser&aacute; que a MANOVA confirma?')}
+
+<div class="step-subtitle">Correlation between DVs (N = 18)</div>
+<table class="data-table">
+  <thead>
+    <tr><th></th><th>Strength</th><th>Speed</th><th>Strategy</th></tr>
+  </thead>
+  <tbody>
+    <tr><td style="font-family:'Permanent Marker',cursive;color:var(--odin-blue)">Strength</td><td>1.00</td><td>${round2(corrMatrix.Strength.Speed)}</td><td>${round2(corrMatrix.Strength.Strategy)}</td></tr>
+    <tr><td style="font-family:'Permanent Marker',cursive;color:var(--odin-blue)">Speed</td><td>${round2(corrMatrix.Speed.Strength)}</td><td>1.00</td><td>${round2(corrMatrix.Speed.Strategy)}</td></tr>
+    <tr><td style="font-family:'Permanent Marker',cursive;color:var(--odin-blue)">Strategy</td><td>${round2(corrMatrix.Strategy.Strength)}</td><td>${round2(corrMatrix.Strategy.Speed)}</td><td>1.00</td></tr>
+  </tbody>
+</table>
+
+${dlg('corvo','&#129430; Muninn whispers:','Correlation moderada entre VDs &eacute; ideal para MANOVA. Se as VDs fossem totalmente independentes (r &asymp; 0), Separate ANOVAs seriam suficientes. Se fossem altamente correlated (r &gt; 0,9), haveria multicolinearidade.')}
+
+<div id="meanBarsContainer" class="bar-container"></div>`;
+  }
+
+  // ============================================================
+  // STEP 9 — ANOVAs UNIVARIADAS (follow-up)
+  // ============================================================
+  case 9: return `
+<div class="step-title">&#128200; Step 9 &mdash; Follow-up: Univariate ANOVAs</div>
+<p>Com MANOVA significant, rodamos ANOVAs para cada VD separadamente, com <span class="highlight">Bonferroni: &alpha; = 0,05/3 = 0,0167</span>.</p>
+
+<div class="step-subtitle">ANOVA Univariada &mdash; Strength &#9876;&#65039;</div>
+<table class="anova-table">
+  <thead><tr><th>Source</th><th>SS</th><th>gl</th><th>MS</th><th>F</th><th>&eta;&sup2;<sub>p</sub></th></tr></thead>
+  <tbody>
+    <tr><td>Academy</td><td>${uniF.Strength.ssb}</td><td>${uniF.Strength.dfb}</td><td>${uniF.Strength.msb}</td><td class="sig">${uniF.Strength.f}</td><td>${uniF.Strength.etaSq}</td></tr>
+    <tr><td>Error</td><td>${uniF.Strength.ssw}</td><td>${uniF.Strength.dfw}</td><td>${uniF.Strength.msw}</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+<div class="step-subtitle">ANOVA Univariada &mdash; Speed &#127939;</div>
+<table class="anova-table">
+  <thead><tr><th>Source</th><th>SS</th><th>gl</th><th>MS</th><th>F</th><th>&eta;&sup2;<sub>p</sub></th></tr></thead>
+  <tbody>
+    <tr><td>Academy</td><td>${uniF.Speed.ssb}</td><td>${uniF.Speed.dfb}</td><td>${uniF.Speed.msb}</td><td class="sig">${uniF.Speed.f}</td><td>${uniF.Speed.etaSq}</td></tr>
+    <tr><td>Error</td><td>${uniF.Speed.ssw}</td><td>${uniF.Speed.dfw}</td><td>${uniF.Speed.msw}</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+<div class="step-subtitle">ANOVA Univariada &mdash; Strategy &#129504;</div>
+<table class="anova-table">
+  <thead><tr><th>Source</th><th>SS</th><th>gl</th><th>MS</th><th>F</th><th>&eta;&sup2;<sub>p</sub></th></tr></thead>
+  <tbody>
+    <tr><td>Academy</td><td>${uniF.Strategy.ssb}</td><td>${uniF.Strategy.dfb}</td><td>${uniF.Strategy.msb}</td><td class="sig">${uniF.Strategy.f}</td><td>${uniF.Strategy.etaSq}</td></tr>
+    <tr><td>Error</td><td>${uniF.Strategy.ssw}</td><td>${uniF.Strategy.dfw}</td><td>${uniF.Strategy.msw}</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Todas as tr&ecirc;s VDs apresentam diferen&ccedil;as significants entre academys. Mas os tamanhos de efeito contam a hist&oacute;ria mais rica &mdash; <em>onde</em> est&aacute; a maior separa&ccedil;&atilde;o?')}
+
+<div class="step-subtitle">Effect Sizes Compared</div>
+<div id="etaBarsContainer" class="bar-container"></div>
+
+${dlg('corvo','&#129430; Muninn whispers:','&eta;&sup2; parcial indica a propor&ccedil;&atilde;o de variance explicada pelo fator, descontando o erro. Refer&ecirc;ncia: 0,01 = pequeno, 0,06 = m&eacute;dio, 0,14 = grande. Todos os nossos efeitos s&atilde;o <strong>grandes</strong>.')}
+${dlg('thor','&#9889; Thorment','Tudo grande! Ent&atilde;o tudo importa igual?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No. Compare os &eta;&sup2;. Strategy provavelmente mostra a <em>maior</em> separa&ccedil;&atilde;o &mdash; Einherjar se destacam ali. Mas s&oacute; a MANOVA capta o padr&atilde;o <em>conjunto</em>.')}`;
+
+  // ============================================================
+  // STEP 10 — REPORTE APA
+  // ============================================================
+  case 10: return `
+<div class="step-title">&#128221; Step 10 &mdash; APA Format Report</div>
+<p>Como reportar MANOVA em artigos cient&iacute;ficos, seguindo as normas da APA (7&ordf; edi&ccedil;&atilde;o).</p>
+
+<div class="apa-box">
+  <div class="apa-label">&#128214; Result Multivariado</div>
+  Uma MANOVA one-way revelou efeito multivariado significant da academy de treinamento sobre os resultados de combate (Strength, Speed e Strategy), Pillai&rsquo;s Trace = ${round2(pillaiTrace)}, <em>F</em>(${df1_display}, ${df2_display}) = ${round2(pillaiF)}, <em>p</em> &lt; .001.
+</div>
+
+<div class="apa-box">
+  <div class="apa-label">&#128214; Follow-up Univariados (com corre&ccedil;&atilde;o de Bonferroni, &alpha; = .017)</div>
+  ANOVAs univariadas de acompanhamento indicaram diferen&ccedil;as significants entre academys para Strength, <em>F</em>(${uniF.Strength.dfb}, ${uniF.Strength.dfw}) = ${uniF.Strength.f}, <em>p</em> &lt; .001, &eta;<sup>2</sup><sub>p</sub> = ${uniF.Strength.etaSq}; Speed, <em>F</em>(${uniF.Speed.dfb}, ${uniF.Speed.dfw}) = ${uniF.Speed.f}, <em>p</em> &lt; .001, &eta;<sup>2</sup><sub>p</sub> = ${uniF.Speed.etaSq}; e Strategy, <em>F</em>(${uniF.Strategy.dfb}, ${uniF.Strategy.dfw}) = ${uniF.Strategy.f}, <em>p</em> &lt; .001, &eta;<sup>2</sup><sub>p</sub> = ${uniF.Strategy.etaSq}.
+</div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Reporte sempre: (1) o teste multivariado usado (Pillai preferencialmente), (2) o valor da estat&iacute;stica, (3) F aproximado com gl, (4) p-value, e (5) tamanho de efeito.')}
+
+<div class="step-subtitle">Checklist do APA Report</div>
+<ul class="checklist">
+  <li>Identificar o teste multivariado (Pillai&rsquo;s Trace recomendado)</li>
+  <li>Reportar valor da estat&iacute;stica com precis&atilde;o (2-4 casas)</li>
+  <li>F aproximado com degrees of freedom (gl<sub>1</sub>, gl<sub>2</sub>)</li>
+  <li>Value de p (exato ou &lt; .001)</li>
+  <li>Effect size (&eta;&sup2; parcial ou &eta;&sup2;)</li>
+  <li>Verificar pressupostos (Box&rsquo;s M, normality)</li>
+  <li>Follow-up com ANOVAs + corre&ccedil;&atilde;o de Bonferroni</li>
+  <li>Post-hoc para pares espec&iacute;ficos (Tukey, Games-Howell)</li>
+</ul>
+
+${dlg('corvo','&#129430; Muninn whispers:','Se Box&rsquo;s M foi significant, reporte: &ldquo;O teste M de Box indicou heterogeneidade de matrizes de covariance (p &lt; .001); portanto, optou-se por Pillai&rsquo;s Trace, que &eacute; mais robusto a essa viola&ccedil;&atilde;o (Tabachnick &amp; Fidell, 2019).&rdquo;')}
+
+<div class="hyp-box">
+  <h4>&#9888;&#65039; Errors Comuns no Reporte</h4>
+  <p><span class="highlight-red">&#10060;</span> Reportar Wilks&rsquo; &Lambda; sem justificativa quando Box&rsquo;s M &eacute; significant</p>
+  <p><span class="highlight-red">&#10060;</span> Rodar ANOVAs univariadas sem MANOVA significant primeiro</p>
+  <p><span class="highlight-red">&#10060;</span> Esquecer a corre&ccedil;&atilde;o de Bonferroni nos follow-ups</p>
+  <p><span class="highlight-red">&#10060;</span> No reportar tamanho de efeito</p>
+  <p><span class="highlight-red">&#10060;</span> Confundir &eta;&sup2; com &eta;&sup2; parcial</p>
+</div>`;
+
+  // ============================================================
+  // STEP 11 — LIÇÃO DOS CORVOS
+  // ============================================================
+  case 11: return `
+<div class="step-title">&#129430; Step 11 &mdash; Lesson of the Ravens</div>
+
+<div class="step-subtitle">Muninn Summarizes: Key Points</div>
+${dlg('corvo','&#129430; Muninn whispers:',`
+<strong>1.</strong> MANOVA testa se os <em>vetores de m&eacute;dias</em> diferem entre grupos &mdash; protegendo &alpha; e aproveitando correla&ccedil;&otilde;es entre VDs.<br><br>
+<strong>2.</strong> Usa matrizes SSCP: <strong>T = H + E</strong>. Os autovalores de H&middot;E<sup>&minus;1</sup> geram os quatro testes multivariados.<br><br>
+<strong>3.</strong> <span class="highlight-green">Pillai&rsquo;s Trace</span> &eacute; o mais robusto. Prefira-o quando houver d&uacute;vida sobre pressupostos.<br><br>
+<strong>4.</strong> Box&rsquo;s M testa homogeneidade de covariance. Use &alpha; = .001 (ele &eacute; sens&iacute;vel demais).<br><br>
+<strong>5.</strong> MANOVA significant &rarr; follow-up com ANOVAs univariadas (Bonferroni) ou an&aacute;lise discriminante.<br><br>
+<strong>6.</strong> APA Report: teste usado + valor + F(gl1, gl2) + p + &eta;&sup2;.
+`)}
+
+<div class="step-subtitle" style="color:var(--corvo-purple)">Huginn Provoca: Challenges</div>
+${dlg('huginn','&#129430; Huginn challenges:',`
+<strong>1.</strong> E se as VDs forem completamente independentes (r &asymp; 0)? <em>MANOVA perde vantagem &mdash; Separate ANOVAs com Bonferroni bastariam.</em><br><br>
+<strong>2.</strong> E se voc&ecirc; tiver 10 VDs e n = 15 por grupo? <em>Mais VDs que observa&ccedil;&otilde;es por grupo colapsa a matriz E. Reduza VDs ou aumente n.</em><br><br>
+<strong>3.</strong> MANOVA prova causa&ccedil;&atilde;o? <em>No. Como toda ANOVA, mostra <strong>diferen&ccedil;a</strong> entre grupos, n&atilde;o causa. S&oacute; delineamento experimental verdadeiro permite infer&ecirc;ncia causal.</em><br><br>
+<strong>4.</strong> Se MANOVA n&atilde;o &eacute; significant, posso rodar ANOVAs &ldquo;s&oacute; pra ver&rdquo;? <em>No! Isso &eacute; p-hacking cl&aacute;ssico. Se o teste &ocirc;nibus n&atilde;o rejeita H&#8320;, pare ali.</em>
+`)}
+
+<div class="step-subtitle">Flowchart de Decision: MANOVA ou No?</div>
+<div class="flowchart-container">
+<svg viewBox="0 0 700 520" xmlns="http://www.w3.org/2000/svg" style="font-family:'Patrick Hand',cursive">
+  <!-- Start -->
+  <rect x="220" y="10" width="260" height="44" rx="22" fill="#1c2333" stroke="#f0c040" stroke-width="2"/>
+  <text x="350" y="38" text-anchor="middle" fill="#f0c040" font-size="15" font-family="Bangers">Multiple continuous DVs?</text>
+  <!-- Arrow -->
+  <line x1="350" y1="54" x2="350" y2="80" stroke="#58a6ff" stroke-width="2"/>
+  <!-- Q2 -->
+  <rect x="220" y="80" width="260" height="44" rx="10" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="350" y="108" text-anchor="middle" fill="#58a6ff" font-size="14" font-family="Permanent Marker">VDs correlated (|r| = 0.2-0.6)?</text>
+  <!-- Sim -->
+  <line x1="350" y1="124" x2="350" y2="155" stroke="#3fb950" stroke-width="2"/>
+  <text x="360" y="145" fill="#3fb950" font-size="12">Sim</text>
+  <!-- Não -->
+  <line x1="480" y1="102" x2="600" y2="102" stroke="#f85149" stroke-width="2"/>
+  <rect x="560" y="82" width="130" height="40" rx="8" fill="#161b22" stroke="#f85149" stroke-width="1.5"/>
+  <text x="625" y="108" text-anchor="middle" fill="#f85149" font-size="12">Separate ANOVAs</text>
+  <!-- Q3 -->
+  <rect x="220" y="155" width="260" height="44" rx="10" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="350" y="183" text-anchor="middle" fill="#58a6ff" font-size="14" font-family="Permanent Marker">n por grupo > n&ordm; de VDs?</text>
+  <line x1="350" y1="199" x2="350" y2="230" stroke="#3fb950" stroke-width="2"/>
+  <text x="360" y="220" fill="#3fb950" font-size="12">Sim</text>
+  <line x1="480" y1="177" x2="600" y2="177" stroke="#f85149" stroke-width="2"/>
+  <rect x="560" y="157" width="130" height="40" rx="8" fill="#161b22" stroke="#f85149" stroke-width="1.5"/>
+  <text x="625" y="177" text-anchor="middle" fill="#f85149" font-size="11">Increase n or</text>
+  <text x="625" y="192" text-anchor="middle" fill="#f85149" font-size="11">reduce DVs</text>
+  <!-- Q4 -->
+  <rect x="220" y="230" width="260" height="44" rx="10" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="350" y="258" text-anchor="middle" fill="#58a6ff" font-size="14" font-family="Permanent Marker">Assumptions OK?</text>
+  <line x1="350" y1="274" x2="350" y2="310" stroke="#3fb950" stroke-width="2"/>
+  <text x="360" y="298" fill="#3fb950" font-size="12">Sim</text>
+  <!-- Box M fail -->
+  <line x1="480" y1="252" x2="600" y2="252" stroke="#f0c040" stroke-width="2"/>
+  <rect x="555" y="232" width="140" height="40" rx="8" fill="#161b22" stroke="#f0c040" stroke-width="1.5"/>
+  <text x="625" y="252" text-anchor="middle" fill="#f0c040" font-size="11">Box M violated?</text>
+  <text x="625" y="267" text-anchor="middle" fill="#f0c040" font-size="11">Use Pillai&rsquo;s Trace</text>
+  <!-- MANOVA! -->
+  <rect x="250" y="310" width="200" height="50" rx="25" fill="#1c2333" stroke="#3fb950" stroke-width="3"/>
+  <text x="350" y="342" text-anchor="middle" fill="#3fb950" font-size="20" font-family="Bangers">RUN THE MANOVA!</text>
+  <!-- Sig? -->
+  <line x1="350" y1="360" x2="350" y2="395" stroke="#58a6ff" stroke-width="2"/>
+  <rect x="250" y="395" width="200" height="40" rx="8" fill="#161b22" stroke="#f0c040" stroke-width="2"/>
+  <text x="350" y="420" text-anchor="middle" fill="#f0c040" font-size="14" font-family="Permanent Marker">Significant?</text>
+  <!-- Sim -> follow up -->
+  <line x1="250" y1="415" x2="120" y2="465" stroke="#3fb950" stroke-width="2"/>
+  <rect x="20" y="455" width="200" height="40" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="120" y="480" text-anchor="middle" fill="#3fb950" font-size="13">Follow-up + Bonferroni</text>
+  <text x="250" y="445" fill="#3fb950" font-size="12">Sim</text>
+  <!-- Não -> pare -->
+  <line x1="450" y1="415" x2="580" y2="465" stroke="#f85149" stroke-width="2"/>
+  <rect x="500" y="455" width="160" height="40" rx="8" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="580" y="480" text-anchor="middle" fill="#f85149" font-size="13">Stop. No effect.</text>
+  <text x="470" y="445" fill="#f85149" font-size="12">No</text>
+</svg>
+</div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','MANOVA &eacute; a fortaleza que protege seu &alpha; quando m&uacute;ltiplas VDs est&atilde;o em jogo. Respeite seus pressupostos, esco&ccedil;a o teste certo (Pillai na d&uacute;vida), e sempre fa&ccedil;a follow-up ap&oacute;s resultado significant. Essa &eacute; a disciplina do Grande Sal&atilde;o das Matrizes.')}
+
+<div class="hyp-box">
+  <h4>&#128218; Recommended Reading</h4>
+  <p>&#9679; Tabachnick, B. G., &amp; Fidell, L. S. (2019). <em>Using Multivariate Statistics</em> (7th ed.) &mdash; Chapters 7-9</p>
+  <p>&#9679; Field, A. (2024). <em>Discovering Statistics</em> (6th ed.) &mdash; Chapter sobre MANOVA</p>
+  <p>&#9679; Hair, J. F. et al. (2019). <em>Multivariate Data Analysis</em> (8th ed.) &mdash; Chapter 6</p>
+</div>`;
+
+  default: return `<p>Step not found.</p>`;
+  }
+}
+
+// ============================================================
+// RENDER ENGINE
+// ============================================================
+function renderStep(){
+  const el = document.getElementById('stepContent');
+  el.style.animation = 'none';
+  el.offsetHeight; // reflow
+  el.style.animation = 'fadeIn 0.4s ease';
+  el.innerHTML = getStepHTML(currentStep);
+
+  // Progress
+  const pct = ((currentStep) / (TOTAL_STEPS - 1)) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Step ${currentStep} of ${TOTAL_STEPS - 1}`;
+  document.getElementById('stepIndicator').textContent = `${currentStep} / ${TOTAL_STEPS - 1}`;
+
+  // Nav buttons
+  document.getElementById('btnPrev').disabled = (currentStep === 0);
+  document.getElementById('btnNext').disabled = (currentStep === TOTAL_STEPS - 1);
+
+  // Animations
+  setTimeout(() => {
+    if(currentStep === 7) drawDiscrimPlot();
+    if(currentStep === 8) animateMeanBars();
+    if(currentStep === 9) animateEtaBars();
+  }, 300);
+
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function nextStep(){ if(currentStep < TOTAL_STEPS-1){ currentStep++; renderStep(); }}
+function prevStep(){ if(currentStep > 0){ currentStep--; renderStep(); }}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight' || e.key === ' ') nextStep();
+  if(e.key === 'ArrowLeft') prevStep();
+});
+
+// ============================================================
+// DISCRIMINANT PLOT (simplified 2D scatter)
+// ============================================================
+function drawDiscrimPlot(){
+  const canvas = document.getElementById('discrimPlot');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = {t:50, r:30, b:60, l:60};
+  const pw = W-pad.l-pad.r, ph = H-pad.t-pad.b;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#1c2333'; ctx.fillRect(0,0,W,H);
+
+  // Use first two DVs as proxy for canonical dimensions (simplified visual)
+  // Map: D1 ~ Strength - Strategy, D2 ~ Speed
+  const colors = {'Ulfhednar':'#58a6ff', 'Berserker':'#f85149', 'Einherjar':'#3fb950'};
+  const shapes = {'Ulfhednar':'circle', 'Berserker':'diamond', 'Einherjar':'triangle'};
+
+  let allD1 = [], allD2 = [];
+  const points = [];
+  academys.forEach(a => {
+    for(let i=0;i<n;i++){
+      const d1 = DATA[a].Strength[i] - DATA[a].Strategy[i];
+      const d2 = DATA[a].Speed[i];
+      allD1.push(d1); allD2.push(d2);
+      points.push({d1, d2, academy: a});
+    }
+  });
+
+  const d1Min = Math.min(...allD1)-5, d1Max = Math.max(...allD1)+5;
+  const d2Min = Math.min(...allD2)-5, d2Max = Math.max(...allD2)+5;
+
+  function xPos(v){ return pad.l + ((v-d1Min)/(d1Max-d1Min))*pw; }
+  function yPos(v){ return pad.t + ph - ((v-d2Min)/(d2Max-d2Min))*ph; }
+
+  // Grid
+  ctx.strokeStyle = '#30363d'; ctx.lineWidth = 0.5;
+  for(let v = Math.ceil(d1Min/10)*10; v <= d1Max; v+=10){
+    ctx.beginPath(); ctx.moveTo(xPos(v), pad.t); ctx.lineTo(xPos(v), pad.t+ph); ctx.stroke();
+    ctx.fillStyle = '#8b949e'; ctx.font = '12px Patrick Hand'; ctx.textAlign = 'center';
+    ctx.fillText(v, xPos(v), H-pad.b+18);
+  }
+  for(let v = Math.ceil(d2Min/10)*10; v <= d2Max; v+=10){
+    ctx.beginPath(); ctx.moveTo(pad.l, yPos(v)); ctx.lineTo(pad.l+pw, yPos(v)); ctx.stroke();
+    ctx.fillStyle = '#8b949e'; ctx.font = '12px Patrick Hand'; ctx.textAlign = 'right';
+    ctx.fillText(v, pad.l-8, yPos(v)+4);
+  }
+
+  // Points
+  points.forEach(p => {
+    const x = xPos(p.d1), y = yPos(p.d2);
+    ctx.fillStyle = colors[p.academy];
+    ctx.beginPath();
+    if(shapes[p.academy] === 'circle'){
+      ctx.arc(x, y, 6, 0, Math.PI*2);
+    } else if(shapes[p.academy] === 'diamond'){
+      ctx.moveTo(x, y-7); ctx.lineTo(x+7, y); ctx.lineTo(x, y+7); ctx.lineTo(x-7, y);
+    } else {
+      ctx.moveTo(x, y-7); ctx.lineTo(x+7, y+5); ctx.lineTo(x-7, y+5);
+    }
+    ctx.closePath(); ctx.fill();
+  });
+
+  // Group centroids
+  academys.forEach(a => {
+    let cd1=0, cd2=0;
+    for(let i=0;i<n;i++){
+      cd1 += DATA[a].Strength[i] - DATA[a].Strategy[i];
+      cd2 += DATA[a].Speed[i];
+    }
+    cd1/=n; cd2/=n;
+    const cx = xPos(cd1), cy = yPos(cd2);
+    // Draw centroid cross
+    ctx.strokeStyle = colors[a]; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx-10,cy); ctx.lineTo(cx+10,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx,cy-10); ctx.lineTo(cx,cy+10); ctx.stroke();
+    // Label
+    ctx.fillStyle = colors[a]; ctx.font = '13px Permanent Marker'; ctx.textAlign = 'left';
+    ctx.fillText(a, cx+14, cy+4);
+  });
+
+  // Title
+  ctx.fillStyle = '#f0c040'; ctx.font = '18px Bangers'; ctx.textAlign = 'center';
+  ctx.fillText('Discriminant Space (simplified)', W/2, 28);
+
+  // Axis labels
+  ctx.fillStyle = '#8b949e'; ctx.font = '13px Permanent Marker'; ctx.textAlign = 'center';
+  ctx.fillText('Dimension 1 (Strength − Strategy)', W/2, H-10);
+  ctx.save(); ctx.translate(16, H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('Dimensão 2 (Speed)', 0, 0);
+  ctx.restore();
+
+  // Legend
+  const ly = pad.t + 15;
+  let lx = pad.l + 10;
+  ctx.font = '12px Permanent Marker';
+  academys.forEach(a => {
+    ctx.fillStyle = colors[a];
+    ctx.fillRect(lx, ly-4, 10, 10);
+    ctx.fillText(a, lx+14, ly+6);
+    lx += ctx.measureText(a).width + 30;
+  });
+}
+
+// ============================================================
+// MEAN BARS ANIMATION (Step 8)
+// ============================================================
+function animateMeanBars(){
+  const container = document.getElementById('meanBarsContainer');
+  if(!container) return;
+
+  const colors = {'Ulfhednar':'var(--odin-blue)', 'Berserker':'var(--thor-red)', 'Einherjar':'var(--success)'};
+  const maxVal = 100;
+
+  let html = '<div class="step-subtitle">Médias por Academy (barras)</div>';
+
+  dvs.forEach(dv => {
+    html += `<p style="font-family:'Permanent Marker',cursive;color:var(--gold);margin:14px 0 6px;font-size:0.95rem">${dvLabels[dv]}</p>`;
+    academys.forEach(a => {
+      const val = groupMean[a][dv];
+      const pct = (val/maxVal)*90;
+      html += `<div class="bar-wrapper">
+        <div class="bar-label" style="color:${colors[a]}">${a}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="background:${colors[a]};width:0" data-width="${pct}%"></div>
+        </div>
+        <div class="bar-value">${round2(val)}</div>
+      </div>`;
+    });
+  });
+
+  container.innerHTML = html;
+
+  setTimeout(() => {
+    container.querySelectorAll('.bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.width;
+    });
+  }, 100);
+}
+
+// ============================================================
+// ETA BARS ANIMATION (Step 9)
+// ============================================================
+function animateEtaBars(){
+  const container = document.getElementById('etaBarsContainer');
+  if(!container) return;
+
+  const dvColors = {'Strength':'var(--odin-blue)', 'Speed':'var(--gold)', 'Strategy':'var(--corvo-purple)'};
+
+  let html = '';
+  dvs.forEach(dv => {
+    const eta = uniF[dv].etaSq;
+    const pct = eta * 100;
+    html += `<div class="bar-wrapper">
+      <div class="bar-label" style="color:${dvColors[dv]}">${dvLabels[dv]}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="background:${dvColors[dv]};width:0" data-width="${pct}%"></div>
+      </div>
+      <div class="bar-value">&eta;&sup2;<sub>p</sub> = ${eta}</div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+
+  setTimeout(() => {
+    container.querySelectorAll('.bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.width;
+    });
+  }, 100);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderStep();
+</script>
+</body>
+</html>

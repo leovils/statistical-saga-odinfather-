@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Guides · MTPQI · Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:30px 20px}
+
+/* Header */
+.header{text-align:center;padding:40px 0 30px;position:relative}
+.header h1{font-family:'Bangers',cursive;font-size:2.6em;color:var(--gold);text-shadow:2px 2px 8px rgba(240,192,64,.3);line-height:1.1}
+.header h2{font-family:'Permanent Marker',cursive;font-size:1.2em;color:var(--corvo-purple);margin-top:6px}
+.header p{color:var(--text-dim);margin-top:14px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.5}
+.badge{display:inline-block;background:linear-gradient(135deg,var(--odin-blue),var(--corvo-purple));padding:5px 18px;border-radius:20px;font-family:'Bangers',cursive;font-size:.9em;color:#fff;margin-bottom:14px}
+
+/* Guia destaque */
+.guia-card{background:linear-gradient(135deg,rgba(88,166,255,.12),rgba(188,140,255,.12));border:2px solid var(--gold);border-radius:16px;padding:28px 30px;margin:30px 0;text-align:center;transition:all .3s;cursor:pointer;text-decoration:none;display:block}
+.guia-card:hover{border-color:#ffd060;box-shadow:0 0 24px rgba(240,192,64,.2);transform:translateY(-2px)}
+.guia-card h3{font-family:'Bangers',cursive;font-size:1.6em;color:var(--gold);margin-bottom:6px}
+.guia-card p{color:var(--text);font-size:1.05em;line-height:1.4}
+.guia-card .guia-tag{display:inline-block;background:var(--gold);color:var(--bg-dark);font-family:'Bangers',cursive;padding:3px 12px;border-radius:6px;font-size:.85em;margin-bottom:10px}
+
+/* Sections */
+.section-title{font-family:'Permanent Marker',cursive;font-size:1.3em;color:var(--odin-blue);margin:30px 0 16px;padding-left:12px;border-left:3px solid var(--odin-blue)}
+.section-title.np{color:var(--corvo-purple);border-left-color:var(--corvo-purple)}
+
+/* Cards grid */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all .3s;text-decoration:none;display:block;position:relative;overflow:hidden}
+.card:hover{border-color:var(--odin-blue);transform:translateY(-2px);box-shadow:0 4px 16px rgba(88,166,255,.12)}
+.card.np:hover{border-color:var(--corvo-purple);box-shadow:0 4px 16px rgba(188,140,255,.12)}
+.card-icon{font-size:1.8em;margin-bottom:8px}
+.card-title{font-family:'Bangers',cursive;font-size:1.2em;color:var(--text);margin-bottom:4px}
+.card-meta{font-size:.8em;color:var(--text-dim);margin-bottom:8px;display:flex;gap:10px;flex-wrap:wrap}
+.card-meta span{display:inline-flex;align-items:center;gap:3px}
+.card-desc{font-size:.92em;color:var(--silver);line-height:1.4}
+.card-tag{position:absolute;top:12px;right:12px;font-family:'Bangers',cursive;font-size:.7em;padding:2px 8px;border-radius:4px}
+.card-tag.param{background:rgba(88,166,255,.15);color:var(--odin-blue)}
+.card-tag.nparam{background:rgba(188,140,255,.15);color:var(--corvo-purple)}
+
+/* Learning trail */
+.trilha{display:flex;align-items:center;justify-content:center;gap:6px;margin:24px 0;flex-wrap:wrap}
+.trilha-node{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-family:'Bangers',cursive;font-size:.85em;color:var(--text-dim);text-align:center;min-width:70px}
+.trilha-node.param{border-color:var(--odin-blue);color:var(--odin-blue)}
+.trilha-node.nparam{border-color:var(--corvo-purple);color:var(--corvo-purple)}
+.trilha-arrow{color:var(--text-dim);font-size:1.2em}
+
+/* Dialogue */
+.dialogue-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin:20px 0}
+.dialogue-box.odin{border-left:4px solid var(--odin-blue)}
+.char-name{font-family:'Bangers',cursive;font-size:1em;margin-bottom:4px;color:var(--odin-blue)}
+.dialogue-text{line-height:1.5;font-size:1em}
+
+/* Footer */
+.footer{text-align:center;margin-top:40px;padding:20px 0;border-top:1px solid var(--border);color:var(--text-dim);font-size:.85em}
+.footer a{color:var(--odin-blue);text-decoration:none}
+.footer a:hover{text-decoration:underline}
+
+/* Responsive */
+@media(max-width:600px){
+  .header h1{font-size:1.9em}
+  .cards{grid-template-columns:1fr}
+  .trilha{flex-direction:column}
+  .trilha-arrow{transform:rotate(90deg)}
+  .container{padding:16px 12px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="badge">MTPQI · 2026</div>
+    <h1>Study Guides</h1>
+    <h2>The Forge of Knowledge of Odinfather</h2>
+    <p>Learn statistics by calculating step by step, as if you were doing it by hand. Each guide walks you through the computations with animations, Norse data, and characters from the Grimoire.</p>
+  </div>
+
+  <!-- Odinfather welcome -->
+  <div class="dialogue-box odin">
+    <div class="char-name">Odinfather</div>
+    <div class="dialogue-text">These study guides are different from the Saga challenges. Here, there is no rush and no scoring -- only deep learning. Each step shows exactly how the calculation works, from raw data to the final result in APA format.</div>
+  </div>
+
+  <!-- Study Guide highlight -->
+  <a class="guia-card" href="study-guide.html">
+    <div class="guia-tag">Start Here</div>
+    <h3>Grimoire of Statistical Artifacts</h3>
+    <p>Complete guide with a learning trail, prerequisites, self-assessment, and exercises for each artifact. Your compass on this journey.</p>
+  </a>
+
+  <!-- Foundations -->
+  <div class="section-title" style="color:var(--gold);border-left-color:var(--gold)">Foundations -- The Bedrock of Everything</div>
+  <div class="cards">
+    <a class="card" href="quantitative-research.html" style="grid-column:1/-1">
+      <span class="card-tag param" style="background:rgba(240,192,64,.15);color:var(--gold)">Foundation</span>
+      <div class="card-icon">&#128220;</div>
+      <div class="card-title">Quantitative Research</div>
+      <div class="card-meta">
+        <span>&#11088; Introductory</span>
+        <span>&#9202; 20-30 min</span>
+        <span>12 steps</span>
+      </div>
+      <div class="card-desc">Variables (IV, DV, moderator, mediator), NOIR scales, hypotheses, internal/external validity, reliability, designs, and biases -- the foundation before any test.</div>
+    </a>
+    <a class="card" href="descriptive-statistics.html">
+      <span class="card-tag param" style="background:rgba(240,192,64,.15);color:var(--gold)">Foundation</span>
+      <div class="card-icon">&#128202;</div>
+      <div class="card-title">Descriptive Statistics</div>
+      <div class="card-meta">
+        <span>&#11088; Introductory</span>
+        <span>&#9202; 25-35 min</span>
+        <span>14 steps</span>
+      </div>
+      <div class="card-desc">Mean, median, mode, outliers (IQR), variance, standard deviation, CV, the empirical rule 68-95-99.7, skewness, and kurtosis.</div>
+    </a>
+    <a class="card" href="probability.html">
+      <span class="card-tag param" style="background:rgba(240,192,64,.15);color:var(--gold)">Foundation</span>
+      <div class="card-icon">&#127922;</div>
+      <div class="card-title">Probability</div>
+      <div class="card-meta">
+        <span>&#11088; Introductory</span>
+        <span>&#9202; 25-35 min</span>
+        <span>12 steps</span>
+      </div>
+      <div class="card-desc">Sample space, addition and multiplication rules, independent events, conditional probability, Bayes' Theorem, and common traps.</div>
+    </a>
+    <a class="card" href="sampling.html">
+      <span class="card-tag param" style="background:rgba(240,192,64,.15);color:var(--gold)">Foundation</span>
+      <div class="card-icon">&#127960;&#65039;</div>
+      <div class="card-title">Sampling</div>
+      <div class="card-meta">
+        <span>&#11088; Introductory</span>
+        <span>&#9202; 20-30 min</span>
+        <span>11 steps</span>
+      </div>
+      <div class="card-desc">Simple random, stratified, cluster, systematic, convenience, sampling bias, sample size, and the CLT.</div>
+    </a>
+  </div>
+
+  <!-- Learning trail -->
+  <div class="trilha">
+    <div class="trilha-node" style="border-color:var(--gold);color:var(--gold)">Quant. Res.</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node" style="border-color:var(--gold);color:var(--gold)">Descriptive</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node" style="border-color:var(--gold);color:var(--gold)">Probability</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node" style="border-color:var(--gold);color:var(--gold)">Sampling</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node" style="border-color:var(--thor-red);color:var(--thor-red)">Hypotheses</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node" style="border-color:var(--thor-red);color:var(--thor-red)">t-Test</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node" style="border-color:var(--thor-red);color:var(--thor-red)">TOST</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node param">ANCOVA</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node param">MANOVA</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node param">MANCOVA</div>
+  </div>
+
+  <!-- Hypothesis Testing & Comparison -->
+  <div class="section-title" style="color:var(--thor-red);border-left-color:var(--thor-red)">Hypothesis Testing &amp; Comparison</div>
+  <div class="cards">
+    <a class="card" href="hypothesis-testing.html">
+      <span class="card-tag param">Inference</span>
+      <div class="card-icon">&#9878;&#65039;</div>
+      <div class="card-title">Hypothesis Testing (NHST)</div>
+      <div class="card-meta">
+        <span>&#11088;&#11088; Intermediate</span>
+        <span>&#9202; 25-35 min</span>
+        <span>13 steps</span>
+      </div>
+      <div class="card-desc">H&#8320; and H&#8321;, p-value (correct interpretation!), Type I/II errors, power, effect size, the NHST ritual, and pitfalls.</div>
+    </a>
+    <a class="card" href="t-test.html">
+      <span class="card-tag param">Parametric</span>
+      <div class="card-icon">&#128481;&#65039;</div>
+      <div class="card-title">t-Test</div>
+      <div class="card-meta">
+        <span>&#11088;&#11088; Intermediate</span>
+        <span>&#9202; 30-40 min</span>
+        <span>14 steps</span>
+      </div>
+      <div class="card-desc">One-sample, independent, and paired t-tests. Levene, Welch, degrees of freedom, Cohen's d, and Hedges' g.</div>
+    </a>
+    <a class="card" href="equivalence-testing-tost.html">
+      <span class="card-tag param">Parametric</span>
+      <div class="card-icon">&#127752;</div>
+      <div class="card-title">Equivalence Testing (TOST)</div>
+      <div class="card-meta">
+        <span>&#11088;&#11088;&#11088; Advanced</span>
+        <span>&#9202; 25-35 min</span>
+        <span>11 steps</span>
+      </div>
+      <div class="card-desc">SESOI, Two One-Sided Tests, 90% CI, the 4 NHST x TOST quadrants, and when to prove equivalence.</div>
+    </a>
+  </div>
+
+  <!-- Parametric -- ANOVA Family -->
+  <div class="section-title">Parametric Tests -- ANOVA Family</div>
+  <div class="cards">
+    <a class="card" href="ancova.html">
+      <span class="card-tag param">Parametric</span>
+      <div class="card-icon">&#128218;</div>
+      <div class="card-title">ANCOVA</div>
+      <div class="card-meta">
+        <span>&#11088;&#11088;&#11088; Advanced</span>
+        <span>&#9202; 30-40 min</span>
+        <span>12 steps</span>
+      </div>
+      <div class="card-desc">Covariates, variance purification, homogeneity of slopes, adjusted means, and the GLM connection.</div>
+    </a>
+    <a class="card" href="manova.html">
+      <span class="card-tag param">Parametric</span>
+      <div class="card-icon">&#127963;&#65039;</div>
+      <div class="card-title">MANOVA</div>
+      <div class="card-meta">
+        <span>&#11088;&#11088;&#11088; Advanced</span>
+        <span>&#9202; 30-40 min</span>
+        <span>12 steps</span>
+      </div>
+      <div class="card-desc">Multiple DVs, SSCP matrices, Box's M, Pillai/Wilks/Hotelling/Roy, follow-up, and discriminant analysis.</div>
+    </a>
+    <a class="card" href="mancova.html">
+      <span class="card-tag param">Parametric</span>
+      <div class="card-icon">&#128081;</div>
+      <div class="card-title">MANCOVA</div>
+      <div class="card-meta">
+        <span>&#11088;&#11088;&#11088; Advanced</span>
+        <span>&#9202; 25-35 min</span>
+        <span>11 steps</span>
+      </div>
+      <div class="card-desc">MANOVA + ANCOVA: the crown of the GLM. Comparison table, parsimony, complete hierarchy, and follow-up.</div>
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026</p>
+    <p style="margin-top:8px"><a href="study-guide.html">Complete Study Guide</a></p>
+  </div>
+
+</div>
+</body>
+</html>

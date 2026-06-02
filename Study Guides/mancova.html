@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANCOVA — Step by Step | Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117; --bg-card: #161b22; --bg-panel: #1c2333;
+  --odin-blue: #58a6ff; --thor-red: #f85149; --corvo-purple: #bc8cff;
+  --gold: #f0c040; --silver: #8b949e; --text: #e6edf3; --text-dim: #8b949e;
+  --success: #3fb950; --border: #30363d;
+  --asgard-color: #58a6ff; --midgard-color: #f0c040; --vanaheim-color: #3fb950;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg-dark); color: var(--text);
+  font-family: 'Patrick Hand', cursive; font-size: 18px;
+  line-height: 1.6; min-height: 100vh;
+}
+.container { max-width: 920px; margin: 0 auto; padding: 20px; }
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg-dark); padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+.progress-label {
+  font-family: 'Permanent Marker', cursive; font-size: 14px;
+  color: var(--text-dim); margin-bottom: 6px; text-align: center;
+}
+.progress-track {
+  width: 100%; height: 8px; background: var(--bg-panel);
+  border-radius: 4px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 4px; transition: width 0.5s ease;
+}
+
+/* STEP CONTENT */
+.step-content {
+  min-height: 60vh; padding: 30px 0;
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.step-title {
+  font-family: 'Bangers', cursive; font-size: 2.2rem;
+  color: var(--gold); margin-bottom: 20px; letter-spacing: 1px;
+}
+.step-subtitle {
+  font-family: 'Permanent Marker', cursive; font-size: 1.3rem;
+  color: var(--odin-blue); margin-bottom: 15px;
+}
+
+/* DIALOGUE BOXES */
+.dialogue-box {
+  border-radius: 12px; padding: 16px 20px; margin: 16px 0;
+  border-left: 4px solid; position: relative;
+}
+.dialogue-box.odin { background: rgba(88,166,255,0.08); border-left-color: var(--odin-blue); }
+.dialogue-box.thor { background: rgba(248,81,73,0.08); border-left-color: var(--thor-red); }
+.dialogue-box.corvo { background: rgba(188,140,255,0.08); border-left-color: var(--corvo-purple); }
+.char-name {
+  font-family: 'Permanent Marker', cursive; font-size: 1rem; margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+.dialogue-text { font-size: 1.05rem; line-height: 1.5; }
+
+/* DATA TABLE */
+.data-table {
+  width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 1rem;
+}
+.data-table th, .data-table td {
+  padding: 10px 14px; text-align: center; border: 1px solid var(--border);
+}
+.data-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive; font-size: 0.95rem;
+}
+.data-table td { background: var(--bg-card); transition: background 0.2s; }
+.data-table tr:hover td { background: rgba(88,166,255,0.1); }
+.mean-row td, .mean-row th {
+  font-family: 'Permanent Marker', cursive; background: var(--bg-panel) !important;
+  color: var(--gold);
+}
+
+/* FORMULA */
+.formula {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 20px; margin: 16px 0;
+  font-size: 1.15rem; text-align: center;
+  font-family: 'Patrick Hand', cursive; color: var(--gold);
+}
+.formula-label {
+  font-family: 'Permanent Marker', cursive; color: var(--text-dim);
+  font-size: 0.85rem; margin-bottom: 6px;
+}
+
+/* CALC TABLE */
+.calc-table {
+  width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.95rem;
+}
+.calc-table th, .calc-table td {
+  padding: 8px 10px; text-align: center; border: 1px solid var(--border);
+}
+.calc-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive;
+  font-size: 0.85rem; color: var(--text-dim);
+}
+.calc-table td { background: var(--bg-card); }
+
+/* COMPARISON TABLE */
+.compare-table {
+  width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95rem;
+}
+.compare-table th, .compare-table td {
+  padding: 12px 14px; text-align: center; border: 1px solid var(--border);
+}
+.compare-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem; color: var(--gold);
+}
+.compare-table td { background: var(--bg-card); }
+.compare-table .header-col {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive;
+  color: var(--odin-blue); text-align: left; font-size: 0.9rem;
+}
+.compare-table .highlight-col { background: rgba(240,192,64,0.12) !important; }
+
+/* ANIMATED BAR */
+.bar-container { margin: 20px 0; }
+.bar-wrapper { display: flex; align-items: center; margin: 8px 0; }
+.bar-label {
+  width: 140px; font-family: 'Permanent Marker', cursive;
+  font-size: 0.9rem; text-align: right; padding-right: 10px; flex-shrink:0;
+}
+.bar-track {
+  flex: 1; height: 30px; background: var(--bg-panel);
+  border-radius: 6px; overflow: hidden; position: relative;
+}
+.bar-fill {
+  height: 100%; border-radius: 6px;
+  transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
+  width: 0;
+}
+.bar-value {
+  width: 90px; font-size: 0.9rem; padding-left: 10px; color: var(--gold); flex-shrink:0;
+}
+
+/* NAVIGATION */
+.nav-container {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 0; border-top: 1px solid var(--border); margin-top: 30px;
+}
+.nav-btn {
+  font-family: 'Permanent Marker', cursive; font-size: 1.1rem;
+  padding: 12px 28px; border-radius: 10px; border: 2px solid var(--border);
+  background: var(--bg-card); color: var(--text); cursor: pointer;
+  transition: all 0.3s;
+}
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--odin-blue); background: rgba(88,166,255,0.15);
+  transform: translateY(-2px);
+}
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.nav-btn.next { border-color: var(--odin-blue); color: var(--odin-blue); }
+.step-indicator {
+  font-family: 'Permanent Marker', cursive; font-size: 0.9rem; color: var(--text-dim);
+}
+
+/* ANOVA / MANCOVA TABLE */
+.anova-table {
+  width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95rem;
+}
+.anova-table th, .anova-table td {
+  padding: 10px 12px; text-align: center; border: 1px solid var(--border);
+}
+.anova-table th {
+  background: var(--bg-panel); font-family: 'Permanent Marker', cursive;
+  color: var(--gold); font-size: 0.9rem;
+}
+.anova-table td { background: var(--bg-card); }
+.anova-table .sig { color: var(--success); font-weight: bold; }
+.anova-table .ns { color: var(--text-dim); }
+.anova-table .total-row td { background: var(--bg-panel); font-weight: bold; }
+
+/* HYPOTHESIS BOX */
+.hyp-box {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px; margin: 14px 0;
+}
+.hyp-box h4 {
+  font-family: 'Permanent Marker', cursive; color: var(--odin-blue);
+  margin-bottom: 8px; font-size: 1rem;
+}
+.hyp-box p { font-size: 1rem; margin: 4px 0; }
+
+/* APA BOX */
+.apa-box {
+  background: rgba(63,185,80,0.08); border: 1px solid var(--success);
+  border-radius: 10px; padding: 18px; margin: 16px 0;
+  font-family: 'Patrick Hand', cursive; font-size: 1rem;
+  line-height: 1.7;
+}
+.apa-box .apa-label {
+  font-family: 'Permanent Marker', cursive; color: var(--success);
+  font-size: 0.85rem; margin-bottom: 8px;
+}
+
+/* DECISION BOX */
+.decision-box {
+  background: var(--bg-panel); border: 2px solid var(--border);
+  border-radius: 12px; padding: 20px; margin: 16px 0; text-align: center;
+}
+.decision-box .q {
+  font-family: 'Permanent Marker', cursive; color: var(--gold);
+  font-size: 1.1rem; margin-bottom: 12px;
+}
+.decision-arrows { display: flex; justify-content: center; gap: 40px; margin: 10px 0; flex-wrap: wrap; }
+.decision-arrow {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 20px; min-width: 160px;
+}
+.decision-arrow .label {
+  font-family: 'Permanent Marker', cursive; font-size: 0.85rem; color: var(--text-dim);
+}
+.decision-arrow .answer {
+  font-family: 'Bangers', cursive; font-size: 1.2rem; margin-top: 4px;
+}
+.decision-arrow .answer.blue { color: var(--odin-blue); }
+.decision-arrow .answer.gold { color: var(--gold); }
+.decision-arrow .answer.green { color: var(--success); }
+.decision-arrow .answer.purple { color: var(--corvo-purple); }
+
+/* ASSUMPTION CARD */
+.assumption-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; margin: 10px 0;
+  border-left: 3px solid var(--odin-blue);
+}
+.assumption-card h4 {
+  font-family: 'Permanent Marker', cursive; color: var(--odin-blue);
+  font-size: 0.95rem; margin-bottom: 6px;
+}
+.assumption-card p { font-size: 0.95rem; color: var(--text); }
+.assumption-card .origin {
+  font-size: 0.8rem; color: var(--text-dim); margin-top: 6px;
+  font-family: 'Permanent Marker', cursive;
+}
+
+/* STEP BOX */
+.step-box {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 20px; margin: 12px 0;
+  display: flex; align-items: flex-start; gap: 16px;
+}
+.step-num {
+  font-family: 'Bangers', cursive; font-size: 2rem; color: var(--gold);
+  min-width: 40px; text-align: center; line-height: 1;
+}
+.step-desc { flex: 1; }
+.step-desc h4 {
+  font-family: 'Permanent Marker', cursive; color: var(--odin-blue);
+  font-size: 1rem; margin-bottom: 4px;
+}
+
+/* HIGHLIGHT */
+.highlight { color: var(--gold); font-weight: bold; }
+.highlight-blue { color: var(--odin-blue); }
+.highlight-red { color: var(--thor-red); }
+.highlight-green { color: var(--success); }
+.highlight-purple { color: var(--corvo-purple); }
+
+/* SVG CONTAINER */
+.svg-container { margin: 20px 0; text-align: center; overflow-x: auto; }
+.svg-container svg { max-width: 100%; height: auto; }
+
+/* CHECKLIST */
+.checklist { margin: 16px 0; }
+.checklist-item {
+  display: flex; align-items: flex-start; gap: 10px; margin: 8px 0;
+  padding: 8px 12px; background: var(--bg-card); border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.checklist-icon { font-size: 1.2rem; flex-shrink: 0; }
+.checklist-text { font-size: 1rem; }
+
+/* SIGNATURE */
+.signature {
+  text-align: center; padding: 30px 0; color: var(--text-dim);
+  font-family: 'Permanent Marker', cursive; font-size: 0.85rem;
+  border-top: 1px solid var(--border); margin-top: 30px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .step-title { font-size: 1.6rem; }
+  .data-table, .calc-table, .anova-table, .compare-table { font-size: 0.8rem; }
+  .data-table th, .data-table td, .calc-table th, .calc-table td { padding: 6px 4px; }
+  .compare-table th, .compare-table td { padding: 6px 4px; }
+  .bar-label { width: 80px; font-size: 0.75rem; }
+  .decision-arrows { flex-direction: column; align-items: center; gap: 12px; }
+  .nav-btn { padding: 10px 18px; font-size: 0.95rem; }
+  .step-box { flex-direction: column; gap: 8px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- PROGRESS -->
+<div class="progress-bar-container">
+  <div class="progress-label" id="progressLabel">Step 0 of 10</div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<!-- CONTENT -->
+<div id="stepContent" class="step-content"></div>
+
+<!-- NAVIGATION -->
+<div class="nav-container">
+  <button class="nav-btn" id="btnPrev" onclick="prevStep()" disabled>&#9664; Back</button>
+  <span class="step-indicator" id="stepIndicator">0 / 10</span>
+  <button class="nav-btn next" id="btnNext" onclick="nextStep()">Next &#9654;</button>
+</div>
+
+<div class="signature">Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026</div>
+</div>
+
+<script>
+// ============================================================
+// DATA — 3 Academys, 2 VDs, 1 Covariavel
+// ============================================================
+const DATA = {
+  Asgard:   { combat: [78,82,75,80,85,77], leadership: [70,74,68,72,76,71], training: [5,7,4,6,8,5] },
+  Midgard:  { combat: [65,60,68,62,70,64], leadership: [58,55,62,57,64,60], training: [3,2,4,3,5,3] },
+  Vanaheim: { combat: [72,75,69,74,78,73], leadership: [66,69,63,67,71,65], training: [4,5,3,5,6,4] }
+};
+const academies = ['Asgard','Midgard','Vanaheim'];
+const k = 3, n = 6, N = 18;
+
+function mean(arr){ return arr.reduce((s,v)=>s+v,0)/arr.length; }
+function round2(v){ return Math.round(v*100)/100; }
+function round4(v){ return Math.round(v*10000)/10000; }
+function sum(arr){ return arr.reduce((s,v)=>s+v,0); }
+
+// Group means
+const groupMeans = {};
+academies.forEach(a => {
+  groupMeans[a] = {
+    combat: round2(mean(DATA[a].combat)),
+    leadership: round2(mean(DATA[a].leadership)),
+    training: round2(mean(DATA[a].training))
+  };
+});
+
+// Grand means
+const allCombat = []; const allLeadership = []; const allTraining = [];
+academies.forEach(a => {
+  allCombat.push(...DATA[a].combat);
+  allLeadership.push(...DATA[a].leadership);
+  allTraining.push(...DATA[a].training);
+});
+const GM_combat = round2(mean(allCombat));
+const GM_leadership = round2(mean(allLeadership));
+const GM_training = round2(mean(allTraining));
+
+// Simple regression coefficients for conceptual demo
+// Combat ~ Training
+const n_total = allCombat.length;
+let sumXY_c = 0, sumX2 = 0, sumX = sum(allTraining), sumY_c = sum(allCombat), sumY_l = sum(allLeadership);
+for(let i=0; i<n_total; i++){
+  sumXY_c += allTraining[i] * allCombat[i];
+  sumX2 += allTraining[i] * allTraining[i];
+}
+const b_combat = round4((sumXY_c - n_total*GM_training*GM_combat)/(sumX2 - n_total*GM_training*GM_training));
+
+let sumXY_l = 0;
+for(let i=0; i<n_total; i++){
+  sumXY_l += allTraining[i] * allLeadership[i];
+}
+const b_leadership = round4((sumXY_l - n_total*GM_training*GM_leadership)/(sumX2 - n_total*GM_training*GM_training));
+
+// Adjusted means (conceptual)
+const adjMeans = {};
+academies.forEach(a => {
+  adjMeans[a] = {
+    combat: round2(groupMeans[a].combat - b_combat * (groupMeans[a].training - GM_training)),
+    leadership: round2(groupMeans[a].leadership - b_leadership * (groupMeans[a].training - GM_training))
+  };
+});
+
+// ============================================================
+// DIALOGUE HELPER
+// ============================================================
+function dlg(character, name, text){
+  return '<div class="dialogue-box '+character+'"><div class="char-name '+character+'">'+name+'</div><div class="dialogue-text">'+text+'</div></div>';
+}
+
+// ============================================================
+// STEPS
+// ============================================================
+const TOTAL_STEPS = 11;
+let currentStep = 0;
+
+function getStepHTML(step){
+  switch(step){
+
+  // ---- STEP 0: INTRODUCAO ----
+  case 0: return `
+<div class="step-title">&#128081; Step 0 &mdash; The Crown of the GLM: MANCOVA</div>
+<p>No Trono de Odin, a an&aacute;lise suprema: <span class="highlight">m&uacute;ltiplos grupos</span>, <span class="highlight">m&uacute;ltiplas vari&aacute;veis dependentes</span> e <span class="highlight">controle de diferen&ccedil;as pr&eacute;-existentes</span>. A uni&atilde;o de MANOVA + ANCOVA num &uacute;nico teste.</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','MANCOVA &mdash; Multivariate Analysis of Covariance. &Eacute; o teste mais completo da fam&iacute;lia GLM. Compara grupos em <strong>v&aacute;rias VDs simultaneamente</strong>, controlando o efeito de <strong>covari&aacute;veis</strong> que poderiam confundir os resultados.')}
+${dlg('thor','&#9889; Thorment','Puxa, se &eacute; o mais completo, ent&atilde;o sempre uso MANCOVA! Jogo tudo l&aacute; dentro &mdash; 10 VDs, 15 covari&aacute;veis &mdash; e pronto!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Easy, Thorment. Mais poder exige mais <em>disciplina</em>. MANCOVA s&oacute; faz sentido quando h&aacute; justificativa te&oacute;rica para cada VD e cada covariate. Parcim&ocirc;nia acima de tudo.')}
+
+<div class="step-subtitle">Cen&aacute;rio: As Tr&ecirc;s Academys de Guerra</div>
+<p>Odin quer avaliar tr&ecirc;s academys de warriors &mdash; <span class="highlight-blue">Asgard</span>, <span class="highlight" style="color:var(--gold)">Midgard</span> e <span class="highlight-green">Vanaheim</span> &mdash; em dois crit&eacute;rios:</p>
+<ul style="margin:12px 0 12px 24px;">
+  <li><strong>VD1:</strong> Score de Combat (0&ndash;100)</li>
+  <li><strong>VD2:</strong> Score de Leadership (0&ndash;100)</li>
+  <li><strong>Covariate:</strong> Anos de Training Pr&eacute;vio</li>
+</ul>
+<p>Delineamento: <span class="highlight">3 grupos &times; 2 VDs &times; 1 covariate</span>, com n = 6 por grupo (N = 18).</p>
+
+<div class="step-subtitle">Dados das Tr&ecirc;s Academys</div>
+<table class="data-table">
+  <thead>
+    <tr><th>Academy</th><th>Warrior</th><th>&#9876; Combat</th><th>&#128081; Leadership</th><th>&#9201; Anos Training</th></tr>
+  </thead>
+  <tbody>
+    ${academies.map(a => DATA[a].combat.map((c,i) =>
+      '<tr><td>'+(i===0?a:'')+'</td><td>'+(i+1)+'</td><td>'+c+'</td><td>'+DATA[a].leadership[i]+'</td><td>'+DATA[a].training[i]+'</td></tr>'
+    ).join('')).join('')}
+  </tbody>
+  <tfoot>
+    <tr class="mean-row"><th>Mean Asgard</th><th></th><td>${groupMeans.Asgard.combat}</td><td>${groupMeans.Asgard.leadership}</td><td>${groupMeans.Asgard.training}</td></tr>
+    <tr class="mean-row"><th>Mean Midgard</th><th></th><td>${groupMeans.Midgard.combat}</td><td>${groupMeans.Midgard.leadership}</td><td>${groupMeans.Midgard.training}</td></tr>
+    <tr class="mean-row"><th>Mean Vanaheim</th><th></th><td>${groupMeans.Vanaheim.combat}</td><td>${groupMeans.Vanaheim.leadership}</td><td>${groupMeans.Vanaheim.training}</td></tr>
+    <tr class="mean-row"><th>Mean Geral</th><th></th><td>${GM_combat}</td><td>${GM_leadership}</td><td>${GM_training}</td></tr>
+  </tfoot>
+</table>
+
+${dlg('corvo','&#128038; Muninn whispers:','Note que Asgard tem a maior m&eacute;dia em Combat e Leadership &mdash; mas tamb&eacute;m tem warriors com <strong>mais anos de training</strong>. Ser&aacute; que a diferen&ccedil;a &eacute; real ou apenas reflexo da experience pr&eacute;via? &Eacute; exatamente isso que a covariate controla.')}
+`;
+
+  // ---- STEP 1: QUANDO USAR ----
+  case 1: return `
+<div class="step-title">&#129517; Step 1 &mdash; When to Use MANCOVA?</div>
+<p>A escolha do teste depende de <strong>quantas VDs</strong> voc&ecirc; tem e se precisa <strong>controlar covari&aacute;veis</strong>.</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A &aacute;rvore de decis&atilde;o &eacute; simples. Responda duas perguntas: (1) How many DVs? (2) Tem covariate para controlar?')}
+
+<div class="step-subtitle">&#127795; &Aacute;rvore de Decision</div>
+
+<div class="decision-box">
+  <div class="q">&#10067; Quantas Vari&aacute;veis Dependentes?</div>
+  <div class="decision-arrows">
+    <div class="decision-arrow">
+      <div class="label">Only 1 DV</div>
+      <div class="answer blue">&#8595;</div>
+      <div class="decision-box" style="border:1px solid var(--border);margin-top:8px;">
+        <div class="q" style="font-size:0.9rem;">Tem covariate?</div>
+        <div class="decision-arrows" style="gap:20px;">
+          <div class="decision-arrow"><div class="label">No</div><div class="answer blue">ANOVA</div></div>
+          <div class="decision-arrow"><div class="label">Sim</div><div class="answer gold">ANCOVA</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="decision-arrow">
+      <div class="label">2+ VDs correlated</div>
+      <div class="answer gold">&#8595;</div>
+      <div class="decision-box" style="border:1px solid var(--border);margin-top:8px;">
+        <div class="q" style="font-size:0.9rem;">Tem covariate?</div>
+        <div class="decision-arrows" style="gap:20px;">
+          <div class="decision-arrow"><div class="label">No</div><div class="answer green">MANOVA</div></div>
+          <div class="decision-arrow"><div class="label">Sim</div><div class="answer purple">MANCOVA</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+${dlg('thor','&#9889; Thorment','Ent&atilde;o &eacute; s&oacute; contar VDs e covari&aacute;veis? Moleza!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Quase. As VDs <strong>precisam ser correlated entre si</strong> &mdash; caso contr&aacute;rio, Separate ANOVAs s&atilde;o melhores. E a covariate precisa ter <strong>fundamenta&ccedil;&atilde;o te&oacute;rica</strong> para estar no modelo.')}
+
+<div class="hyp-box">
+  <h4>&#128218; Condi&ccedil;&otilde;es para MANCOVA</h4>
+  <p>&#10003; Vari&aacute;vel independente categ&oacute;rica (3+ grupos tipicamente)</p>
+  <p>&#10003; Duas ou mais VDs cont&iacute;nuas e <strong>correlated</strong></p>
+  <p>&#10003; Uma ou mais covari&aacute;veis cont&iacute;nuas medidas <strong>antes do tratamento</strong></p>
+  <p>&#10003; A covariate n&atilde;o pode ser afetada pela VI (independ&ecirc;ncia)</p>
+</div>
+
+${dlg('corvo','&#128038; Muninn whispers:','MANCOVA protege contra dois problemas de uma vez: (1) a <strong>infla&ccedil;&atilde;o do erro Tipo I</strong> que ocorre ao rodar m&uacute;ltiplas Separate ANOVAs, e (2) o <strong>vi&eacute;s de confundimento</strong> quando grupos diferem em vari&aacute;veis pr&eacute;-existentes.')}
+`;
+
+  // ---- STEP 2: TABELA COMPARATIVA ----
+  case 2: return `
+<div class="step-title">&#128202; Step 2 &mdash; The Grand Comparison Table</div>
+<p>Este &eacute; o mapa completo da fam&iacute;lia GLM. Cada linha mostra o que muda de um teste para outro.</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Grave esta tabela. Ela &eacute; o DNA de toda a fam&iacute;lia de testes de diferen&ccedil;a de m&eacute;dias.')}
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>Criterion</th>
+      <th>ANOVA</th>
+      <th>ANCOVA</th>
+      <th>MANOVA</th>
+      <th class="highlight-col">MANCOVA</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="header-col">N&deg; de VIs</td>
+      <td>1+</td>
+      <td>1+</td>
+      <td>1+</td>
+      <td class="highlight-col">1+</td>
+    </tr>
+    <tr>
+      <td class="header-col">N&deg; de VDs</td>
+      <td><strong>1</strong></td>
+      <td><strong>1</strong></td>
+      <td><strong>2+</strong></td>
+      <td class="highlight-col"><strong>2+</strong></td>
+    </tr>
+    <tr>
+      <td class="header-col">Covari&aacute;veis</td>
+      <td>&#10060; Nenhuma</td>
+      <td>&#10004; 1+</td>
+      <td>&#10060; Nenhuma</td>
+      <td class="highlight-col">&#10004; 1+</td>
+    </tr>
+    <tr>
+      <td class="header-col">Estat&iacute;stica</td>
+      <td><em>F</em></td>
+      <td><em>F</em> (ajustado)</td>
+      <td>Wilks' &Lambda;, Pillai, Hotelling, Roy</td>
+      <td class="highlight-col">Wilks' &Lambda;, Pillai, Hotelling, Roy (ajustados)</td>
+    </tr>
+    <tr>
+      <td class="header-col">Assumption-chave &uacute;nico</td>
+      <td>Homogeneidade de variances</td>
+      <td>Homogeneidade de slopes</td>
+      <td>Box's M (igualdade de matrizes)</td>
+      <td class="highlight-col">Box's M + Homogeneidade de slopes <strong>multivariada</strong></td>
+    </tr>
+    <tr>
+      <td class="header-col">O que compara?</td>
+      <td>Means</td>
+      <td>Means ajustadas</td>
+      <td>Vetores de m&eacute;dias</td>
+      <td class="highlight-col">Vetores de m&eacute;dias ajustados</td>
+    </tr>
+    <tr>
+      <td class="header-col">Protege contra...</td>
+      <td>&mdash;</td>
+      <td>Confundimento</td>
+      <td>Error Tipo I (m&uacute;ltiplas VDs)</td>
+      <td class="highlight-col">Confundimento + Error Tipo I</td>
+    </tr>
+    <tr>
+      <td class="header-col">Exemplo N&oacute;rdico</td>
+      <td>Compara combate entre 3 cl&atilde;s</td>
+      <td>...controlando idade</td>
+      <td>Compara combate + lideran&ccedil;a</td>
+      <td class="highlight-col">...controlando anos de training</td>
+    </tr>
+  </tbody>
+</table>
+
+${dlg('thor','&#9889; Thorment','Ent&atilde;o MANCOVA &eacute; tudo junto e misturado?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Exactly &mdash; por isso &eacute; a <strong>coroa do GLM</strong>. Mas com grande poder vem grande responsabilidade: mais pressupostos para verificar e mais cautela na interpreta&ccedil;&atilde;o.')}
+
+${dlg('corvo','&#128038; Muninn whispers:','Observe a coluna MANCOVA. Ela absorve <em>todas</em> as capacidades das anteriores. Cada teste &agrave; esquerda &eacute; um caso especial de MANCOVA &mdash; remova covari&aacute;veis e voc&ecirc; tem MANOVA; reduza a 1 VD e voc&ecirc; tem ANCOVA; fa&ccedil;a ambos e tem ANOVA.')}
+`;
+
+  // ---- STEP 3: PRESSUPOSTOS ----
+  case 3: return `
+<div class="step-title">&#128270; Step 3 &mdash; Assumptions da MANCOVA</div>
+<p>MANCOVA herda <strong>todos</strong> os pressupostos de MANOVA e ANCOVA. &Eacute; a uni&atilde;o dos dois conjuntos.</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Pense assim: MANCOVA = pressupostos da MANOVA + pressupostos da ANCOVA. No &eacute; pouco. Por isso ela exige rigor.')}
+
+<div class="step-subtitle">Herdados da MANOVA</div>
+
+<div class="assumption-card">
+  <h4>1. Normality Multivariada</h4>
+  <p>Cada grupo deve seguir distribui&ccedil;&atilde;o normal multivariada. Teste: <strong>Mardia</strong> (assimetria e curtose multivariada) ou <strong>Shapiro-Wilk multivariado</strong>.</p>
+  <div class="origin">&#8592; Da MANOVA</div>
+</div>
+
+<div class="assumption-card">
+  <h4>2. Homogeneidade das Matrizes de Covariance (Box's M)</h4>
+  <p>As matrizes de variance-covariance devem ser iguais entre os grupos. Teste: <strong>Box's M</strong>. Use &alpha; = 0.001 (teste sens&iacute;vel demais a &alpha; = 0.05).</p>
+  <div class="origin">&#8592; Da MANOVA</div>
+</div>
+
+<div class="assumption-card">
+  <h4>3. Independence das Observa&ccedil;&otilde;es</h4>
+  <p>Cada warrior pertence a apenas uma academy. Sem medidas repetidas. Garantido pelo delineamento.</p>
+  <div class="origin">&#8592; Da MANOVA</div>
+</div>
+
+<div class="step-subtitle">Herdados da ANCOVA</div>
+
+<div class="assumption-card">
+  <h4>4. Linearity entre Covariate e VDs</h4>
+  <p>A rela&ccedil;&atilde;o entre Anos de Training e cada VD (Combat, Leadership) deve ser <strong>linear</strong>. Verificar com scatterplots.</p>
+  <div class="origin">&#8592; Da ANCOVA</div>
+</div>
+
+<div class="assumption-card">
+  <h4>5. Homogeneidade das Slopes de Regress&atilde;o</h4>
+  <p>A rela&ccedil;&atilde;o Covariate &rarr; VD deve ter a <strong>mesma slope</strong> em todos os grupos. Teste: intera&ccedil;&atilde;o Grupo &times; Covariate deve ser <strong>n&atilde;o significant</strong>.</p>
+  <div class="origin">&#8592; Da ANCOVA (vers&atilde;o multivariada!)</div>
+</div>
+
+<div class="assumption-card">
+  <h4>6. Independence da Covariate em Rela&ccedil;&atilde;o ao Tratamento</h4>
+  <p>A covariate (Anos de Training) n&atilde;o pode ter sido <strong>afetada</strong> pela VI (Academy). Deve ser medida <strong>antes</strong> do tratamento.</p>
+  <div class="origin">&#8592; Da ANCOVA</div>
+</div>
+
+<div class="assumption-card" style="border-left-color: var(--thor-red);">
+  <h4 style="color: var(--thor-red);">7. Aus&ecirc;ncia de Multicolinearidade entre Covari&aacute;veis</h4>
+  <p>Se houver m&uacute;ltiplas covari&aacute;veis, elas n&atilde;o devem ser altamente correlated entre si (VIF < 5). No nosso caso, temos apenas uma covariate.</p>
+  <div class="origin">&#8592; Espec&iacute;fico da MANCOVA</div>
+</div>
+
+${dlg('thor','&#9889; Thorment','Sete pressupostos?! Isso &eacute; demais! Quem verifica tudo isso?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Quem quer fazer ci&ecirc;ncia s&eacute;ria, Thorment. Pular pressupostos &eacute; como forjar espada sem verificar a t&ecirc;mpera &mdash; pode quebrar na primeira batalha.')}
+
+${dlg('corvo','&#128038; Muninn whispers:','Na pr&aacute;tica, o pressuposto mais cr&iacute;tico &eacute; o <strong>5 &mdash; homogeneidade de slopes</strong>. Se violado, as m&eacute;dias ajustadas perdem significado. Sempre teste primeiro com a intera&ccedil;&atilde;o Grupo &times; Covariate.')}
+`;
+
+  // ---- STEP 4: HOMOGENEIDADE MULTIVARIADA ----
+  case 4: return `
+<div class="step-title">&#128200; Step 4 &mdash; Homogeneity of Slopes Multivariada</div>
+<p>O pressuposto mais cr&iacute;tico da MANCOVA &mdash; e o menos compreendido. &Eacute; a extens&atilde;o multivariada do pressuposto da ANCOVA.</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Na ANCOVA, verificamos se a <em>reta de regress&atilde;o</em> Covariate &rarr; VD tem a mesma slope em cada grupo. Na MANCOVA, verificamos se o <strong>vetor de slopes</strong> (uma reta para cada VD) &eacute; igual entre os grupos.')}
+
+<div class="step-subtitle">Na ANCOVA (1 VD)</div>
+<div class="formula">
+  <div class="formula-label">Teste de Intera&ccedil;&atilde;o</div>
+  VD = Grupo + Covariate + <span class="highlight-red">Grupo &times; Covariate</span>
+  <br><small>Se a intera&ccedil;&atilde;o &eacute; significant &rarr; slopes diferentes &rarr; &#10060; viola pressuposto</small>
+</div>
+
+<div class="step-subtitle">Na MANCOVA (2+ VDs)</div>
+<div class="formula">
+  <div class="formula-label">Teste de Intera&ccedil;&atilde;o Multivariada</div>
+  <strong>[VD1, VD2]</strong> = Grupo + Covariate + <span class="highlight-red">Grupo &times; Covariate</span>
+  <br><small>Teste multivariado (Wilks' &Lambda;) na intera&ccedil;&atilde;o &rarr; deve ser n&atilde;o significant</small>
+</div>
+
+<p style="margin-top:16px;">No nosso exemplo:</p>
+<table class="calc-table">
+  <thead>
+    <tr><th>Efeito</th><th>Wilks' &Lambda;</th><th><em>F</em></th><th><em>p</em></th><th>Decision</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align:left;">Academy &times; Anos de Training</td>
+      <td>0.891</td>
+      <td>0.36</td>
+      <td class="ns">.831</td>
+      <td class="ns">Not significant &#10004;</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><span class="highlight-green">Result:</span> A intera&ccedil;&atilde;o Grupo &times; Covariate n&atilde;o foi significant &mdash; as slopes s&atilde;o homog&ecirc;neas. Podemos prosseguir com a MANCOVA!</p>
+
+${dlg('thor','&#9889; Thorment','E se fosse significant?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A&iacute; a covariate tem efeito diferente em cada grupo &mdash; ajustar as m&eacute;dias n&atilde;o faz sentido. Op&ccedil;&otilde;es: (1) remover a covariate e usar MANOVA, (2) usar an&aacute;lise estratificada por grupo, (3) testar modelos com slopes heterog&ecirc;neas (Johnson-Neyman).')}
+
+<div class="svg-container" id="slopesSVG"></div>
+
+${dlg('corvo','&#128038; Muninn whispers:','Visualmente: retas paralelas = pressuposto atendido. Retas cruzadas = viola&ccedil;&atilde;o. No gr&aacute;fico acima, as tr&ecirc;s academys mostram retas com slopes semelhantes &mdash; sinal verde para MANCOVA.')}
+`;
+
+  // ---- STEP 5: PARCIMONIA ----
+  case 5: return `
+<div class="step-title">&#9878; Step 5 &mdash; Parsimony: Less Is More</div>
+<p>S&oacute; porque voc&ecirc; <em>pode</em> colocar 20 covari&aacute;veis n&atilde;o significa que <em>deve</em>.</p>
+
+${dlg('thor','&#9889; Thorment','Eu tenho 10 covari&aacute;veis dispon&iacute;veis! Idade, altura, peso, tempo de sono, n&uacute;mero de batalhas, tipo de espada, cor da armadura, signo viking, n&uacute;mero de cicatrizes e litros de hidromel consumidos. Jogo tudo l&aacute;!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Thorment, essa &eacute; a receita do desastre. Cada covariate consome <strong>degrees of freedom</strong>, reduz <strong>poder estat&iacute;stico</strong> e aumenta a <strong>complexidade de interpreta&ccedil;&atilde;o</strong>.')}
+
+<div class="step-subtitle">&#128220; Regras de Ouro para Covari&aacute;veis</div>
+
+<div class="checklist">
+  <div class="checklist-item">
+    <span class="checklist-icon">&#128218;</span>
+    <span class="checklist-text"><strong>Justificativa te&oacute;rica:</strong> Cada covariate precisa de fundamenta&ccedil;&atilde;o na literatura. "Porque eu coletei" n&atilde;o &eacute; justificativa.</span>
+  </div>
+  <div class="checklist-item">
+    <span class="checklist-icon">&#128200;</span>
+    <span class="checklist-text"><strong>Correlation com VD:</strong> Se a covariate n&atilde;o se correlaciona com nenhuma VD, ela s&oacute; consome degrees of freedom sem benef&iacute;cio.</span>
+  </div>
+  <div class="checklist-item">
+    <span class="checklist-icon">&#9888;</span>
+    <span class="checklist-text"><strong>Independence do tratamento:</strong> A covariate deve ter sido medida <strong>antes</strong> da interven&ccedil;&atilde;o. Nunca use uma vari&aacute;vel que o pr&oacute;prio tratamento possa ter alterado.</span>
+  </div>
+  <div class="checklist-item">
+    <span class="checklist-icon">&#128279;</span>
+    <span class="checklist-text"><strong>Sem multicolinearidade:</strong> Covari&aacute;veis altamente correlated entre si (r > .80) s&atilde;o redundantes. Escolha uma e descarte a outra.</span>
+  </div>
+  <div class="checklist-item">
+    <span class="checklist-icon">&#128290;</span>
+    <span class="checklist-text"><strong>Rule of thumb de n:</strong> No m&iacute;nimo 10 observa&ccedil;&otilde;es por c&eacute;lula para cada covariate adicionada. Com N pequeno, cada covariate extra &eacute; um luxo perigoso.</span>
+  </div>
+</div>
+
+<div class="formula">
+  <div class="formula-label">Formula do Poder Perdido</div>
+  Cada covariate extra = &minus;1 gl<sub>erro</sub> &rarr; &darr; poder estat&iacute;stico
+  <br><small>Com k = 3 grupos, p = 2 VDs e c = 1 covariate: gl<sub>erro</sub> = N &minus; k &minus; c = 18 &minus; 3 &minus; 1 = 14</small>
+  <br><small>Se c = 5 covari&aacute;veis: gl<sub>erro</sub> = 18 &minus; 3 &minus; 5 = 10 &#128556;</small>
+</div>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No nosso caso, <strong>Anos de Training</strong> tem justificativa clara: &eacute; um preditor &oacute;bvio de desempenho e foi medido antes da entrada na academy. Uma covariate, limpa e justificada. Perfeito.')}
+
+${dlg('corvo','&#128038; Muninn whispers:','A regra de Miller (1997): <strong>no m&aacute;ximo 1 covariate para cada 10 participantes por grupo</strong>. Com n=6, j&aacute; estamos no limite com 1 covariate. Parcim&ocirc;nia n&atilde;o &eacute; opcional &mdash; &eacute; sobreviv&ecirc;ncia.')}
+`;
+
+  // ---- STEP 6: CALCULO CONCEITUAL ----
+  case 6: return `
+<div class="step-title">&#9881; Step 6 &mdash; Calculation Conceitual da MANCOVA</div>
+<p>A MANCOVA opera em tr&ecirc;s grandes etapas. Pense nela como uma "receita" de tr&ecirc;s fases.</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A l&oacute;gica conceitual &eacute; mais simples do que parece: primeiro REMOVA o efeito da covariate, depois COMPARE os grupos nos residuals.')}
+
+<div class="step-box">
+  <div class="step-num">1</div>
+  <div class="step-desc">
+    <h4>Regredir cada VD na Covariate</h4>
+    <p>Para cada VD, ajuste uma regress&atilde;o com a covariate como preditor. Isso calcula <strong>quanto da VD &eacute; explicado pela covariate</strong>.</p>
+    <div class="formula" style="margin-top:10px;text-align:left;font-size:1rem;">
+      Combat<sub>i</sub> = a + <span class="highlight">${b_combat}</span> &times; AnosTraining<sub>i</sub> + e<sub>i</sub><br>
+      Leadership<sub>i</sub> = a + <span class="highlight">${b_leadership}</span> &times; AnosTraining<sub>i</sub> + e<sub>i</sub>
+    </div>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">2</div>
+  <div class="step-desc">
+    <h4>Obter Residuals Multivariados</h4>
+    <p>Os residuals s&atilde;o a parte da VD que a covariate <strong>n&atilde;o explica</strong>. &Eacute; o "Combat l&iacute;quido" e a "Leadership l&iacute;quida" &mdash; livres do efeito dos anos de training.</p>
+    <div class="formula" style="margin-top:10px;font-size:1rem;">
+      Res&iacute;duo = Value Observado &minus; Value Predito pela Covariate
+    </div>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">3</div>
+  <div class="step-desc">
+    <h4>Rodar MANOVA nos Residuals</h4>
+    <p>Agora compare os tr&ecirc;s grupos usando os <strong>vetores de residuals</strong>. O teste multivariado (Wilks' &Lambda;, Pillai etc.) avalia se os <strong>centroid&eacute;s ajustados</strong> diferem.</p>
+  </div>
+</div>
+
+<div class="step-subtitle">Means Adjusteds vs. Observadas</div>
+<table class="data-table">
+  <thead>
+    <tr><th>Academy</th><th colspan="2">Means Observadas</th><th colspan="2">Means Adjusteds</th></tr>
+    <tr><th></th><th>&#9876; Combat</th><th>&#128081; Leadership</th><th>&#9876; Combat*</th><th>&#128081; Leadership*</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Asgard</td><td>${groupMeans.Asgard.combat}</td><td>${groupMeans.Asgard.leadership}</td><td>${adjMeans.Asgard.combat}</td><td>${adjMeans.Asgard.leadership}</td></tr>
+    <tr><td>Midgard</td><td>${groupMeans.Midgard.combat}</td><td>${groupMeans.Midgard.leadership}</td><td>${adjMeans.Midgard.combat}</td><td>${adjMeans.Midgard.leadership}</td></tr>
+    <tr><td>Vanaheim</td><td>${groupMeans.Vanaheim.combat}</td><td>${groupMeans.Vanaheim.leadership}</td><td>${adjMeans.Vanaheim.combat}</td><td>${adjMeans.Vanaheim.leadership}</td></tr>
+  </tbody>
+</table>
+<p><small>* Adjusteds para a m&eacute;dia geral de Anos de Training (${GM_training})</small></p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Observe: Asgard <strong>caiu</strong> ap&oacute;s o ajuste e Midgard <strong>subiu</strong>. Faz sentido &mdash; Asgard tinha warriors mais experientes. Parte da vantagem era training pr&eacute;vio, n&atilde;o a academy em si.')}
+
+${dlg('corvo','&#128038; Muninn whispers:','A m&eacute;dia ajustada responde: <em>"qual seria a m&eacute;dia deste grupo se todos tivessem a mesma quantidade de training pr&eacute;vio?"</em> &mdash; &eacute; uma equaliza&ccedil;&atilde;o estat&iacute;stica.')}
+
+<div id="adjustedBars"></div>
+`;
+
+  // ---- STEP 7: FOLLOW-UP ----
+  case 7: return `
+<div class="step-title">&#128269; Step 7 &mdash; Follow-up: Unpacking the MANCOVA</div>
+<p>Se o teste multivariado &eacute; significant, precisamos abrir a caixa preta. A MANCOVA diz "os grupos diferem" &mdash; mas em qu&ecirc;? E quem difere de quem?</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','O follow-up da MANCOVA segue uma cascata l&oacute;gica em tr&ecirc;s n&iacute;veis. Cada n&iacute;vel responde uma pergunta mais espec&iacute;fica.')}
+
+<div class="step-box">
+  <div class="step-num">1</div>
+  <div class="step-desc">
+    <h4>Teste Multivariado (MANCOVA)</h4>
+    <p>"Os <strong>vetores de m&eacute;dias ajustadas</strong> diferem entre os grupos?"</p>
+    <table class="calc-table" style="margin-top:10px;">
+      <thead><tr><th>Efeito</th><th>Wilks' &Lambda;</th><th><em>F</em></th><th>gl</th><th><em>p</em></th><th>&eta;&sup2; parcial</th></tr></thead>
+      <tbody>
+        <tr><td>Covariate (Training)</td><td>0.312</td><td>14.32</td><td>2, 13</td><td class="sig">&lt; .001</td><td>.688</td></tr>
+        <tr><td><strong>Academy</strong></td><td><strong>0.148</strong></td><td><strong>7.85</strong></td><td><strong>4, 26</strong></td><td class="sig"><strong>.001</strong></td><td><strong>.547</strong></td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:8px;"><span class="highlight-green">&#10004; Significant!</span> Os grupos diferem multivariadamente. Prosseguir para n&iacute;vel 2.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">2</div>
+  <div class="step-desc">
+    <h4>ANCOVAs Univariadas por VD</h4>
+    <p>"<strong>Em qual VD</strong> os grupos diferem?" &mdash; Rode uma ANCOVA separada para cada VD.</p>
+    <table class="calc-table" style="margin-top:10px;">
+      <thead><tr><th>VD</th><th><em>F</em></th><th>gl</th><th><em>p</em></th><th>&eta;&sup2; parcial</th><th>Decision</th></tr></thead>
+      <tbody>
+        <tr><td>&#9876; Combat</td><td>8.41</td><td>2, 14</td><td class="sig">.004</td><td>.546</td><td class="sig">Significant</td></tr>
+        <tr><td>&#128081; Leadership</td><td>6.93</td><td>2, 14</td><td class="sig">.008</td><td>.497</td><td class="sig">Significant</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:8px;"><span class="highlight-green">&#10004;</span> Ambas as VDs mostram diferen&ccedil;a! Mas aplique <strong>corre&ccedil;&atilde;o de Bonferroni</strong>: &alpha; = 0.05/2 = 0.025. Ambos p < .025 &mdash; mant&ecirc;m significants.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">3</div>
+  <div class="step-desc">
+    <h4>Compara&ccedil;&otilde;es Par-a-Par com Means Adjusteds</h4>
+    <p>"<strong>Quem difere de quem?</strong>" &mdash; Testes post-hoc (Bonferroni) nas m&eacute;dias ajustadas.</p>
+    <table class="calc-table" style="margin-top:10px;">
+      <thead><tr><th>Comparison</th><th>Dif. Combat*</th><th><em>p</em></th><th>Dif. Leadership*</th><th><em>p</em></th></tr></thead>
+      <tbody>
+        <tr><td>Asgard vs. Midgard</td><td>${round2(adjMeans.Asgard.combat - adjMeans.Midgard.combat)}</td><td class="sig">.003</td><td>${round2(adjMeans.Asgard.leadership - adjMeans.Midgard.leadership)}</td><td class="sig">.011</td></tr>
+        <tr><td>Asgard vs. Vanaheim</td><td>${round2(adjMeans.Asgard.combat - adjMeans.Vanaheim.combat)}</td><td>.084</td><td>${round2(adjMeans.Asgard.leadership - adjMeans.Vanaheim.leadership)}</td><td>.127</td></tr>
+        <tr><td>Midgard vs. Vanaheim</td><td>${round2(adjMeans.Midgard.combat - adjMeans.Vanaheim.combat)}</td><td class="sig">.019</td><td>${round2(adjMeans.Midgard.leadership - adjMeans.Vanaheim.leadership)}</td><td class="sig">.031</td></tr>
+      </tbody>
+    </table>
+    <p><small>* Diferen&ccedil;as entre m&eacute;dias ajustadas, corrigidas por Bonferroni</small></p>
+  </div>
+</div>
+
+${dlg('thor','&#9889; Thorment','Ent&atilde;o s&atilde;o tr&ecirc;s testes em cascata? Isso n&atilde;o infla o erro?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Por isso usamos <strong>Bonferroni</strong> em cada n&iacute;vel. E s&oacute; avan&ccedil;amos para o n&iacute;vel seguinte se o anterior for significant. &Eacute; uma cascata protegida.')}
+
+${dlg('corvo','&#128038; Muninn whispers:','Na pr&aacute;tica, o resultado mostra que Midgard &eacute; significantmente inferior a Asgard e Vanaheim <strong>mesmo ap&oacute;s controlar os anos de training</strong>. Asgard e Vanaheim n&atilde;o diferem entre si. O training pr&eacute;vio explica parte, mas n&atilde;o toda a diferen&ccedil;a.')}
+`;
+
+  // ---- STEP 8: GLM COMPLETO ----
+  case 8: return `
+<div class="step-title">&#127968; Step 8 &mdash; The Complete GLM: The Hierarchy</div>
+<p>MANCOVA &eacute; o caso mais geral. Todos os outros testes s&atilde;o <strong>casos especiais</strong> dela.</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','Pense no GLM como uma &aacute;rvore geneal&oacute;gica. A MANCOVA est&aacute; no topo &mdash; &eacute; a ancestral de todas. Remova pe&ccedil;as e voc&ecirc; desce a &aacute;rvore.')}
+
+<div class="svg-container" id="glmTreeSVG"></div>
+
+<div class="step-subtitle">Como Navegar a &Aacute;rvore</div>
+<table class="compare-table" style="font-size:0.9rem;">
+  <thead>
+    <tr><th>De...</th><th>Para...</th><th>O que muda</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>MANCOVA</td><td>MANOVA</td><td>Remove covari&aacute;veis</td></tr>
+    <tr><td>MANCOVA</td><td>ANCOVA</td><td>Reduz a 1 VD</td></tr>
+    <tr><td>MANOVA</td><td>ANOVA</td><td>Reduz a 1 VD</td></tr>
+    <tr><td>ANCOVA</td><td>ANOVA</td><td>Remove covari&aacute;veis</td></tr>
+    <tr><td>ANOVA</td><td>Teste t</td><td>Reduz a 2 grupos</td></tr>
+  </tbody>
+</table>
+
+${dlg('thor','&#9889; Thorment','Ent&atilde;o o teste t &eacute; o mais fraco?')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','No "fraco" &mdash; o mais <strong>espec&iacute;fico</strong>. Cada teste existe por um motivo. Use o mais simples que responda &agrave; sua pergunta de pesquisa. Navaja de Ockham.')}
+
+<div class="hyp-box">
+  <h4>&#127942; Resumo da Hierarquia</h4>
+  <p><strong>teste t:</strong> 2 groups, 1 DV &mdash; "Asgard vs. Midgard em Combat"</p>
+  <p><strong>ANOVA:</strong> 3+ grupos, 1 VD &mdash; "As 3 academys diferem em Combat?"</p>
+  <p><strong>ANCOVA:</strong> 3+ grupos, 1 VD, covariate &mdash; "...controlando training pr&eacute;vio?"</p>
+  <p><strong>MANOVA:</strong> 3+ grupos, 2+ VDs &mdash; "...em Combat E Leadership simultaneamente?"</p>
+  <p><strong>MANCOVA:</strong> 3+ grupos, 2+ VDs, covariate &mdash; "...controlando training pr&eacute;vio?"</p>
+</div>
+
+${dlg('corvo','&#128038; Muninn whispers:','Matematicamente, o teste t &eacute; uma ANOVA com 2 grupos, que &eacute; uma MANOVA com 1 VD, que &eacute; uma MANCOVA sem covariate. A equa&ccedil;&atilde;o geral: <strong>Y = Xb + e</strong>, onde Y &eacute; matriz de VDs, X &eacute; matriz de delineamento (grupos + covari&aacute;veis), b s&atilde;o os coeficientes e e &eacute; o erro.')}
+`;
+
+  // ---- STEP 9: REPORTE APA ----
+  case 9: return `
+<div class="step-title">&#128221; Step 9 &mdash; Reporte em APA Format</div>
+<p>Publicar resultados de MANCOVA exige <strong>tr&ecirc;s blocos de informa&ccedil;&atilde;o</strong> no texto.</p>
+
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','O reporte APA de MANCOVA segue a mesma cascata do follow-up: primeiro o teste multivariado, depois os univariados, depois os post-hoc.')}
+
+<div class="step-subtitle">Bloco 1: Teste Multivariado</div>
+<div class="apa-box">
+  <div class="apa-label">&#128203; APA Format</div>
+  Uma MANCOVA foi conduzida para examinar o efeito de Academy (Asgard, Midgard, Vanaheim) sobre as pontua&ccedil;&otilde;es de Combat e Leadership, controlando os Anos de Training Pr&eacute;vio. O teste de Box n&atilde;o foi significant (<em>p</em> = .412), indicando homogeneidade das matrizes de covariance. A intera&ccedil;&atilde;o Grupo &times; Covariate tamb&eacute;m n&atilde;o foi significant, &Lambda; = 0.891, <em>F</em>(4, 26) = 0.36, <em>p</em> = .831, confirmando homogeneidade das slopes. O efeito multivariado de Academy foi significant, <strong>Wilks' &Lambda; = 0.148, <em>F</em>(4, 26) = 7.85, <em>p</em> = .001, &eta;<sup>2</sup><sub>p</sub> = .547</strong>.
+</div>
+
+<div class="step-subtitle">Bloco 2: ANCOVAs Univariadas</div>
+<div class="apa-box">
+  <div class="apa-label">&#128203; APA Format</div>
+  An&aacute;lises univariadas de follow-up (ANCOVAs com corre&ccedil;&atilde;o de Bonferroni, &alpha; = .025) revelaram efeito significant de Academy tanto em Combat, <em>F</em>(2, 14) = 8.41, <em>p</em> = .004, &eta;<sup>2</sup><sub>p</sub> = .546, quanto em Leadership, <em>F</em>(2, 14) = 6.93, <em>p</em> = .008, &eta;<sup>2</sup><sub>p</sub> = .497.
+</div>
+
+<div class="step-subtitle">Bloco 3: Means Adjusteds e Post-hoc</div>
+<div class="apa-box">
+  <div class="apa-label">&#128203; APA Format</div>
+  Compara&ccedil;&otilde;es par-a-par com corre&ccedil;&atilde;o de Bonferroni nas m&eacute;dias ajustadas indicaram que Asgard (<em>M</em><sub>adj</sub> = ${adjMeans.Asgard.combat}, <em>SE</em> = 2.14) superou significantmente Midgard (<em>M</em><sub>adj</sub> = ${adjMeans.Midgard.combat}, <em>SE</em> = 2.08) em Combat (<em>p</em> = .003). Vanaheim (<em>M</em><sub>adj</sub> = ${adjMeans.Vanaheim.combat}, <em>SE</em> = 2.11) tamb&eacute;m superou Midgard (<em>p</em> = .019). A diferen&ccedil;a Asgard vs. Vanaheim n&atilde;o foi significant (<em>p</em> = .084). Padr&atilde;o an&aacute;logo foi observado em Leadership.
+</div>
+
+${dlg('thor','&#9889; Thorment','Tudo isso num par&aacute;grafo?! Ningu&eacute;m vai ler!')}
+${dlg('odin','&#129497;&#8205;&#9794;&#65039; Odinfather','A APA exige completude. Cada n&uacute;mero tem fun&ccedil;&atilde;o: o &Lambda; mostra o efeito global, os <em>F</em> univariados mostram onde est&aacute; a diferen&ccedil;a, as m&eacute;dias ajustadas mostram quem difere de quem. Sem redundância &mdash; cada pe&ccedil;a conta.')}
+
+<div class="hyp-box">
+  <h4>&#128204; Report Checklist MANCOVA</h4>
+  <p>&#10003; Descri&ccedil;&atilde;o do delineamento (VI, VDs, covariate)</p>
+  <p>&#10003; Verifica&ccedil;&atilde;o de Box's M</p>
+  <p>&#10003; Verifica&ccedil;&atilde;o de homogeneidade de slopes</p>
+  <p>&#10003; Teste multivariado: &Lambda;, <em>F</em>, gl, <em>p</em>, &eta;&sup2;<sub>p</sub></p>
+  <p>&#10003; ANCOVAs univariadas: <em>F</em>, gl, <em>p</em>, &eta;&sup2;<sub>p</sub> (com Bonferroni)</p>
+  <p>&#10003; Post-hoc: m&eacute;dias ajustadas (<em>M</em><sub>adj</sub>) com <em>SE</em> e <em>p</em></p>
+  <p>&#10003; Effect size (&eta;&sup2;<sub>p</sub> ou Pillai's trace)</p>
+</div>
+
+${dlg('corvo','&#128038; Muninn whispers:','Na MANCOVA, prefira reportar <strong>Pillai&apos;s Trace</strong> quando os pressupostos est&atilde;o marginais &mdash; &eacute; mais robusto. Use <strong>Wilks&apos; &Lambda;</strong> quando tudo est&aacute; limpo. Ambos s&atilde;o aceit&aacute;veis pela APA.')}
+`;
+
+  // ---- STEP 10: LICAO DOS CORVOS ----
+  case 10: return `
+<div class="step-title">&#128038; Step 10 &mdash; Lesson of the Ravens</div>
+
+${dlg('corvo','&#128038; Muninn summarizes:',`
+<strong>O que aprendemos sobre MANCOVA:</strong><br><br>
+&#10003; MANCOVA = MANOVA + ANCOVA &mdash; a <strong>coroa do GLM</strong><br>
+&#10003; Compara <strong>vetores de m&eacute;dias ajustadas</strong> entre grupos<br>
+&#10003; Controla <strong>covari&aacute;veis cont&iacute;nuas</strong> que poderiam confundir resultados<br>
+&#10003; Protege contra <strong>infla&ccedil;&atilde;o do Tipo I</strong> (m&uacute;ltiplas VDs) e <strong>confundimento</strong><br>
+&#10003; Exige <strong>7 pressupostos</strong> &mdash; todos devem ser verificados<br>
+&#10003; Assumption cr&iacute;tico: <strong>homogeneidade de slopes multivariada</strong><br>
+&#10003; Follow-up em cascata: MANCOVA &rarr; ANCOVAs &rarr; Post-hoc<br>
+&#10003; Sempre reporte <strong>m&eacute;dias ajustadas</strong> (n&atilde;o observadas) nos resultados<br>
+&#10003; Parcim&ocirc;nia: cada covariate precisa de <strong>justificativa te&oacute;rica</strong><br>
+&#10003; Toda a fam&iacute;lia GLM &eacute; um caso especial de <strong>Y = Xb + e</strong>
+`)}
+
+${dlg('corvo','&#128038; Huginn challenges:',`
+<strong>Challenges for you:</strong><br><br>
+&#9881; MANCOVA &eacute; <strong>sempre</strong> melhor que MANOVA? When n&atilde;o &eacute;?<br>
+<small style="color:var(--text-dim);">(Dica: pense em covari&aacute;veis sem correla&ccedil;&atilde;o com a VD)</small><br><br>
+&#9881; E se voc&ecirc; tem <strong>3 covari&aacute;veis e n = 8</strong> por grupo? &Eacute; vi&aacute;vel?<br>
+<small style="color:var(--text-dim);">(Dica: calcule os degrees of freedom do erro)</small><br><br>
+&#9881; Um colega usa "anos de training" como covariate, mas ela foi medida <strong>ap&oacute;s</strong> um ano na academy. Qual o problema?<br>
+<small style="color:var(--text-dim);">(Dica: a covariate pode ter sido contaminada pelo tratamento)</small><br><br>
+&#9881; Combat e Leadership t&ecirc;m correla&ccedil;&atilde;o r = 0.92. Isso &eacute; bom ou ruim para a MANCOVA?<br>
+<small style="color:var(--text-dim);">(Dica: multicolinearidade entre VDs reduce o poder multivariado)</small><br><br>
+&#9881; O teste de Box d&aacute; <em>p</em> = .03. Voc&ecirc; rejeita a MANCOVA?<br>
+<small style="color:var(--text-dim);">(Dica: Box's M usa &alpha; = .001 como crit&eacute;rio usual)</small>
+`)}
+
+<div class="svg-container" id="familyTreeFinal"></div>
+
+<div class="hyp-box" style="border-color: var(--gold);">
+  <h4 style="color: var(--gold);">&#127942; Quick Guide: When Usar Cada Teste?</h4>
+  <p><strong>2 groups, 1 DV:</strong> teste t independente</p>
+  <p><strong>3+ grupos, 1 VD:</strong> ANOVA one-way</p>
+  <p><strong>3+ grupos, 1 VD, covariate:</strong> ANCOVA</p>
+  <p><strong>2+ fatores, 1 VD:</strong> ANOVA Fatorial</p>
+  <p><strong>3+ grupos, 2+ VDs:</strong> MANOVA</p>
+  <p><strong>3+ grupos, 2+ VDs, covariate:</strong> <span class="highlight">MANCOVA</span> &#128081;</p>
+  <p style="margin-top:10px;color:var(--text-dim);font-size:0.9rem;"><em>Regra: use o teste mais simples que responda &agrave; sua pergunta. Parcim&ocirc;nia sempre.</em></p>
+</div>
+
+<div class="signature" style="margin-top:30px;border:none;font-size:1rem;color:var(--gold);">
+  &#128081; From Odin's Throne, the supreme knowledge of the GLM has been revealed! &#128081;
+</div>
+`;
+
+  default: return '<p>Step not found.</p>';
+  }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function renderStep(){
+  const el = document.getElementById('stepContent');
+  el.style.animation = 'none';
+  el.offsetHeight;
+  el.style.animation = 'fadeIn 0.4s ease';
+  el.innerHTML = getStepHTML(currentStep);
+
+  const pct = (currentStep / (TOTAL_STEPS-1)) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = 'Step ' + currentStep + ' of ' + (TOTAL_STEPS-1);
+  document.getElementById('stepIndicator').textContent = currentStep + ' / ' + (TOTAL_STEPS-1);
+
+  document.getElementById('btnPrev').disabled = currentStep === 0;
+  document.getElementById('btnNext').disabled = currentStep === TOTAL_STEPS-1;
+  document.getElementById('btnNext').innerHTML = currentStep === TOTAL_STEPS-1 ? 'End' : 'Next &#9654;';
+
+  // Post-render
+  setTimeout(() => {
+    if(currentStep === 4) drawSlopesChart();
+    if(currentStep === 6) drawAdjustedBars();
+    if(currentStep === 8) drawGLMTree();
+    if(currentStep === 10) drawFamilyTreeFinal();
+  }, 300);
+
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function nextStep(){ if(currentStep < TOTAL_STEPS-1){ currentStep++; renderStep(); }}
+function prevStep(){ if(currentStep > 0){ currentStep--; renderStep(); }}
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight' || e.key === ' ') nextStep();
+  if(e.key === 'ArrowLeft') prevStep();
+});
+
+// ============================================================
+// SLOPES CHART (Step 4)
+// ============================================================
+function drawSlopesChart(){
+  const container = document.getElementById('slopesSVG');
+  if(!container) return;
+
+  const W = 700, H = 350;
+  const pad = {t:40, r:40, b:60, l:70};
+  const pw = W - pad.l - pad.r;
+  const ph = H - pad.t - pad.b;
+
+  const xMin = 1, xMax = 9, yMin = 50, yMax = 90;
+
+  function xPos(v){ return pad.l + ((v-xMin)/(xMax-xMin))*pw; }
+  function yPos(v){ return pad.t + ph - ((v-yMin)/(yMax-yMin))*ph; }
+
+  const colors = {Asgard:'#58a6ff', Midgard:'#f0c040', Vanaheim:'#3fb950'};
+  const intercepts = {Asgard:60, Midgard:52, Vanaheim:56};
+  const slope = 2.8;
+
+  let svg = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="background:#1c2333;border-radius:10px;border:1px solid #30363d;">';
+
+  // Grid
+  for(let y = 50; y <= 90; y += 10){
+    svg += '<line x1="'+pad.l+'" y1="'+yPos(y)+'" x2="'+(W-pad.r)+'" y2="'+yPos(y)+'" stroke="#30363d" stroke-width="1"/>';
+    svg += '<text x="'+(pad.l-8)+'" y="'+(yPos(y)+4)+'" fill="#8b949e" font-size="12" text-anchor="end" font-family="Patrick Hand">'+y+'</text>';
+  }
+  for(let x = 2; x <= 8; x += 2){
+    svg += '<line x1="'+xPos(x)+'" y1="'+pad.t+'" x2="'+xPos(x)+'" y2="'+(H-pad.b)+'" stroke="#30363d" stroke-width="1" stroke-dasharray="4"/>';
+    svg += '<text x="'+xPos(x)+'" y="'+(H-pad.b+20)+'" fill="#8b949e" font-size="12" text-anchor="middle" font-family="Patrick Hand">'+x+'</text>';
+  }
+
+  // Axis labels
+  svg += '<text x="'+(W/2)+'" y="'+(H-8)+'" fill="#8b949e" font-size="14" text-anchor="middle" font-family="Permanent Marker">Anos de Training</text>';
+  svg += '<text x="18" y="'+(H/2)+'" fill="#8b949e" font-size="14" text-anchor="middle" font-family="Permanent Marker" transform="rotate(-90,18,'+(H/2)+')">Combat</text>';
+
+  // Lines
+  academies.forEach(a => {
+    const y1 = intercepts[a] + slope * xMin;
+    const y2 = intercepts[a] + slope * xMax;
+    svg += '<line x1="'+xPos(xMin)+'" y1="'+yPos(y1)+'" x2="'+xPos(xMax)+'" y2="'+yPos(y2)+'" stroke="'+colors[a]+'" stroke-width="2.5" opacity="0.8"/>';
+  });
+
+  // Data points
+  academies.forEach(a => {
+    DATA[a].training.forEach((t,i) => {
+      const combat = DATA[a].combat[i];
+      svg += '<circle cx="'+xPos(t)+'" cy="'+yPos(combat)+'" r="5" fill="'+colors[a]+'" opacity="0.7"/>';
+    });
+  });
+
+  // Legend
+  let lx = pad.l + 10;
+  academies.forEach(a => {
+    svg += '<rect x="'+lx+'" y="'+(pad.t-25)+'" width="14" height="14" rx="3" fill="'+colors[a]+'"/>';
+    svg += '<text x="'+(lx+20)+'" y="'+(pad.t-13)+'" fill="'+colors[a]+'" font-size="13" font-family="Permanent Marker">'+a+'</text>';
+    lx += 120;
+  });
+
+  // Title
+  svg += '<text x="'+(W/2)+'" y="18" fill="#f0c040" font-size="15" text-anchor="middle" font-family="Bangers">Parallel Lines = Homogeneous Slopes &#10004;</text>';
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// ============================================================
+// ADJUSTED BARS (Step 6)
+// ============================================================
+function drawAdjustedBars(){
+  const container = document.getElementById('adjustedBars');
+  if(!container) return;
+
+  const maxVal = 85;
+  let html = '<div class="step-subtitle">Comparacao Visual: Observadas vs. Adjusteds</div>';
+
+  // Combat
+  html += '<p style="font-family:Permanent Marker;color:var(--gold);margin-top:14px;">Combat</p>';
+  academies.forEach(a => {
+    const obs = groupMeans[a].combat;
+    const adj = adjMeans[a].combat;
+    const colors_map = {Asgard:'var(--odin-blue)', Midgard:'var(--gold)', Vanaheim:'var(--success)'};
+    html += '<div class="bar-wrapper">';
+    html += '<div class="bar-label" style="color:'+colors_map[a]+'">'+a+'</div>';
+    html += '<div class="bar-track">';
+    html += '<div class="bar-fill" style="background:'+colors_map[a]+';opacity:0.4;width:'+(obs/maxVal*100)+'%;position:absolute;" title="Observada: '+obs+'"></div>';
+    html += '<div class="bar-fill" style="background:'+colors_map[a]+';width:'+(adj/maxVal*100)+'%;" title="Adjusted: '+adj+'"></div>';
+    html += '</div>';
+    html += '<div class="bar-value">'+adj+' <small style="color:var(--text-dim);">('+obs+')</small></div>';
+    html += '</div>';
+  });
+
+  // Leadership
+  html += '<p style="font-family:Permanent Marker;color:var(--gold);margin-top:20px;">Lideranca</p>';
+  academies.forEach(a => {
+    const obs = groupMeans[a].leadership;
+    const adj = adjMeans[a].leadership;
+    const colors_map = {Asgard:'var(--odin-blue)', Midgard:'var(--gold)', Vanaheim:'var(--success)'};
+    html += '<div class="bar-wrapper">';
+    html += '<div class="bar-label" style="color:'+colors_map[a]+'">'+a+'</div>';
+    html += '<div class="bar-track">';
+    html += '<div class="bar-fill" style="background:'+colors_map[a]+';opacity:0.4;width:'+(obs/maxVal*100)+'%;position:absolute;" title="Observada: '+obs+'"></div>';
+    html += '<div class="bar-fill" style="background:'+colors_map[a]+';width:'+(adj/maxVal*100)+'%;" title="Adjusted: '+adj+'"></div>';
+    html += '</div>';
+    html += '<div class="bar-value">'+adj+' <small style="color:var(--text-dim);">('+obs+')</small></div>';
+    html += '</div>';
+  });
+
+  html += '<p style="font-size:0.85rem;color:var(--text-dim);margin-top:8px;">Solid bars = adjusted | Transparent bars = observed</p>';
+  container.innerHTML = html;
+}
+
+// ============================================================
+// GLM TREE (Step 8)
+// ============================================================
+function drawGLMTree(){
+  const container = document.getElementById('glmTreeSVG');
+  if(!container) return;
+
+  const W = 720, H = 420;
+  let svg = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="background:#1c2333;border-radius:10px;border:1px solid #30363d;">';
+
+  // Nodes
+  const nodes = [
+    {x:360, y:40,  label:'MANCOVA',  sub:'k groups, p DVs, c covs', color:'#f0c040', w:160, h:52},
+    {x:180, y:140, label:'MANOVA',   sub:'k groups, p DVs',         color:'#3fb950', w:150, h:48},
+    {x:540, y:140, label:'ANCOVA',   sub:'k groups, 1 DV, c covs',  color:'#bc8cff', w:150, h:48},
+    {x:180, y:250, label:'ANOVA',    sub:'k groups, 1 DV',          color:'#58a6ff', w:140, h:44},
+    {x:540, y:250, label:'ANOVA',    sub:'(redundant)',             color:'#58a6ff', w:140, h:44},
+    {x:360, y:350, label:'Teste t',  sub:'2 groups, 1 DV',          color:'#f85149', w:130, h:44}
+  ];
+
+  // Edges
+  const edges = [
+    {from:0, to:1, label:'- covs'},
+    {from:0, to:2, label:'- DVs'},
+    {from:1, to:3, label:'- DVs'},
+    {from:2, to:4, label:'- covs'},
+    {from:3, to:5, label:'- groups'},
+    {from:4, to:5, label:'- groups'}
+  ];
+
+  // Draw edges
+  edges.forEach(e => {
+    const f = nodes[e.from], t = nodes[e.to];
+    svg += '<line x1="'+f.x+'" y1="'+(f.y+f.h/2+4)+'" x2="'+t.x+'" y2="'+(t.y-t.h/2-4)+'" stroke="#30363d" stroke-width="2" marker-end="url(#arrowhead)"/>';
+    const mx = (f.x+t.x)/2 + (f.x===t.x?40:0);
+    const my = (f.y+f.h/2+t.y-t.h/2)/2;
+    svg += '<text x="'+(mx+8)+'" y="'+(my+4)+'" fill="#8b949e" font-size="11" font-family="Patrick Hand" text-anchor="start">'+e.label+'</text>';
+  });
+
+  // Arrow marker
+  svg += '<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#30363d"/></marker></defs>';
+
+  // Draw nodes
+  nodes.forEach(n => {
+    svg += '<rect x="'+(n.x-n.w/2)+'" y="'+(n.y-n.h/2)+'" width="'+n.w+'" height="'+n.h+'" rx="10" fill="#161b22" stroke="'+n.color+'" stroke-width="2"/>';
+    svg += '<text x="'+n.x+'" y="'+(n.y-2)+'" fill="'+n.color+'" font-size="16" text-anchor="middle" font-family="Bangers">'+n.label+'</text>';
+    svg += '<text x="'+n.x+'" y="'+(n.y+14)+'" fill="#8b949e" font-size="10" text-anchor="middle" font-family="Patrick Hand">'+n.sub+'</text>';
+  });
+
+  // Crown emoji on MANCOVA
+  svg += '<text x="360" y="18" font-size="18" text-anchor="middle">&#128081;</text>';
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// ============================================================
+// FAMILY TREE FINAL (Step 10) — Decision Flowchart
+// ============================================================
+function drawFamilyTreeFinal(){
+  const container = document.getElementById('familyTreeFinal');
+  if(!container) return;
+
+  const W = 720, H = 500;
+  let svg = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="background:#1c2333;border-radius:10px;border:1px solid #30363d;">';
+
+  // Title
+  svg += '<text x="360" y="28" fill="#f0c040" font-size="16" text-anchor="middle" font-family="Bangers">Flowchart de Decisao: Qual Teste Usar?</text>';
+
+  // Decision diamonds
+  function diamond(x, y, text, color){
+    const w = 140, h = 50;
+    svg += '<polygon points="'+x+','+(y-h/2)+' '+(x+w/2)+','+y+' '+x+','+(y+h/2)+' '+(x-w/2)+','+y+'" fill="#161b22" stroke="'+color+'" stroke-width="2"/>';
+    svg += '<text x="'+x+'" y="'+(y+4)+'" fill="'+color+'" font-size="11" text-anchor="middle" font-family="Permanent Marker">'+text+'</text>';
+  }
+
+  // Result boxes
+  function resultBox(x, y, text, color){
+    const w = 120, h = 36;
+    svg += '<rect x="'+(x-w/2)+'" y="'+(y-h/2)+'" width="'+w+'" height="'+h+'" rx="8" fill="#161b22" stroke="'+color+'" stroke-width="2"/>';
+    svg += '<text x="'+x+'" y="'+(y+5)+'" fill="'+color+'" font-size="13" text-anchor="middle" font-family="Bangers">'+text+'</text>';
+  }
+
+  // Nodes
+  diamond(360, 75, 'How many DVs?', '#8b949e');
+
+  // Left: 1 VD
+  diamond(160, 175, 'How many groups?', '#58a6ff');
+  diamond(160, 295, 'Tem covariates?', '#bc8cff');
+  resultBox(60, 395, 'ANOVA', '#58a6ff');
+  resultBox(260, 395, 'ANCOVA', '#bc8cff');
+
+  // Right: 2+ VDs
+  diamond(560, 175, 'Tem covariates?', '#f0c040');
+  resultBox(460, 295, 'MANOVA', '#3fb950');
+  resultBox(660, 295, 'MANCOVA', '#f0c040');
+
+  // Far left: 2 groups
+  resultBox(60, 175, 'Teste t', '#f85149');
+
+  // Edges
+  function arrow(x1,y1,x2,y2,label,side){
+    svg += '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="#30363d" stroke-width="1.5" marker-end="url(#ah2)"/>';
+    if(label){
+      const mx = (x1+x2)/2 + (side==='l'?-16:side==='r'?12:0);
+      const my = (y1+y2)/2;
+      svg += '<text x="'+mx+'" y="'+(my-4)+'" fill="#8b949e" font-size="10" text-anchor="middle" font-family="Patrick Hand">'+label+'</text>';
+    }
+  }
+  svg += '<defs><marker id="ah2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#30363d"/></marker></defs>';
+
+  // From "How many DVs?"
+  arrow(290, 75, 160, 148, '1 VD', 'l');
+  arrow(430, 75, 560, 148, '2+ VDs', 'r');
+
+  // From "How many groups?" (1 VD)
+  arrow(90, 175, 68, 175, '2', 'l');
+  arrow(160, 200, 160, 268, '3+', '');
+
+  // From "Tem covs?" (1 VD)
+  arrow(90, 295, 60, 376, 'Nao', 'l');
+  arrow(230, 295, 260, 376, 'Sim', 'r');
+
+  // From "Tem covs?" (2+ VDs)
+  arrow(490, 175, 460, 268, 'Nao', 'l');
+  arrow(630, 175, 660, 268, 'Sim', 'r');
+
+  // Crown on MANCOVA
+  svg += '<text x="660" y="260" font-size="16" text-anchor="middle">&#128081;</text>';
+
+  // Legend
+  svg += '<rect x="250" y="445" width="220" height="30" rx="8" fill="#161b22" stroke="#f0c040" stroke-width="1"/>';
+  svg += '<text x="360" y="465" fill="#f0c040" font-size="12" text-anchor="middle" font-family="Permanent Marker">MANCOVA = the crown of the GLM</text>';
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderStep();
+</script>
+</body>
+</html>
