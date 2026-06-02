@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather — Realm 10: Repeated Measures ANOVA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh;overflow-x:hidden}
+#game-container{max-width:800px;margin:0 auto;padding:20px;min-height:100vh}
+.title-screen{text-align:center;padding:60px 20px;animation:fadeIn 1s ease}
+.title-screen h1{font-family:'Bangers',cursive;font-size:2.8em;color:var(--gold);text-shadow:2px 2px 8px rgba(240,192,64,.3);line-height:1.1;margin-bottom:8px}
+.title-screen h2{font-family:'Permanent Marker',cursive;font-size:1.5em;color:var(--odin-blue);margin-bottom:30px}
+.title-screen .subtitle{color:var(--text-dim);font-size:1.1em;margin-bottom:40px}
+.reino-badge{display:inline-block;background:linear-gradient(135deg,var(--odin-blue),var(--corvo-purple));padding:6px 20px;border-radius:20px;font-family:'Bangers',cursive;font-size:1em;color:#fff;margin-bottom:16px}
+.difficulty-select{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.diff-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Bangers',cursive;font-size:1.2em;padding:16px 32px;border-radius:12px;cursor:pointer;transition:all .3s;min-width:180px}
+.diff-btn:hover{border-color:var(--odin-blue);transform:translateY(-2px)}
+.diff-btn .diff-label{font-size:1.3em}.diff-btn .diff-desc{font-family:'Patrick Hand',cursive;font-size:.65em;color:var(--text-dim);margin-top:4px}
+.scene{animation:slideIn .5s ease;padding:10px 0}
+.dialogue-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative}
+.dialogue-box.odin{border-left:4px solid var(--odin-blue)}.dialogue-box.thor{border-left:4px solid var(--thor-red)}.dialogue-box.corvo{border-left:4px solid var(--corvo-purple)}.dialogue-box.narrator{border-left:4px solid var(--gold)}
+.char-name{font-family:'Bangers',cursive;font-size:1.1em;margin-bottom:6px}
+.char-name.odin{color:var(--odin-blue)}.char-name.thor{color:var(--thor-red)}.char-name.corvo{color:var(--corvo-purple)}.char-name.narrator{color:var(--gold)}
+.dialogue-text{line-height:1.5;font-size:1.05em}.dialogue-text em{color:var(--gold);font-style:normal;font-weight:bold}
+.challenge-box{background:var(--bg-panel);border:2px solid var(--gold);border-radius:12px;padding:24px;margin:20px 0;animation:pulse-border 2s ease infinite}
+@keyframes pulse-border{0%,100%{border-color:var(--gold);box-shadow:0 0 8px rgba(240,192,64,.15)}50%{border-color:#f0c040cc;box-shadow:0 0 16px rgba(240,192,64,.3)}}
+.challenge-title{font-family:'Bangers',cursive;font-size:1.4em;color:var(--gold);margin-bottom:12px;text-align:center}
+.challenge-question{margin-bottom:16px;line-height:1.5}
+.data-display{background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:'Courier New',monospace;font-size:1em;color:var(--odin-blue);text-align:center;letter-spacing:1px;line-height:1.6}
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.option-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Patrick Hand',cursive;font-size:1.05em;padding:14px 18px;border-radius:10px;cursor:pointer;text-align:left;transition:all .25s;line-height:1.4}
+.option-btn:hover:not(.disabled){border-color:var(--odin-blue);background:#1a2233}
+.option-btn.correct{border-color:var(--success);background:#0d2818;color:var(--success)}
+.option-btn.wrong{border-color:var(--thor-red);background:#2d1116;color:var(--thor-red)}
+.option-btn.disabled{cursor:default;opacity:.7}
+.feedback-box{border-radius:10px;padding:16px 20px;margin:16px 0;animation:fadeIn .4s ease;line-height:1.5}
+.feedback-box.correct{background:#0d2818;border:1px solid var(--success);color:var(--success)}
+.feedback-box.wrong{background:#2d1116;border:1px solid var(--thor-red);color:var(--thor-red)}
+.xp-badge{display:inline-block;background:var(--gold);color:var(--bg-dark);font-family:'Bangers',cursive;padding:2px 10px;border-radius:6px;font-size:.9em;margin-left:6px}
+.xp-bar-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.xp-label{font-family:'Bangers',cursive;color:var(--gold);font-size:1em;white-space:nowrap}
+.xp-bar-bg{flex:1;height:14px;background:var(--bg-dark);border-radius:7px;overflow:hidden}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--odin-blue),var(--gold));border-radius:7px;transition:width .6s ease}
+.xp-count{font-family:'Bangers',cursive;color:var(--text);font-size:1em;min-width:60px;text-align:right}
+.continue-btn{display:block;margin:20px auto 0;background:transparent;border:2px solid var(--odin-blue);color:var(--odin-blue);font-family:'Bangers',cursive;font-size:1.15em;padding:12px 36px;border-radius:10px;cursor:pointer;transition:all .25s}
+.continue-btn:hover{background:var(--odin-blue);color:var(--bg-dark)}
+.result-screen{text-align:center;padding:40px 20px;animation:fadeIn .8s ease}
+.result-screen h2{font-family:'Bangers',cursive;font-size:2.2em;color:var(--gold);margin-bottom:8px}
+.result-rank{font-family:'Permanent Marker',cursive;font-size:1.5em;margin:16px 0}
+.result-stats{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:20px 0;text-align:left}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text-dim)}.stat-value{font-family:'Bangers',cursive;color:var(--odin-blue)}
+.hint-box{background:#1a1530;border:1px solid var(--corvo-purple);border-radius:10px;padding:14px 18px;margin:12px 0;font-size:.95em;color:var(--corvo-purple);animation:fadeIn .5s ease}
+.hint-box .hint-label{font-family:'Bangers',cursive;font-size:1em;margin-bottom:4px}
+/* ── VISUAL: Variance Partition ── */
+.variance-visual{display:flex;align-items:center;justify-content:center;gap:4px;margin:16px 0;flex-wrap:wrap}
+.var-segment{padding:12px 10px;text-align:center;font-family:'Courier New',monospace;font-size:.85em;min-width:80px;border-radius:6px}
+.var-total{background:#1a2040;color:var(--gold);border:2px solid var(--gold)}
+.var-model{background:#0d2818;color:var(--success);border:2px solid var(--success)}
+.var-resid{background:#2d1116;color:var(--thor-red);border:2px solid var(--thor-red)}
+.var-subject{background:#1a1530;color:var(--corvo-purple);border:2px solid var(--corvo-purple)}
+.var-eq{font-family:'Bangers',cursive;color:var(--text);font-size:1.2em;padding:0 4px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.title-screen h1{font-size:2em}.title-screen h2{font-size:1.2em}.difficulty-select{flex-direction:column;align-items:center}#game-container{padding:12px}.challenge-box{padding:16px}.variance-visual{flex-wrap:wrap}.var-segment{min-width:60px;font-size:.75em}}
+
+/* ── ARMOR SYSTEM ── */
+.armor-panel{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.viking-mini{position:relative;width:120px;height:180px;flex-shrink:0}
+.vm-head{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:#d4a574;border:1.5px solid #b8956a;z-index:5}
+.vm-torso{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:44px;height:58px;background:#8b7355;border-radius:7px 7px 4px 4px;z-index:3}
+.vm-arm-l{position:absolute;top:59px;left:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-arm-r{position:absolute;top:59px;right:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-leg-l{position:absolute;top:111px;left:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-leg-r{position:absolute;top:111px;right:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-slot{position:absolute;opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1);transform:scale(.3)}
+.vm-slot.on{opacity:1;transform:scale(1)}
+.vm-helm{top:16px;left:50%;transform:translateX(-50%) scale(.3);z-index:8}.vm-helm.on{transform:translateX(-50%) scale(1)}
+.vm-mail{top:57px;left:50%;transform:translateX(-50%) scale(.3);z-index:4}.vm-mail.on{transform:translateX(-50%) scale(1)}
+.vm-cape{top:53px;left:50%;transform:translateX(-50%) scale(.3);z-index:1}.vm-cape.on{transform:translateX(-50%) scale(1)}
+.vm-left{top:66px;left:0;z-index:7}.vm-right{top:56px;right:0;z-index:7}
+.vm-boots{bottom:4px;left:50%;transform:translateX(-50%) scale(.3);z-index:7;display:flex;gap:10px}.vm-boots.on{transform:translateX(-50%) scale(1)}
+.gear-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.gp-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;font-size:.8em;color:var(--text-dim);transition:all .3s}
+.gp-row.earned{color:var(--success);font-weight:bold}
+.gp-row .gp-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .3s;flex-shrink:0}
+.gp-row.earned .gp-dot{background:var(--success);border-color:var(--success)}
+.vm-sparks{position:absolute;pointer-events:none;z-index:20}
+.vm-spark{position:absolute;border-radius:50%;animation:vmSp .6s ease-out forwards}
+@keyframes vmSp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+.vm-flash{animation:vmFl .4s ease}
+@keyframes vmFl{0%{filter:brightness(1)}30%{filter:brightness(1.8) drop-shadow(0 0 12px rgba(240,180,40,.6))}100%{filter:brightness(1)}}
+.result-viking{position:relative;width:160px;height:240px;margin:16px auto}
+.rv-head{position:absolute;top:36px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#d4a574;border:2px solid #b8956a;z-index:5}
+.rv-torso{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:56px;height:74px;background:#8b7355;border-radius:9px 9px 5px 5px;z-index:3}
+.rv-arm-l{position:absolute;top:77px;left:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-arm-r{position:absolute;top:77px;right:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-leg-l{position:absolute;top:144px;left:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-leg-r{position:absolute;top:144px;right:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-slot{position:absolute}
+.rv-helm{top:20px;left:50%;transform:translateX(-50%);z-index:8}
+.rv-mail{top:74px;left:50%;transform:translateX(-50%);z-index:4}
+.rv-cape{top:69px;left:50%;transform:translateX(-50%);z-index:1}
+.rv-left{top:86px;left:4px;z-index:7}.rv-right{top:72px;right:4px;z-index:7}
+.rv-boots{bottom:4px;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:14px}
+@media(max-width:600px){.armor-panel{flex-direction:column;align-items:center}.viking-mini{width:100px;height:160px}}
+</style>
+</head>
+<body>
+<div id="game-container"><div id="game-content"></div></div>
+<script>
+// ════════════════════════════════════════════════════
+// THE STATISTICAL SAGA OF ODINFATHER — REALM 10
+// REPEATED MEASURES ANOVA
+// ════════════════════════════════════════════════════
+const GAME={difficulty:null,xp:0,maxXP:0,hits:0,total:0,currentScene:0,scenes:[]};
+const content=()=>document.getElementById('game-content');
+function dialogue(c,t){
+  const cls={odin:'odin',thor:'thor',muninn:'corvo',huginn:'corvo',narrator:'narrator'};
+  const nm={odin:'Odinfather 🧙‍♂️',thor:'Thorment ⚡',muninn:'Muninn 🐦‍⬛',huginn:'Huginn 🐦',narrator:'📜 Narrator'};
+  return `<div class="dialogue-box ${cls[c]||'narrator'}"><div class="char-name ${cls[c]||'narrator'}">${nm[c]||c}</div><div class="dialogue-text">${t}</div></div>`;
+}
+function hintBox(t){return `<div class="hint-box"><div class="hint-label">🐦‍⬛ Muninn's Hint</div>${t}</div>`;}
+function xpBar(){
+  const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;
+  return armorPanelHTML()+`<div class="xp-bar-container"><div class="xp-label">⚡ XP</div><div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${p}%"></div></div><div class="xp-count">${GAME.xp} / ${GAME.maxXP}</div></div>`;
+}
+function updateXPBar(){
+  const b=document.querySelector('.xp-bar-fill'),c=document.querySelector('.xp-count');
+  if(b&&c){const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;b.style.width=p+'%';c.textContent=`${GAME.xp} / ${GAME.maxXP}`;}
+}
+function showTitleScreen(){
+  content().innerHTML=`
+  <div class="title-screen">
+    <div class="reino-badge">REALM 10</div>
+    <h1>The Statistical Saga of Odinfather</h1>
+    <h2>Realm of Repeated Measures</h2>
+    <p class="subtitle">In the Forge of Time, where the same warriors are tested before, during, and after training, Odinfather reveals how to extract the pure signal by eliminating individual differences.</p>
+    <div class="difficulty-select">
+      <button class="diff-btn" onclick="startGame('apprentice')"><div class="diff-label">🛡️ Apprentice</div><div class="diff-desc">Undergraduate — with Muninn's hints</div></button>
+      <button class="diff-btn" onclick="startGame('master')"><div class="diff-label">⚔️ Master</div><div class="diff-desc">Graduate — no hints, extra challenges</div></button>
+    </div>
+  </div>`;
+}
+function startGame(d){
+  GAME.difficulty=d;GAME.xp=0;GAME.hits=0;GAME.total=0;GAME.currentScene=0;gearEarned=0;
+  buildScenes();GAME.maxXP=countMaxXP();renderScene();
+}
+
+// ════════════════════════════════════════════════════
+function buildScenes(){
+  GAME.scenes=[];
+
+  // ━━ SCENE 1: Within-Subjects Design ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('narrator','The gates of the <em>Forge of Time</em> creak open. Eternal embers crackle at the center of the chamber — here, the same metal is tempered, cooled, and tempered again. The same warriors are tested at multiple time points, and each cycle reveals more about the soul of the steel.')}
+      ${dialogue('odin','In Independent ANOVA, each condition has <em>different people</em>. In Repeated Measures, the <em>SAME people</em> appear in all conditions. This changes everything!')}
+      ${dialogue('odin','Advantages: fewer participants needed (smaller N), and greater sensitivity — we control each individual\'s baseline, reducing <em>unsystematic variance</em>.')}
+      ${dialogue('muninn','If each condition has different people, the recipe is Independent ANOVA. If the same people undergo all manipulations, it\'s <em>Repeated Measures</em>!')}
+      <button class="continue-btn" onclick="nextScene()">Enter the Forge →</button>
+    </div>`});
+
+  // ━━ SCENE 2: Variance Partitioning ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('odin','In Repeated Measures, we extract <em>individual differences</em> from the error. SST = SSM + SSR, but the SSR is <em>PURIFIED</em> — we remove personal variations.')}
+      <div class="variance-visual">
+        <div class="var-segment var-total">SST<br><small>Total</small></div>
+        <div class="var-eq">=</div>
+        <div class="var-segment var-model">SSM<br><small>Model</small></div>
+        <div class="var-eq">+</div>
+        <div class="var-segment var-subject">SS<sub>Subjects</sub><br><small>Individual</small></div>
+        <div class="var-eq">+</div>
+        <div class="var-segment var-resid">SS<sub>Error</sub><br><small>Purified</small></div>
+      </div>
+      ${dialogue('odin','The secret: by removing individual differences from the error term (SSR), our denominator in the <em>F-ratio decreases</em>. Result? It\'s easier to find a significant F than in independent designs.')}
+      ${dialogue('huginn','Feel the power of precision! <em>Less noise = more statistical power!</em>')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 3: CHALLENGE 1 — Within vs Between ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='apprentice'?hintBox('Same participants across multiple conditions = within-subjects = <em>Repeated Measures</em>.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 1: The Same Steel, Three Temperings</div>
+        <div class="challenge-question">A researcher measured the anxiety of the SAME 20 warriors before, during, and after battle. What type of ANOVA is appropriate?</div>
+        <div class="data-display">
+          N = 20 warriors &nbsp;|&nbsp; 3 measurements: before, during, after<br>
+          Same participants in all conditions
+        </div>
+        ${hint}
+        <div class="options-grid" id="q1-opts">
+          <button class="option-btn" onclick="checkQ(1,this,'a')">One-way independent ANOVA — each time point is a separate group</button>
+          <button class="option-btn" onclick="checkQ(1,this,'b')">Repeated Measures ANOVA — the same participants are measured across 3 conditions (before/during/after)</button>
+          <button class="option-btn" onclick="checkQ(1,this,'c')">Three separate paired t-tests — one for each pair of time points</button>
+          <button class="option-btn" onclick="checkQ(1,this,'d')">MANOVA — because we have multiple dependent variables</button>
+        </div>
+        <div id="q1-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 4: Sphericity ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','The assumption unique to Repeated Measures: <em>SPHERICITY</em>. The variance of the differences between all pairs of conditions must be similar.')}
+      ${dialogue('odin','<em>IMPORTANT:</em> We only worry about sphericity when we have 3 or more conditions! With only 2 conditions, sphericity is automatically satisfied.')}
+      ${dialogue('muninn','We test it with <em>Mauchly\'s Test</em>. We want Sig. > 0.05 (sphericity holds). If Sig. < 0.05, the sphericity assumption is violated.')}
+      ${dialogue('huginn','Unlike most tests where we want p < 0.05, with Mauchly we want <em>p GREATER than 0.05</em>!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 5: CHALLENGE 2 — Mauchly's Test ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='apprentice'?hintBox('Mauchly: p > 0.05 = ok; p < 0.05 = sphericity violated. Here p = 0.036 < 0.05.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 2: Mauchly's Hourglass</div>
+        <div class="challenge-question">Mauchly's Test returned W = 0.789, χ² = 10.234, df = 2, Sig. = 0.036. What does this mean?</div>
+        <div class="data-display">
+          Mauchly: W = 0.789 &nbsp;|&nbsp; χ² = 10.234<br>
+          df = 2 &nbsp;|&nbsp; Sig. = 0.036
+        </div>
+        ${hint}
+        <div class="options-grid" id="q2-opts">
+          <button class="option-btn" onclick="checkQ(2,this,'a')">All good, sphericity is fine — proceed normally with the ANOVA</button>
+          <button class="option-btn" onclick="checkQ(2,this,'b')">Normality was violated — we need a non-parametric test</button>
+          <button class="option-btn" onclick="checkQ(2,this,'c')">Sphericity was VIOLATED (Sig. = 0.036 < 0.05). We need to apply a correction to the degrees of freedom</button>
+          <button class="option-btn" onclick="checkQ(2,this,'d')">The model is invalid — redo data collection with more participants</button>
+        </div>
+        <div id="q2-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 6: Greenhouse-Geisser and Huynh-Feldt ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','When sphericity is violated, we adjust the degrees of freedom with <em>corrections</em>.')}
+      ${dialogue('odin','If <em>ε < 0.75</em>: use <em>Greenhouse-Geisser</em> (more conservative). If <em>ε > 0.75</em>: use <em>Huynh-Feldt</em> (more liberal).')}
+      ${dialogue('thor','Sphericity? Dependency? <em>IGNORE ALL THAT!</em> Swing the hammer and run a regular independent ANOVA!')}
+      ${dialogue('odin','Silence, Thorment! Ignoring sphericity drastically inflates the <em>Type I Error</em> rate. Finding an effect when none exists is unforgivable.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 7: CHALLENGE 3 — Corrections ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='apprentice'?hintBox('ε < 0.75 → Greenhouse-Geisser (conservative). ε > 0.75 → Huynh-Feldt (liberal).'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 3: The Forge Correction</div>
+        <div class="challenge-question">Mauchly yielded Sig. = 0.01 (violated) and ε = 0.62. In the ANOVA table, which row should you read?</div>
+        <div class="data-display">
+          Mauchly: Sig. = 0.01 (sphericity violated)<br>
+          ε (epsilon) = 0.62
+        </div>
+        ${hint}
+        <div class="options-grid" id="q3-opts">
+          <button class="option-btn" onclick="checkQ(3,this,'a')">Greenhouse-Geisser — because ε < 0.75, we use the more conservative correction</button>
+          <button class="option-btn" onclick="checkQ(3,this,'b')">Huynh-Feldt — it's the default correction for any violation</button>
+          <button class="option-btn" onclick="checkQ(3,this,'c')">Sphericity Assumed — Mauchly's test is merely informational</button>
+          <button class="option-btn" onclick="checkQ(3,this,'d')">Any of the rows will do — the results are always identical</button>
+        </div>
+        <div id="q3-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 8: Reading the ANOVA Table ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','The Repeated Measures table shows 3 rows: <em>Sphericity Assumed</em>, <em>Greenhouse-Geisser</em>, and <em>Huynh-Feldt</em>. Identify the correct one based on your Mauchly result!')}
+      ${dialogue('odin','Notice that the df become <em>FRACTIONAL</em> when corrected — that\'s normal! That\'s how the correction works.')}
+      ${dialogue('muninn','Rule of thumb: Mauchly p > 0.05 → read "Sphericity Assumed." Mauchly p < 0.05 and ε < 0.75 → Greenhouse-Geisser. Mauchly p < 0.05 and ε > 0.75 → Huynh-Feldt.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 9: CHALLENGE 4 — Reading Output ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='apprentice'?hintBox('Mauchly p = 0.12 > 0.05 → sphericity ok → read the "Sphericity Assumed" row.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 4: The Output Scroll</div>
+        <div class="challenge-question">Mauchly Sig.=0.12 (ok). Table shows: Spher. Assumed F=15.6, df1=2, df2=12, p=.001; G-G F=13.2, df1=1.6, df2=9.6, p=.005. Which result to report?</div>
+        <div class="data-display">
+          Mauchly: Sig. = 0.12 (sphericity ok)<br>
+          Spher. Assumed: F(2, 12) = 15.6, p = .001<br>
+          Greenhouse-Geisser: F(1.6, 9.6) = 13.2, p = .005
+        </div>
+        ${hint}
+        <div class="options-grid" id="q4-opts">
+          <button class="option-btn" onclick="checkQ(4,this,'a')">Always Greenhouse-Geisser — it's the safest option regardless of Mauchly</button>
+          <button class="option-btn" onclick="checkQ(4,this,'b')">The average of the two F values for greater precision</button>
+          <button class="option-btn" onclick="checkQ(4,this,'c')">Whichever has the smaller p-value — to maximize significance</button>
+          <button class="option-btn" onclick="checkQ(4,this,'d')">Sphericity Assumed: F(2, 12) = 15.6, p = .001 — because Mauchly p > 0.05, sphericity holds</button>
+        </div>
+        <div id="q4-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 10: Mixed ANOVA and Friedman ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','<em>Mixed ANOVA (Split-Plot)</em>: when we have at least one between-subjects factor AND at least one within-subjects factor. Example: Teaching method (between) × Time (within).')}
+      ${dialogue('odin','Double check: <em>Levene\'s</em> for the between-subjects factor, <em>Mauchly\'s</em> for the within-subjects factor.')}
+      ${dialogue('muninn','And if the data severely violate normality? The non-parametric alternative is <em>Friedman\'s ANOVA</em> — it uses ranks instead of raw means.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 11: CHALLENGE 5 — Mixed ANOVA ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='apprentice'?hintBox('One between factor + one within factor = <em>Mixed ANOVA</em>.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 5: The Alliance of Two Factors</div>
+        <div class="challenge-question">A study compares 2 diets (between-subjects) measuring weight at 3 time points (within-subjects). What type of ANOVA should be used?</div>
+        <div class="data-display">
+          Factor 1: Diet (A vs B) — between-subjects<br>
+          Factor 2: Time (T1, T2, T3) — within-subjects
+        </div>
+        ${hint}
+        <div class="options-grid" id="q5-opts">
+          <button class="option-btn" onclick="checkQ(5,this,'a')">Simple Repeated Measures ANOVA — ignore the diet factor</button>
+          <button class="option-btn" onclick="checkQ(5,this,'b')">Mixed ANOVA (Split-Plot) — it has one between factor (diet) and one within factor (time)</button>
+          <button class="option-btn" onclick="checkQ(5,this,'c')">Two separate independent ANOVAs — one for each diet</button>
+          <button class="option-btn" onclick="checkQ(5,this,'d')">MANOVA — because we have multiple dependent variables</button>
+        </div>
+        <div id="q5-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 12: Effect Size and Post-Hoc ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','In Repeated Measures, the recommended effect size metric is <em>ω² (omega squared)</em>. The formula differs from independent ANOVA.')}
+      ${dialogue('odin','Post-Hoc: use <em>Bonferroni</em> to compare pairs of conditions. Or <em>planned contrasts</em> if you had an a priori hypothesis.')}
+      ${dialogue('huginn','Don\'t confuse statistical significance with practical significance! <em>Always calculate and report the Effect Size!</em>')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 13: CHALLENGE 6 — Effect Size ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='apprentice'?hintBox('p < .001 but ω² ≈ 0 → large sample inflates significance. <em>Always look at the effect size!</em>'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 6: The True Weight of the Hammer</div>
+        <div class="challenge-question">A significant F in a Repeated Measures ANOVA with N=200 and p < .001, but ω² = 0.008. What should you conclude?</div>
+        <div class="data-display">
+          RM ANOVA: Significant F, p < .001<br>
+          N = 200 &nbsp;|&nbsp; ω² = 0.008
+        </div>
+        ${hint}
+        <div class="options-grid" id="q6-opts">
+          <button class="option-btn" onclick="checkQ(6,this,'a')">Huge effect — p < .001 proves the difference is large and important</button>
+          <button class="option-btn" onclick="checkQ(6,this,'b')">Something is wrong — a large N invalidates Repeated Measures ANOVA</button>
+          <button class="option-btn" onclick="checkQ(6,this,'c')">The effect is statistically significant but practically irrelevant (ω² = .008 < .01 = small). The large sample made a tiny effect "significant"</button>
+          <button class="option-btn" onclick="checkQ(6,this,'d')">Report only the p-value — effect size is supplementary</button>
+        </div>
+        <div id="q6-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 14: CHALLENGE 7 — Friedman ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='apprentice'?hintBox('Repeated measures + normality violation → <em>Friedman</em>. Kruskal-Wallis is for independent groups.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 7: The Rebel Metal</div>
+        <div class="challenge-question">Repeated measures data with 3 conditions severely violated normality. What alternative should you use?</div>
+        <div class="data-display">
+          Design: Repeated Measures (3 conditions)<br>
+          Shapiro-Wilk: Sig. < 0.001 (normality violated)
+        </div>
+        ${hint}
+        <div class="options-grid" id="q7-opts">
+          <button class="option-btn" onclick="checkQ(7,this,'a')">Friedman's ANOVA — the non-parametric equivalent that uses ranks instead of raw means</button>
+          <button class="option-btn" onclick="checkQ(7,this,'b')">Kruskal-Wallis — it's the non-parametric test for comparing 3 groups</button>
+          <button class="option-btn" onclick="checkQ(7,this,'c')">Wilcoxon test for 3 groups — a natural extension of the paired version</button>
+          <button class="option-btn" onclick="checkQ(7,this,'d')">Ignore the violation — ANOVA is robust to deviations from normality</button>
+        </div>
+        <div id="q7-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ MASTER CHALLENGES ━━
+  if(GAME.difficulty==='master'){
+    // CHALLENGE 8: Mixed ANOVA with Mauchly and Levene
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: The Double Check</div>
+          <div class="challenge-question">In a Mixed ANOVA with 2 groups (between) × 3 time points (within), Mauchly's Test yielded Sig.=0.03 and ε=0.82. Levene's Test yielded Sig.=0.15 at all time points. What should you do?</div>
+          <div class="data-display">
+            Mixed ANOVA: 2 groups (between) × 3 time points (within)<br>
+            Mauchly: Sig. = 0.03 (violated) &nbsp;|&nbsp; ε = 0.82<br>
+            Levene: Sig. = 0.15 (ok at all time points)
+          </div>
+          <div class="options-grid" id="q8-opts">
+            <button class="option-btn" onclick="checkQ(8,this,'a')">Use Greenhouse-Geisser — always safer when Mauchly is significant</button>
+            <button class="option-btn" onclick="checkQ(8,this,'b')">Ignore everything — corrections are optional in Mixed ANOVA</button>
+            <button class="option-btn" onclick="checkQ(8,this,'c')">Use independent ANOVA — the violation invalidates Repeated Measures</button>
+            <button class="option-btn" onclick="checkQ(8,this,'d')">Homogeneity ok (Levene p > .05) but sphericity violated (Mauchly p < .05). Since ε = 0.82 > 0.75, use Huynh-Feldt for the within effect and for the interaction</button>
+          </div>
+          <div id="q8-fb"></div>
+        </div>
+      </div>`});
+
+    // CHALLENGE 9: Aggregation destroys temporal variance
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: Thorment's Trap</div>
+          <div class="challenge-question">Thorment proposed: "Sum each participant's scores from Time 1, 2, and 3, divide by 3, and run a t-test between Groups A and B." Why is this inappropriate?</div>
+          <div class="data-display">
+            Thorment's proposal:<br>
+            Mean(T1+T2+T3) per subject → t-test between Groups
+          </div>
+          <div class="options-grid" id="q9-opts">
+            <button class="option-btn" onclick="checkQ(9,this,'a')">It's correct — it's simpler and produces the same result</button>
+            <button class="option-btn" onclick="checkQ(9,this,'b')">Aggregating destroys temporal variance! The purpose of Mixed ANOVA is precisely to understand how the TRAJECTORY changes between groups over time (the Interaction). Aggregating eliminates that information</button>
+            <button class="option-btn" onclick="checkQ(9,this,'c')">Because the t-test requires normality and aggregation violates that assumption</button>
+            <button class="option-btn" onclick="checkQ(9,this,'d')">Because we need MANOVA instead of a t-test</button>
+          </div>
+          <div id="q9-fb"></div>
+        </div>
+      </div>`});
+  }
+
+  // ━━ FINAL SCENE ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','The Forge slowly cools. The metal has been shaped, tempered, and purified — each cycle revealed more about the essence of the steel. The young blacksmith has mastered the art of measuring the same warrior across time.')}
+      ${dialogue('odin','You have conquered the <em>Realm of Repeated Measures</em>! You mastered the within-subjects design, sphericity, Mauchly\'s Test, Greenhouse-Geisser and Huynh-Feldt corrections, Mixed ANOVA, and Friedman. The Forge of Time is yours!')}
+      ${dialogue('thor','Alright, I admit it... sphericity matters. Without it, I\'d find effects that don\'t exist — and that\'s worse than losing a real battle.')}
+      ${dialogue('muninn','In the next Realm, the recipes gain covariates: <em>ANCOVA, MANOVA, MANCOVA</em>... The Linear Grimoire expands. Prepare yourself!')}
+      <button class="continue-btn" onclick="showResults()">See Final Result ⏳</button>
+    </div>`});
+}
+
+// ════════════════════════════════════════════════════
+const ANSWERS={1:'b',2:'c',3:'a',4:'d',5:'b',6:'c',7:'a',8:'d',9:'b'};
+const EXPLANATIONS={
+  1:{
+    correct:'✅ Perfect! The same 20 warriors were measured across 3 conditions (before, during, after). This is a <em>within-subjects</em> design — the right recipe is <em>Repeated Measures ANOVA</em>. Independent ANOVA would require different people in each group. Multiple t-tests would inflate Type I Error.',
+    wrong:'❌ The SAME 20 warriors were measured at 3 time points. This is a <em>within-subjects</em> design — <em>Repeated Measures</em> ANOVA is the correct choice. Independent ANOVA is for different groups; multiple t-tests inflate error.',
+    charC:'odin',charW:'thor'
+  },
+  2:{
+    correct:'✅ Correct! Mauchly Sig. = 0.036 < 0.05 → <em>sphericity was violated</em>. The variances of the differences between pairs of conditions are not homogeneous. We need to correct the degrees of freedom with Greenhouse-Geisser or Huynh-Feldt.',
+    wrong:'❌ In Mauchly\'s Test, we want p > 0.05 (sphericity holds). Here p = 0.036 < 0.05, so <em>sphericity was violated</em>. This doesn\'t invalidate the analysis — just apply a correction (Greenhouse-Geisser or Huynh-Feldt) to the degrees of freedom.',
+    charC:'muninn',charW:'thor'
+  },
+  3:{
+    correct:'✅ Exactly! Mauchly significant (sphericity violated) and <em>ε = 0.62 < 0.75</em> → use <em>Greenhouse-Geisser</em>, the more conservative correction. If ε were > 0.75, we would use Huynh-Feldt (more liberal).',
+    wrong:'❌ When sphericity is violated: ε < 0.75 → <em>Greenhouse-Geisser</em> (conservative); ε > 0.75 → Huynh-Feldt (liberal). Here ε = 0.62 < 0.75, so the correct row is Greenhouse-Geisser. Never ignore Mauchly!',
+    charC:'odin',charW:'thor'
+  },
+  4:{
+    correct:'✅ Perfect! Mauchly p = 0.12 > 0.05 → <em>sphericity holds</em>. Read the "Sphericity Assumed" row: <em>F(2, 12) = 15.6, p = .001</em>. No correction needed. Don\'t pick the smallest p — pick the correct row based on the Mauchly diagnostic.',
+    wrong:'❌ Mauchly p = 0.12 > 0.05 → sphericity holds → read <em>"Sphericity Assumed"</em>: F(2, 12) = 15.6, p = .001. You don\'t average two F values or pick the smallest p — the decision depends solely on the Mauchly result.',
+    charC:'odin',charW:'thor'
+  },
+  5:{
+    correct:'✅ Correct! One between-subjects factor (diet: A vs B) + one within-subjects factor (time: T1, T2, T3) = <em>Mixed ANOVA (Split-Plot)</em>. It tests the main effect of each factor AND the interaction between them — exactly what we need!',
+    wrong:'❌ Diet is a <em>between-subjects</em> factor (different groups) and Time is a <em>within-subjects</em> factor (same people). When we have both, we use <em>Mixed ANOVA (Split-Plot)</em>. Ignoring one of the factors or running separate analyses wastes information.',
+    charC:'muninn',charW:'thor'
+  },
+  6:{
+    correct:'✅ Excellent! p < .001 but ω² = 0.008 — <em>below the small effect threshold (0.01)</em>. The large sample (N=200) had enough power to detect a practically nonexistent effect. Statistical significance ≠ practical significance. Always report ω²!',
+    wrong:'❌ p < .001 with N = 200 doesn\'t mean a large effect! <em>ω² = 0.008 < 0.01</em> (below even the "small" threshold). Large samples make tiny effects "significant." Without the effect size, you\'re fooled by significance.',
+    charC:'huginn',charW:'thor'
+  },
+  7:{
+    correct:'✅ Correct! Repeated measures with severely violated normality → <em>Friedman\'s ANOVA</em>, the non-parametric equivalent. It uses ranks instead of raw means. Kruskal-Wallis is for <em>independent groups</em> — don\'t confuse them!',
+    wrong:'❌ For repeated measures with normality violation, use <em>Friedman</em> (non-parametric within-subjects). <em>Kruskal-Wallis</em> is the non-parametric equivalent of <em>independent</em> ANOVA, not Repeated Measures. Wilcoxon works for 2 conditions, not 3.',
+    charC:'muninn',charW:'thor'
+  },
+  8:{
+    correct:'✅ Flawless analysis! Levene p = 0.15 > 0.05 → <em>homogeneity ok</em> for the between factor. Mauchly p = 0.03 < 0.05 → <em>sphericity violated</em> for the within factor. Since ε = 0.82 > 0.75, use <em>Huynh-Feldt</em> for the effects involving the within factor (within main effect and interaction).',
+    wrong:'❌ In Mixed ANOVA: Levene for the between factor (p = 0.15 > 0.05 → ok), Mauchly for the within factor (p = 0.03 < 0.05 → violated). ε = 0.82 > 0.75 → use <em>Huynh-Feldt</em> (not G-G). The correction applies to the within effect and the interaction.',
+    charC:'odin',charW:'thor'
+  },
+  9:{
+    correct:'✅ Brilliant! Aggregating the temporal measures (mean of T1+T2+T3) <em>destroys information about the trajectory</em>. The purpose of Mixed ANOVA is to test whether groups change differently over time — the <em>interaction</em>. Aggregating eliminates precisely that information. It\'s like melting all the metal\'s temperings together and losing the record of how it evolved.',
+    wrong:'❌ Temporal aggregation (mean T1+T2+T3) <em>eliminates within-subjects variance</em>. You lose the Group × Time interaction — the most important effect! Mixed ANOVA exists to model <em>different trajectories</em> across groups.',
+    charC:'huginn',charW:'thor'
+  }
+};
+
+function checkQ(q,btn,ans){
+  const opts=document.querySelectorAll(`#q${q}-opts .option-btn`);
+  opts.forEach(b=>{b.classList.add('disabled');b.onclick=null;});
+  const fb=document.getElementById(`q${q}-fb`),cor=ANSWERS[q],exp=EXPLANATIONS[q];
+  GAME.total++;
+  if(ans===cor){
+    btn.classList.add('correct');GAME.hits++;GAME.xp+=20;updateXPBar();earnGear();
+    fb.innerHTML=`<div class="feedback-box correct">${dialogue(exp.charC,exp.correct+' <span class="xp-badge">+20 XP</span>')}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }else{
+    btn.classList.add('wrong');
+    const ci=['a','b','c','d'].indexOf(cor);if(opts[ci])opts[ci].classList.add('correct');
+    fb.innerHTML=`<div class="feedback-box wrong">${dialogue(exp.charW,exp.wrong)}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }
+}
+
+function countMaxXP(){return (GAME.difficulty==='master'?9:7)*20;}
+function renderScene(){if(GAME.currentScene<GAME.scenes.length){content().innerHTML=GAME.scenes[GAME.currentScene].html();restoreGear();window.scrollTo({top:0,behavior:'smooth'});}}
+function nextScene(){GAME.currentScene++;renderScene();}
+
+function showResults(){
+  const pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  let rank,rc;
+  if(pct>=90){rank='🏆 Master of the Temporal Forge';rc='#f0c040';}
+  else if(pct>=70){rank='📜 Blacksmith of Measures';rc='#58a6ff';}
+  else if(pct>=50){rank='🛡️ Anvil Apprentice';rc='#8b949e';}
+  else{rank='⛓️ Prisoner of Time';rc='#f85149';}
+  content().innerHTML=`
+  <div class="result-screen">
+    <div class="reino-badge">REALM 10 — COMPLETE</div>
+    <h2>Adventure Results</h2>
+    ${resultVikingHTML()}
+    <div class="result-rank" style="color:${rc}">${rank}</div>
+    <div class="result-stats">
+      <div class="stat-row"><span class="stat-label">Difficulty</span><span class="stat-value">${GAME.difficulty==='master'?'⚔️ Master':'🛡️ Apprentice'}</span></div>
+      <div class="stat-row"><span class="stat-label">Correct</span><span class="stat-value">${GAME.hits} / ${GAME.total}</span></div>
+      <div class="stat-row"><span class="stat-label">Accuracy</span><span class="stat-value">${pct}%</span></div>
+      <div class="stat-row"><span class="stat-label">XP Earned</span><span class="stat-value">${GAME.xp} / ${GAME.maxXP}</span></div>
+    </div>
+    ${dialogue('odin',pct>=70
+      ?'The Forge of Time applauds! You mastered Repeated Measures ANOVA — within-subjects design, sphericity, Mauchly, degree of freedom corrections, Mixed ANOVA, Friedman, and effect size. The metal has been purified!'
+      :'The Forge cooled before the metal took shape... Go back and review: sphericity, Mauchly, ε < 0.75 → G-G, ε > 0.75 → H-F, Mixed ANOVA, and Friedman. The next tempering will be perfect!'
+    )}
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+      <button class="continue-btn" onclick="showTitleScreen()">🔄 Play Again</button>
+    </div>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+var GEAR_ITEMS=[
+  {"s":"boots","n":"Temporal Boots","h":"<div style=\"display:flex;gap:14px\"><div style=\"width:24px;height:18px;background:#3a4a5a;border-radius:3px 3px 4px 7px;border:2px solid #5a7a9a\"></div><div style=\"width:24px;height:18px;background:#3a4a5a;border-radius:3px 3px 4px 7px;border:2px solid #5a7a9a\"></div></div>"},
+  {"s":"mail","n":"Cuirass of Repetition","h":"<div style=\"width:60px;height:72px;background:linear-gradient(180deg,#4a6a8a,#2a4a6a);border-radius:7px 7px 4px 4px;border:2px solid #3a5a7a;position:relative\"><div style=\"position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:20px\">⟳</div></div>"},
+  {"s":"right","n":"Hammer of Sphericity","h":"<div style=\"display:flex;flex-direction:column;align-items:center\"><div style=\"width:20px;height:14px;background:linear-gradient(135deg,#c0c0c0,#808080);border-radius:3px;border:1px solid #606060\"></div><div style=\"width:6px;height:30px;background:#8b6914;border-radius:2px;margin-top:-1px\"></div></div>"},
+  {"s":"left","n":"Mauchly's Hourglass","h":"<div style=\"width:28px;height:40px;position:relative\"><div style=\"position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:16px;background:#f0c040;border-radius:12px 12px 0 0;clip-path:polygon(0 0,100% 0,70% 100%,30% 100%)\"></div><div style=\"position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:24px;height:16px;background:#f0c040;border-radius:0 0 12px 12px;clip-path:polygon(30% 0,70% 0,100% 100%,0 100%)\"></div></div>"},
+  {"s":"cape","n":"Within-Subjects Cloak","h":"<div style=\"width:84px;height:110px;background:linear-gradient(135deg,#1a3a6a,#0a2a4a);border-radius:5px 5px 28px 28px;clip-path:polygon(16% 0%,84% 0%,100% 18%,92% 100%,50% 88%,8% 100%,0% 18%)\"></div>"},
+  {"s":"helm","n":"Helm of Corrections","h":"<div style=\"width:52px;height:28px;background:linear-gradient(135deg,#708090,#4a5a6a);border-radius:26px 26px 5px 5px;border:2px solid #5a6a7a;position:relative\"><div style=\"position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:8px;height:14px;background:#c0d0e0;border-radius:2px\"></div></div>"}
+];
+var gearEarned=0;
+function armorPanelHTML(){
+  var rows='';
+  for(var i=0;i<GEAR_ITEMS.length;i++){rows+='<div class="gp-row'+(i<gearEarned?' earned':'')+'" id="gprow'+i+'"><span class="gp-dot"></span><span>'+GEAR_ITEMS[i].n+'</span></div>';}
+  var sl='<div class="vm-sparks" id="vmsparks"></div>';
+  sl+='<div class="vm-slot vm-cape" id="vmslot-cape"></div>';
+  sl+='<div class="vm-head"></div><div class="vm-arm-l"></div><div class="vm-arm-r"></div><div class="vm-torso"></div><div class="vm-leg-l"></div><div class="vm-leg-r"></div>';
+  sl+='<div class="vm-slot vm-boots" id="vmslot-boots"></div><div class="vm-slot vm-mail" id="vmslot-mail"></div>';
+  sl+='<div class="vm-slot vm-left" id="vmslot-left"></div><div class="vm-slot vm-right" id="vmslot-right"></div>';
+  sl+='<div class="vm-slot vm-helm" id="vmslot-helm"></div>';
+  return '<div class="armor-panel"><div class="viking-mini" id="vmini">'+sl+'</div><div class="gear-progress">'+rows+'</div></div>';
+}
+function restoreGear(){for(var i=0;i<gearEarned&&i<GEAR_ITEMS.length;i++){var g=GEAR_ITEMS[i],el=document.getElementById('vmslot-'+g.s);if(el){el.innerHTML=g.h;el.classList.add('on');}}}
+function earnGear(){
+  if(gearEarned>=GEAR_ITEMS.length)return;
+  var g=GEAR_ITEMS[gearEarned],el=document.getElementById('vmslot-'+g.s);
+  if(el){el.innerHTML=g.h;el.classList.add('on','vm-flash');setTimeout(function(){el.classList.remove('vm-flash')},500);spawnVMSparks(el);}
+  var row=document.getElementById('gprow'+gearEarned);if(row)row.classList.add('earned');
+  gearEarned++;
+}
+function spawnVMSparks(el){
+  var sc=document.getElementById('vmsparks');if(!sc||!el)return;
+  var r=el.getBoundingClientRect(),sr=document.getElementById('vmini').getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height/2;
+  var cols=['#f0c040','#f08030','#f0e080','#ff6040','#ffd060'];
+  for(var i=0;i<10;i++){var s=document.createElement('div');s.className='vm-spark';
+    var a=Math.random()*Math.PI*2,d=20+Math.random()*30;
+    s.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+cols[Math.floor(Math.random()*5)]+';--sx:'+(Math.cos(a)*d)+'px;--sy:'+(Math.sin(a)*d)+'px;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px';
+    sc.appendChild(s);setTimeout(function(x){x.remove()},700,s);}
+}
+function resultVikingHTML(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var ti=[];if(pct>=90)ti=GEAR_ITEMS;else if(pct>=70)ti=GEAR_ITEMS.slice(0,5);else if(pct>=50)ti=GEAR_ITEMS.slice(0,2);
+  var sm={boots:'rv-boots',mail:'rv-mail',right:'rv-right',left:'rv-left',cape:'rv-cape',helm:'rv-helm'};
+  var html='<div class="result-viking">';
+  html+='<div class="rv-slot rv-cape" id="rvs-cape"></div>';
+  html+='<div class="rv-head"></div><div class="rv-arm-l"></div><div class="rv-arm-r"></div><div class="rv-torso"></div><div class="rv-leg-l"></div><div class="rv-leg-r"></div>';
+  html+='<div class="rv-slot rv-boots" id="rvs-boots"></div><div class="rv-slot rv-mail" id="rvs-mail"></div>';
+  html+='<div class="rv-slot rv-left" id="rvs-left"></div><div class="rv-slot rv-right" id="rvs-right"></div>';
+  html+='<div class="rv-slot rv-helm" id="rvs-helm"></div></div>';
+  setTimeout(function(){ti.forEach(function(g){var e=document.getElementById('rvs-'+g.s);if(e)e.innerHTML=g.h;});},100);
+  return html;
+}
+
+showTitleScreen();
+</script>
+</body>
+</html>

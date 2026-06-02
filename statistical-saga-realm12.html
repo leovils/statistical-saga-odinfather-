@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather — Realm 12: MANOVA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh;overflow-x:hidden}
+#game-container{max-width:800px;margin:0 auto;padding:20px;min-height:100vh}
+.title-screen{text-align:center;padding:60px 20px;animation:fadeIn 1s ease}
+.title-screen h1{font-family:'Bangers',cursive;font-size:2.8em;color:var(--gold);text-shadow:2px 2px 8px rgba(240,192,64,.3);line-height:1.1;margin-bottom:8px}
+.title-screen h2{font-family:'Permanent Marker',cursive;font-size:1.5em;color:var(--odin-blue);margin-bottom:30px}
+.title-screen .subtitle{color:var(--text-dim);font-size:1.1em;margin-bottom:40px}
+.reino-badge{display:inline-block;background:linear-gradient(135deg,var(--odin-blue),var(--corvo-purple));padding:6px 20px;border-radius:20px;font-family:'Bangers',cursive;font-size:1em;color:#fff;margin-bottom:16px}
+.difficulty-select{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.diff-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Bangers',cursive;font-size:1.2em;padding:16px 32px;border-radius:12px;cursor:pointer;transition:all .3s;min-width:180px}
+.diff-btn:hover{border-color:var(--odin-blue);transform:translateY(-2px)}
+.diff-btn .diff-label{font-size:1.3em}.diff-btn .diff-desc{font-family:'Patrick Hand',cursive;font-size:.65em;color:var(--text-dim);margin-top:4px}
+.scene{animation:slideIn .5s ease;padding:10px 0}
+.dialogue-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative}
+.dialogue-box.odin{border-left:4px solid var(--odin-blue)}.dialogue-box.thor{border-left:4px solid var(--thor-red)}.dialogue-box.corvo{border-left:4px solid var(--corvo-purple)}.dialogue-box.narrator{border-left:4px solid var(--gold)}
+.char-name{font-family:'Bangers',cursive;font-size:1.1em;margin-bottom:6px}
+.char-name.odin{color:var(--odin-blue)}.char-name.thor{color:var(--thor-red)}.char-name.corvo{color:var(--corvo-purple)}.char-name.narrator{color:var(--gold)}
+.dialogue-text{line-height:1.5;font-size:1.05em}.dialogue-text em{color:var(--gold);font-style:normal;font-weight:bold}
+.challenge-box{background:var(--bg-panel);border:2px solid var(--gold);border-radius:12px;padding:24px;margin:20px 0;animation:pulse-border 2s ease infinite}
+@keyframes pulse-border{0%,100%{border-color:var(--gold);box-shadow:0 0 8px rgba(240,192,64,.15)}50%{border-color:#f0c040cc;box-shadow:0 0 16px rgba(240,192,64,.3)}}
+.challenge-title{font-family:'Bangers',cursive;font-size:1.4em;color:var(--gold);margin-bottom:12px;text-align:center}
+.challenge-question{margin-bottom:16px;line-height:1.5}
+.data-display{background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:'Courier New',monospace;font-size:1em;color:var(--odin-blue);text-align:center;letter-spacing:1px;line-height:1.6}
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.option-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Patrick Hand',cursive;font-size:1.05em;padding:14px 18px;border-radius:10px;cursor:pointer;text-align:left;transition:all .25s;line-height:1.4}
+.option-btn:hover:not(.disabled){border-color:var(--odin-blue);background:#1a2233}
+.option-btn.correct{border-color:var(--success);background:#0d2818;color:var(--success)}
+.option-btn.wrong{border-color:var(--thor-red);background:#2d1116;color:var(--thor-red)}
+.option-btn.disabled{cursor:default;opacity:.7}
+.feedback-box{border-radius:10px;padding:16px 20px;margin:16px 0;animation:fadeIn .4s ease;line-height:1.5}
+.feedback-box.correct{background:#0d2818;border:1px solid var(--success);color:var(--success)}
+.feedback-box.wrong{background:#2d1116;border:1px solid var(--thor-red);color:var(--thor-red)}
+.xp-badge{display:inline-block;background:var(--gold);color:var(--bg-dark);font-family:'Bangers',cursive;padding:2px 10px;border-radius:6px;font-size:.9em;margin-left:6px}
+.xp-bar-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.xp-label{font-family:'Bangers',cursive;color:var(--gold);font-size:1em;white-space:nowrap}
+.xp-bar-bg{flex:1;height:14px;background:var(--bg-dark);border-radius:7px;overflow:hidden}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--odin-blue),var(--gold));border-radius:7px;transition:width .6s ease}
+.xp-count{font-family:'Bangers',cursive;color:var(--text);font-size:1em;min-width:60px;text-align:right}
+.continue-btn{display:block;margin:20px auto 0;background:transparent;border:2px solid var(--odin-blue);color:var(--odin-blue);font-family:'Bangers',cursive;font-size:1.15em;padding:12px 36px;border-radius:10px;cursor:pointer;transition:all .25s}
+.continue-btn:hover{background:var(--odin-blue);color:var(--bg-dark)}
+.result-screen{text-align:center;padding:40px 20px;animation:fadeIn .8s ease}
+.result-screen h2{font-family:'Bangers',cursive;font-size:2.2em;color:var(--gold);margin-bottom:8px}
+.result-rank{font-family:'Permanent Marker',cursive;font-size:1.5em;margin:16px 0}
+.result-stats{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:20px 0;text-align:left}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text-dim)}.stat-value{font-family:'Bangers',cursive;color:var(--odin-blue)}
+.hint-box{background:#1a1530;border:1px solid var(--corvo-purple);border-radius:10px;padding:14px 18px;margin:12px 0;font-size:.95em;color:var(--corvo-purple);animation:fadeIn .5s ease}
+.hint-box .hint-label{font-family:'Bangers',cursive;font-size:1em;margin-bottom:4px}
+/* ── VISUAL: Matrix Structure ── */
+.matrix-visual{display:flex;align-items:center;justify-content:center;gap:4px;margin:16px 0;flex-wrap:wrap}
+.mat-segment{padding:12px 10px;text-align:center;font-family:'Courier New',monospace;font-size:.85em;min-width:80px;border-radius:6px}
+.mat-total{background:#1a2040;color:var(--gold);border:2px solid var(--gold)}
+.mat-hyp{background:#0d2818;color:var(--success);border:2px solid var(--success)}
+.mat-err{background:#2d1116;color:var(--thor-red);border:2px solid var(--thor-red)}
+.mat-eq{font-family:'Bangers',cursive;color:var(--text);font-size:1.2em;padding:0 4px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.title-screen h1{font-size:2em}.title-screen h2{font-size:1.2em}.difficulty-select{flex-direction:column;align-items:center}#game-container{padding:12px}.challenge-box{padding:16px}.matrix-visual{flex-wrap:wrap}.mat-segment{min-width:60px;font-size:.75em}}
+
+/* ── ARMOR SYSTEM ── */
+.armor-panel{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.viking-mini{position:relative;width:120px;height:180px;flex-shrink:0}
+.vm-head{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:#d4a574;border:1.5px solid #b8956a;z-index:5}
+.vm-torso{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:44px;height:58px;background:#8b7355;border-radius:7px 7px 4px 4px;z-index:3}
+.vm-arm-l{position:absolute;top:59px;left:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-arm-r{position:absolute;top:59px;right:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-leg-l{position:absolute;top:111px;left:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-leg-r{position:absolute;top:111px;right:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-slot{position:absolute;opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1);transform:scale(.3)}
+.vm-slot.on{opacity:1;transform:scale(1)}
+.vm-helm{top:16px;left:50%;transform:translateX(-50%) scale(.3);z-index:8}.vm-helm.on{transform:translateX(-50%) scale(1)}
+.vm-mail{top:57px;left:50%;transform:translateX(-50%) scale(.3);z-index:4}.vm-mail.on{transform:translateX(-50%) scale(1)}
+.vm-cape{top:53px;left:50%;transform:translateX(-50%) scale(.3);z-index:1}.vm-cape.on{transform:translateX(-50%) scale(1)}
+.vm-left{top:66px;left:0;z-index:7}.vm-right{top:56px;right:0;z-index:7}
+.vm-boots{bottom:4px;left:50%;transform:translateX(-50%) scale(.3);z-index:7;display:flex;gap:10px}.vm-boots.on{transform:translateX(-50%) scale(1)}
+.gear-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.gp-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;font-size:.8em;color:var(--text-dim);transition:all .3s}
+.gp-row.earned{color:var(--success);font-weight:bold}
+.gp-row .gp-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .3s;flex-shrink:0}
+.gp-row.earned .gp-dot{background:var(--success);border-color:var(--success)}
+.vm-sparks{position:absolute;pointer-events:none;z-index:20}
+.vm-spark{position:absolute;border-radius:50%;animation:vmSp .6s ease-out forwards}
+@keyframes vmSp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+.vm-flash{animation:vmFl .4s ease}
+@keyframes vmFl{0%{filter:brightness(1)}30%{filter:brightness(1.8) drop-shadow(0 0 12px rgba(240,180,40,.6))}100%{filter:brightness(1)}}
+.result-viking{position:relative;width:160px;height:240px;margin:16px auto}
+.rv-head{position:absolute;top:36px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#d4a574;border:2px solid #b8956a;z-index:5}
+.rv-torso{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:56px;height:74px;background:#8b7355;border-radius:9px 9px 5px 5px;z-index:3}
+.rv-arm-l{position:absolute;top:77px;left:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-arm-r{position:absolute;top:77px;right:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-leg-l{position:absolute;top:144px;left:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-leg-r{position:absolute;top:144px;right:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-slot{position:absolute}
+.rv-helm{top:20px;left:50%;transform:translateX(-50%);z-index:8}
+.rv-mail{top:74px;left:50%;transform:translateX(-50%);z-index:4}
+.rv-cape{top:69px;left:50%;transform:translateX(-50%);z-index:1}
+.rv-left{top:86px;left:4px;z-index:7}.rv-right{top:72px;right:4px;z-index:7}
+.rv-boots{bottom:4px;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:14px}
+@media(max-width:600px){.armor-panel{flex-direction:column;align-items:center}.viking-mini{width:100px;height:160px}}
+</style>
+</head>
+<body>
+<div id="game-container"><div id="game-content"></div></div>
+<script>
+// ════════════════════════════════════════════════════
+// THE STATISTICAL SAGA OF ODINFATHER — REALM 12
+// MANOVA — MULTIVARIATE ANALYSIS OF VARIANCE
+// ════════════════════════════════════════════════════
+const GAME={difficulty:null,xp:0,maxXP:0,hits:0,total:0,currentScene:0,scenes:[]};
+const content=()=>document.getElementById('game-content');
+function dialogue(c,t){
+  const cls={odin:'odin',thor:'thor',muninn:'corvo',huginn:'corvo',narrator:'narrator'};
+  const nm={odin:'Odinfather 🧙‍♂️',thor:'Thorment ⚡',muninn:'Muninn 🐦‍⬛',huginn:'Huginn 🐦',narrator:'📜 Narrator'};
+  return `<div class="dialogue-box ${cls[c]||'narrator'}"><div class="char-name ${cls[c]||'narrator'}">${nm[c]||c}</div><div class="dialogue-text">${t}</div></div>`;
+}
+function hintBox(t){return `<div class="hint-box"><div class="hint-label">🐦‍⬛ Muninn's Hint</div>${t}</div>`;}
+function xpBar(){
+  const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;
+  return armorPanelHTML()+`<div class="xp-bar-container"><div class="xp-label">⚡ XP</div><div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${p}%"></div></div><div class="xp-count">${GAME.xp} / ${GAME.maxXP}</div></div>`;
+}
+function updateXPBar(){
+  const b=document.querySelector('.xp-bar-fill'),c=document.querySelector('.xp-count');
+  if(b&&c){const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;b.style.width=p+'%';c.textContent=`${GAME.xp} / ${GAME.maxXP}`;}
+}
+function showTitleScreen(){
+  content().innerHTML=`
+  <div class="title-screen">
+    <div class="reino-badge">REALM 12</div>
+    <h1>The Statistical Saga of Odinfather</h1>
+    <h2>Realm of MANOVA</h2>
+    <p class="subtitle">In the Great Hall of Matrices, where dependent variables dance together across multiple dimensions, Odinfather reveals how to protect Type I Error at the multidimensional feast.</p>
+    <div class="difficulty-select">
+      <button class="diff-btn" onclick="startGame('aprendiz')"><div class="diff-label">🛡️ Apprentice</div><div class="diff-desc">Undergraduate — with Muninn's hints</div></button>
+      <button class="diff-btn" onclick="startGame('mestre')"><div class="diff-label">⚔️ Master</div><div class="diff-desc">Graduate — no hints, extra challenges</div></button>
+    </div>
+  </div>`;
+}
+function startGame(d){
+  GAME.difficulty=d;GAME.xp=0;GAME.hits=0;GAME.total=0;GAME.currentScene=0;gearEarned=0;
+  buildScenes();GAME.maxXP=countMaxXP();renderScene();
+}
+
+// ════════════════════════════════════════════════════
+function buildScenes(){
+  GAME.scenes=[];
+
+  // ━━ SCENE 1: The Great Hall of Matrices ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('narrator','The doors of the <em>Great Hall of Matrices</em> burst open with a dimensional roar. The space expands in impossible directions — each table at the feast represents a dependent variable, and all of them vibrate in sync. Here, no outcome is evaluated alone.')}
+      ${dialogue('odin','When we have <em>MULTIPLE dependent variables</em>, we cannot simply run several separate ANOVAs. That inflates Type I Error!')}
+      ${dialogue('thor','Multiple dependent variables? Easy! Just run a bunch of univariate ANOVAs, one for each variable! Copy and paste 10 ANOVAs in a row!')}
+      ${dialogue('odin','Amateur folly! Multiple ANOVAs dramatically inflate the Type I Error rate. Moreover, throwing away the precious intercorrelations between variables is destroying information. For multidimensional feasts, we demand the magic of matrices: <em>MANOVA</em>!')}
+      <button class="continue-btn" onclick="nextScene()">Enter the Hall →</button>
+    </div>`});
+
+  // ━━ SCENE 2: MANOVA Structure ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('odin','MANOVA = 1+ Independent Variables (categorical) + 2+ Dependent Variables (continuous and theoretically correlated).')}
+      ${dialogue('odin','Instead of analyzing unidimensional variance (Sum of Squares), MANOVA uses <em>SSCP Matrices</em> (Hypothesis, Error, Total). It creates <em>Linear Combinations (Variates)</em> of the DVs, testing whether groups differ in a multidimensional plane.')}
+      <div class="matrix-visual">
+        <div class="mat-segment mat-total">SSCP<sub>T</sub><br><small>Total</small></div>
+        <div class="mat-eq">=</div>
+        <div class="mat-segment mat-hyp">SSCP<sub>H</sub><br><small>Hypothesis</small></div>
+        <div class="mat-eq">+</div>
+        <div class="mat-segment mat-err">SSCP<sub>E</sub><br><small>Error</small></div>
+      </div>
+      ${dialogue('huginn','Don\'t throw variables into the cauldron just because you collected them. If they have no theoretical connection, MANOVA loses statistical power and turns into an indigestible stew!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 3: CHALLENGE 1 — When to use MANOVA ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('MANOVA = multiple correlated DVs + protection against Type I Error.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 1: The Feast of Many Tables</div>
+        <div class="challenge-question">When is MANOVA preferable to multiple separate ANOVAs?</div>
+        ${hint}
+        <div class="options-grid" id="q1-opts">
+          <button class="option-btn" onclick="checkQ(1,this,'a')">Whenever you have more than one variable, regardless of correlation or theory</button>
+          <button class="option-btn" onclick="checkQ(1,this,'b')">When we have 2+ theoretically correlated DVs and want to protect against Type I Error inflation by testing them simultaneously in multivariate space</button>
+          <button class="option-btn" onclick="checkQ(1,this,'c')">When the ANOVA yields a non-significant result and we need a more "powerful" test</button>
+          <button class="option-btn" onclick="checkQ(1,this,'d')">Never — separate ANOVAs are always better and easier to interpret</button>
+        </div>
+        <div id="q1-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 4: Multivariate Assumptions ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','MANOVA assumptions: 1) <em>Multivariate Normality</em> — the DVs collectively must have multivariate normality. 2) <em>Homogeneity of Covariance Matrices</em> — the correlations between DVs must be equal across all groups.')}
+      ${dialogue('muninn','The guardian of homogeneity is <em>Box\'s M Test</em>. If group sizes are unequal AND Box\'s Test is significant (p < 0.001), your results are in serious danger!')}
+      ${dialogue('odin','Multivariate normality is more demanding than univariate — each DV can be normal on its own, but the joint distribution may not be. In practice, with large samples (N > 30 per group), MANOVA is robust against mild violations.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 5: CHALLENGE 2 — Box's Test ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Box\'s M with p < .001 + unequal groups = danger. Pillai is more robust.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 2: The Guardian of Box</div>
+        <div class="challenge-question">Box's M Test returned F = 3.45, p = .0003. The groups have unequal sizes (n₁=15, n₂=30, n₃=45). What is the consequence?</div>
+        <div class="data-display">
+          Box's M: F = 3.45, p = .0003<br>
+          Groups: n₁=15 &nbsp;|&nbsp; n₂=30 &nbsp;|&nbsp; n₃=45
+        </div>
+        ${hint}
+        <div class="options-grid" id="q2-opts">
+          <button class="option-btn" onclick="checkQ(2,this,'a')">No problem — p > .05 (misread), you can use any statistic</button>
+          <button class="option-btn" onclick="checkQ(2,this,'b')">Just use Wilks' Lambda — it's the most popular statistic and solves everything</button>
+          <button class="option-btn" onclick="checkQ(2,this,'c')">Redo the data collection with exactly equal groups before any analysis</button>
+          <button class="option-btn" onclick="checkQ(2,this,'d')">The homogeneity of covariance matrices has been VIOLATED (p < .001) AND the groups are unequal — this is serious and can invalidate the results. Use Pillai's Trace as the most robust statistic</button>
+        </div>
+        <div id="q2-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 6: The 4 Test Statistics ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','MANOVA produces <em>4 test statistics</em>: 1) <em>Pillai\'s Trace</em> — safest, most robust. 2) <em>Wilks\' Lambda</em> — most popular. 3) <em>Hotelling\'s Trace</em>. 4) <em>Roy\'s Largest Root</em>.')}
+      ${dialogue('muninn','When in doubt, serve <em>Pillai\'s Trace</em>! It is the safest and most robust statistic, especially when assumptions waver or group sizes are unequal. If p < 0.05, the multivariate feast is a success.')}
+      ${dialogue('odin','Wilks\' Lambda is the most reported in the literature, but assumes stricter assumptions. Roy\'s Largest Root is the most powerful when there is a single discriminant dimension, but it is the least robust. Each statistic tells a part of the multivariate story.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 7: CHALLENGE 3 — Test Statistics ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Pillai = safest/most robust. Wilks = most popular. Roy = least robust.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 3: The Choice of the Trace</div>
+        <div class="challenge-question">Which MANOVA statistic is recommended when assumptions are partially violated and groups have unequal sizes?</div>
+        ${hint}
+        <div class="options-grid" id="q3-opts">
+          <button class="option-btn" onclick="checkQ(3,this,'a')">Pillai's Trace — it is the most robust against assumption violations and unequal group sizes</button>
+          <button class="option-btn" onclick="checkQ(3,this,'b')">Wilks' Lambda — it is the most popular, so it is always the best choice</button>
+          <button class="option-btn" onclick="checkQ(3,this,'c')">Roy's Largest Root — it is the most powerful in any scenario</button>
+          <button class="option-btn" onclick="checkQ(3,this,'d')">Any of them will do — they all produce the same result</button>
+        </div>
+        <div id="q3-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 8: Follow-up after MANOVA ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Significant MANOVA? Great. But now: <em>where</em> is the difference? Two options:')}
+      ${dialogue('odin','1) <em>Follow-up Univariate ANOVAs</em> with Bonferroni correction — easy to interpret, but they ignore correlations between DVs.')}
+      ${dialogue('odin','2) <em>Discriminant Analysis</em> — maintains the multivariate spirit, discovers which linear combinations of DVs best separate the groups. It is the recommendation of the gods.')}
+      ${dialogue('muninn','Bonferroni adjusts alpha: if you have 3 DVs, adjusted alpha = .05/3 ≈ .017. Any univariate ANOVA needs p < .017 to be considered significant. That is the price of multiplicity!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 9: CHALLENGE 4 — Follow-up ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('5 ANOVAs without correction = Type I Error inflation. Bonferroni: adjusted alpha = .05/5 = .01.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 4: The Price of Multiplicity</div>
+        <div class="challenge-question">After a significant MANOVA, the researcher ran 5 univariate ANOVAs (one per DV) WITHOUT Bonferroni correction. What is the problem?</div>
+        <div class="data-display">
+          5 univariate ANOVAs &nbsp;|&nbsp; α = .05 each<br>
+          Accumulated error ≈ 1 − (1−.05)⁵ ≈ 23%
+        </div>
+        ${hint}
+        <div class="options-grid" id="q4-opts">
+          <button class="option-btn" onclick="checkQ(4,this,'a')">No problem — the MANOVA already controlled the error, the ANOVAs are free</button>
+          <button class="option-btn" onclick="checkQ(4,this,'b')">The Bonferroni correction is just an optional suggestion, not mandatory</button>
+          <button class="option-btn" onclick="checkQ(4,this,'c')">Without Bonferroni correction, the Type I Error rate inflates with each additional test. With 5 tests at α=.05, the accumulated error can reach ~23%</button>
+          <button class="option-btn" onclick="checkQ(4,this,'d')">Should have run t-tests instead of follow-up ANOVAs</button>
+        </div>
+        <div id="q4-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 10: Choosing DVs wisely ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','The DVs should be <em>theoretically related</em> and <em>moderately correlated</em> (r between .3 and .7). If r > .9 = redundancy. If r ≈ 0 = it makes no sense to analyze them together.')}
+      ${dialogue('huginn','Thought that "more variables = more power"? Wrong! Each irrelevant DV you throw into the cauldron consumes degrees of freedom and dilutes MANOVA\'s power. Be surgical — include only what theory justifies.')}
+      ${dialogue('muninn','Multicollinearity among DVs (r > .90) is as dangerous as in regression. The SSCP matrix becomes unstable, and the results lose reliability. Combine the redundant ones into a composite score or eliminate the duplicates.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 11: CHALLENGE 5 — DV Selection ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('DVs with r > .90 are redundant. Removing or combining them improves the analysis.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 5: The Dimensional Stew</div>
+        <div class="challenge-question">A researcher included 8 DVs in the MANOVA, but 3 of them have correlations r > 0.90 with each other. What should be done?</div>
+        <div class="data-display">
+          8 DVs in MANOVA<br>
+          3 DVs with r > .90 among them (redundant)
+        </div>
+        ${hint}
+        <div class="options-grid" id="q5-opts">
+          <button class="option-btn" onclick="checkQ(5,this,'a')">Keep all of them — more variables means more statistical power</button>
+          <button class="option-btn" onclick="checkQ(5,this,'b')">Run 8 separate ANOVAs instead of MANOVA</button>
+          <button class="option-btn" onclick="checkQ(5,this,'c')">Use MANCOVA to control the redundant DVs as covariates</button>
+          <button class="option-btn" onclick="checkQ(5,this,'d')">Remove the redundant DVs (r > .90) or combine them into a composite score. Multicollinearity among DVs harms MANOVA</button>
+        </div>
+        <div id="q5-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 12: CHALLENGE 6 — Full Interpretation ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Bonferroni: .05/3 = .017. DV1 .002 < .017 ✓; DV2 .03 > .017 ✗; DV3 .45 ✗.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 6: The Multivariate Scroll</div>
+        <div class="challenge-question">MANOVA with 2 groups, 3 DVs: Pillai's Trace = 0.34, F(3, 56) = 9.67, p < .001. Follow-up ANOVAs (Bonferroni α = .017): DV1 p=.002, DV2 p=.03, DV3 p=.45. Conclusion?</div>
+        <div class="data-display">
+          Pillai's Trace = 0.34, F(3, 56) = 9.67, p < .001<br>
+          Bonferroni α = .05/3 = .017<br>
+          DV1: p = .002 &nbsp;|&nbsp; DV2: p = .03 &nbsp;|&nbsp; DV3: p = .45
+        </div>
+        ${hint}
+        <div class="options-grid" id="q6-opts">
+          <button class="option-btn" onclick="checkQ(6,this,'a')">All 3 DVs differ significantly between groups</button>
+          <button class="option-btn" onclick="checkQ(6,this,'b')">Significant multivariate difference (Pillai p < .001). In the univariate follow-ups with Bonferroni: DV1 contributes (p=.002 < .017), DV2 does NOT (p=.03 > .017), DV3 does not (p=.45). Only DV1 survives the correction</button>
+          <button class="option-btn" onclick="checkQ(6,this,'c')">Only DV3 matters because it has the largest p-value</button>
+          <button class="option-btn" onclick="checkQ(6,this,'d')">The MANOVA is wrong — the univariate results contradict the multivariate one</button>
+        </div>
+        <div id="q6-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 13: CHALLENGE 7 — Why not multiple ANOVAs ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('MANOVA = Type I protection + respects intercorrelations among DVs.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 7: The Final Argument</div>
+        <div class="challenge-question">What is the main reason for using MANOVA instead of multiple ANOVAs?</div>
+        ${hint}
+        <div class="options-grid" id="q7-opts">
+          <button class="option-btn" onclick="checkQ(7,this,'a')">MANOVA is simpler to calculate and interpret</button>
+          <button class="option-btn" onclick="checkQ(7,this,'b')">Univariate ANOVAs are obsolete and should no longer be used</button>
+          <button class="option-btn" onclick="checkQ(7,this,'c')">MANOVA protects against Type I Error inflation and preserves the information about correlations among DVs that univariate ANOVAs ignore</button>
+          <button class="option-btn" onclick="checkQ(7,this,'d')">MANOVA does not require assumptions, unlike ANOVA</button>
+        </div>
+        <div id="q7-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ MASTER CHALLENGES ━━
+  if(GAME.difficulty==='mestre'){
+    // CHALLENGE 8: Roy's Largest Root
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: Roy's Root</div>
+          <div class="challenge-question">In what situation is Roy's Largest Root preferable to Pillai's Trace?</div>
+          <div class="options-grid" id="q8-opts">
+            <button class="option-btn" onclick="checkQ(8,this,'a')">When there is only one relevant dimension separating the groups (the first linear discriminant combination explains nearly all the variance). Roy is more powerful in this specific scenario, but less robust in general</button>
+            <button class="option-btn" onclick="checkQ(8,this,'b')">Always — Roy is the most powerful statistic in any scenario</button>
+            <button class="option-btn" onclick="checkQ(8,this,'c')">Never — Pillai is superior in all possible scenarios</button>
+            <button class="option-btn" onclick="checkQ(8,this,'d')">When groups have equal sizes and assumptions are met</button>
+          </div>
+          <div id="q8-fb"></div>
+        </div>
+      </div>`});
+
+    // CHALLENGE 9: Cherry-picking
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: Dimensional Cherry-Picking</div>
+          <div class="challenge-question">A researcher collected 3 DVs and ran a MANOVA (non-significant: Pillai p = .12). They then ran 3 separate ANOVAs and found one significant result (p = .04). They want to report only the significant ANOVA. Is this appropriate?</div>
+          <div class="data-display">
+            MANOVA: Pillai p = .12 (non-significant)<br>
+            ANOVA DV1: p = .32 &nbsp;|&nbsp; ANOVA DV2: p = .04* &nbsp;|&nbsp; ANOVA DV3: p = .58
+          </div>
+          <div class="options-grid" id="q9-opts">
+            <button class="option-btn" onclick="checkQ(9,this,'a')">Yes — the univariate ANOVA is more precise than the MANOVA for each individual DV</button>
+            <button class="option-btn" onclick="checkQ(9,this,'b')">NO — this is cherry-picking (QRP). The non-significant MANOVA indicates there is no multivariate difference. Reporting only the isolated ANOVA ignores the Type I Error inflation that MANOVA was supposed to have controlled</button>
+            <button class="option-btn" onclick="checkQ(9,this,'c')">It depends on the journal — some accept separate ANOVAs even with a non-significant MANOVA</button>
+            <button class="option-btn" onclick="checkQ(9,this,'d')">Yes, as long as both results are reported in the paper</button>
+          </div>
+          <div id="q9-fb"></div>
+        </div>
+      </div>`});
+  }
+
+  // ━━ FINAL SCENE ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','The Great Hall of Matrices reverberates with power. The dimensions align, the variables dance in harmony, and the multivariate space bows before the statistician who learned to respect its laws.')}
+      ${dialogue('odin','You have conquered the <em>Realm of MANOVA</em>! You mastered the SSCP matrices, multivariate assumptions, Box\'s Test, the four test statistics, follow-ups with Bonferroni, and careful DV selection. The multidimensional feast is yours!')}
+      ${dialogue('thor','All right... I admit that Pillai\'s Trace saved me when my covariance matrices collapsed. But I still prefer a good one-way ANOVA — only one dimension to worry about!')}
+      ${dialogue('muninn','In the next Realm, the final fusion: <em>MANCOVA</em> — when continuous covariates join the multivariate feast. The complexity increases, but the logic remains the same. Prepare for the last layer of the Linear Grimoire!')}
+      <button class="continue-btn" onclick="showResults()">See Final Result ⚔️</button>
+    </div>`});
+}
+
+// ════════════════════════════════════════════════════
+const ANSWERS={1:'b',2:'d',3:'a',4:'c',5:'d',6:'b',7:'c',8:'a',9:'b'};
+const EXPLANATIONS={
+  1:{
+    correct:'✅ Perfect! MANOVA is indicated when we have <em>2+ theoretically correlated DVs</em> and want to protect against Type I Error inflation. It tests differences in multivariate space — preserving the intercorrelations among DVs that separate ANOVAs discard.',
+    wrong:'❌ MANOVA is not for "any case with multiple variables." It requires <em>2+ theoretically correlated DVs</em> and protects against Type I Error inflation by testing them simultaneously. Without theoretical correlation among DVs, it loses power and meaning.',
+    charC:'odin',charW:'thor'
+  },
+  2:{
+    correct:'✅ Correct! Box\'s M with p = .0003 < .001 → <em>homogeneity violated</em>. With unequal groups (15, 30, 45), this is serious. <em>Pillai\'s Trace</em> is the most robust statistic under these conditions. Wilks and Roy would be more vulnerable to this violation.',
+    wrong:'❌ Box\'s M p = .0003 is less than .001 — the homogeneity of covariance matrices has been <em>violated</em>. With unequal groups, this is especially dangerous. Use <em>Pillai\'s Trace</em>, which is the most robust statistic against such violations.',
+    charC:'muninn',charW:'thor'
+  },
+  3:{
+    correct:'✅ Exactly! <em>Pillai\'s Trace</em> is the most robust MANOVA statistic. When assumptions are partially violated or groups are unequal, Pillai is the safest choice. Wilks is more popular but less robust; Roy is the least robust of all.',
+    wrong:'❌ With violated assumptions and unequal groups, the safe choice is <em>Pillai\'s Trace</em> — the most robust among the 4 statistics. Wilks\' Lambda is popular but less robust; Roy\'s Largest Root is the most vulnerable to violations.',
+    charC:'odin',charW:'thor'
+  },
+  4:{
+    correct:'✅ Perfect! Without Bonferroni, 5 tests at α = .05 generate an accumulated error of ≈ 23%. The <em>Bonferroni correction</em> adjusts: adjusted alpha = .05/5 = .01. Each ANOVA needs p < .01 to be significant. That is the price of multiplicity.',
+    wrong:'❌ Multiple ANOVAs without correction dramatically inflate Type I Error. With 5 tests: 1 − (1−.05)⁵ ≈ 23% chance of a false positive! The <em>Bonferroni correction</em> is essential: adjusted alpha = .05/5 = .01.',
+    charC:'odin',charW:'thor'
+  },
+  5:{
+    correct:'✅ Excellent! DVs with r > .90 are <em>redundant</em> — multicollinearity destabilizes the SSCP matrix and harms the results. Remove the duplicates or combine them into a <em>composite score</em>. MANOVA needs moderately correlated DVs (.3 to .7), not identical ones.',
+    wrong:'❌ DVs with r > .90 are redundant and create <em>multicollinearity</em> that harms MANOVA. The solution is to <em>remove the duplicates or combine them</em> into a composite score. More variables does not always = more power — redundant DVs dilute the analysis.',
+    charC:'muninn',charW:'thor'
+  },
+  6:{
+    correct:'✅ Flawless reading! The multivariate MANOVA is significant (Pillai p < .001) — a global difference exists. In the univariate follow-ups with <em>Bonferroni (α = .017)</em>: DV1 p = .002 < .017 ✓, DV2 p = .03 > .017 ✗, DV3 p = .45 ✗. Only DV1 survives the correction.',
+    wrong:'❌ Bonferroni requires adjusted alpha = .05/3 = <em>.017</em>. DV1 (p = .002) passes; DV2 (p = .03) does NOT pass — .03 > .017; DV3 (p = .45) does not pass. The multivariate difference exists (Pillai p < .001), but only DV1 contributes individually after the correction.',
+    charC:'odin',charW:'thor'
+  },
+  7:{
+    correct:'✅ Brilliant! MANOVA offers <em>protection against Type I Error inflation</em> by testing multiple DVs simultaneously. Additionally, it <em>preserves the intercorrelations among DVs</em> — information that univariate ANOVAs simply discard. It is the combination of these two advantages that justifies its use.',
+    wrong:'❌ MANOVA\'s main advantage is twofold: <em>protects against Type I Error inflation</em> (single test vs. multiple) and <em>preserves the correlations among DVs</em>. Separate ANOVAs ignore those correlations and inflate the error. MANOVA is neither simpler nor assumption-free.',
+    charC:'huginn',charW:'thor'
+  },
+  8:{
+    correct:'✅ Correct! Roy\'s Largest Root is more <em>powerful</em> when there is a single dominant discriminant dimension — that is, when the first linear combination of DVs explains nearly all the separation between groups. Outside this specific scenario, it is the least robust.',
+    wrong:'❌ Roy\'s Largest Root is preferable when there is <em>only one relevant dimension</em> separating the groups. In that scenario, it is the most powerful. But it is the <em>least robust</em> in general — if there are multiple dimensions or assumption violations, Pillai is superior.',
+    charC:'odin',charW:'thor'
+  },
+  9:{
+    correct:'✅ Exactly! This is <em>cherry-picking</em> — a Questionable Research Practice (QRP). The non-significant MANOVA (p = .12) indicates there is no multivariate difference. Fishing for a significant ANOVA afterward and reporting only that one completely ignores the Type I Error inflation that MANOVA was supposed to have controlled.',
+    wrong:'❌ This is <em>cherry-picking (QRP)</em>. The MANOVA p = .12 indicates absence of multivariate difference. Ignoring that result and fishing for a significant ANOVA violates the logic of Type I Error control. If MANOVA failed, the subsequent ANOVAs should not be used selectively.',
+    charC:'muninn',charW:'thor'
+  }
+};
+
+function checkQ(q,btn,ans){
+  const opts=document.querySelectorAll(`#q${q}-opts .option-btn`);
+  opts.forEach(b=>{b.classList.add('disabled');b.onclick=null;});
+  const fb=document.getElementById(`q${q}-fb`),cor=ANSWERS[q],exp=EXPLANATIONS[q];
+  GAME.total++;
+  if(ans===cor){
+    btn.classList.add('correct');GAME.hits++;GAME.xp+=20;updateXPBar();earnGear();
+    fb.innerHTML=`<div class="feedback-box correct">${dialogue(exp.charC,exp.correct+' <span class="xp-badge">+20 XP</span>')}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }else{
+    btn.classList.add('wrong');
+    const ci=['a','b','c','d'].indexOf(cor);if(opts[ci])opts[ci].classList.add('correct');
+    fb.innerHTML=`<div class="feedback-box wrong">${dialogue(exp.charW,exp.wrong)}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }
+}
+
+function countMaxXP(){return (GAME.difficulty==='mestre'?9:7)*20;}
+function renderScene(){if(GAME.currentScene<GAME.scenes.length){content().innerHTML=GAME.scenes[GAME.currentScene].html();restoreGear();window.scrollTo({top:0,behavior:'smooth'});}}
+function nextScene(){GAME.currentScene++;renderScene();}
+
+function showResults(){
+  const pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  let rank,rc;
+  if(pct>=90){rank='🏆 Lord of the Matrices';rc='#f0c040';}
+  else if(pct>=70){rank='📜 Multivariate Guardian';rc='#58a6ff';}
+  else if(pct>=50){rank='🛡️ Dimensional Apprentice';rc='#8b949e';}
+  else{rank='⛓️ Lost in the Dimensions';rc='#f85149';}
+  content().innerHTML=`
+  <div class="result-screen">
+    <div class="reino-badge">REALM 12 — COMPLETE</div>
+    <h2>Adventure Result</h2>
+    ${resultVikingHTML()}
+    <div class="result-rank" style="color:${rc}">${rank}</div>
+    <div class="result-stats">
+      <div class="stat-row"><span class="stat-label">Difficulty</span><span class="stat-value">${GAME.difficulty==='mestre'?'⚔️ Master':'🛡️ Apprentice'}</span></div>
+      <div class="stat-row"><span class="stat-label">Correct Challenges</span><span class="stat-value">${GAME.hits} / ${GAME.total}</span></div>
+      <div class="stat-row"><span class="stat-label">Accuracy</span><span class="stat-value">${pct}%</span></div>
+      <div class="stat-row"><span class="stat-label">XP Earned</span><span class="stat-value">${GAME.xp} / ${GAME.maxXP}</span></div>
+    </div>
+    ${dialogue('odin',pct>=70
+      ?'The Great Hall of Matrices reverberates in your honor! You mastered MANOVA — from SSCP matrices to Pillai\'s Trace, from Box\'s Test to Bonferroni. The multivariate space has bowed before your knowledge!'
+      :'The dimensions collapsed before you could tame them... Return to the Hall and review: SSCP matrices, Box\'s M, the 4 test statistics, follow-ups with Bonferroni, and DV selection. The multivariate space awaits your second attempt!'
+    )}
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+      <button class="continue-btn" onclick="showTitleScreen()">🔄 Play Again</button>
+    </div>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+var GEAR_ITEMS=[
+  {"s":"boots","n":"Multidimensional Boots","h":"<div style=\"display:flex;gap:14px\"><div style=\"width:24px;height:18px;background:#2a4a6a;border-radius:3px 3px 4px 7px;border:2px solid #3a6a9a\"></div><div style=\"width:24px;height:18px;background:#2a4a6a;border-radius:3px 3px 4px 7px;border:2px solid #3a6a9a\"></div></div>"},
+  {"s":"mail","n":"Matrix Armor","h":"<div style=\"width:60px;height:72px;background:linear-gradient(135deg,#1a3a6a,#0a2a5a);border-radius:7px 7px 4px 4px;border:2px solid #2a4a7a;position:relative\"><div style=\"position:absolute;top:8px;left:8px;width:16px;height:16px;border:2px solid #58a6ff;border-radius:3px\"></div><div style=\"position:absolute;top:8px;right:8px;width:16px;height:16px;border:2px solid #58a6ff;border-radius:3px\"></div><div style=\"position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:16px;height:16px;border:2px solid #58a6ff;border-radius:3px\"></div></div>"},
+  {"s":"right","n":"Pillai's Scepter","h":"<div style=\"display:flex;flex-direction:column;align-items:center\"><div style=\"width:14px;height:14px;background:linear-gradient(135deg,#58a6ff,#2070c0);border-radius:50%;border:2px solid #4090d0\"></div><div style=\"width:5px;height:34px;background:linear-gradient(180deg,#c0d0e0,#8090a0);border-radius:2px;margin-top:-2px\"></div></div>"},
+  {"s":"left","n":"Box's Shield","h":"<div style=\"width:36px;height:40px;background:linear-gradient(180deg,#3a6a9a,#1a4a7a);border-radius:3px 3px 12px 12px;border:2px solid #4a7aaa;position:relative\"><div style=\"position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:#f0c040;font-weight:bold\">M</div></div>"},
+  {"s":"cape","n":"Vector Space Cloak","h":"<div style=\"width:84px;height:110px;background:linear-gradient(135deg,#0a2a5a,#1a1a4a);border-radius:5px 5px 28px 28px;clip-path:polygon(16% 0%,84% 0%,100% 18%,92% 100%,50% 88%,8% 100%,0% 18%)\"></div>"},
+  {"s":"helm","n":"Crown of Wilks","h":"<div style=\"width:52px;height:26px;background:linear-gradient(135deg,#4a90d0,#2060a0);border-radius:26px 26px 5px 5px;border:2px solid #3070b0;position:relative\"><div style=\"position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:10px;height:10px;background:#f0c040;clip-path:polygon(50% 0%,0% 100%,100% 100%)\"></div></div>"}
+];
+var gearEarned=0;
+function armorPanelHTML(){
+  var rows='';
+  for(var i=0;i<GEAR_ITEMS.length;i++){rows+='<div class="gp-row'+(i<gearEarned?' earned':'')+'" id="gprow'+i+'"><span class="gp-dot"></span><span>'+GEAR_ITEMS[i].n+'</span></div>';}
+  var sl='<div class="vm-sparks" id="vmsparks"></div>';
+  sl+='<div class="vm-slot vm-cape" id="vmslot-cape"></div>';
+  sl+='<div class="vm-head"></div><div class="vm-arm-l"></div><div class="vm-arm-r"></div><div class="vm-torso"></div><div class="vm-leg-l"></div><div class="vm-leg-r"></div>';
+  sl+='<div class="vm-slot vm-boots" id="vmslot-boots"></div><div class="vm-slot vm-mail" id="vmslot-mail"></div>';
+  sl+='<div class="vm-slot vm-left" id="vmslot-left"></div><div class="vm-slot vm-right" id="vmslot-right"></div>';
+  sl+='<div class="vm-slot vm-helm" id="vmslot-helm"></div>';
+  return '<div class="armor-panel"><div class="viking-mini" id="vmini">'+sl+'</div><div class="gear-progress">'+rows+'</div></div>';
+}
+function restoreGear(){for(var i=0;i<gearEarned&&i<GEAR_ITEMS.length;i++){var g=GEAR_ITEMS[i],el=document.getElementById('vmslot-'+g.s);if(el){el.innerHTML=g.h;el.classList.add('on');}}}
+function earnGear(){
+  if(gearEarned>=GEAR_ITEMS.length)return;
+  var g=GEAR_ITEMS[gearEarned],el=document.getElementById('vmslot-'+g.s);
+  if(el){el.innerHTML=g.h;el.classList.add('on','vm-flash');setTimeout(function(){el.classList.remove('vm-flash')},500);spawnVMSparks(el);}
+  var row=document.getElementById('gprow'+gearEarned);if(row)row.classList.add('earned');
+  gearEarned++;
+}
+function spawnVMSparks(el){
+  var sc=document.getElementById('vmsparks');if(!sc||!el)return;
+  var r=el.getBoundingClientRect(),sr=document.getElementById('vmini').getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height/2;
+  var cols=['#f0c040','#f08030','#f0e080','#ff6040','#ffd060'];
+  for(var i=0;i<10;i++){var s=document.createElement('div');s.className='vm-spark';
+    var a=Math.random()*Math.PI*2,d=20+Math.random()*30;
+    s.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+cols[Math.floor(Math.random()*5)]+';--sx:'+(Math.cos(a)*d)+'px;--sy:'+(Math.sin(a)*d)+'px;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px';
+    sc.appendChild(s);setTimeout(function(x){x.remove()},700,s);}
+}
+function resultVikingHTML(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var ti=[];if(pct>=90)ti=GEAR_ITEMS;else if(pct>=70)ti=GEAR_ITEMS.slice(0,5);else if(pct>=50)ti=GEAR_ITEMS.slice(0,2);
+  var sm={boots:'rv-boots',mail:'rv-mail',right:'rv-right',left:'rv-left',cape:'rv-cape',helm:'rv-helm'};
+  var html='<div class="result-viking">';
+  html+='<div class="rv-slot rv-cape" id="rvs-cape"></div>';
+  html+='<div class="rv-head"></div><div class="rv-arm-l"></div><div class="rv-arm-r"></div><div class="rv-torso"></div><div class="rv-leg-l"></div><div class="rv-leg-r"></div>';
+  html+='<div class="rv-slot rv-boots" id="rvs-boots"></div><div class="rv-slot rv-mail" id="rvs-mail"></div>';
+  html+='<div class="rv-slot rv-left" id="rvs-left"></div><div class="rv-slot rv-right" id="rvs-right"></div>';
+  html+='<div class="rv-slot rv-helm" id="rvs-helm"></div></div>';
+  setTimeout(function(){ti.forEach(function(g){var e=document.getElementById('rvs-'+g.s);if(e)e.innerHTML=g.h;});},100);
+  return html;
+}
+
+showTitleScreen();
+</script>
+</body>
+</html>

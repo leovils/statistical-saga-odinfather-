@@ -50,6 +50,18 @@ body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',curs
 .realm-card:nth-child(5)::before{background:var(--thor-red)}
 .realm-card:nth-child(6)::before{background:#f97316}
 .realm-card:nth-child(7)::before{background:#06b6d4}
+.realm-card:nth-child(8)::before{background:#e74c3c}
+.realm-card:nth-child(9)::before{background:#9b59b6}
+.realm-card:nth-child(10)::before{background:#1abc9c}
+.realm-card:nth-child(11)::before{background:#3498db}
+.realm-card:nth-child(12)::before{background:#e67e22}
+.realm-card:nth-child(13)::before{background:#f1c40f}
+.realm-card:nth-child(15)::before{background:#2ecc71}
+
+/* ── SECTION DIVIDER ── */
+.section-divider{text-align:center;margin:30px 0 20px;padding:16px;border-top:2px solid var(--border);border-bottom:2px solid var(--border)}
+.section-divider h3{font-family:'Bangers',cursive;font-size:1.6em;color:var(--gold);margin-bottom:4px}
+.section-divider p{font-size:.9em;color:var(--text-dim)}
 
 /* ── FOOTER ── */
 .hub-footer{text-align:center;margin-top:40px;padding:20px;border-top:1px solid var(--border);color:var(--text-dim);font-size:.9em}
@@ -107,8 +119,8 @@ body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',curs
 
   <!-- STATS -->
   <div class="hub-stats">
-    <div class="hub-stat"><div class="stat-num">7</div><div class="stat-txt">Realms</div></div>
-    <div class="hub-stat"><div class="stat-num">63</div><div class="stat-txt">Challenges (Master)</div></div>
+    <div class="hub-stat"><div class="stat-num">14</div><div class="stat-txt">Realms</div></div>
+    <div class="hub-stat"><div class="stat-num">126</div><div class="stat-txt">Challenges (Master)</div></div>
     <div class="hub-stat"><div class="stat-num">2</div><div class="stat-txt">Difficulty Modes</div></div>
     <div class="hub-stat"><div class="stat-num">&infin;</div><div class="stat-txt">Replayability</div></div>
   </div>
@@ -181,6 +193,88 @@ body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',curs
         <div class="realm-title">Equivalence Testing (TOST)</div>
         <div class="realm-setting">&#x1F308; Bridge of Bifrost</div>
         <div class="realm-topics">SESOI &middot; TOST (Two One-Sided Tests) &middot; 90% CI &middot; Paired vs Independent &middot; 4 Quadrants NHST&times;TOST</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+
+    <!-- SECTION: ANOVA & Variations -->
+    <div class="section-divider">
+      <h3>&#x2694;&#xFE0F; ANOVA &amp; Variations</h3>
+      <p>The advanced realms of analysis of variance — from the banquet hall to the throne room</p>
+    </div>
+
+    <a class="realm-card" href="statistical-saga-realm8.html">
+      <div class="realm-number">8</div>
+      <div class="realm-info">
+        <div class="realm-title">One-Way ANOVA</div>
+        <div class="realm-setting">&#x1F356; Banquet Hall of Valhalla</div>
+        <div class="realm-topics">SST = SSM + SSR &middot; F Ratio &middot; Degrees of Freedom &middot; Levene &middot; Post-Hoc &middot; &omega;&sup2; vs &eta;&sup2; &middot; GLM</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm9.html">
+      <div class="realm-number">9</div>
+      <div class="realm-info">
+        <div class="realm-title">Factorial ANOVA</div>
+        <div class="realm-setting">&#x1F9EA; Culinary Grimoire of Valhalla</div>
+        <div class="realm-topics">2+ Factors &middot; Main Effects &middot; Interaction &middot; Familywise Error &middot; Variance Partition &middot; APA Reporting</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm10.html">
+      <div class="realm-number">10</div>
+      <div class="realm-info">
+        <div class="realm-title">Repeated Measures ANOVA</div>
+        <div class="realm-setting">&#x231B; Forge of Time</div>
+        <div class="realm-topics">Within-Subjects &middot; Sphericity &middot; Mauchly &middot; Greenhouse-Geisser &middot; Huynh-Feldt &middot; Mixed ANOVA &middot; Friedman</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm11.html">
+      <div class="realm-number">11</div>
+      <div class="realm-info">
+        <div class="realm-title">ANCOVA</div>
+        <div class="realm-setting">&#x1F4DA; Library of the Sages of Asgard</div>
+        <div class="realm-topics">Covariates &middot; Variance Purification &middot; Homogeneity of Slopes &middot; Assumptions &middot; GLM Connection</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm12.html">
+      <div class="realm-number">12</div>
+      <div class="realm-info">
+        <div class="realm-title">MANOVA</div>
+        <div class="realm-setting">&#x1F3DB;&#xFE0F; Great Hall of Matrices</div>
+        <div class="realm-topics">Multiple DVs &middot; SSCP Matrices &middot; Box's M &middot; Pillai/Wilks/Hotelling/Roy &middot; Follow-up &middot; Discriminant</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+
+    <a class="realm-card" href="statistical-saga-realm13.html">
+      <div class="realm-number">13</div>
+      <div class="realm-info">
+        <div class="realm-title">MANCOVA</div>
+        <div class="realm-setting">&#x1F451; Odin's Throne</div>
+        <div class="realm-topics">MANOVA + ANCOVA &middot; Parsimony &middot; Comparison Table &middot; Assumptions &middot; Follow-up &middot; Full GLM</div>
+      </div>
+      <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
+    </a>
+
+    <!-- SECTION: Non-Parametric Tests -->
+    <div class="section-divider">
+      <h3>&#x1F3F9; Non-Parametric Tests</h3>
+      <p>When parametric assumptions fail — the ranking weapons of Niflheim</p>
+    </div>
+
+    <a class="realm-card" href="statistical-saga-realm14.html">
+      <div class="realm-number">14</div>
+      <div class="realm-info">
+        <div class="realm-title">Non-Parametric Tests</div>
+        <div class="realm-setting">&#x2744;&#xFE0F; Niflheim — Land of Ice</div>
+        <div class="realm-topics">Mann-Whitney U &middot; Wilcoxon &middot; Kruskal-Wallis &middot; Friedman &middot; Spearman &rho; &middot; Kendall &tau; &middot; Effect Size r</div>
       </div>
       <div><span class="realm-badge badge-aprendiz">7 + 2&#x1F3F4;</span></div>
     </a>

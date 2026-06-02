@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather — Realm 11: ANCOVA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh;overflow-x:hidden}
+#game-container{max-width:800px;margin:0 auto;padding:20px;min-height:100vh}
+.title-screen{text-align:center;padding:60px 20px;animation:fadeIn 1s ease}
+.title-screen h1{font-family:'Bangers',cursive;font-size:2.8em;color:var(--gold);text-shadow:2px 2px 8px rgba(240,192,64,.3);line-height:1.1;margin-bottom:8px}
+.title-screen h2{font-family:'Permanent Marker',cursive;font-size:1.5em;color:var(--odin-blue);margin-bottom:30px}
+.title-screen .subtitle{color:var(--text-dim);font-size:1.1em;margin-bottom:40px}
+.reino-badge{display:inline-block;background:linear-gradient(135deg,var(--odin-blue),var(--corvo-purple));padding:6px 20px;border-radius:20px;font-family:'Bangers',cursive;font-size:1em;color:#fff;margin-bottom:16px}
+.difficulty-select{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.diff-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Bangers',cursive;font-size:1.2em;padding:16px 32px;border-radius:12px;cursor:pointer;transition:all .3s;min-width:180px}
+.diff-btn:hover{border-color:var(--odin-blue);transform:translateY(-2px)}
+.diff-btn .diff-label{font-size:1.3em}.diff-btn .diff-desc{font-family:'Patrick Hand',cursive;font-size:.65em;color:var(--text-dim);margin-top:4px}
+.scene{animation:slideIn .5s ease;padding:10px 0}
+.dialogue-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative}
+.dialogue-box.odin{border-left:4px solid var(--odin-blue)}.dialogue-box.thor{border-left:4px solid var(--thor-red)}.dialogue-box.corvo{border-left:4px solid var(--corvo-purple)}.dialogue-box.narrator{border-left:4px solid var(--gold)}
+.char-name{font-family:'Bangers',cursive;font-size:1.1em;margin-bottom:6px}
+.char-name.odin{color:var(--odin-blue)}.char-name.thor{color:var(--thor-red)}.char-name.corvo{color:var(--corvo-purple)}.char-name.narrator{color:var(--gold)}
+.dialogue-text{line-height:1.5;font-size:1.05em}.dialogue-text em{color:var(--gold);font-style:normal;font-weight:bold}
+.challenge-box{background:var(--bg-panel);border:2px solid var(--gold);border-radius:12px;padding:24px;margin:20px 0;animation:pulse-border 2s ease infinite}
+@keyframes pulse-border{0%,100%{border-color:var(--gold);box-shadow:0 0 8px rgba(240,192,64,.15)}50%{border-color:#f0c040cc;box-shadow:0 0 16px rgba(240,192,64,.3)}}
+.challenge-title{font-family:'Bangers',cursive;font-size:1.4em;color:var(--gold);margin-bottom:12px;text-align:center}
+.challenge-question{margin-bottom:16px;line-height:1.5}
+.data-display{background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:'Courier New',monospace;font-size:1em;color:var(--odin-blue);text-align:center;letter-spacing:1px;line-height:1.6}
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.option-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Patrick Hand',cursive;font-size:1.05em;padding:14px 18px;border-radius:10px;cursor:pointer;text-align:left;transition:all .25s;line-height:1.4}
+.option-btn:hover:not(.disabled){border-color:var(--odin-blue);background:#1a2233}
+.option-btn.correct{border-color:var(--success);background:#0d2818;color:var(--success)}
+.option-btn.wrong{border-color:var(--thor-red);background:#2d1116;color:var(--thor-red)}
+.option-btn.disabled{cursor:default;opacity:.7}
+.feedback-box{border-radius:10px;padding:16px 20px;margin:16px 0;animation:fadeIn .4s ease;line-height:1.5}
+.feedback-box.correct{background:#0d2818;border:1px solid var(--success);color:var(--success)}
+.feedback-box.wrong{background:#2d1116;border:1px solid var(--thor-red);color:var(--thor-red)}
+.xp-badge{display:inline-block;background:var(--gold);color:var(--bg-dark);font-family:'Bangers',cursive;padding:2px 10px;border-radius:6px;font-size:.9em;margin-left:6px}
+.xp-bar-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.xp-label{font-family:'Bangers',cursive;color:var(--gold);font-size:1em;white-space:nowrap}
+.xp-bar-bg{flex:1;height:14px;background:var(--bg-dark);border-radius:7px;overflow:hidden}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--odin-blue),var(--gold));border-radius:7px;transition:width .6s ease}
+.xp-count{font-family:'Bangers',cursive;color:var(--text);font-size:1em;min-width:60px;text-align:right}
+.continue-btn{display:block;margin:20px auto 0;background:transparent;border:2px solid var(--odin-blue);color:var(--odin-blue);font-family:'Bangers',cursive;font-size:1.15em;padding:12px 36px;border-radius:10px;cursor:pointer;transition:all .25s}
+.continue-btn:hover{background:var(--odin-blue);color:var(--bg-dark)}
+.result-screen{text-align:center;padding:40px 20px;animation:fadeIn .8s ease}
+.result-screen h2{font-family:'Bangers',cursive;font-size:2.2em;color:var(--gold);margin-bottom:8px}
+.result-rank{font-family:'Permanent Marker',cursive;font-size:1.5em;margin:16px 0}
+.result-stats{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:20px 0;text-align:left}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text-dim)}.stat-value{font-family:'Bangers',cursive;color:var(--odin-blue)}
+.hint-box{background:#1a1530;border:1px solid var(--corvo-purple);border-radius:10px;padding:14px 18px;margin:12px 0;font-size:.95em;color:var(--corvo-purple);animation:fadeIn .5s ease}
+.hint-box .hint-label{font-family:'Bangers',cursive;font-size:1em;margin-bottom:4px}
+/* ── VISUAL: Variance Partition ── */
+.variance-visual{display:flex;align-items:center;justify-content:center;gap:4px;margin:16px 0;flex-wrap:wrap}
+.var-segment{padding:12px 10px;text-align:center;font-family:'Courier New',monospace;font-size:.85em;min-width:80px;border-radius:6px}
+.var-total{background:#1a2040;color:var(--gold);border:2px solid var(--gold)}
+.var-model{background:#0d2818;color:var(--success);border:2px solid var(--success)}
+.var-resid{background:#2d1116;color:var(--thor-red);border:2px solid var(--thor-red)}
+.var-covar{background:#1a1530;color:var(--corvo-purple);border:2px solid var(--corvo-purple)}
+.var-eq{font-family:'Bangers',cursive;color:var(--text);font-size:1.2em;padding:0 4px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.title-screen h1{font-size:2em}.title-screen h2{font-size:1.2em}.difficulty-select{flex-direction:column;align-items:center}#game-container{padding:12px}.challenge-box{padding:16px}.variance-visual{flex-wrap:wrap}.var-segment{min-width:60px;font-size:.75em}}
+
+/* ── ARMOR SYSTEM ── */
+.armor-panel{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.viking-mini{position:relative;width:120px;height:180px;flex-shrink:0}
+.vm-head{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:#d4a574;border:1.5px solid #b8956a;z-index:5}
+.vm-torso{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:44px;height:58px;background:#8b7355;border-radius:7px 7px 4px 4px;z-index:3}
+.vm-arm-l{position:absolute;top:59px;left:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-arm-r{position:absolute;top:59px;right:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-leg-l{position:absolute;top:111px;left:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-leg-r{position:absolute;top:111px;right:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-slot{position:absolute;opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1);transform:scale(.3)}
+.vm-slot.on{opacity:1;transform:scale(1)}
+.vm-helm{top:16px;left:50%;transform:translateX(-50%) scale(.3);z-index:8}.vm-helm.on{transform:translateX(-50%) scale(1)}
+.vm-mail{top:57px;left:50%;transform:translateX(-50%) scale(.3);z-index:4}.vm-mail.on{transform:translateX(-50%) scale(1)}
+.vm-cape{top:53px;left:50%;transform:translateX(-50%) scale(.3);z-index:1}.vm-cape.on{transform:translateX(-50%) scale(1)}
+.vm-left{top:66px;left:0;z-index:7}.vm-right{top:56px;right:0;z-index:7}
+.vm-boots{bottom:4px;left:50%;transform:translateX(-50%) scale(.3);z-index:7;display:flex;gap:10px}.vm-boots.on{transform:translateX(-50%) scale(1)}
+.gear-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.gp-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;font-size:.8em;color:var(--text-dim);transition:all .3s}
+.gp-row.earned{color:var(--success);font-weight:bold}
+.gp-row .gp-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .3s;flex-shrink:0}
+.gp-row.earned .gp-dot{background:var(--success);border-color:var(--success)}
+.vm-sparks{position:absolute;pointer-events:none;z-index:20}
+.vm-spark{position:absolute;border-radius:50%;animation:vmSp .6s ease-out forwards}
+@keyframes vmSp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+.vm-flash{animation:vmFl .4s ease}
+@keyframes vmFl{0%{filter:brightness(1)}30%{filter:brightness(1.8) drop-shadow(0 0 12px rgba(240,180,40,.6))}100%{filter:brightness(1)}}
+.result-viking{position:relative;width:160px;height:240px;margin:16px auto}
+.rv-head{position:absolute;top:36px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#d4a574;border:2px solid #b8956a;z-index:5}
+.rv-torso{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:56px;height:74px;background:#8b7355;border-radius:9px 9px 5px 5px;z-index:3}
+.rv-arm-l{position:absolute;top:77px;left:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-arm-r{position:absolute;top:77px;right:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-leg-l{position:absolute;top:144px;left:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-leg-r{position:absolute;top:144px;right:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-slot{position:absolute}
+.rv-helm{top:20px;left:50%;transform:translateX(-50%);z-index:8}
+.rv-mail{top:74px;left:50%;transform:translateX(-50%);z-index:4}
+.rv-cape{top:69px;left:50%;transform:translateX(-50%);z-index:1}
+.rv-left{top:86px;left:4px;z-index:7}.rv-right{top:72px;right:4px;z-index:7}
+.rv-boots{bottom:4px;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:14px}
+@media(max-width:600px){.armor-panel{flex-direction:column;align-items:center}.viking-mini{width:100px;height:160px}}
+</style>
+</head>
+<body>
+<div id="game-container"><div id="game-content"></div></div>
+<script>
+// ════════════════════════════════════════════════════
+// THE STATISTICAL SAGA OF ODINFATHER — REALM 11
+// ANCOVA (Analysis of Covariance)
+// ════════════════════════════════════════════════════
+const GAME={difficulty:null,xp:0,maxXP:0,hits:0,total:0,currentScene:0,scenes:[]};
+const content=()=>document.getElementById('game-content');
+function dialogue(c,t){
+  const cls={odin:'odin',thor:'thor',muninn:'corvo',huginn:'corvo',narrator:'narrator'};
+  const nm={odin:'Odinfather \u{1F9D9}‍♂️',thor:'Thorment ⚡',muninn:'Muninn \u{1F426}‍⬛',huginn:'Huginn \u{1F426}',narrator:'\u{1F4DC} Narrator'};
+  return `<div class="dialogue-box ${cls[c]||'narrator'}"><div class="char-name ${cls[c]||'narrator'}">${nm[c]||c}</div><div class="dialogue-text">${t}</div></div>`;
+}
+function hintBox(t){return `<div class="hint-box"><div class="hint-label">\u{1F426}‍⬛ Muninn's Hint</div>${t}</div>`;}
+function xpBar(){
+  const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;
+  return armorPanelHTML()+`<div class="xp-bar-container"><div class="xp-label">⚡ XP</div><div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${p}%"></div></div><div class="xp-count">${GAME.xp} / ${GAME.maxXP}</div></div>`;
+}
+function updateXPBar(){
+  const b=document.querySelector('.xp-bar-fill'),c=document.querySelector('.xp-count');
+  if(b&&c){const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;b.style.width=p+'%';c.textContent=`${GAME.xp} / ${GAME.maxXP}`;}
+}
+function showTitleScreen(){
+  content().innerHTML=`
+  <div class="title-screen">
+    <div class="reino-badge">REALM 11</div>
+    <h1>The Statistical Saga of Odinfather</h1>
+    <h2>Realm of ANCOVA</h2>
+    <p class="subtitle">In the Library of the Sages, where ancient scrolls guard secrets of statistical purification, Odinfather teaches the art of controlling confounders and isolating the true effect.</p>
+    <div class="difficulty-select">
+      <button class="diff-btn" onclick="startGame('aprendiz')"><div class="diff-label">\u{1F6E1}️ Apprentice</div><div class="diff-desc">Undergraduate — with Muninn's hints</div></button>
+      <button class="diff-btn" onclick="startGame('mestre')"><div class="diff-label">⚔️ Master</div><div class="diff-desc">Graduate — no hints, extra challenges</div></button>
+    </div>
+  </div>`;
+}
+function startGame(d){
+  GAME.difficulty=d;GAME.xp=0;GAME.hits=0;GAME.total=0;GAME.currentScene=0;gearEarned=0;
+  buildScenes();GAME.maxXP=countMaxXP();renderScene();
+}
+
+// ════════════════════════════════════════════════════
+function buildScenes(){
+  GAME.scenes=[];
+
+  // ━━ SCENE 1: The Library of the Sages ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('narrator','The oak doors of the <em>Library of the Sages of Asgard</em> open with a reverent creak. Immense shelves reach the vaulted ceiling, filled with ancient scrolls covered in runes. The air smells of old ink and candle wax. Here, the greatest secrets of statistical purification await those with the courage to uncover them.')}
+      ${dialogue('odin','<em>ANCOVA (Analysis of Covariance)</em> is like a turbocharged ANOVA. Beyond comparing groups, it CONTROLS continuous variables that can confound the result — the <em>covariates</em>.')}
+      ${dialogue('odin','Structure: 1 Dependent Variable (continuous) + 1 or more Independent Variables (categorical/factors) + 1 or more Covariates (continuous). The covariate affects the DV but is <em>NOT</em> part of the experimental manipulation.')}
+      ${dialogue('muninn','Example: comparing 3 warrior training methods (IV) on final strength (DV), controlling for <em>prior experience</em> (covariate). ANCOVA "cleans" the effect of experience before comparing the methods.')}
+      <button class="continue-btn" onclick="nextScene()">Enter the Library →</button>
+    </div>`});
+
+  // ━━ SCENE 2: The Purifying Effect ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('odin','ANCOVA reduces the <em>error variance (SSR)</em> within groups by removing the portion explained by the covariate. By purifying the noise, the model effect (SSM) shines brighter.')}
+      <div class="variance-visual">
+        <div class="var-segment var-total">SST<br><small>Total</small></div>
+        <div class="var-eq">=</div>
+        <div class="var-segment var-model">SSM<br><small>Model</small></div>
+        <div class="var-eq">+</div>
+        <div class="var-segment var-covar">SS<sub>cov</sub><br><small>Covariate</small></div>
+        <div class="var-eq">+</div>
+        <div class="var-segment var-resid">SSR<br><small>Purified Error</small></div>
+      </div>
+      ${dialogue('odin','Think of a pie chart: SST is split into SSM (model), covariate variance, and SSR (purified error). The SSR becomes <em>smaller</em> → the F-test becomes more powerful.')}
+      ${dialogue('huginn','Could your covariate be masking the treatment effect itself? The covariate should share variance with the DV, but ideally should <em>NOT</em> be correlated with the IV.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 3: CHALLENGE 1 — What ANCOVA does ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('ANCOVA = ANOVA + control of a continuous covariate. Reduces SSR by explaining part of the noise.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 1: The Purpose of Purification</div>
+        <div class="challenge-question">What is the main objective of ANCOVA?</div>
+        ${hint}
+        <div class="options-grid" id="q1-opts">
+          <button class="option-btn" onclick="checkQ(1,this,'a')">To test multiple dependent variables at the same time</button>
+          <button class="option-btn" onclick="checkQ(1,this,'b')">To replace the t-test when data are not normal</button>
+          <button class="option-btn" onclick="checkQ(1,this,'c')">To control continuous variables (covariates) that confound the relationship between IV and DV, reducing residual error and increasing the power of the F-test</button>
+          <button class="option-btn" onclick="checkQ(1,this,'d')">To automatically eliminate outliers from the data</button>
+        </div>
+        <div id="q1-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 4: ANCOVA Assumptions ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','ANCOVA assumptions: 1) <em>Independence</em>, 2) <em>Normality of residuals</em> (Shapiro-Wilk), 3) <em>Homogeneity of variances</em> (Levene/Breusch-Pagan), 4) <em>Homogeneity of regression slopes</em>.')}
+      ${dialogue('odin','The 4th assumption is <em>EXCLUSIVE to ANCOVA</em>: the relationship between the covariate and the DV must be the same across all groups. The regression lines must be <em>parallel</em>!')}
+      ${dialogue('muninn','In the software, check the interaction between the Factor and the Covariate. If the interaction is significant (p < .05), the assumption has been violated. Stop cooking!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 5: CHALLENGE 2 — Homogeneity of Slopes ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('In the Factor × Covariate interaction, we want p > .05 (parallel lines). p < .05 = non-parallel lines = violation.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 2: Parallel or Crossed Lines?</div>
+        <div class="challenge-question">To verify homogeneity of regression slopes in ANCOVA, you test the Factor × Covariate interaction and obtain p = .03. What should you do?</div>
+        <div class="data-display">
+          Factor × Covariate Interaction: p = .03
+        </div>
+        ${hint}
+        <div class="options-grid" id="q2-opts">
+          <button class="option-btn" onclick="checkQ(2,this,'a')">The assumption has been VIOLATED (p < .05). The regression lines are not parallel — the covariate-DV relationship differs across groups. Standard ANCOVA is not appropriate.</button>
+          <button class="option-btn" onclick="checkQ(2,this,'b')">Perfect, p < .05 confirms that the assumption is met</button>
+          <button class="option-btn" onclick="checkQ(2,this,'c')">Ignore it and run ANCOVA normally — this assumption is secondary</button>
+          <button class="option-btn" onclick="checkQ(2,this,'d')">Log-transform the data and try again</button>
+        </div>
+        <div id="q2-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 6: General Assumptions (residuals) ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','The assumptions of independence, normality, and homoscedasticity are evaluated on the <em>RESIDUALS</em>, not on the variables themselves. The Gauss-Markov theorem blesses point estimates; but F-tests and Confidence Intervals require the residuals to behave.')}
+      ${dialogue('thor','Why waste time checking residuals on boring plots? Just hit "Run" in the software and look at the p-value!')}
+      ${dialogue('odin','Unacceptable! Linear models are not blind magic. Without checking the residuals, you serve illusions, not statistics.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 7: CHALLENGE 3 — Assumptions on Residuals ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('GLM evaluates assumptions on the RESIDUALS. Not on the original variables.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 3: Where Does Truth Reside?</div>
+        <div class="challenge-question">The assumptions of normality and homoscedasticity in ANCOVA are evaluated on:</div>
+        ${hint}
+        <div class="options-grid" id="q3-opts">
+          <button class="option-btn" onclick="checkQ(3,this,'a')">The dependent variable directly</button>
+          <button class="option-btn" onclick="checkQ(3,this,'b')">The model residuals — not on the raw variables. The residuals must follow a normal distribution and have constant variance.</button>
+          <button class="option-btn" onclick="checkQ(3,this,'c')">The covariate in isolation</button>
+          <button class="option-btn" onclick="checkQ(3,this,'d')">In all groups separately before running the model</button>
+        </div>
+        <div id="q3-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 8: When to Use ANCOVA ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','Use ANCOVA when: 1) There is a <em>continuous covariate</em> that influences the DV, 2) You want to "clean" the effect of that covariate, 3) You cannot fully randomize.')}
+      ${dialogue('odin','Do <em>NOT</em> use it as an excuse to throw everything into the model. Each covariate costs degrees of freedom.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 9: CHALLENGE 4 — When to Use ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Initial weight is a continuous variable that confounds the DV. ANCOVA is perfect for this.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 4: The Warriors’ Diet</div>
+        <div class="challenge-question">A researcher from Midgard compares 3 diets (IV) on the warriors’ final weight (DV). The participants started with different initial weights. What should he do?</div>
+        <div class="data-display">
+          IV = 3 diets &nbsp;|&nbsp; DV = final weight<br>
+          Problem: different initial weights across participants
+        </div>
+        ${hint}
+        <div class="options-grid" id="q4-opts">
+          <button class="option-btn" onclick="checkQ(4,this,'a')">Ignore the initial weight and run a simple ANOVA</button>
+          <button class="option-btn" onclick="checkQ(4,this,'b')">Use MANOVA with initial and final weight as DVs</button>
+          <button class="option-btn" onclick="checkQ(4,this,'c')">Run a t-test between each pair of diets</button>
+          <button class="option-btn" onclick="checkQ(4,this,'d')">Use ANCOVA with initial weight as a covariate — thus controlling for baseline differences between groups</button>
+        </div>
+        <div id="q4-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 10: y = Xβ + ε ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','ANCOVA is a case of the <em>General Linear Model (GLM)</em>: y = Xβ + ε. The categorical IV enters as a <em>dummy variable</em>, and the covariate enters as a continuous predictor in the same model.')}
+      ${dialogue('muninn','It is like reading a scroll with two layers of writing: one layer is the categorical factors (dummies), the other is the continuous covariate. Together, they purify the final message.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 11: CHALLENGE 5 — Connection to GLM ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('ANCOVA = GLM with categorical predictors (dummies) + continuous predictors (covariate).'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 5: The GLM Scroll</div>
+        <div class="challenge-question">In ANCOVA, the model equation includes:</div>
+        ${hint}
+        <div class="options-grid" id="q5-opts">
+          <button class="option-btn" onclick="checkQ(5,this,'a')">Dependent variable = factor effects (categorical IV as dummies) + covariate effect (continuous) + residual error. It is a general linear model with mixed predictors.</button>
+          <button class="option-btn" onclick="checkQ(5,this,'b')">Only categorical variables as predictors</button>
+          <button class="option-btn" onclick="checkQ(5,this,'c')">Only continuous variables as predictors</button>
+          <button class="option-btn" onclick="checkQ(5,this,'d')">The covariate replaces the dependent variable in the model</button>
+        </div>
+        <div id="q5-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 12: CHALLENGE 6 — Interpretation ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('If the effect disappears when we control for the covariate, it was confounded by it.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 6: The Phantom Effect</div>
+        <div class="challenge-question">After running ANCOVA, the Factor effect (3 groups) was F(2, 56) = 0.89, p = .42, but BEFORE controlling for the covariate (simple ANOVA), it was F(2, 57) = 5.20, p = .008. What happened?</div>
+        <div class="data-display">
+          Simple ANOVA: F(2, 57) = 5.20, p = .008 ✓<br>
+          ANCOVA: F(2, 56) = 0.89, p = .42 ✗
+        </div>
+        ${hint}
+        <div class="options-grid" id="q6-opts">
+          <button class="option-btn" onclick="checkQ(6,this,'a')">The ANCOVA is wrong — go back to simple ANOVA</button>
+          <button class="option-btn" onclick="checkQ(6,this,'b')">The covariate destroyed the real treatment effect</button>
+          <button class="option-btn" onclick="checkQ(6,this,'c')">The covariate was explaining the apparent difference between groups. By purifying its effect, the difference disappeared — the "effect" was spurious, caused by the covariate.</button>
+          <button class="option-btn" onclick="checkQ(6,this,'d')">Always use simple ANOVA to avoid this problem</button>
+        </div>
+        <div id="q6-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 13: CHALLENGE 7 — Practical Application ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Covariate = a variable that confounds, not the main manipulation.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 7: The Impostor in the Library</div>
+        <div class="challenge-question">Which of the following is NOT a suitable covariate for an ANCOVA?</div>
+        ${hint}
+        <div class="options-grid" id="q7-opts">
+          <button class="option-btn" onclick="checkQ(7,this,'a')">Participants’ age</button>
+          <button class="option-btn" onclick="checkQ(7,this,'b')">The independent variable itself (the manipulated factor) — the covariate must be a confounding variable, not the experimental manipulation itself</button>
+          <button class="option-btn" onclick="checkQ(7,this,'c')">Pre-test score</button>
+          <button class="option-btn" onclick="checkQ(7,this,'d')">Participants’ IQ</button>
+        </div>
+        <div id="q7-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ MASTER CHALLENGES ━━
+  if(GAME.difficulty==='mestre'){
+    // CHALLENGE 8: ANCOVA with Randomization
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: Randomization and Covariate</div>
+          <div class="challenge-question">A researcher used the pre-test score as a covariate in ANCOVA. But in the design, the groups were ALREADY randomized. Does it make sense to use ANCOVA even with randomization?</div>
+          <div class="options-grid" id="q8-opts">
+            <button class="option-btn" onclick="checkQ(8,this,'a')">No — randomization eliminates the need for any covariate</button>
+            <button class="option-btn" onclick="checkQ(8,this,'b')">Yes, but only when the groups are very small</button>
+            <button class="option-btn" onclick="checkQ(8,this,'c')">Yes — even with randomization, ANCOVA with the pre-test as a covariate INCREASES statistical power by reducing error variance, even if the covariate is not a confounder</button>
+            <button class="option-btn" onclick="checkQ(8,this,'d')">Randomization makes ANCOVA statistically invalid</button>
+          </div>
+          <div id="q8-fb"></div>
+        </div>
+      </div>`});
+
+    // CHALLENGE 9: Double Violation
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge: The Double Violation</div>
+          <div class="challenge-question">Two ANCOVA assumptions were violated: homogeneity of variances (Levene p = .02) and homogeneity of regression slopes (Factor×Covariate interaction p = .04). Which is more serious?</div>
+          <div class="data-display">
+            Levene: p = .02 (heterogeneous variances)<br>
+            Factor×Covariate Interaction: p = .04 (non-parallel slopes)
+          </div>
+          <div class="options-grid" id="q9-opts">
+            <button class="option-btn" onclick="checkQ(9,this,'a')">Both are equally serious — invalidate everything</button>
+            <button class="option-btn" onclick="checkQ(9,this,'b')">The Levene violation is more serious</button>
+            <button class="option-btn" onclick="checkQ(9,this,'c')">Neither matters with large N</button>
+            <button class="option-btn" onclick="checkQ(9,this,'d')">The violation of homogeneity of regression slopes is more serious — it means the covariate affects the DV DIFFERENTLY in each group, invalidating the core logic of ANCOVA. The Levene violation is less critical with similarly sized groups.</button>
+          </div>
+          <div id="q9-fb"></div>
+        </div>
+      </div>`});
+  }
+
+  // ━━ FINAL SCENE ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','The scrolls of the Library close softly. Golden rune dust floats in the air as the candles crackle in approval. The knowledge of statistical purification has been absorbed.')}
+      ${dialogue('odin','You have conquered the <em>Realm of ANCOVA</em>! You mastered the art of controlling covariates, verifying homogeneity of regression slopes, evaluating residuals, and interpreting the purification of effects. Few sages achieve such clarity.')}
+      ${dialogue('thor','Alright, I admit it... checking the residuals was worth it. Without that, I would have served statistical illusions as if they were truths.')}
+      ${dialogue('muninn','In the next Realms, the Library reveals even more powerful techniques: MANOVA and MANCOVA — when multiple dependent variables join the dance. Prepare yourself!')}
+      <button class="continue-btn" onclick="showResults()">View Final Result \u{1F4DC}</button>
+    </div>`});
+}
+
+// ════════════════════════════════════════════════════
+const ANSWERS={1:'c',2:'a',3:'b',4:'d',5:'a',6:'c',7:'b',8:'c',9:'d'};
+const EXPLANATIONS={
+  1:{
+    correct:'✅ Perfect! ANCOVA <em>controls continuous variables (covariates)</em> that confound the relationship between IV and DV. By "cleaning" the variance explained by the covariate, SSR decreases and the F-test gains power. It is an ANOVA with built-in purification.',
+    wrong:'❌ ANCOVA does not test multiple DVs (that is MANOVA), does not replace the t-test, and does not eliminate outliers. Its purpose is to <em>control continuous covariates</em> that confound the result, reducing residual error and increasing the power of the F-test.',
+    charC:'odin',charW:'thor'
+  },
+  2:{
+    correct:'✅ Correct! p = .03 < .05 → the Factor × Covariate interaction is significant → the <em>regression lines are NOT parallel</em>. The relationship between the covariate and the DV differs across groups. Standard ANCOVA is not appropriate in this scenario.',
+    wrong:'❌ In the Factor × Covariate interaction, we want p > .05 (parallel lines). p = .03 < .05 means the lines are <em>not</em> parallel — the assumption exclusive to ANCOVA has been violated. Do not ignore it or blindly transform.',
+    charC:'muninn',charW:'thor'
+  },
+  3:{
+    correct:'✅ Exactly! The assumptions of normality and homoscedasticity are evaluated on the <em>model residuals</em>, not on the raw variables. The residuals must follow a normal distribution and have constant variance. Gauss-Markov protects point estimates; F-tests require well-behaved residuals.',
+    wrong:'❌ We do not evaluate assumptions on the original variables or on the covariate in isolation. The GLM evaluates normality and homoscedasticity on the <em>model residuals</em> — it is the difference between the observed and predicted that must behave.',
+    charC:'odin',charW:'thor'
+  },
+  4:{
+    correct:'✅ Perfect! Initial weight is a <em>continuous variable that confounds the DV</em>. ANCOVA with initial weight as a covariate "cleans" those baseline differences before comparing the diets. That is exactly what it was made for.',
+    wrong:'❌ Ignoring initial weight contaminates the comparison. MANOVA is for multiple DVs. The t-test does not compare 3 groups. The correct solution is <em>ANCOVA with initial weight as a covariate</em>, controlling for baseline differences.',
+    charC:'odin',charW:'thor'
+  },
+  5:{
+    correct:'✅ Brilliant! ANCOVA is a GLM with <em>mixed predictors</em>: the categorical IV enters as dummies and the covariate enters as a continuous predictor. DV = factor effects + covariate effect + error. Two layers of writing on the same scroll.',
+    wrong:'❌ ANCOVA does NOT use only categorical predictors (that would be ANOVA) nor only continuous ones (pure regression). It combines <em>both</em>: dummies for the factor + continuous covariate. And the covariate never replaces the DV.',
+    charC:'muninn',charW:'thor'
+  },
+  6:{
+    correct:'✅ Excellent reading! The <em>covariate was explaining the apparent difference</em> between groups. Without controlling, there seemed to be an effect (p = .008). After purification, the difference disappeared (p = .42) — it was a spurious effect, confounded by the covariate. ANCOVA revealed the truth.',
+    wrong:'❌ The ANCOVA is not wrong, nor did it "destroy" the effect. What happened is that the <em>covariate explained the apparent difference</em>. By controlling for it, the effect vanished — proving it was spurious. ANCOVA purified the illusion.',
+    charC:'huginn',charW:'thor'
+  },
+  7:{
+    correct:'✅ Correct! The <em>independent variable (manipulated factor) is NEVER</em> a suitable covariate. The covariate must be an external confounding variable — something that affects the DV but is not the main manipulation. Age, pre-test, and IQ are legitimate covariates.',
+    wrong:'❌ Age, pre-test score, and IQ are perfectly valid covariates — they are continuous variables that can confound the result. What <em>CANNOT</em> be a covariate is the IV itself (the manipulated factor). Covariate ≠ experimental manipulation.',
+    charC:'odin',charW:'thor'
+  },
+  8:{
+    correct:'✅ Correct! Even with <em>perfect randomization</em>, ANCOVA with the pre-test as a covariate <em>INCREASES statistical power</em>. The covariate reduces error variance (SSR), making the F-test more sensitive. It is not just for correcting confounding — it is for gaining precision.',
+    wrong:'❌ Randomization eliminates systematic confounding, but does <em>NOT</em> eliminate residual variance. ANCOVA with a relevant covariate (such as a pre-test) <em>increases power</em> by reducing SSR, even in perfectly randomized designs.',
+    charC:'odin',charW:'thor'
+  },
+  9:{
+    correct:'✅ Excellent! The violation of <em>homogeneity of regression slopes</em> is more serious because it strikes at the core logic of ANCOVA: if the covariate affects the DV differently in each group, the covariate "adjustment" is invalid. The Levene violation is less critical with balanced groups.',
+    wrong:'❌ The violations are not equal. <em>Homogeneity of regression slopes</em> (parallel slopes) is the most critical ANCOVA assumption — without it, the logic of the covariate adjustment collapses. The Levene test, while important, is less destructive with similarly sized groups.',
+    charC:'muninn',charW:'thor'
+  }
+};
+
+function checkQ(q,btn,ans){
+  const opts=document.querySelectorAll(`#q${q}-opts .option-btn`);
+  opts.forEach(b=>{b.classList.add('disabled');b.onclick=null;});
+  const fb=document.getElementById(`q${q}-fb`),cor=ANSWERS[q],exp=EXPLANATIONS[q];
+  GAME.total++;
+  if(ans===cor){
+    btn.classList.add('correct');GAME.hits++;GAME.xp+=20;updateXPBar();earnGear();
+    fb.innerHTML=`<div class="feedback-box correct">${dialogue(exp.charC,exp.correct+' <span class="xp-badge">+20 XP</span>')}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }else{
+    btn.classList.add('wrong');
+    const ci=['a','b','c','d'].indexOf(cor);if(opts[ci])opts[ci].classList.add('correct');
+    fb.innerHTML=`<div class="feedback-box wrong">${dialogue(exp.charW,exp.wrong)}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }
+}
+
+function countMaxXP(){return (GAME.difficulty==='mestre'?9:7)*20;}
+function renderScene(){if(GAME.currentScene<GAME.scenes.length){content().innerHTML=GAME.scenes[GAME.currentScene].html();restoreGear();window.scrollTo({top:0,behavior:'smooth'});}}
+function nextScene(){GAME.currentScene++;renderScene();}
+
+function showResults(){
+  const pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  let rank,rc;
+  if(pct>=90){rank='\u{1F3C6} Supreme Sage of Asgard';rc='#f0c040';}
+  else if(pct>=70){rank='\u{1F4DC} Guardian of the Scrolls';rc='#58a6ff';}
+  else if(pct>=50){rank='\u{1F6E1}️ Library Student';rc='#8b949e';}
+  else{rank='⛓️ Apprentice Lost Among Books';rc='#f85149';}
+  content().innerHTML=`
+  <div class="result-screen">
+    <div class="reino-badge">REALM 11 — COMPLETE</div>
+    <h2>Adventure Result</h2>
+    ${resultVikingHTML()}
+    <div class="result-rank" style="color:${rc}">${rank}</div>
+    <div class="result-stats">
+      <div class="stat-row"><span class="stat-label">Difficulty</span><span class="stat-value">${GAME.difficulty==='mestre'?'⚔️ Master':'\u{1F6E1}️ Apprentice'}</span></div>
+      <div class="stat-row"><span class="stat-label">Correct Challenges</span><span class="stat-value">${GAME.hits} / ${GAME.total}</span></div>
+      <div class="stat-row"><span class="stat-label">Accuracy</span><span class="stat-value">${pct}%</span></div>
+      <div class="stat-row"><span class="stat-label">XP Earned</span><span class="stat-value">${GAME.xp} / ${GAME.maxXP}</span></div>
+    </div>
+    ${dialogue('odin',pct>=70
+      ?'The Library of the Sages applauds in silence! You mastered ANCOVA — covariate control, homogeneity of regression slopes, residual evaluation, connection to the GLM, and interpretation of the purification effect. The scrolls shall preserve your name!'
+      :'The scrolls closed before you could absorb all the knowledge... Return to the Library and review: covariates, exclusive assumptions (parallel slopes), residuals, and the logic of purification. Wisdom awaits!'
+    )}
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+      <button class="continue-btn" onclick="showTitleScreen()">\u{1F504} Play Again</button>
+    </div>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+var GEAR_ITEMS=[
+  {"s":"boots","n":"Sage's Sandals","h":"<div style=\"display:flex;gap:14px\"><div style=\"width:24px;height:18px;background:#8b7355;border-radius:3px 3px 4px 7px;border:2px solid #a08860\"></div><div style=\"width:24px;height:18px;background:#8b7355;border-radius:3px 3px 4px 7px;border:2px solid #a08860\"></div></div>"},
+  {"s":"mail","n":"Purification Toga","h":"<div style=\"width:60px;height:72px;background:linear-gradient(180deg,#f0e8d0,#d8c8a0);border-radius:7px 7px 4px 4px;border:2px solid #c0b080;position:relative\"><div style=\"position:absolute;top:30px;left:50%;transform:translateX(-50%);width:20px;height:20px;border:2px solid #4a8a4a;border-radius:50%;background:rgba(74,138,74,0.2)\"></div></div>"},
+  {"s":"right","n":"Covariate Lens","h":"<div style=\"display:flex;flex-direction:column;align-items:center\"><div style=\"width:24px;height:24px;border:3px solid #c0a050;border-radius:50%;background:rgba(240,200,100,0.15)\"></div><div style=\"width:4px;height:20px;background:#8b6914;border-radius:2px;transform:rotate(-30deg);margin-top:-4px;margin-left:12px\"></div></div>"},
+  {"s":"left","n":"Regression Scroll","h":"<div style=\"width:34px;height:42px;background:#f0e0c0;border-radius:2px;border:2px solid #c0a870;position:relative;overflow:hidden\"><div style=\"position:absolute;top:12px;left:4px;width:26px;height:2px;background:#4a8a4a;transform:rotate(-20deg)\"></div><div style=\"position:absolute;top:12px;left:4px;width:26px;height:2px;background:#8a4a4a;transform:rotate(-25deg)\"></div></div>"},
+  {"s":"cape","n":"Cloak of Control","h":"<div style=\"width:84px;height:110px;background:linear-gradient(135deg,#2a6a2a,#1a4a1a);border-radius:5px 5px 28px 28px;clip-path:polygon(16% 0%,84% 0%,100% 18%,92% 100%,50% 88%,8% 100%,0% 18%)\"></div>"},
+  {"s":"helm","n":"Crown of Wisdom","h":"<div style=\"width:52px;height:24px;background:linear-gradient(135deg,#d4a535,#b08820);border-radius:26px 26px 5px 5px;border:2px solid #b08820;position:relative\"><div style=\"position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:20px;height:14px;border:3px solid #d4a535;border-bottom:none;border-radius:10px 10px 0 0\"></div></div>"}
+];
+var gearEarned=0;
+function armorPanelHTML(){
+  var rows='';
+  for(var i=0;i<GEAR_ITEMS.length;i++){rows+='<div class="gp-row'+(i<gearEarned?' earned':'')+'" id="gprow'+i+'"><span class="gp-dot"></span><span>'+GEAR_ITEMS[i].n+'</span></div>';}
+  var sl='<div class="vm-sparks" id="vmsparks"></div>';
+  sl+='<div class="vm-slot vm-cape" id="vmslot-cape"></div>';
+  sl+='<div class="vm-head"></div><div class="vm-arm-l"></div><div class="vm-arm-r"></div><div class="vm-torso"></div><div class="vm-leg-l"></div><div class="vm-leg-r"></div>';
+  sl+='<div class="vm-slot vm-boots" id="vmslot-boots"></div><div class="vm-slot vm-mail" id="vmslot-mail"></div>';
+  sl+='<div class="vm-slot vm-left" id="vmslot-left"></div><div class="vm-slot vm-right" id="vmslot-right"></div>';
+  sl+='<div class="vm-slot vm-helm" id="vmslot-helm"></div>';
+  return '<div class="armor-panel"><div class="viking-mini" id="vmini">'+sl+'</div><div class="gear-progress">'+rows+'</div></div>';
+}
+function restoreGear(){for(var i=0;i<gearEarned&&i<GEAR_ITEMS.length;i++){var g=GEAR_ITEMS[i],el=document.getElementById('vmslot-'+g.s);if(el){el.innerHTML=g.h;el.classList.add('on');}}}
+function earnGear(){
+  if(gearEarned>=GEAR_ITEMS.length)return;
+  var g=GEAR_ITEMS[gearEarned],el=document.getElementById('vmslot-'+g.s);
+  if(el){el.innerHTML=g.h;el.classList.add('on','vm-flash');setTimeout(function(){el.classList.remove('vm-flash')},500);spawnVMSparks(el);}
+  var row=document.getElementById('gprow'+gearEarned);if(row)row.classList.add('earned');
+  gearEarned++;
+}
+function spawnVMSparks(el){
+  var sc=document.getElementById('vmsparks');if(!sc||!el)return;
+  var r=el.getBoundingClientRect(),sr=document.getElementById('vmini').getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height/2;
+  var cols=['#f0c040','#f08030','#f0e080','#ff6040','#ffd060'];
+  for(var i=0;i<10;i++){var s=document.createElement('div');s.className='vm-spark';
+    var a=Math.random()*Math.PI*2,d=20+Math.random()*30;
+    s.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+cols[Math.floor(Math.random()*5)]+';--sx:'+(Math.cos(a)*d)+'px;--sy:'+(Math.sin(a)*d)+'px;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px';
+    sc.appendChild(s);setTimeout(function(x){x.remove()},700,s);}
+}
+function resultVikingHTML(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var ti=[];if(pct>=90)ti=GEAR_ITEMS;else if(pct>=70)ti=GEAR_ITEMS.slice(0,5);else if(pct>=50)ti=GEAR_ITEMS.slice(0,2);
+  var sm={boots:'rv-boots',mail:'rv-mail',right:'rv-right',left:'rv-left',cape:'rv-cape',helm:'rv-helm'};
+  var html='<div class="result-viking">';
+  html+='<div class="rv-slot rv-cape" id="rvs-cape"></div>';
+  html+='<div class="rv-head"></div><div class="rv-arm-l"></div><div class="rv-arm-r"></div><div class="rv-torso"></div><div class="rv-leg-l"></div><div class="rv-leg-r"></div>';
+  html+='<div class="rv-slot rv-boots" id="rvs-boots"></div><div class="rv-slot rv-mail" id="rvs-mail"></div>';
+  html+='<div class="rv-slot rv-left" id="rvs-left"></div><div class="rv-slot rv-right" id="rvs-right"></div>';
+  html+='<div class="rv-slot rv-helm" id="rvs-helm"></div></div>';
+  setTimeout(function(){ti.forEach(function(g){var e=document.getElementById('rvs-'+g.s);if(e)e.innerHTML=g.h;});},100);
+  return html;
+}
+
+showTitleScreen();
+</script>
+</body>
+</html>
