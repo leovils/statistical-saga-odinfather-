@@ -165,6 +165,14 @@ body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',curs
     <div class="trilha-node param">MANOVA</div>
     <div class="trilha-arrow">&rarr;</div>
     <div class="trilha-node param">MANCOVA</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node" style="border-color:var(--success);color:var(--success)">Correlation</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node" style="border-color:var(--success);color:var(--success)">Mult. Regr.</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node" style="border-color:var(--success);color:var(--success)">Logistic Regr.</div>
+    <div class="trilha-arrow">&rarr;</div>
+    <div class="trilha-node" style="border-color:var(--gold);color:var(--gold)">Bayesian</div>
   </div>
 
   <!-- Hypothesis Testing & Comparison -->
@@ -240,6 +248,60 @@ body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',curs
         <span>11 steps</span>
       </div>
       <div class="card-desc">MANOVA + ANCOVA: the crown of the GLM. Comparison table, parsimony, complete hierarchy, and follow-up.</div>
+    </a>
+  </div>
+
+  <!-- Regression & Modeling -->
+  <div class="section-title" style="color:var(--success);border-left-color:var(--success)">Regression &amp; Modeling — The Forge of Predictions</div>
+  <div class="cards">
+    <a class="card" href="correlation-regression.html">
+      <span class="card-tag param" style="background:rgba(63,185,80,.15);color:var(--success)">Regression</span>
+      <div class="card-icon">&#128506;</div>
+      <div class="card-title">Correlation &amp; Simple Linear Regression</div>
+      <div class="card-meta">
+        <span>&#11088;&#11088; Intermediate</span>
+        <span>&#9202; 30-40 min</span>
+        <span>12 steps</span>
+      </div>
+      <div class="card-desc">Pearson r, Spearman ρ, r², scatterplots, least squares, regression line, residuals, SST/SSR/SSE, and LINE assumptions.</div>
+    </a>
+    <a class="card" href="multiple-regression.html">
+      <span class="card-tag param" style="background:rgba(63,185,80,.15);color:var(--success)">Regression</span>
+      <div class="card-icon">&#128200;</div>
+      <div class="card-title">Multiple Linear Regression</div>
+      <div class="card-meta">
+        <span>&#11088;&#11088;&#11088; Advanced</span>
+        <span>&#9202; 35-45 min</span>
+        <span>12 steps</span>
+      </div>
+      <div class="card-desc">Partial coefficients, Adjusted R², F-test, individual t-tests, VIF and multicollinearity, variable selection, and dummy variables.</div>
+    </a>
+    <a class="card" href="logistic-regression.html">
+      <span class="card-tag param" style="background:rgba(63,185,80,.15);color:var(--success)">Regression</span>
+      <div class="card-icon">&#128256;</div>
+      <div class="card-title">Logistic Regression</div>
+      <div class="card-meta">
+        <span>&#11088;&#11088;&#11088; Advanced</span>
+        <span>&#9202; 35-45 min</span>
+        <span>12 steps</span>
+      </div>
+      <div class="card-desc">Sigmoid function, odds and log-odds, odds ratios (OR), maximum likelihood, pseudo-R², confusion matrix, and classification.</div>
+    </a>
+  </div>
+
+  <!-- Bayesian Inference -->
+  <div class="section-title" style="color:var(--gold);border-left-color:var(--gold)">Bayesian Inference — The Oracle of the Norns</div>
+  <div class="cards">
+    <a class="card" href="bayesian-inference.html" style="grid-column:1/-1">
+      <span class="card-tag param" style="background:rgba(240,192,64,.15);color:var(--gold)">Bayesian</span>
+      <div class="card-icon">&#128302;</div>
+      <div class="card-title">Introduction to Bayesian Inference</div>
+      <div class="card-meta">
+        <span>&#11088;&#11088;&#11088; Advanced</span>
+        <span>&#9202; 30-40 min</span>
+        <span>12 steps</span>
+      </div>
+      <div class="card-desc">Bayes' Theorem, prior/likelihood/posterior, sequential updating, credible vs. confidence intervals, Bayes Factor, and when to go Bayesian.</div>
     </a>
   </div>
 

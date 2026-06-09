@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather — Realm 18: Introduction to Bayesian Inference</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh;overflow-x:hidden}
+#game-container{max-width:800px;margin:0 auto;padding:20px;min-height:100vh}
+.title-screen{text-align:center;padding:60px 20px;animation:fadeIn 1s ease}
+.title-screen h1{font-family:'Bangers',cursive;font-size:2.8em;color:var(--gold);text-shadow:2px 2px 8px rgba(240,192,64,.3);line-height:1.1;margin-bottom:8px}
+.title-screen h2{font-family:'Permanent Marker',cursive;font-size:1.5em;color:var(--odin-blue);margin-bottom:30px}
+.title-screen .subtitle{color:var(--text-dim);font-size:1.1em;margin-bottom:40px}
+.reino-badge{display:inline-block;background:linear-gradient(135deg,var(--odin-blue),var(--corvo-purple));padding:6px 20px;border-radius:20px;font-family:'Bangers',cursive;font-size:1em;color:#fff;margin-bottom:16px}
+.difficulty-select{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.diff-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Bangers',cursive;font-size:1.2em;padding:16px 32px;border-radius:12px;cursor:pointer;transition:all .3s;min-width:180px}
+.diff-btn:hover{border-color:var(--odin-blue);transform:translateY(-2px)}
+.diff-btn .diff-label{font-size:1.3em}.diff-btn .diff-desc{font-family:'Patrick Hand',cursive;font-size:.65em;color:var(--text-dim);margin-top:4px}
+.scene{animation:slideIn .5s ease;padding:10px 0}
+.dialogue-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative}
+.dialogue-box.odin{border-left:4px solid var(--odin-blue)}.dialogue-box.thor{border-left:4px solid var(--thor-red)}.dialogue-box.corvo{border-left:4px solid var(--corvo-purple)}.dialogue-box.narrator{border-left:4px solid var(--gold)}
+.char-name{font-family:'Bangers',cursive;font-size:1.1em;margin-bottom:6px}
+.char-name.odin{color:var(--odin-blue)}.char-name.thor{color:var(--thor-red)}.char-name.corvo{color:var(--corvo-purple)}.char-name.narrator{color:var(--gold)}
+.dialogue-text{line-height:1.5;font-size:1.05em}.dialogue-text em{color:var(--gold);font-style:normal;font-weight:bold}
+.challenge-box{background:var(--bg-panel);border:2px solid var(--gold);border-radius:12px;padding:24px;margin:20px 0;animation:pulse-border 2s ease infinite}
+@keyframes pulse-border{0%,100%{border-color:var(--gold);box-shadow:0 0 8px rgba(240,192,64,.15)}50%{border-color:#f0c040cc;box-shadow:0 0 16px rgba(240,192,64,.3)}}
+.challenge-title{font-family:'Bangers',cursive;font-size:1.4em;color:var(--gold);margin-bottom:12px;text-align:center}
+.challenge-question{margin-bottom:16px;line-height:1.5}
+.data-display{background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:'Courier New',monospace;font-size:1em;color:var(--odin-blue);text-align:center;letter-spacing:1px;line-height:1.6}
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.option-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Patrick Hand',cursive;font-size:1.05em;padding:14px 18px;border-radius:10px;cursor:pointer;text-align:left;transition:all .25s;line-height:1.4}
+.option-btn:hover:not(.disabled){border-color:var(--odin-blue);background:#1a2233}
+.option-btn.correct{border-color:var(--success);background:#0d2818;color:var(--success)}
+.option-btn.wrong{border-color:var(--thor-red);background:#2d1116;color:var(--thor-red)}
+.option-btn.disabled{cursor:default;opacity:.7}
+.feedback-box{border-radius:10px;padding:16px 20px;margin:16px 0;animation:fadeIn .4s ease;line-height:1.5}
+.feedback-box.correct{background:#0d2818;border:1px solid var(--success);color:var(--success)}
+.feedback-box.wrong{background:#2d1116;border:1px solid var(--thor-red);color:var(--thor-red)}
+.xp-badge{display:inline-block;background:var(--gold);color:var(--bg-dark);font-family:'Bangers',cursive;padding:2px 10px;border-radius:6px;font-size:.9em;margin-left:6px}
+.xp-bar-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.xp-label{font-family:'Bangers',cursive;color:var(--gold);font-size:1em;white-space:nowrap}
+.xp-bar-bg{flex:1;height:14px;background:var(--bg-dark);border-radius:7px;overflow:hidden}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--odin-blue),var(--gold));border-radius:7px;transition:width .6s ease}
+.xp-count{font-family:'Bangers',cursive;color:var(--text);font-size:1em;min-width:60px;text-align:right}
+.continue-btn{display:block;margin:20px auto 0;background:transparent;border:2px solid var(--odin-blue);color:var(--odin-blue);font-family:'Bangers',cursive;font-size:1.15em;padding:12px 36px;border-radius:10px;cursor:pointer;transition:all .25s}
+.continue-btn:hover{background:var(--odin-blue);color:var(--bg-dark)}
+.result-screen{text-align:center;padding:40px 20px;animation:fadeIn .8s ease}
+.result-screen h2{font-family:'Bangers',cursive;font-size:2.2em;color:var(--gold);margin-bottom:8px}
+.result-rank{font-family:'Permanent Marker',cursive;font-size:1.5em;margin:16px 0}
+.result-stats{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:20px 0;text-align:left}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text-dim)}.stat-value{font-family:'Bangers',cursive;color:var(--odin-blue)}
+.hint-box{background:#1a1530;border:1px solid var(--corvo-purple);border-radius:10px;padding:14px 18px;margin:12px 0;font-size:.95em;color:var(--corvo-purple);animation:fadeIn .5s ease}
+.hint-box .hint-label{font-family:'Bangers',cursive;font-size:1em;margin-bottom:4px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.title-screen h1{font-size:2em}.title-screen h2{font-size:1.2em}.difficulty-select{flex-direction:column;align-items:center}#game-container{padding:12px}.challenge-box{padding:16px}}
+
+/* ── ARMOR SYSTEM ── */
+.armor-panel{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.viking-mini{position:relative;width:120px;height:180px;flex-shrink:0}
+.vm-head{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:#d4a574;border:1.5px solid #b8956a;z-index:5}
+.vm-torso{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:44px;height:58px;background:#8b7355;border-radius:7px 7px 4px 4px;z-index:3}
+.vm-arm-l{position:absolute;top:59px;left:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-arm-r{position:absolute;top:59px;right:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-leg-l{position:absolute;top:111px;left:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-leg-r{position:absolute;top:111px;right:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-slot{position:absolute;opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1);transform:scale(.3)}
+.vm-slot.on{opacity:1;transform:scale(1)}
+.vm-helm{top:16px;left:50%;transform:translateX(-50%) scale(.3);z-index:8}.vm-helm.on{transform:translateX(-50%) scale(1)}
+.vm-mail{top:57px;left:50%;transform:translateX(-50%) scale(.3);z-index:4}.vm-mail.on{transform:translateX(-50%) scale(1)}
+.vm-cape{top:53px;left:50%;transform:translateX(-50%) scale(.3);z-index:1}.vm-cape.on{transform:translateX(-50%) scale(1)}
+.vm-left{top:66px;left:0;z-index:7}.vm-right{top:56px;right:0;z-index:7}
+.vm-boots{bottom:4px;left:50%;transform:translateX(-50%) scale(.3);z-index:7;display:flex;gap:10px}.vm-boots.on{transform:translateX(-50%) scale(1)}
+.gear-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.gp-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;font-size:.8em;color:var(--text-dim);transition:all .3s}
+.gp-row.earned{color:var(--success);font-weight:bold}
+.gp-row .gp-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .3s;flex-shrink:0}
+.gp-row.earned .gp-dot{background:var(--success);border-color:var(--success)}
+.vm-sparks{position:absolute;pointer-events:none;z-index:20}
+.vm-spark{position:absolute;border-radius:50%;animation:vmSp .6s ease-out forwards}
+@keyframes vmSp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+.vm-flash{animation:vmFl .4s ease}
+@keyframes vmFl{0%{filter:brightness(1)}30%{filter:brightness(1.8) drop-shadow(0 0 12px rgba(240,180,40,.6))}100%{filter:brightness(1)}}
+.result-viking{position:relative;width:160px;height:240px;margin:16px auto}
+.rv-head{position:absolute;top:36px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#d4a574;border:2px solid #b8956a;z-index:5}
+.rv-torso{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:56px;height:74px;background:#8b7355;border-radius:9px 9px 5px 5px;z-index:3}
+.rv-arm-l{position:absolute;top:77px;left:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-arm-r{position:absolute;top:77px;right:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-leg-l{position:absolute;top:144px;left:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-leg-r{position:absolute;top:144px;right:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-slot{position:absolute}
+.rv-helm{top:20px;left:50%;transform:translateX(-50%);z-index:8}
+.rv-mail{top:74px;left:50%;transform:translateX(-50%);z-index:4}
+.rv-cape{top:69px;left:50%;transform:translateX(-50%);z-index:1}
+.rv-left{top:86px;left:4px;z-index:7}.rv-right{top:72px;right:4px;z-index:7}
+.rv-boots{bottom:4px;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:14px}
+@media(max-width:600px){.armor-panel{flex-direction:column;align-items:center}.viking-mini{width:100px;height:160px}}
+footer{text-align:center;padding:24px 12px;color:var(--text-dim);font-size:.85em;border-top:1px solid var(--border);margin-top:40px}
+footer a{color:var(--odin-blue);text-decoration:none}footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div id="game-container"><div id="game-content"></div></div>
+<footer>
+  <a href="index.html">Return to Realm Hub</a><br>
+  Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026
+</footer>
+<script>
+// ════════════════════════════════════════════════════
+// THE STATISTICAL SAGA OF ODINFATHER — REALM 18
+// INTRODUCTION TO BAYESIAN INFERENCE
+// ════════════════════════════════════════════════════
+var GAME={difficulty:null,xp:0,maxXP:0,hits:0,total:0,currentScene:0,scenes:[]};
+var content=function(){return document.getElementById("game-content");};
+function dialogue(c,t){
+  var cls={odin:"odin",thor:"thor",muninn:"corvo",huginn:"corvo",narrator:"narrator"};
+  var nm={odin:"Odinfather \u{1F9D9}‍♂️",thor:"Thorment ⚡",muninn:"Muninn \u{1F426}‍⬛",huginn:"Huginn \u{1F426}",narrator:"\u{1F4DC} Narrator"};
+  return "<div class=\"dialogue-box "+(cls[c]||"narrator")+"\"><div class=\"char-name "+(cls[c]||"narrator")+"\">"+(nm[c]||c)+"</div><div class=\"dialogue-text\">"+t+"</div></div>";
+}
+function hintBox(t){return "<div class=\"hint-box\"><div class=\"hint-label\">\u{1F426}‍⬛ Muninn\x27s Hint</div>"+t+"</div>";}
+function xpBar(){
+  var p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;
+  return armorPanelHTML()+"<div class=\"xp-bar-container\"><div class=\"xp-label\">⚡ XP</div><div class=\"xp-bar-bg\"><div class=\"xp-bar-fill\" style=\"width:"+p+"%\"></div></div><div class=\"xp-count\">"+GAME.xp+" / "+GAME.maxXP+"</div></div>";
+}
+function updateXPBar(){
+  var b=document.querySelector(".xp-bar-fill"),c=document.querySelector(".xp-count");
+  if(b&&c){var p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;b.style.width=p+"%";c.textContent=GAME.xp+" / "+GAME.maxXP;}
+}
+function showTitleScreen(){
+  content().innerHTML="<div class=\"title-screen\"><div class=\"reino-badge\">REALM 18</div><h1>The Statistical Saga of Odinfather</h1><h2>Realm of Bayesian Inference</h2><p class=\"subtitle\">In the depths of Mímisbrunnr, the Well of Wisdom, Odinfather teaches the art of updating beliefs — combining prior knowledge with new evidence to reach the posterior.</p><div class=\"difficulty-select\"><button class=\"diff-btn\" onclick=\"startGame(\x27aprendiz\x27)\"><div class=\"diff-label\">\u{1F6E1}️ Apprentice</div><div class=\"diff-desc\">Undergraduate — with Muninn\x27s hints</div></button><button class=\"diff-btn\" onclick=\"startGame(\x27mestre\x27)\"><div class=\"diff-label\">⚔️ Master</div><div class=\"diff-desc\">Graduate — no hints, extra challenges</div></button></div></div>";
+}
+function startGame(d){
+  GAME.difficulty=d;GAME.xp=0;GAME.hits=0;GAME.total=0;GAME.currentScene=0;gearEarned=0;
+  buildScenes();GAME.maxXP=countMaxXP();renderScene();
+}
+
+// ════════════════════════════════════════════════════
+function buildScenes(){
+  GAME.scenes=[];
+
+  // ━━ SCENE 1: Arrival at the Oracle of Mímisbrunnr ━━
+  GAME.scenes.push({type:"narrative",html:function(){return "<div class=\"scene\">"+
+    dialogue("narrator","A silver light emanates from the depths of <em>Mímisbrunnr</em> — the Well of Wisdom, where Odin sacrificed an eye to see beyond the visible. Here, knowledge does not emerge from nothing: it is <em>updated</em>. What you already knew (the prior) mixes with what the data reveals (the likelihood) to generate a sharper vision (the posterior).")+
+    dialogue("odin","Bayesian inference is the art of <em>combining prior knowledge with new evidence</em>. We don\x27t start from zero — we start from what we already know and update our beliefs as data arrives. The formula is elegant:")+
+    "<div class=\"data-display\">Bayes\x27 Theorem:<br>P(θ|y) ∝ P(y|θ) × P(θ)<br><br>Posterior ∝ Likelihood × Prior</div>"+
+    dialogue("thor","Prior? That\x27s just guessing! I only trust raw data!")+
+    dialogue("odin","The prior is not guessing — it\x27s <em>accumulated knowledge</em>. Previous studies, theory, domain expertise. And the beauty of Bayes: with enough data, the posterior converges to the same answer regardless of the prior. Data dominates!")+
+    "<button class=\"continue-btn\" onclick=\"nextScene()\">Drink from the Well of Wisdom →</button></div>";}});
+
+  // ━━ SCENE 2: The Three Components ━━
+  GAME.scenes.push({type:"narrative",html:function(){return "<div class=\"scene\">"+
+    dialogue("odin","Three components form the Bayesian recipe:<br><br>• <em>Prior P(θ)</em> — what we knew before the data. Can be informative (based on studies), weakly informative, or diffuse.<br>• <em>Likelihood P(y|θ)</em> — what the data tells us. Quantifies the support data gives to each parameter value.<br>• <em>Posterior P(θ|y)</em> — the updated belief. Combines prior + likelihood.")+
+    dialogue("muninn","Think of mixing two waters: the water of memory (prior) with the water of evidence (likelihood). The resulting mixture is the posterior — clearer than either one alone.")+
+    dialogue("huginn","Careful: there is no such thing as a \"non-informative\" prior. Even a flat (uniform) prior carries information — it says all values are equally probable, which is rarely true. The correct term is <em>diffuse</em>.")+
+    "<button class=\"continue-btn\" onclick=\"nextScene()\">Continue →</button></div>";}});
+
+  // ━━ SCENE 3: CHALLENGE 1 — What does the prior represent? ━━
+  GAME.scenes.push({type:"challenge",html:function(){
+    var hint=GAME.difficulty==="aprendiz"?hintBox("The prior comes <em>before</em> the data. It represents our initial state of knowledge about the parameter."):"";
+    return "<div class=\"scene\">"+xpBar()+
+      "<div class=\"challenge-box\"><div class=\"challenge-title\">⚔️ Challenge 1: The Source of Knowledge</div>"+
+      "<div class=\"challenge-question\">In the Bayesian framework, what does the <em>prior distribution</em> represent?</div>"+hint+
+      "<div class=\"options-grid\" id=\"q1-opts\">"+
+      "<button class=\"option-btn\" onclick=\"checkQ(1,this,\x27a\x27)\">The final result of the analysis after observing data — the prior is just another name for the posterior once we incorporate the likelihood</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(1,this,\x27b\x27)\">A distribution that only exists when we have no data — once data are collected, the prior disappears and only the likelihood matters</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(1,this,\x27c\x27)\">The probability that the data are significant (p-value) — the prior distribution is simply the Bayesian equivalent of the significance level</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(1,this,\x27d\x27)\">Our knowledge or belief about the parameter <em>before</em> observing the current data — based on previous studies, theory, or domain expertise</button>"+
+      "</div><div id=\"q1-fb\"></div></div></div>";}});
+
+  // ━━ SCENE 4: Types of Priors ━━
+  GAME.scenes.push({type:"narrative",html:function(){return "<div class=\"scene\">"+xpBar()+
+    dialogue("odin","Types of priors — each has its place:<br><br>• <em>Informative</em> — based on previous studies. E.g., β_age ~ N(2.5, 5). Concentrates the distribution near plausible values.<br>• <em>Weakly informative</em> — rules out absurd values without being too restrictive. E.g., N(0, 10).<br>• <em>Diffuse</em> — spreads probability widely. E.g., N(0, 1000). Caution: this is <em>not</em> \"non-informative\"!")+
+    dialogue("muninn","Golden rule: with <em>small samples</em>, the prior weighs more in the posterior. With <em>large samples</em>, the data dominates and the prior almost disappears. That\x27s why prior choice is critical when n is small!")+
+    dialogue("thor","So with lots of data I can ignore the prior?")+
+    dialogue("odin","Almost. With large n, different priors converge to the same posterior. But with small n, the prior can change the result completely. That\x27s why we run <em>sensitivity analysis</em>!")+
+    "<button class=\"continue-btn\" onclick=\"nextScene()\">Continue →</button></div>";}});
+
+  // ━━ SCENE 5: CHALLENGE 2 — Small sample and prior ━━
+  GAME.scenes.push({type:"challenge",html:function(){
+    var hint=GAME.difficulty==="aprendiz"?hintBox("With a very small sample, the data lack enough strength to \"move\" the posterior. What dominates?"):"";
+    return "<div class=\"scene\">"+xpBar()+
+      "<div class=\"challenge-box\"><div class=\"challenge-title\">⚔️ Challenge 2: The Weight of the Past</div>"+
+      "<div class=\"challenge-question\">With a very small sample (n = 10) and an informative prior, what <em>dominates</em> the posterior distribution?</div>"+
+      "<div class=\"data-display\">n = 10 | Prior: N(2.5, 5) informative<br>Posterior = ?</div>"+hint+
+      "<div class=\"options-grid\" id=\"q2-opts\">"+
+      "<button class=\"option-btn\" onclick=\"checkQ(2,this,\x27a\x27)\">The likelihood always dominates, regardless of sample size — observed data always override prior beliefs</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(2,this,\x27b\x27)\">The prior dominates — with so few data points, there is not enough evidence to \"move\" the posterior away from the prior</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(2,this,\x27c\x27)\">Neither dominates — the posterior is always a 50/50 blend of prior and likelihood, regardless of sample size</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(2,this,\x27d\x27)\">The p-value determines which dominates — if p < 0.05, the likelihood wins; if p > 0.05, the prior wins</button>"+
+      "</div><div id=\"q2-fb\"></div></div></div>";}});
+
+  // ━━ SCENE 6: Prior Predictive Check and WAMBS ━━
+  GAME.scenes.push({type:"narrative",html:function(){return "<div class=\"scene\">"+xpBar()+
+    dialogue("odin","Before running the analysis, do a <em>prior predictive check</em>: simulate data from the priors and see if the generated values make sense. If the prior generates absurd data (negative salaries, 500-year-old ages), something is wrong!")+
+    dialogue("muninn","Watch out for the <em>precision vs variance</em> trap! Some software uses precision (1/variance) as the parameter. If you specify variance = 0.2 thinking it\x27s \"wide,\" but the software interprets it as precision = 0.2 (variance = 5), the result changes drastically.")+
+    dialogue("huginn","The <em>WAMBS</em> checklist (When to worry And how to Manage Bayesian Statistics) from Van de Schoot et al. (2021) is essential. It covers: checking priors, verifying convergence, sensitivity analysis, and ensuring results are trustworthy.")+
+    "<button class=\"continue-btn\" onclick=\"nextScene()\">Continue →</button></div>";}});
+
+  // ━━ SCENE 7: CHALLENGE 3 — Precision trap ━━
+  GAME.scenes.push({type:"challenge",html:function(){
+    var hint=GAME.difficulty==="aprendiz"?hintBox("If the software uses precision and you enter 0.2 as \"variance,\" the prior ends up with real variance = 1/0.2 = 5 — or vice-versa. Confusing the two makes the prior extremely informative or extremely diffuse."):"";
+    return "<div class=\"scene\">"+xpBar()+
+      "<div class=\"challenge-box\"><div class=\"challenge-title\">⚔️ Challenge 3: The Precision Trap</div>"+
+      "<div class=\"challenge-question\">A researcher specifies a prior with mean 2.5 and \"variance\" 0.2, intending it to be weakly informative. But the software uses <em>precision</em> (1/variance) as the parameter. What happens?</div>"+
+      "<div class=\"data-display\">Intended prior: N(2.5, var=0.2)<br>Software interprets: precision = 0.2<br>→ Real variance = 1/0.2 = 5</div>"+hint+
+      "<div class=\"options-grid\" id=\"q3-opts\">"+
+      "<button class=\"option-btn\" onclick=\"checkQ(3,this,\x27a\x27)\">The prior becomes extremely diffuse (variance = 5 instead of 0.2), when the intention was the opposite. This can completely change the posterior</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(3,this,\x27b\x27)\">Nothing changes — precision and variance are equivalent parameterizations, and the software converts between them automatically</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(3,this,\x27c\x27)\">The software automatically corrects the issue by detecting whether the user intended precision or variance and adjusting the prior accordingly</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(3,this,\x27d\x27)\">The analysis returns an error and won\x27t run, because mismatched parameterizations are caught by the MCMC sampler before estimation begins</button>"+
+      "</div><div id=\"q3-fb\"></div></div></div>";}});
+
+  // ━━ SCENE 8: MCMC ━━
+  GAME.scenes.push({type:"narrative",html:function(){return "<div class=\"scene\">"+xpBar()+
+    dialogue("odin","In most real problems, we cannot compute the posterior analytically. We use <em>MCMC (Markov Chain Monte Carlo)</em> to sample from the posterior. Think of explorer chains wandering through the parameter space, collecting samples proportional to the posterior probability.")+
+    dialogue("muninn","Essential MCMC diagnostics:<br><br>• <em>Trace plots</em> — chains should look like \"grass\" (caterpillar plots), not trends<br>• <em>R-hat (R̂)</em> — should be < 1.01 to indicate convergence<br>• <em>Warm-up (burn-in)</em> — discard the first samples before convergence<br>• <em>Multiple chains</em> — run 3–4 chains and verify they agree")+
+    dialogue("thor","This sounds way too complicated. Where does this stuff even run?")+
+    dialogue("odin","Software like <em>Stan, BRMS, JAGS</em>, and the <em>brms</em> R package do the heavy lifting. You specify the model and the priors, the software does the MCMC.")+
+    "<button class=\"continue-btn\" onclick=\"nextScene()\">Continue →</button></div>";}});
+
+  // ━━ SCENE 9: CHALLENGE 4 — Trace plot failure ━━
+  GAME.scenes.push({type:"challenge",html:function(){
+    var hint=GAME.difficulty==="aprendiz"?hintBox("When a chain gets \"stuck\" at a constant value while others explore, it means it has not converged. The R-hat will be > 1.01."):"";
+    return "<div class=\"scene\">"+xpBar()+
+      "<div class=\"challenge-box\"><div class=\"challenge-title\">⚔️ Challenge 4: The Lost Chains</div>"+
+      "<div class=\"challenge-question\">While examining the trace plots of a Bayesian model, you notice that one chain (chain 3) is stuck at a constant value while the other three explore freely. What does this indicate?</div>"+
+      "<div class=\"data-display\">Chain 1: ██░█░██░█ (exploring)<br>Chain 2: ░██░█░██░ (exploring)<br>Chain 3: █████████ (constant!)<br>Chain 4: █░██░█░██ (exploring)</div>"+hint+
+      "<div class=\"options-grid\" id=\"q4-opts\">"+
+      "<button class=\"option-btn\" onclick=\"checkQ(4,this,\x27a\x27)\">Everything is normal — each chain can have different behavior because MCMC allows chains to explore independently, and one chain stabilizing is actually a sign of convergence</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(4,this,\x27b\x27)\">Chain 3 found the true value and the others are wrong — a stable chain has converged to the posterior mode while the others are still searching</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(4,this,\x27c\x27)\">Convergence failure — the chain is stuck in a local maximum. R-hat will be > 1.01 and results are unreliable. You should increase warm-up, reparameterize the model, or use more informative priors</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(4,this,\x27d\x27)\">The model needs more predictor variables — a stuck chain indicates the model is underspecified and adding more predictors will fix convergence</button>"+
+      "</div><div id=\"q4-fb\"></div></div></div>";}});
+
+  // ━━ SCENE 10: Credible Intervals and Bayes Factor ━━
+  GAME.scenes.push({type:"narrative",html:function(){return "<div class=\"scene\">"+xpBar()+
+    dialogue("odin","Now the crucial difference: <em>Credible Interval</em> vs Confidence Interval.<br><br>The Bayesian CI is a <em>direct probability statement</em>: \"There is a 95% probability that the parameter lies between A and B, given the data and the prior.\" The frequentist CI does not allow this interpretation!")+
+    dialogue("muninn","<em>Bayes Factor (BF)</em> — the evidence ratio between two models:<br><br>• BF₁₀ = 1–3: Anecdotal evidence<br>• BF₁₀ = 3–10: Moderate evidence<br>• BF₁₀ = 10–30: Strong evidence<br>• BF₁₀ = 30–100: Very strong evidence<br>• BF₁₀ > 100: Extreme evidence")+
+    dialogue("huginn","The BF can also support H₀! If BF₁₀ = 0.05, then BF₀₁ = 20 — strong evidence <em>in favor</em> of the null hypothesis. This is impossible with NHST!")+
+    "<button class=\"continue-btn\" onclick=\"nextScene()\">Continue →</button></div>";}});
+
+  // ━━ SCENE 11: CHALLENGE 5 — Credible Interval ━━
+  GAME.scenes.push({type:"challenge",html:function(){
+    var hint=GAME.difficulty==="aprendiz"?hintBox("The Bayesian credible interval allows direct probability interpretation: \"95% probability that the parameter lies in this interval.\""):"";
+    return "<div class=\"scene\">"+xpBar()+
+      "<div class=\"challenge-box\"><div class=\"challenge-title\">⚔️ Challenge 5: The Language of Probability</div>"+
+      "<div class=\"challenge-question\">A 95% credible interval for β is [0.8, 3.2]. What is the <em>correct</em> interpretation?</div>"+
+      "<div class=\"data-display\">95% Bayesian CI for β: [0.8, 3.2]</div>"+hint+
+      "<div class=\"options-grid\" id=\"q5-opts\">"+
+      "<button class=\"option-btn\" onclick=\"checkQ(5,this,\x27a\x27)\">If we repeat the study many times, 95% of intervals will contain the true value</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(5,this,\x27b\x27)\">There is a 95% probability that β lies between 0.8 and 3.2, given the observed data and the prior used</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(5,this,\x27c\x27)\">The true parameter is certainly between 0.8 and 3.2 — the 95% credible interval guarantees it</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(5,this,\x27d\x27)\">The p-value for β is less than 0.05 — a credible interval excluding zero means significance</button>"+
+      "</div><div id=\"q5-fb\"></div></div></div>";}});
+
+  // ━━ SCENE 12: CHALLENGE 6 — Bayes Factor ━━
+  GAME.scenes.push({type:"challenge",html:function(){
+    var hint=GAME.difficulty==="aprendiz"?hintBox("BF₁₀ > 10 indicates strong evidence. The BF quantifies <em>how many times</em> the data are more probable under H₁ than under H₀."):"";
+    return "<div class=\"scene\">"+xpBar()+
+      "<div class=\"challenge-box\"><div class=\"challenge-title\">⚔️ Challenge 6: The Scale of Evidence</div>"+
+      "<div class=\"challenge-question\">A Bayesian analysis reports BF₁₀ = 15.3 for H₁ versus H₀. What is the interpretation?</div>"+
+      "<div class=\"data-display\">BF₁₀ = 15.3<br>Jeffreys\x27 scale: 10–30 = strong evidence</div>"+hint+
+      "<div class=\"options-grid\" id=\"q6-opts\">"+
+      "<button class=\"option-btn\" onclick=\"checkQ(6,this,\x27a\x27)\">The data are 15.3 times more probable under H₁ than under H₀ — strong evidence in favor of H₁</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(6,this,\x27b\x27)\">H₁ has a 15.3% chance of being true — BF converts directly to a hypothesis probability</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(6,this,\x27c\x27)\">The p-value is equivalent to 1/15.3 = 0.065, therefore not significant</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(6,this,\x27d\x27)\">Weak evidence — BF needs to be > 100 to be relevant on Jeffreys\x27 scale</button>"+
+      "</div><div id=\"q6-fb\"></div></div></div>";}});
+
+  // ━━ SCENE 13: CHALLENGE 7 — Sensitivity Analysis ━━
+  GAME.scenes.push({type:"challenge",html:function(){
+    var hint=GAME.difficulty==="aprendiz"?hintBox("If different priors lead to different conclusions, results are not robust. What to do: collect more data, use better-justified priors, or transparently report the sensitivity."):"";
+    return "<div class=\"scene\">"+xpBar()+
+      "<div class=\"challenge-box\"><div class=\"challenge-title\">⚔️ Challenge 7: The Robustness Test</div>"+
+      "<div class=\"challenge-question\">A sensitivity analysis shows that results change <em>dramatically</em> when different priors are used. What should the researcher do?</div>"+
+      "<div class=\"data-display\">Informative prior: β = 2.1 [1.5, 2.8]<br>Diffuse prior: β = 0.4 [−0.3, 1.2]<br>Results contradict each other!</div>"+hint+
+      "<div class=\"options-grid\" id=\"q7-opts\">"+
+      "<button class=\"option-btn\" onclick=\"checkQ(7,this,\x27a\x27)\">Choose the prior that gives the most favorable result — sensitivity analysis helps identify which prior maximizes effect</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(7,this,\x27b\x27)\">Ignore the sensitivity analysis — it is optional and only required for exploratory studies, not for confirmatory Bayesian analyses</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(7,this,\x27c\x27)\">Report the sensitivity transparently, collect more data so the likelihood dominates, and justify the prior choice based on substantial evidence</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(7,this,\x27d\x27)\">Abandon the Bayesian approach and use NHST instead — when priors affect results, it proves the Bayesian method is unreliable for this dataset</button>"+
+      "</div><div id=\"q7-fb\"></div></div></div>";}});
+
+  // ━━ MASTER SCENES ━━
+  if(GAME.difficulty==="mestre"){
+
+  // ━━ SCENE 14 (MASTER): CHALLENGE 8 — Design a Bayesian analysis ━━
+  GAME.scenes.push({type:"challenge",html:function(){
+    return "<div class=\"scene\">"+xpBar()+
+      "<div class=\"challenge-box\"><div class=\"challenge-title\">⚔️ Challenge 8: The Oracle\x27s Design (MASTER)</div>"+
+      "<div class=\"challenge-question\">333 warriors completed their training in Valhalla. You want to predict the <em>delay</em> (in months) in completing training as a function of age. Previous studies suggest β_age ≈ 2.5. Which Bayesian approach is most appropriate?</div>"+
+      "<div class=\"data-display\">N = 333 | y = delay (months) | x = age<br>Model: y = β₀ + β₁×Age + β₂×Age² + ε<br>Prior evidence: β_age ≈ 2.5</div>"+
+      "<div class=\"options-grid\" id=\"q8-opts\">"+
+      "<button class=\"option-btn\" onclick=\"checkQ(8,this,\x27a\x27)\">Diffuse prior N(0, 1000) for all parameters — let the data \"speak\". Diffuse priors are always best because they impose zero assumptions on the analysis</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(8,this,\x27b\x27)\">Extremely informative prior β_age ~ N(2.5, 0.01) to force the expected result — since previous studies found 2.5, we should lock the prior tightly around it</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(8,this,\x27c\x27)\">Use maximum likelihood (ML) only — Bayes is unnecessary with n = 333 because at this sample size ML and Bayesian approaches give identical results</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(8,this,\x27d\x27)\">Informative prior β_age ~ N(2.5, 5) based on previous studies, weakly informative priors for other parameters, prior predictive check, MCMC with 4 chains, verify R-hat < 1.01 and trace plots, sensitivity analysis</button>"+
+      "</div><div id=\"q8-fb\"></div></div></div>";}});
+
+  // ━━ SCENE 15 (MASTER): CHALLENGE 9 — Identify all issues ━━
+  GAME.scenes.push({type:"challenge",html:function(){
+    return "<div class=\"scene\">"+xpBar()+
+      "<div class=\"challenge-box\"><div class=\"challenge-title\">⚔️ Challenge 9: The Oracle\x27s Auditor (MASTER)</div>"+
+      "<div class=\"challenge-question\">A paper reports a Bayesian analysis as follows: \"We used non-informative priors. The MCMC ran with 1 chain and 500 iterations. The 95% credible interval for β is [0.5, 2.3].\" What problems do you identify?</div>"+
+      "<div class=\"data-display\">Reported issues:<br>1. \"Non-informative priors\"<br>2. 1 chain, 500 iterations<br>3. No trace plots or R-hat<br>4. No sensitivity analysis</div>"+
+      "<div class=\"options-grid\" id=\"q9-opts\">"+
+      "<button class=\"option-btn\" onclick=\"checkQ(9,this,\x27a\x27)\">There are no problems — the analysis is adequate because Bayesian methods are inherently robust to procedural choices like number of chains and iterations, and the term non-informative is standard in the literature</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(9,this,\x27b\x27)\">Only the number of iterations is low; the rest is fine — 1 chain is acceptable because convergence can be assessed within a single chain, and omitting sensitivity analysis is normal for confirmatory studies</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(9,this,\x27c\x27)\">Multiple problems: (1) the term \"non-informative\" is incorrect — use \"diffuse\"; (2) 1 chain prevents checking inter-chain convergence — minimum 3–4; (3) 500 iterations is far too few; (4) no convergence diagnostics reported (trace plots, R-hat); (5) no sensitivity analysis to assess the impact of priors</button>"+
+      "<button class=\"option-btn\" onclick=\"checkQ(9,this,\x27d\x27)\">The only problem is using \"non-informative\" instead of \"diffuse\" — everything else follows standard Bayesian practice: 1 chain is sufficient, 500 iterations is adequate, and convergence diagnostics are optional when the model is simple</button>"+
+      "</div><div id=\"q9-fb\"></div></div></div>";}});
+
+  }// end master
+
+  // ━━ FINAL SCENE: Ravens\x27 Lesson ━━
+  GAME.scenes.push({type:"narrative",html:function(){return "<div class=\"scene\">"+xpBar()+
+    dialogue("narrator","The silver light of Mímisbrunnr pulses stronger. The student has emerged with a new vision — the Bayesian vision. The prior, the likelihood, and the posterior dance together in harmony, guided by MCMC and validated by the WAMBS checklist.")+
+    dialogue("odin","You have conquered the <em>Realm of Bayesian Inference</em>! The art of updating beliefs with evidence is one of the most powerful in modern statistics.")+
+    dialogue("thor","Fine, I admit it... this business of combining priors with data has its charm. But I still prefer brute force!")+
+    dialogue("muninn","<strong>Ravens\x27 Lesson — Muninn summarizes:</strong><br>• Posterior ∝ Likelihood × Prior<br>• Priors: informative, weakly informative, diffuse (NEVER \"non-informative\")<br>• Prior predictive check: simulate data to validate priors<br>• MCMC: trace plots, R-hat < 1.01, multiple chains<br>• Credible interval = direct probability statement<br>• Bayes Factor: quantifies evidence for/against H₀")+
+    dialogue("huginn","<strong>Ravens\x27 Lesson — Huginn challenges:</strong><br>• Always run sensitivity analysis!<br>• Caution: precision ≠ variance in software<br>• Follow the WAMBS checklist<br>• With small samples, the prior dominates — justify it well<br>• The BF can support H₀ — something impossible with NHST!")+
+    "<button class=\"continue-btn\" onclick=\"showResults()\">See Final Result ⚔️</button></div>";}});
+}
+
+// ════════════════════════════════════════════════════
+var ANSWERS={1:"d",2:"b",3:"a",4:"c",5:"b",6:"a",7:"c",8:"d",9:"c"};
+var EXPLANATIONS={
+  1:{correct:"✅ Perfect! The prior distribution represents our <em>knowledge or belief about the parameter before observing the current data</em>. It can be based on previous studies, theory, or domain expertise.",wrong:"❌ The prior represents our knowledge <em>before</em> the current data — previous studies, theory, expertise. It is not the final result (posterior) nor the p-value.",charC:"odin",charW:"thor"},
+  2:{correct:"✅ Exactly! With a small sample (n = 10), there is not enough evidence to \"move\" the posterior away from the prior. The <em>prior dominates</em>. With large samples, the data dominate and different priors converge to the same posterior.",wrong:"❌ With n = 10 and an informative prior, the <em>prior dominates</em> the posterior. The likelihood only dominates with large samples.",charC:"muninn",charW:"thor"},
+  3:{correct:"✅ You caught the trap! Confusing precision with variance changes the prior completely. The real variance becomes 1/0.2 = 5 (very diffuse) instead of 0.2 (quite informative). <em>WAMBS recommends: always verify the software\x27s parameterization!</em>",wrong:"❌ Precision = 1/variance. If the software uses precision = 0.2, the real variance is 5 — very different from 0.2! This turns an informative prior into a diffuse one.",charC:"huginn",charW:"thor"},
+  4:{correct:"✅ Correct diagnosis! A stuck chain indicates <em>convergence failure</em>. R-hat will be > 1.01. Solutions: increase warm-up, reparameterize the model, use more informative priors, or check model identification.",wrong:"❌ A chain stuck at a constant value = <em>convergence failure</em>. All chains should explore the same space. R-hat > 1.01 confirms the problem.",charC:"odin",charW:"thor"},
+  5:{correct:"✅ Perfect interpretation! The Bayesian credible interval is a <em>direct probability statement</em>: \"95% probability that β is between 0.8 and 3.2, given the data and the prior.\" This is what everyone <em>thinks</em> the frequentist CI says — but only the Bayesian one actually allows it!",wrong:"❌ The Bayesian CI allows a direct statement: \"<em>There is a 95% probability that β lies in this interval</em>.\" The repeated-sampling interpretation belongs to the frequentist CI, not the Bayesian one.",charC:"odin",charW:"thor"},
+  6:{correct:"✅ Flawless interpretation! BF₁₀ = 15.3 means the data are <em>15.3 times more probable</em> under H₁ than under H₀. On Jeffreys\x27 scale, 10–30 = <em>strong</em> evidence in favor of H₁.",wrong:"❌ BF₁₀ = 15.3 means the data are 15.3 times more probable under H₁. It is not a probability of H₁ being true, nor a p-value. On Jeffreys\x27 scale: <em>strong evidence</em>.",charC:"muninn",charW:"thor"},
+  7:{correct:"✅ Exemplary scientific approach! Transparency is essential. <em>Report the sensitivity</em>, collect more data, and justify priors with substantial evidence. Choosing the prior by favorable results is Bayesian p-hacking!",wrong:"❌ When different priors yield conflicting results, the solution is <em>transparency</em>: report the sensitivity, collect more data, and justify the prior.",charC:"huginn",charW:"thor"},
+  8:{correct:"✅ Exemplary design! Informative prior β_age ~ N(2.5, 5) based on evidence, prior predictive check, MCMC with multiple chains, convergence diagnostics, and sensitivity analysis. This is the complete WAMBS Bayesian workflow!",wrong:"❌ The ideal workflow: informative prior based on evidence, prior predictive check, MCMC with 4 chains, R-hat < 1.01, trace plots, and sensitivity analysis (WAMBS checklist).",charC:"odin",charW:"thor"},
+  9:{correct:"✅ Complete audit! Five critical problems: (1) \"non-informative\" is incorrect; (2) 1 chain prevents convergence checks; (3) 500 iterations is insufficient; (4) no diagnostics (trace plots, R-hat); (5) no sensitivity analysis. The WAMBS checklist would fail this analysis!",wrong:"❌ There are 5 problems: \"non-informative\" incorrect, 1 chain insufficient, 500 iterations too few, no diagnostics, no sensitivity. WAMBS would fail it!",charC:"huginn",charW:"thor"}
+};
+
+function checkQ(q,btn,ans){
+  var opts=document.querySelectorAll("#q"+q+"-opts .option-btn");
+  opts.forEach(function(b){b.classList.add("disabled");b.onclick=null;});
+  var fb=document.getElementById("q"+q+"-fb"),cor=ANSWERS[q],exp=EXPLANATIONS[q];
+  GAME.total++;
+  if(ans===cor){
+    btn.classList.add("correct");GAME.hits++;GAME.xp+=20;updateXPBar();earnGear();
+    fb.innerHTML="<div class=\"feedback-box correct\">"+dialogue(exp.charC,exp.correct+" <span class=\"xp-badge\">+20 XP</span>")+"<button class=\"continue-btn\" onclick=\"nextScene()\">Continue →</button></div>";
+  }else{
+    btn.classList.add("wrong");
+    var ci=["a","b","c","d"].indexOf(cor);if(opts[ci])opts[ci].classList.add("correct");
+    fb.innerHTML="<div class=\"feedback-box wrong\">"+dialogue(exp.charW,exp.wrong)+"<button class=\"continue-btn\" onclick=\"nextScene()\">Continue →</button></div>";
+  }
+}
+
+function countMaxXP(){return (GAME.difficulty==="mestre"?9:7)*20;}
+function renderScene(){if(GAME.currentScene<GAME.scenes.length){content().innerHTML=GAME.scenes[GAME.currentScene].html();restoreGear();window.scrollTo({top:0,behavior:"smooth"});}}
+function nextScene(){GAME.currentScene++;renderScene();}
+
+function showResults(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var rank,rc;
+  if(pct>=90){rank="\u{1F3C6} Oracle of Mímisbrunnr";rc="#f0c040";}
+  else if(pct>=70){rank="\u{1F4DC} Bayesian Seer";rc="#58a6ff";}
+  else if(pct>=50){rank="\u{1F6E1}️ Posterior Apprentice";rc="#8b949e";}
+  else{rank="⛓️ Servant of the Vague Prior";rc="#f85149";}
+  content().innerHTML="<div class=\"result-screen\"><div class=\"reino-badge\">REALM 18 — COMPLETE</div><h2>Adventure Result</h2>"+resultVikingHTML()+
+    "<div class=\"result-rank\" style=\"color:"+rc+"\">"+rank+"</div>"+
+    "<div class=\"result-stats\">"+
+    "<div class=\"stat-row\"><span class=\"stat-label\">Difficulty</span><span class=\"stat-value\">"+(GAME.difficulty==="mestre"?"⚔️ Master":"\u{1F6E1}️ Apprentice")+"</span></div>"+
+    "<div class=\"stat-row\"><span class=\"stat-label\">Challenges Correct</span><span class=\"stat-value\">"+GAME.hits+" / "+GAME.total+"</span></div>"+
+    "<div class=\"stat-row\"><span class=\"stat-label\">Accuracy</span><span class=\"stat-value\">"+pct+"%</span></div>"+
+    "<div class=\"stat-row\"><span class=\"stat-label\">XP Earned</span><span class=\"stat-value\">"+GAME.xp+" / "+GAME.maxXP+"</span></div></div>"+
+    dialogue("odin",pct>=70
+      ?"The waters of Mímisbrunnr have revealed their secrets! Posterior, prior, likelihood, MCMC, Bayes Factor — all Bayesian tools are in your arsenal. Go forth and update your beliefs with confidence!"
+      :"Mímisbrunnr does not forgive the inattentive... Go back and review: Bayes\x27 theorem, types of priors, MCMC and convergence, credible vs confidence intervals, and the Bayes Factor. The well awaits your second attempt!"
+    )+
+    "<div style=\"display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px\"><button class=\"continue-btn\" onclick=\"showTitleScreen()\">\u{1F504} Play Again</button></div></div>";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ════════════════════════════════════════════════════
+// ARMOR SYSTEM
+// ════════════════════════════════════════════════════
+var GEAR_ITEMS=[
+  {s:"boots",n:"Prior Boots",h:"<div style=\"display:flex;gap:14px\"><div style=\"background:linear-gradient(#2a4a7a,#1a3050);width:16px;height:12px;border-radius:3px 3px 2px 2px;border:1.5px solid #1a2a4a;position:relative\"><span style=\"position:absolute;top:1px;left:2px;font-size:6px;color:#58a6ff;font-weight:bold\">P</span></div><div style=\"background:linear-gradient(#2a4a7a,#1a3050);width:16px;height:12px;border-radius:3px 3px 2px 2px;border:1.5px solid #1a2a4a;position:relative\"><span style=\"position:absolute;top:1px;left:2px;font-size:6px;color:#58a6ff;font-weight:bold\">θ</span></div></div>"},
+  {s:"mail",n:"Likelihood Chainmail",h:"<div style=\"width:46px;height:42px;background:linear-gradient(135deg,#4a6a4a,#2a4a2a);clip-path:polygon(50% 0%,100% 30%,100% 100%,0 100%,0 30%);border:1.5px solid #6a8a6a;position:relative\"><div style=\"position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:12px;color:#f0c040;font-weight:bold;font-family:serif\">L</div></div>"},
+  {s:"right",n:"Posterior Sword",h:"<div style=\"display:flex;flex-direction:column;align-items:center\"><div style=\"width:12px;height:4px;background:linear-gradient(#c0c0c0,#808080);border-radius:2px\"></div><div style=\"width:3px;height:32px;background:linear-gradient(#e0e0e0,#a0a0a0);border:1px solid #707070;position:relative\"><span style=\"position:absolute;top:6px;left:-8px;font-size:6px;color:#bc8cff;font-weight:bold\">P(θ|y)</span></div><div style=\"width:10px;height:6px;background:#5a3a1a;border-radius:1px;border:1px solid #3a2a10\"></div></div>"},
+  {s:"left",n:"Credible Shield",h:"<div style=\"width:28px;height:32px;background:radial-gradient(circle,#4a6a8a,#2a3a5a);border-radius:50% 50% 50% 50% / 45% 45% 55% 55%;border:2px solid #6a8aaa;position:relative\"><div style=\"position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8px;color:#f0c040;font-weight:bold;font-family:monospace\">CI%</div></div>"},
+  {s:"cape",n:"MCMC Cape",h:"<div style=\"width:58px;height:52px;background:linear-gradient(180deg,#2a1a3a,#1a0a2a);clip-path:polygon(15% 0%,85% 0%,100% 100%,0% 100%);opacity:.85;position:relative\"><div style=\"position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;gap:2px\"><span style=\"width:4px;height:4px;border-radius:50%;background:#bc8cff\"></span><span style=\"width:4px;height:4px;border-radius:50%;background:#bc8cff\"></span><span style=\"width:4px;height:4px;border-radius:50%;background:#bc8cff\"></span></div><div style=\"position:absolute;top:24px;left:50%;transform:translateX(-50%);font-size:7px;color:#bc8cff;font-weight:bold\">MCMC</div></div>"},
+  {s:"helm",n:"Bayes Helm",h:"<div style=\"width:38px;height:22px;background:linear-gradient(#6a5a2a,#4a3a1a);clip-path:polygon(5% 100%,15% 30%,50% 0%,85% 30%,95% 100%);border-bottom:3px solid #8a7a3a;position:relative\"><div style=\"position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:8px;color:#f0c040;font-weight:bold;font-family:serif\">BF</div></div>"}
+];
+var gearEarned=0;
+function armorPanelHTML(){
+  var rows="";
+  for(var i=0;i<GEAR_ITEMS.length;i++){rows+="<div class=\"gp-row"+(i<gearEarned?" earned":"")+"\" id=\"gprow"+i+"\"><span class=\"gp-dot\"></span><span>"+GEAR_ITEMS[i].n+"</span></div>";}
+  var sl="<div class=\"vm-sparks\" id=\"vmsparks\"></div>";
+  sl+="<div class=\"vm-slot vm-cape\" id=\"vmslot-cape\"></div>";
+  sl+="<div class=\"vm-head\"></div><div class=\"vm-arm-l\"></div><div class=\"vm-arm-r\"></div><div class=\"vm-torso\"></div><div class=\"vm-leg-l\"></div><div class=\"vm-leg-r\"></div>";
+  sl+="<div class=\"vm-slot vm-boots\" id=\"vmslot-boots\"></div><div class=\"vm-slot vm-mail\" id=\"vmslot-mail\"></div>";
+  sl+="<div class=\"vm-slot vm-left\" id=\"vmslot-left\"></div><div class=\"vm-slot vm-right\" id=\"vmslot-right\"></div>";
+  sl+="<div class=\"vm-slot vm-helm\" id=\"vmslot-helm\"></div>";
+  return "<div class=\"armor-panel\"><div class=\"viking-mini\" id=\"vmini\">"+sl+"</div><div class=\"gear-progress\">"+rows+"</div></div>";
+}
+function restoreGear(){for(var i=0;i<gearEarned&&i<GEAR_ITEMS.length;i++){var g=GEAR_ITEMS[i],el=document.getElementById("vmslot-"+g.s);if(el){el.innerHTML=g.h;el.classList.add("on");}}}
+function earnGear(){
+  if(gearEarned>=GEAR_ITEMS.length)return;
+  var g=GEAR_ITEMS[gearEarned],el=document.getElementById("vmslot-"+g.s);
+  if(el){el.innerHTML=g.h;el.classList.add("on","vm-flash");setTimeout(function(){el.classList.remove("vm-flash")},500);spawnVMSparks(el);}
+  var row=document.getElementById("gprow"+gearEarned);if(row)row.classList.add("earned");
+  gearEarned++;
+}
+function spawnVMSparks(el){
+  var sc=document.getElementById("vmsparks");if(!sc||!el)return;
+  var r=el.getBoundingClientRect(),sr=document.getElementById("vmini").getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height/2;
+  var cols=["#f0c040","#f08030","#f0e080","#ff6040","#ffd060"];
+  for(var i=0;i<10;i++){var s=document.createElement("div");s.className="vm-spark";
+    var a=Math.random()*Math.PI*2,d=20+Math.random()*30;
+    s.style.cssText="left:"+cx+"px;top:"+cy+"px;background:"+cols[Math.floor(Math.random()*5)]+";--sx:"+(Math.cos(a)*d)+"px;--sy:"+(Math.sin(a)*d)+"px;width:"+(2+Math.random()*3)+"px;height:"+(2+Math.random()*3)+"px";
+    sc.appendChild(s);setTimeout(function(x){x.remove()},700,s);}
+}
+function resultVikingHTML(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var ti=[];if(pct>=90)ti=GEAR_ITEMS;else if(pct>=70)ti=GEAR_ITEMS.slice(0,5);else if(pct>=50)ti=GEAR_ITEMS.slice(0,2);
+  var html="<div class=\"result-viking\">";
+  html+="<div class=\"rv-slot rv-cape\" id=\"rvs-cape\"></div>";
+  html+="<div class=\"rv-head\"></div><div class=\"rv-arm-l\"></div><div class=\"rv-arm-r\"></div><div class=\"rv-torso\"></div><div class=\"rv-leg-l\"></div><div class=\"rv-leg-r\"></div>";
+  html+="<div class=\"rv-slot rv-boots\" id=\"rvs-boots\"></div><div class=\"rv-slot rv-mail\" id=\"rvs-mail\"></div>";
+  html+="<div class=\"rv-slot rv-left\" id=\"rvs-left\"></div><div class=\"rv-slot rv-right\" id=\"rvs-right\"></div>";
+  html+="<div class=\"rv-slot rv-helm\" id=\"rvs-helm\"></div></div>";
+  setTimeout(function(){ti.forEach(function(g){var e=document.getElementById("rvs-"+g.s);if(e)e.innerHTML=g.h;});},100);
+  return html;
+}
+
+showTitleScreen();
+</script>
+</body>
+</html>

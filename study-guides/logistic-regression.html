@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logistic Regression — Step by Step | Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --bg-panel: #1c2333;
+  --odin-blue: #58a6ff;
+  --thor-red: #f85149;
+  --corvo-purple: #bc8cff;
+  --gold: #f0c040;
+  --silver: #8b949e;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --success: #3fb950;
+  --border: #30363d;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 18px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-dark);
+  padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-panel);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* STEP CONTENT */
+.step-content {
+  min-height: 60vh;
+  padding: 30px 0;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+  font-family: 'Bangers', cursive;
+  font-size: 2.2rem;
+  color: var(--gold);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.step-subtitle {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.3rem;
+  color: var(--odin-blue);
+  margin-bottom: 15px;
+}
+
+/* DIALOGUE BOXES */
+.dialogue-box {
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  border-left: 4px solid;
+  position: relative;
+}
+
+.dialogue-box.odin {
+  background: rgba(88,166,255,0.08);
+  border-left-color: var(--odin-blue);
+}
+.dialogue-box.thor {
+  background: rgba(248,81,73,0.08);
+  border-left-color: var(--thor-red);
+}
+.dialogue-box.corvo {
+  background: rgba(188,140,255,0.08);
+  border-left-color: var(--corvo-purple);
+}
+
+.char-name {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+
+.dialogue-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* DATA TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 1rem;
+}
+
+.data-table th, .data-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.data-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+}
+
+.data-table td {
+  background: var(--bg-card);
+  transition: background 0.2s;
+}
+
+.data-table tr:hover td {
+  background: rgba(88,166,255,0.1);
+}
+
+/* CALC TABLE */
+.calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 0.95rem;
+}
+
+.calc-table th, .calc-table td {
+  padding: 8px 10px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.calc-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.calc-table td {
+  background: var(--bg-card);
+}
+
+/* FORMULA */
+.formula {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-size: 1.15rem;
+  text-align: center;
+  font-family: 'Patrick Hand', cursive;
+  color: var(--gold);
+}
+
+.formula-label {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+/* SVG VISUALS */
+.visual-container {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.visual-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* CONCEPT GRID */
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.concept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.concept-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+/* COMPARISON GRID */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.comparison-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.comparison-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.comparison-result {
+  font-size: 1.4rem;
+  font-family: 'Bangers', cursive;
+}
+
+/* APA BOX */
+.apa-box {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 20px 0;
+  font-style: italic;
+  line-height: 1.7;
+}
+
+.apa-label {
+  font-family: 'Bangers', cursive;
+  color: var(--gold);
+  font-style: normal;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+/* WARNING BOX */
+.warning-box {
+  background: rgba(248,81,73,0.06);
+  border: 2px solid var(--thor-red);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.warning-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--thor-red);
+  margin-bottom: 12px;
+}
+
+/* CORRECT BOX */
+.correct-box {
+  background: rgba(63,185,80,0.06);
+  border: 2px solid var(--success);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.correct-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--success);
+  margin-bottom: 12px;
+}
+
+/* RAVENS LESSON */
+.licao-box {
+  background: rgba(188,140,255,0.06);
+  border: 2px solid var(--corvo-purple);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.licao-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--corvo-purple);
+  margin-bottom: 12px;
+}
+
+/* TRAP GRID */
+.trap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.trap-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.trap-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  color: var(--thor-red);
+  margin-bottom: 8px;
+}
+
+/* NAVIGATION */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 40px;
+  gap: 12px;
+}
+
+.nav-btn {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover {
+  border-color: var(--odin-blue);
+  background: rgba(88,166,255,0.1);
+}
+
+.nav-btn.primary {
+  background: var(--odin-blue);
+  color: var(--bg-dark);
+  border-color: var(--odin-blue);
+}
+
+.nav-btn.primary:hover {
+  background: #79bbff;
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* SIGNATURE */
+.signature {
+  text-align: center;
+  padding: 30px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* HIGHLIGHTS */
+.hl-gold { color: var(--gold); font-weight: bold; }
+.hl-blue { color: var(--odin-blue); }
+.hl-red { color: var(--thor-red); }
+.hl-green { color: var(--success); }
+.hl-purple { color: var(--corvo-purple); }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container { padding: 12px; }
+  .step-title { font-size: 1.6rem; }
+  .concept-grid, .comparison-grid, .trap-grid { grid-template-columns: 1fr; }
+  .nav-btn { padding: 10px 18px; font-size: 0.95rem; }
+  body { font-size: 16px; }
+}
+
+.fade-in { animation: fadeIn 0.6s ease both; }
+.fade-in-delay { animation: fadeIn 0.6s ease 0.3s both; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="progress-bar-container">
+    <div class="progress-label" id="progressLabel">Step 0 of 11</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="step-content" id="stepContent"></div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" id="btnBack" onclick="goBack()" disabled>&#9664; Back</button>
+    <button class="nav-btn primary" id="btnNext" onclick="goNext()">Next &#9654;</button>
+  </div>
+
+  <div class="signature">
+    Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+// 20 Norse warriors: Training (years), Armor Quality (1-10), Shield (0/1), Battle Experience (campaigns), Survived (0/1)
+var warriors = [
+  'Bjorn Ironside','Sigurd Snake-eye','Ivar the Boneless','Halfdan Ragnarsson','Ubba',
+  'Rollo of Normandy','Leif the Lucky','Erik Bloodaxe','Harald Fairhair','Ragnar Lothbrok',
+  'Gunnar Hamundarson','Floki the Shipbuilder','Arne the Bold','Thorfinn Skullsplitter','Olaf Tryggvason',
+  'Egil Skallagrimsson','Ketill Flatnose','Ulf the Fearless','Astrid Shieldmaiden','Freydis Eiriksdottir'
+];
+var Train = [8, 5, 3, 6, 2, 7, 4, 9, 10, 6, 3, 1, 5, 8, 7, 4, 2, 6, 9, 7]; // Training years
+var Armor = [9, 6, 4, 7, 3, 8, 5, 8, 10, 7, 5, 2, 6, 9, 8, 3, 4, 7, 9, 6]; // Armor quality 1-10
+var Shield= [1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0]; // Has shield
+var BatEx = [12, 7, 5, 8, 1, 10, 3, 14, 15, 9, 4, 0, 6, 11, 9, 2, 1, 8, 13, 5]; // Battle experience
+var Surv = [1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0]; // Survived
+var n = warriors.length;
+
+// ===== HELPERS =====
+function sum(arr) { return arr.reduce(function(a,b){return a+b;},0); }
+function mean(arr) { return sum(arr) / arr.length; }
+function rf(v, d) { return Number(v).toFixed(d === undefined ? 2 : d); }
+function r4(v) { return Number(v).toFixed(4); }
+
+// ===== LOGISTIC REGRESSION VIA IRLS (Iteratively Reweighted Least Squares) =====
+function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
+
+// Build design matrix [1, Train, Armor, Shield, BatEx]
+var Xmat = [];
+for (var i = 0; i < n; i++) {
+  Xmat.push([1, Train[i], Armor[i], Shield[i], BatEx[i]]);
+}
+
+// IRLS for logistic regression
+function fitLogistic(X, y, maxIter, tol) {
+  var p = X[0].length;
+  var nn = X.length;
+  var beta = [];
+  for (var j = 0; j < p; j++) beta[j] = 0;
+
+  for (var iter = 0; iter < maxIter; iter++) {
+    var pHat = [];
+    for (var i2 = 0; i2 < nn; i2++) {
+      var z = 0;
+      for (var j2 = 0; j2 < p; j2++) z += beta[j2] * X[i2][j2];
+      pHat[i2] = sigmoid(z);
+    }
+
+    // Gradient: X'(y - pHat)
+    var grad = [];
+    for (var j3 = 0; j3 < p; j3++) {
+      var s = 0;
+      for (var i3 = 0; i3 < nn; i3++) s += X[i3][j3] * (y[i3] - pHat[i3]);
+      grad[j3] = s;
+    }
+
+    // Hessian: -X' W X where W = diag(pHat*(1-pHat))
+    var H = [];
+    for (var a = 0; a < p; a++) {
+      H[a] = [];
+      for (var b = 0; b < p; b++) {
+        var ss = 0;
+        for (var i4 = 0; i4 < nn; i4++) {
+          var w = pHat[i4] * (1 - pHat[i4]);
+          ss -= X[i4][a] * w * X[i4][b];
+        }
+        H[a][b] = ss;
+      }
+    }
+
+    // Invert Hessian
+    var Hinv = invertMatrix(H);
+    if (!Hinv) break;
+
+    // Newton step: beta_new = beta - H^{-1} * grad
+    var betaNew = [];
+    var maxDiff = 0;
+    for (var j4 = 0; j4 < p; j4++) {
+      var delta = 0;
+      for (var j5 = 0; j5 < p; j5++) delta += Hinv[j4][j5] * grad[j5];
+      betaNew[j4] = beta[j4] - delta;
+      maxDiff = Math.max(maxDiff, Math.abs(betaNew[j4] - beta[j4]));
+    }
+    beta = betaNew;
+    if (maxDiff < tol) break;
+  }
+  return beta;
+}
+
+function invertMatrix(M) {
+  var sz = M.length;
+  var aug = [];
+  for (var i = 0; i < sz; i++) {
+    aug[i] = [];
+    for (var j = 0; j < sz; j++) aug[i][j] = M[i][j];
+    for (var j2 = 0; j2 < sz; j2++) aug[i][sz + j2] = (i === j2) ? 1 : 0;
+  }
+  for (var col = 0; col < sz; col++) {
+    var maxRow = col;
+    for (var row = col + 1; row < sz; row++) {
+      if (Math.abs(aug[row][col]) > Math.abs(aug[maxRow][col])) maxRow = row;
+    }
+    var tmp = aug[col]; aug[col] = aug[maxRow]; aug[maxRow] = tmp;
+    var pivot = aug[col][col];
+    if (Math.abs(pivot) < 1e-12) return null;
+    for (var j3 = 0; j3 < 2 * sz; j3++) aug[col][j3] /= pivot;
+    for (var row2 = 0; row2 < sz; row2++) {
+      if (row2 !== col) {
+        var factor = aug[row2][col];
+        for (var j4 = 0; j4 < 2 * sz; j4++) aug[row2][j4] -= factor * aug[col][j4];
+      }
+    }
+  }
+  var inv = [];
+  for (var i2 = 0; i2 < sz; i2++) {
+    inv[i2] = [];
+    for (var j5 = 0; j5 < sz; j5++) inv[i2][j5] = aug[i2][sz + j5];
+  }
+  return inv;
+}
+
+var betas = fitLogistic(Xmat, Surv, 100, 1e-8);
+var b0 = betas[0], b1 = betas[1], b2 = betas[2], b3 = betas[3], b4 = betas[4];
+
+// Predicted probabilities
+var pHat = [];
+for (var i = 0; i < n; i++) {
+  var z = b0 + b1*Train[i] + b2*Armor[i] + b3*Shield[i] + b4*BatEx[i];
+  pHat[i] = sigmoid(z);
+}
+
+// Odds ratios
+var OR1 = Math.exp(b1), OR2 = Math.exp(b2), OR3 = Math.exp(b3), OR4 = Math.exp(b4);
+
+// Log-likelihood
+var LL = 0;
+for (var i2 = 0; i2 < n; i2++) {
+  var pi = pHat[i2];
+  if (pi < 1e-10) pi = 1e-10;
+  if (pi > 1 - 1e-10) pi = 1 - 1e-10;
+  LL += Surv[i2] * Math.log(pi) + (1 - Surv[i2]) * Math.log(1 - pi);
+}
+
+// Null model log-likelihood (intercept only)
+var pBar = mean(Surv);
+var LL0 = 0;
+for (var i3 = 0; i3 < n; i3++) {
+  LL0 += Surv[i3] * Math.log(pBar) + (1 - Surv[i3]) * Math.log(1 - pBar);
+}
+
+// Deviance
+var deviance = -2 * LL;
+var nullDeviance = -2 * LL0;
+
+// Pseudo-R2
+var coxSnellR2 = 1 - Math.exp((2/n) * (LL0 - LL));
+var maxCoxSnell = 1 - Math.exp((2/n) * LL0);
+var nagelkerkeR2 = coxSnellR2 / maxCoxSnell;
+
+// AIC
+var AIC = -2 * LL + 2 * 5; // 5 parameters (b0..b4)
+
+// Classification (cutoff = 0.5)
+var TP = 0, TN = 0, FP = 0, FN = 0;
+var predClass = [];
+for (var i4 = 0; i4 < n; i4++) {
+  predClass[i4] = pHat[i4] >= 0.5 ? 1 : 0;
+  if (Surv[i4] === 1 && predClass[i4] === 1) TP++;
+  else if (Surv[i4] === 0 && predClass[i4] === 0) TN++;
+  else if (Surv[i4] === 0 && predClass[i4] === 1) FP++;
+  else FN++;
+}
+var sensitivity = TP / (TP + FN);
+var specificity = TN / (TN + FP);
+var accuracy = (TP + TN) / n;
+
+// ===== DIALOGUE HELPER =====
+function dialogue(character, name, text) {
+  return '<div class="dialogue-box ' + character + '">' +
+    '<div class="char-name ' + character + '">' + name + '</div>' +
+    '<div class="dialogue-text">' + text + '</div>' +
+  '</div>';
+}
+
+// ===== SVG: SIGMOID CURVE =====
+function buildSigmoidSVG() {
+  var w = 680, h = 340;
+  var pad = { top: 30, right: 40, bottom: 50, left: 60 };
+  var pw = w - pad.left - pad.right;
+  var ph = h - pad.top - pad.bottom;
+
+  var xMin = -8, xMax = 8;
+  var yMin = 0, yMax = 1;
+  function sx(v) { return pad.left + (v - xMin) / (xMax - xMin) * pw; }
+  function sy(v) { return pad.top + ph - (v - yMin) / (yMax - yMin) * ph; }
+
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+
+  // Grid
+  for (var gy = 0; gy <= 1; gy += 0.25) {
+    svg += '<line x1="' + pad.left + '" y1="' + sy(gy) + '" x2="' + (pad.left + pw) + '" y2="' + sy(gy) + '" stroke="#30363d" stroke-width="0.5" opacity="0.5"/>';
+    svg += '<text x="' + (pad.left - 10) + '" y="' + (sy(gy) + 4) + '" fill="#8b949e" font-size="11" text-anchor="end" font-family="Patrick Hand">' + gy.toFixed(2) + '</text>';
+  }
+
+  // Axes
+  svg += '<line x1="' + pad.left + '" y1="' + (pad.top + ph) + '" x2="' + (pad.left + pw) + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+  svg += '<line x1="' + pad.left + '" y1="' + pad.top + '" x2="' + pad.left + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+
+  // 0.5 reference line
+  svg += '<line x1="' + pad.left + '" y1="' + sy(0.5) + '" x2="' + (pad.left + pw) + '" y2="' + sy(0.5) + '" stroke="#f0c040" stroke-width="1" stroke-dasharray="6,4" opacity="0.6"/>';
+  svg += '<text x="' + (pad.left + pw + 5) + '" y="' + (sy(0.5) + 4) + '" fill="#f0c040" font-size="11" font-family="Patrick Hand">0.50</text>';
+
+  // Sigmoid curve
+  var path = 'M';
+  for (var x = xMin; x <= xMax; x += 0.1) {
+    var yy = 1 / (1 + Math.exp(-x));
+    path += (x === xMin ? '' : ' L') + rf(sx(x), 1) + ' ' + rf(sy(yy), 1);
+  }
+  svg += '<path d="' + path + '" fill="none" stroke="#58a6ff" stroke-width="3"/>';
+
+  // Labels
+  svg += '<text x="' + (pad.left + pw/2) + '" y="' + (h - 5) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker">z = b₀ + b₁x₁ + ... + bₖxₖ</text>';
+  svg += '<text x="15" y="' + (pad.top + ph/2) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker" transform="rotate(-90,15,' + (pad.top + ph/2) + ')">P(Y=1)</text>';
+
+  // Tick labels x
+  for (var gx = -6; gx <= 6; gx += 2) {
+    svg += '<text x="' + sx(gx) + '" y="' + (pad.top + ph + 20) + '" fill="#8b949e" font-size="11" text-anchor="middle" font-family="Patrick Hand">' + gx + '</text>';
+  }
+
+  // Annotation
+  svg += '<text x="' + sx(3.5) + '" y="' + (sy(0.95) - 12) + '" fill="#58a6ff" font-size="13" font-family="Permanent Marker">Sigmoid S-curve</text>';
+  svg += '<text x="' + sx(-5) + '" y="' + (sy(0.05) + 20) + '" fill="#f85149" font-size="11" font-family="Patrick Hand">Asymptotically approaches 0</text>';
+  svg += '<text x="' + sx(4) + '" y="' + (sy(0.95) + 8) + '" fill="#3fb950" font-size="11" font-family="Patrick Hand">Asymptotically approaches 1</text>';
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ===== SVG: LINEAR vs LOGISTIC =====
+function buildComparisonSVG() {
+  var w = 680, h = 340;
+  var pad = { top: 30, right: 40, bottom: 50, left: 60 };
+  var pw = w - pad.left - pad.right;
+  var ph = h - pad.top - pad.bottom;
+
+  var xMin = 0, xMax = 12;
+  var yMin = -0.3, yMax = 1.3;
+  function sx(v) { return pad.left + (v - xMin) / (xMax - xMin) * pw; }
+  function sy(v) { return pad.top + ph - (v - yMin) / (yMax - yMin) * ph; }
+
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+
+  // Reference bands
+  svg += '<rect x="' + pad.left + '" y="' + sy(1) + '" width="' + pw + '" height="' + (sy(0) - sy(1)) + '" fill="rgba(63,185,80,0.04)" />';
+  svg += '<rect x="' + pad.left + '" y="' + pad.top + '" width="' + pw + '" height="' + (sy(1) - pad.top) + '" fill="rgba(248,81,73,0.04)" />';
+  svg += '<rect x="' + pad.left + '" y="' + sy(0) + '" width="' + pw + '" height="' + (pad.top + ph - sy(0)) + '" fill="rgba(248,81,73,0.04)" />';
+
+  // 0 and 1 lines
+  svg += '<line x1="' + pad.left + '" y1="' + sy(0) + '" x2="' + (pad.left + pw) + '" y2="' + sy(0) + '" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>';
+  svg += '<line x1="' + pad.left + '" y1="' + sy(1) + '" x2="' + (pad.left + pw) + '" y2="' + sy(1) + '" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>';
+  svg += '<text x="' + (pad.left - 10) + '" y="' + (sy(0) + 4) + '" fill="#8b949e" font-size="11" text-anchor="end" font-family="Patrick Hand">0</text>';
+  svg += '<text x="' + (pad.left - 10) + '" y="' + (sy(1) + 4) + '" fill="#8b949e" font-size="11" text-anchor="end" font-family="Patrick Hand">1</text>';
+
+  // Axes
+  svg += '<line x1="' + pad.left + '" y1="' + (pad.top + ph) + '" x2="' + (pad.left + pw) + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+  svg += '<line x1="' + pad.left + '" y1="' + pad.top + '" x2="' + pad.left + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+
+  // Data points (simulated binary outcome)
+  var ptsX = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 9.5, 10, 10.5, 11];
+  var ptsY = [0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1];
+  for (var i = 0; i < ptsX.length; i++) {
+    var col = ptsY[i] === 1 ? '#3fb950' : '#f85149';
+    svg += '<circle cx="' + sx(ptsX[i]) + '" cy="' + sy(ptsY[i]) + '" r="5" fill="' + col + '" stroke="#0d1117" stroke-width="1.5" opacity="0.85"/>';
+  }
+
+  // Linear regression line (OLS)
+  var lSlope = 0.09;
+  var lInt = -0.15;
+  svg += '<line x1="' + sx(0) + '" y1="' + sy(lInt) + '" x2="' + sx(12) + '" y2="' + sy(lInt + 12 * lSlope) + '" stroke="#f85149" stroke-width="2.5" stroke-dasharray="8,4" opacity="0.8"/>';
+
+  // Logistic curve
+  var logPath = 'M';
+  for (var x = 0; x <= 12; x += 0.15) {
+    var zz = -4.5 + 0.75 * x;
+    var yy = 1 / (1 + Math.exp(-zz));
+    logPath += (x === 0 ? '' : ' L') + rf(sx(x), 1) + ' ' + rf(sy(yy), 1);
+  }
+  svg += '<path d="' + logPath + '" fill="none" stroke="#58a6ff" stroke-width="3"/>';
+
+  // Labels
+  svg += '<text x="' + sx(11) + '" y="' + (sy(lInt + 11 * lSlope) - 10) + '" fill="#f85149" font-size="12" font-family="Permanent Marker">OLS line</text>';
+  svg += '<text x="' + sx(9.5) + '" y="' + (sy(0.85) - 14) + '" fill="#58a6ff" font-size="12" font-family="Permanent Marker">Logistic</text>';
+  svg += '<text x="' + (pad.left + pw/2) + '" y="' + (h - 5) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker">Training (years)</text>';
+
+  // Problem annotations
+  svg += '<text x="' + (pad.left + pw - 5) + '" y="' + (sy(1.15)) + '" fill="#f85149" font-size="10" text-anchor="end" font-family="Patrick Hand">Predictions > 1 (impossible!)</text>';
+  svg += '<text x="' + (pad.left + 5) + '" y="' + (sy(-0.15)) + '" fill="#f85149" font-size="10" font-family="Patrick Hand">Predictions < 0 (impossible!)</text>';
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ===== SVG: CONFUSION MATRIX =====
+function buildConfusionMatrixSVG() {
+  var w = 500, h = 400;
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+
+  // Title
+  svg += '<text x="250" y="25" fill="#f0c040" font-size="16" text-anchor="middle" font-family="Permanent Marker">Confusion Matrix</text>';
+
+  // Headers
+  svg += '<text x="300" y="55" fill="#8b949e" font-size="14" text-anchor="middle" font-family="Permanent Marker">Predicted</text>';
+  svg += '<text x="225" y="80" fill="#3fb950" font-size="12" text-anchor="middle" font-family="Patrick Hand">Survived (1)</text>';
+  svg += '<text x="375" y="80" fill="#f85149" font-size="12" text-anchor="middle" font-family="Patrick Hand">Fell (0)</text>';
+
+  svg += '<text x="70" y="155" fill="#8b949e" font-size="14" text-anchor="middle" font-family="Permanent Marker" transform="rotate(-90,70,155)">Actual</text>';
+  svg += '<text x="105" y="140" fill="#3fb950" font-size="12" text-anchor="middle" font-family="Patrick Hand" transform="rotate(-90,105,140)">Survived (1)</text>';
+  svg += '<text x="105" y="280" fill="#f85149" font-size="12" text-anchor="middle" font-family="Patrick Hand" transform="rotate(-90,105,280)">Fell (0)</text>';
+
+  // Cells
+  // TP
+  svg += '<rect x="150" y="90" width="150" height="110" rx="8" fill="rgba(63,185,80,0.15)" stroke="#3fb950" stroke-width="2"/>';
+  svg += '<text x="225" y="135" fill="#3fb950" font-size="28" text-anchor="middle" font-family="Bangers">' + TP + '</text>';
+  svg += '<text x="225" y="160" fill="#3fb950" font-size="13" text-anchor="middle" font-family="Patrick Hand">True Positive</text>';
+  svg += '<text x="225" y="180" fill="#8b949e" font-size="11" text-anchor="middle" font-family="Patrick Hand">(Hit)</text>';
+
+  // FN
+  svg += '<rect x="300" y="90" width="150" height="110" rx="8" fill="rgba(248,81,73,0.12)" stroke="#f85149" stroke-width="2"/>';
+  svg += '<text x="375" y="135" fill="#f85149" font-size="28" text-anchor="middle" font-family="Bangers">' + FN + '</text>';
+  svg += '<text x="375" y="160" fill="#f85149" font-size="13" text-anchor="middle" font-family="Patrick Hand">False Negative</text>';
+  svg += '<text x="375" y="180" fill="#8b949e" font-size="11" text-anchor="middle" font-family="Patrick Hand">(Miss)</text>';
+
+  // FP
+  svg += '<rect x="150" y="200" width="150" height="110" rx="8" fill="rgba(248,81,73,0.12)" stroke="#f85149" stroke-width="2"/>';
+  svg += '<text x="225" y="245" fill="#f85149" font-size="28" text-anchor="middle" font-family="Bangers">' + FP + '</text>';
+  svg += '<text x="225" y="270" fill="#f85149" font-size="13" text-anchor="middle" font-family="Patrick Hand">False Positive</text>';
+  svg += '<text x="225" y="290" fill="#8b949e" font-size="11" text-anchor="middle" font-family="Patrick Hand">(False Alarm)</text>';
+
+  // TN
+  svg += '<rect x="300" y="200" width="150" height="110" rx="8" fill="rgba(63,185,80,0.15)" stroke="#3fb950" stroke-width="2"/>';
+  svg += '<text x="375" y="245" fill="#3fb950" font-size="28" text-anchor="middle" font-family="Bangers">' + TN + '</text>';
+  svg += '<text x="375" y="270" fill="#3fb950" font-size="13" text-anchor="middle" font-family="Patrick Hand">True Negative</text>';
+  svg += '<text x="375" y="290" fill="#8b949e" font-size="11" text-anchor="middle" font-family="Patrick Hand">(Correct Rejection)</text>';
+
+  // Metrics
+  svg += '<text x="250" y="345" fill="#f0c040" font-size="13" text-anchor="middle" font-family="Permanent Marker">Sensitivity = ' + rf(sensitivity * 100, 1) + '% | Specificity = ' + rf(specificity * 100, 1) + '% | Accuracy = ' + rf(accuracy * 100, 1) + '%</text>';
+  svg += '<text x="250" y="375" fill="#8b949e" font-size="12" text-anchor="middle" font-family="Patrick Hand">Cutoff = 0.50</text>';
+
+  svg += '</svg>';
+  return svg;
+}
+
+
+// =============================================
+// STEP FUNCTIONS
+// =============================================
+
+function step0() {
+  return '<div class="step-title">The Gates of Valhalla: Who Survives the Battle?</div>' +
+
+    '<p>At the gates of <span class="hl-gold">Valhalla</span>, the Valkyries must decide which warriors survived the great battle and which have fallen. But the Allfather wants to <em>predict</em> survival \x96 not judge after the fact. Can the characteristics of a warrior \x96 their training, armor, shield, and experience \x96 tell us the probability of survival?</p>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'This is a <strong>binary outcome</strong> \x96 a warrior either survived (1) or fell (0). There is no middle ground. Linear regression won\x27t work here. We need a tool designed for yes/no predictions. Enter <span class="hl-gold">logistic regression</span>.') +
+
+    dialogue('thor', '⚡ Thorment', 'Binary? Just use regular regression and round to 0 or 1! Problem solved.') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'That\x27s the naive approach, Thorment. And it fails spectacularly. A linear model can predict probabilities of \x96 0.3 or 1.4 \x96 which are nonsensical for a probability. We need a function that <em>constrains</em> the output between 0 and 1.') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Logistic regression</strong> was developed by statistician David Cox in 1958, building on the logistic function discovered by Pierre-François Verhulst in 1845. It models the probability of a binary outcome as a function of one or more predictors. The dependent variable is categorical (0/1), not continuous.') +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">The Question</h4>' +
+        '<p>What is the <strong>probability</strong> a warrior survives, given their characteristics?</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">The Tool</h4>' +
+        '<p><strong>Logistic regression</strong> \x96 maps any linear combination to a probability between 0 and 1.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">Y = 1</h4>' +
+        '<p>The warrior <strong>survived</strong> the battle. The event of interest occurred.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--thor-red)">Y = 0</h4>' +
+        '<p>The warrior <strong>fell</strong> in battle. The event of interest did not occur.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Think about this: if you used OLS on binary data, your residuals would violate <em>every</em> assumption \x96 normality, homoscedasticity, linearity. The predictions would be meaningless outside the observed range. Logistic regression solves all of these problems with one elegant trick: the sigmoid function.');
+}
+
+function step1() {
+  return '<div class="step-title">Step 1: Why Not Linear Regression?</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Before we learn logistic regression, we must understand <em>why</em> ordinary linear regression fails with binary outcomes. Let me show you the fundamental problem.') +
+
+    '<p>Suppose we try to predict survival (0 or 1) using only <span class="hl-blue">training years</span> with a straight line:</p>' +
+
+    '<div class="visual-container">' + buildComparisonSVG() + '</div>' +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ Three Fatal Problems with OLS on Binary Data</div>' +
+      '<p><strong>1. Predicted values escape [0, 1].</strong> A linear model happily predicts P = 1.3 or P = \x960.2. These make no sense as probabilities.</p>' +
+      '<p style="margin-top:8px"><strong>2. Non-normal residuals.</strong> When Y is 0 or 1, residuals cluster at two levels. The normality assumption is destroyed.</p>' +
+      '<p style="margin-top:8px"><strong>3. Heteroscedasticity by design.</strong> The variance of a binary variable depends on its mean: Var = p(1\x96p). As predicted probability changes, so does variance.</p>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'Fine, so the line goes too high and too low. Just clip it at 0 and 1!') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Clipping creates flat regions where the derivative is zero \x96 the model stops learning. And the clipped estimates are still biased. The elegant solution is to use a function that <em>naturally</em> lives between 0 and 1: the <span class="hl-gold">sigmoid function</span>.') +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--thor-red)">OLS on Binary Y</h4>' +
+        '<p>Called the <strong>Linear Probability Model (LPM)</strong>. Sometimes used for simplicity, but it has serious flaws.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Logistic Regression</h4>' +
+        '<p>Uses the <strong>logit link function</strong> to constrain predictions to [0, 1]. Proper probability model.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The Linear Probability Model is still used in economics for causal inference because coefficients are easy to interpret. But for prediction and proper inference about probabilities, logistic regression is the standard in management, psychology, and health sciences.');
+}
+
+function step2() {
+  return '<div class="step-title">Step 2: The Logistic Function \x96 The S-Curve</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'The heart of logistic regression is the <strong>sigmoid function</strong> (also called the logistic function). It takes any real number and compresses it into the range (0, 1).') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">The Sigmoid / Logistic Function</div>' +
+      'σ(z) = 1 / (1 + e<sup>\x96z</sup>)' +
+    '</div>' +
+
+    '<div class="visual-container">' + buildSigmoidSVG() + '</div>' +
+
+    '<p>The variable <span class="hl-gold">z</span> is the <strong>linear predictor</strong>: z = b₀ + b₁x₁ + ... + bₖxₖ. The sigmoid transforms z into a probability P(Y=1).</p>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">When z = 0</h4>' +
+        '<p>σ(0) = 1/(1+1) = <strong>0.50</strong>. The inflection point. Equal odds.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">When z → +∞</h4>' +
+        '<p>σ(z) → <strong>1</strong>. The function approaches certainty of Y=1.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--thor-red)">When z → \x96∞</h4>' +
+        '<p>σ(z) → <strong>0</strong>. Near certainty that Y=0.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">The Inverse: Logit</h4>' +
+        '<p>logit(p) = ln(p / (1\x96p)). Maps a probability back to (\x96∞, +∞).</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'The sigmoid is symmetric around z = 0. This means the effect of moving from z = \x962 to z = 0 on the probability scale is the <em>same</em> as moving from z = 0 to z = +2. But the effect on the probability is <strong>not linear</strong> \x96 the steepest change happens near z = 0. Keep this in mind when interpreting coefficients.') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'The logit function \x96 the inverse of the sigmoid \x96 is the key link. It transforms a probability into a real number, which is what our linear model produces. That\x27s why we call it the <em>logit link function</em>.');
+}
+
+function step3() {
+  return '<div class="step-title">Step 3: The Data \x96 Warriors of the Nine Realms</div>' +
+
+    '<p>Odin Allfather has recorded the fate of <span class="hl-gold">20 warriors</span> from the last great battle. For each warrior, we know their <span class="hl-blue">training</span> (years), <span class="hl-green">armor quality</span> (1\x9610), whether they carried a <span class="hl-purple">shield</span> (0/1), and their <span class="hl-gold">battle experience</span> (campaigns). The outcome: did they survive?</p>' +
+
+    '<div style="overflow-x:auto">' +
+    '<table class="data-table">' +
+    '<tr><th>#</th><th>Warrior</th><th>Training (yrs)</th><th>Armor (1\x9610)</th><th>Shield (0/1)</th><th>Experience</th><th>Survived</th></tr>' +
+    warriors.map(function(w, i) {
+      var survColor = Surv[i] === 1 ? 'color:var(--success)' : 'color:var(--thor-red)';
+      return '<tr><td>' + (i+1) + '</td><td style="text-align:left">' + w + '</td><td>' + Train[i] + '</td><td>' + Armor[i] + '</td><td>' + Shield[i] + '</td><td>' + BatEx[i] + '</td><td style="' + survColor + ';font-weight:bold">' + Surv[i] + '</td></tr>';
+    }).join('') +
+    '</table>' +
+    '</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Notice: the outcome column is strictly <span class="hl-green">1</span> (survived) or <span class="hl-red">0</span> (fell). No half-survivals. This is the binary dependent variable that logistic regression is built for.') +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Continuous Predictors</h4>' +
+        '<p>Training (years), Armor Quality (1\x9610), Battle Experience (campaigns)</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">Binary Predictor</h4>' +
+        '<p>Shield (0 = no, 1 = yes). A dummy variable inside the model.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'With 20 observations and 4 predictors, we have 5 <strong>events per variable</strong> (EPV = 10 events / 4 vars = 2.5). Wait \x96 that\x27s below the recommended EPV ≥ 10. We\x27ll revisit this concern in the assumptions step. For now, treat these results as illustrative.');
+}
+
+function step4() {
+  return '<div class="step-title">Step 4: Odds and Log-Odds \x96 The Language of Logistic Regression</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Before we fit the model, we need to speak the language of logistic regression. Three concepts build on each other: <span class="hl-gold">probability</span>, <span class="hl-blue">odds</span>, and <span class="hl-purple">log-odds (logit)</span>.') +
+
+    '<p>In our data, <span class="hl-gold">' + sum(Surv) + ' of ' + n + '</span> warriors survived. The base probability is:</p>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Base Probability</div>' +
+      'P(Survived) = ' + sum(Surv) + ' / ' + n + ' = ' + rf(pBar, 2) +
+    '</div>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Odds = P / (1 \x96 P)</div>' +
+      'Odds = ' + rf(pBar, 2) + ' / ' + rf(1 - pBar, 2) + ' = ' + rf(pBar / (1 - pBar), 4) +
+    '</div>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Log-Odds (Logit) = ln(Odds)</div>' +
+      'Logit = ln(' + rf(pBar / (1 - pBar), 4) + ') = ' + rf(Math.log(pBar / (1 - pBar)), 4) +
+    '</div>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">Probability</h4>' +
+        '<p>Ranges from <strong>0 to 1</strong>. The language of prediction. P = ' + rf(pBar, 2) + '</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Odds</h4>' +
+        '<p>Ranges from <strong>0 to ∞</strong>. "How much more likely is success than failure?" Odds = ' + rf(pBar / (1 - pBar), 2) + '</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">Log-Odds (Logit)</h4>' +
+        '<p>Ranges from <strong>\x96∞ to +∞</strong>. This is what the linear model predicts! Logit = ' + rf(Math.log(pBar / (1 - pBar)), 2) + '</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">Why Log-Odds?</h4>' +
+        '<p>Because they live on the same scale as a linear equation: (\x96∞, +∞). A perfect match for b₀ + b₁x.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'Odds, log-odds, probabilities \x96 I\x27m confused. Why not just predict the probability directly?') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Because probability is bounded (0 to 1), but a linear equation isn\x27t. The logit transformation maps the bounded probability to the unbounded real line. The model works in log-odds space, then we convert back to probabilities when we want predictions.') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Think of it as a three-step process: <strong>1)</strong> The model computes a log-odds (z). <strong>2)</strong> We exponentiate to get odds: e<sup>z</sup>. <strong>3)</strong> We convert odds to probability: p = odds / (1 + odds). This chain is the logistic function.');
+}
+
+function step5() {
+  return '<div class="step-title">Step 5: The Logistic Model \x96 Predicting Log-Odds</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Now we put it all together. The logistic regression model says that the <strong>log-odds of the outcome</strong> is a linear function of the predictors.') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">The Logistic Regression Model</div>' +
+      'logit(p) = ln(p / (1\x96p)) = b₀ + b₁x₁ + b₂x₂ + ... + bₖxₖ' +
+    '</div>' +
+
+    '<p>For our warrior data, the fitted model is:</p>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Fitted Model</div>' +
+      'logit(P[Survived]) = ' + rf(b0, 4) + ' + ' + rf(b1, 4) + '(Training) + ' + rf(b2, 4) + '(Armor) + ' + rf(b3, 4) + '(Shield) + ' + rf(b4, 4) + '(Experience)' +
+    '</div>' +
+
+    '<div style="overflow-x:auto">' +
+    '<table class="calc-table">' +
+    '<tr><th>Coefficient</th><th>Variable</th><th>Estimate (b)</th><th>Interpretation (in log-odds)</th></tr>' +
+    '<tr><td>b₀</td><td>Intercept</td><td>' + rf(b0, 4) + '</td><td>Log-odds when all predictors = 0</td></tr>' +
+    '<tr><td>b₁</td><td>Training (years)</td><td>' + rf(b1, 4) + '</td><td>Each extra year of training changes log-odds by ' + rf(b1, 4) + '</td></tr>' +
+    '<tr><td>b₂</td><td>Armor Quality</td><td>' + rf(b2, 4) + '</td><td>Each unit of armor quality changes log-odds by ' + rf(b2, 4) + '</td></tr>' +
+    '<tr><td>b₃</td><td>Shield (0/1)</td><td>' + rf(b3, 4) + '</td><td>Having a shield changes log-odds by ' + rf(b3, 4) + '</td></tr>' +
+    '<tr><td>b₄</td><td>Battle Experience</td><td>' + rf(b4, 4) + '</td><td>Each extra campaign changes log-odds by ' + rf(b4, 4) + '</td></tr>' +
+    '</table>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'Wait \x96 a coefficient of ' + rf(b1, 4) + ' means what? An increase of ' + rf(b1, 4) + ' in the probability?') +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ Critical Distinction!</div>' +
+      '<p>In logistic regression, coefficients are changes in <strong>log-odds</strong>, NOT changes in probability! A coefficient of ' + rf(b1, 2) + ' means the log-odds increase by ' + rf(b1, 2) + ' for each unit increase in the predictor. The effect on probability depends on <em>where you are on the curve</em>.</p>' +
+    '</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'This is the most common mistake with logistic regression. The coefficient tells you the change in <span class="hl-gold">log-odds</span>, not probability. To make them more intuitive, we convert them to <span class="hl-blue">odds ratios</span> \x96 which is what we\x27ll do in the next step.') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The sign of the coefficient tells you the direction: positive means higher values of X increase the probability of Y=1, negative means they decrease it. The magnitude tells you how strongly. But always in log-odds units.');
+}
+
+function step6() {
+  return '<div class="step-title">Step 6: Odds Ratios \x96 The Key Interpretive Tool</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Since log-odds are hard to interpret intuitively, we exponentiate the coefficients to get <strong>odds ratios (OR)</strong>. An odds ratio tells you: for each unit increase in X, by how much do the <em>odds</em> multiply?') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">From Coefficient to Odds Ratio</div>' +
+      'OR = e<sup>b</sup>' +
+    '</div>' +
+
+    '<div style="overflow-x:auto">' +
+    '<table class="data-table">' +
+    '<tr><th>Variable</th><th>b</th><th>OR = e<sup>b</sup></th><th>Interpretation</th></tr>' +
+    '<tr><td>Training (years)</td><td>' + rf(b1, 4) + '</td><td><span class="hl-gold">' + rf(OR1, 4) + '</span></td><td>Each extra year of training multiplies the odds of survival by ' + rf(OR1, 2) + '</td></tr>' +
+    '<tr><td>Armor Quality</td><td>' + rf(b2, 4) + '</td><td><span class="hl-gold">' + rf(OR2, 4) + '</span></td><td>Each unit of armor quality multiplies the odds by ' + rf(OR2, 2) + '</td></tr>' +
+    '<tr><td>Shield (0/1)</td><td>' + rf(b3, 4) + '</td><td><span class="hl-gold">' + rf(OR3, 4) + '</span></td><td>Having a shield multiplies the odds by ' + rf(OR3, 2) + '</td></tr>' +
+    '<tr><td>Battle Experience</td><td>' + rf(b4, 4) + '</td><td><span class="hl-gold">' + rf(OR4, 4) + '</span></td><td>Each extra campaign multiplies the odds by ' + rf(OR4, 2) + '</td></tr>' +
+    '</table>' +
+    '</div>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">OR > 1</h4>' +
+        '<p>The predictor <strong>increases</strong> the odds of the event. The higher the OR, the stronger the positive effect.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--thor-red)">OR < 1</h4>' +
+        '<p>The predictor <strong>decreases</strong> the odds of the event. E.g., OR = 0.5 means odds are halved.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">OR = 1</h4>' +
+        '<p><strong>No effect</strong>. The predictor does not change the odds at all (b = 0).</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">Binary Predictors</h4>' +
+        '<p>For Shield (0/1): OR compares the odds of survival <em>with</em> shield vs. <em>without</em> shield.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'So if the odds ratio for training is ' + rf(OR1, 2) + ', that means each extra year increases probability by ' + rf((OR1 - 1) * 100, 0) + '%?') +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ Odds ≠ Probability!</div>' +
+      '<p>An OR of ' + rf(OR1, 2) + ' means the <strong>odds</strong> multiply by ' + rf(OR1, 2) + ' \x96 NOT that the probability increases by ' + rf((OR1 - 1) * 100, 0) + '%. Odds and probability are different scales. When the base probability is low, odds and probability are close. When it\x27s high, they diverge dramatically.</p>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Clinicians and epidemiologists love odds ratios because they\x27re symmetric and have a natural null value (OR=1). In rare-event studies, OR approximates the <strong>relative risk</strong>. But for common events (prevalence > 10%), this approximation breaks down.');
+}
+
+function step7() {
+  return '<div class="step-title">Step 7: Maximum Likelihood Estimation \x96 How the Model Learns</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'In OLS regression, we minimized the sum of squared residuals. In logistic regression, there\x27s no closed-form solution. Instead, we use <strong>Maximum Likelihood Estimation (MLE)</strong> \x96 we find the coefficients that make the observed data most probable.') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">The Likelihood Principle</div>' +
+      'L(β) = ∏ P(Yᵢ | Xᵢ, β)' +
+    '</div>' +
+
+    '<p>For each warrior, the model predicts a probability of survival. If the warrior actually survived (Y=1), that predicted probability contributes directly to the likelihood. If they fell (Y=0), then (1 \x96 predicted probability) contributes.</p>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">The Intuition</h4>' +
+        '<p>MLE finds coefficients that assign <strong>high probabilities to what actually happened</strong>. If a warrior survived and the model gives P = 0.95, good. If P = 0.10, bad.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Log-Likelihood</h4>' +
+        '<p>We work with the <strong>log</strong> of the likelihood (sums instead of products). LL = ∑[Yᵢ ln(p̂ᵢ) + (1\x96Yᵢ) ln(1\x96p̂ᵢ)]</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">Iterative Algorithm</h4>' +
+        '<p>No closed-form solution exists. The computer uses <strong>Newton-Raphson</strong> or IRLS to converge on the best coefficients.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">Deviance = \x962LL</h4>' +
+        '<p>The <strong>deviance</strong> is \x962 × log-likelihood. Smaller deviance = better fit. It plays the role that SSE plays in OLS.</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Our Model\x27s Log-Likelihood</div>' +
+      'LL(model) = ' + rf(LL, 4) +
+    '</div>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Null Model Log-Likelihood (intercept only)</div>' +
+      'LL(null) = ' + rf(LL0, 4) +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'So we don\x27t minimize errors \x96 we maximize how "likely" the data is? That sounds backwards.') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'It\x27s the same philosophy, just from a different angle. OLS minimizes prediction errors. MLE maximizes the probability of observing what we actually observed. For normal-distribution models, they give the same answer. For binary outcomes, MLE is the right approach.') +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Here\x27s a crucial detail: because MLE is iterative, it can sometimes <strong>fail to converge</strong>. This happens when the data perfectly separates the classes (called "complete separation") or when the sample is too small. If your software warns about convergence, take it seriously.');
+}
+
+function step8() {
+  return '<div class="step-title">Step 8: Model Evaluation \x96 How Good Is the Model?</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'There is no single R² in logistic regression like in OLS. Instead, we have multiple fit indices, each capturing a different dimension of model quality.') +
+
+    '<div class="comparison-grid">' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--gold)">Null Deviance</div>' +
+        '<div class="comparison-result" style="color:var(--gold)">' + rf(nullDeviance, 2) + '</div>' +
+        '<p style="font-size:0.85rem;color:var(--text-dim)">\x962 × LL(null)</p>' +
+      '</div>' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--odin-blue)">Model Deviance</div>' +
+        '<div class="comparison-result" style="color:var(--odin-blue)">' + rf(deviance, 2) + '</div>' +
+        '<p style="font-size:0.85rem;color:var(--text-dim)">\x962 × LL(model)</p>' +
+      '</div>' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--success)">Reduction</div>' +
+        '<div class="comparison-result" style="color:var(--success)">' + rf(nullDeviance - deviance, 2) + '</div>' +
+        '<p style="font-size:0.85rem;color:var(--text-dim)">Δ Deviance</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<p>The deviance dropped from <span class="hl-gold">' + rf(nullDeviance, 2) + '</span> (null) to <span class="hl-blue">' + rf(deviance, 2) + '</span> (model), a reduction of <span class="hl-green">' + rf(nullDeviance - deviance, 2) + '</span>. This reduction is tested with a chi-square test (df = ' + 4 + ').</p>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">AIC</h4>' +
+        '<p><strong>' + rf(AIC, 2) + '</strong><br>Akaike Information Criterion. Lower = better. Penalizes complexity. Useful for comparing models.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Cox & Snell R²</h4>' +
+        '<p><strong>' + rf(coxSnellR2, 4) + '</strong><br>Cannot reach 1.0. A general pseudo-R².</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">Nagelkerke R²</h4>' +
+        '<p><strong>' + rf(nagelkerkeR2, 4) + '</strong><br>Adjusted to reach 1.0. Most commonly reported pseudo-R².</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">Hosmer-Lemeshow</h4>' +
+        '<p>Groups observations into deciles and compares observed vs. expected. Non-significant = good fit. Not computed here (needs chi-square tables).</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ Pseudo-R² ≠ R²</div>' +
+      '<p>Pseudo-R² values are typically <strong>much lower</strong> than OLS R². A Nagelkerke R² of 0.30 in logistic regression is often considered a strong model. Don\x27t compare pseudo-R² to the R² you\x27re used to from linear regression!</p>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The Hosmer-Lemeshow test divides predicted probabilities into groups (usually 10) and compares observed vs. expected frequencies in each group using a chi-square statistic. A non-significant p-value (p > .05) means the model fits adequately. But with small samples, it has low power.');
+}
+
+function step9() {
+  return '<div class="step-title">Step 9: Classification \x96 Turning Probabilities into Decisions</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'The model gives us <strong>predicted probabilities</strong>. But the Valkyries need a decision: survived or fell? We need a <span class="hl-gold">cutoff</span> (threshold) to classify each warrior.') +
+
+    '<p>Using the default cutoff of <span class="hl-gold">0.50</span>: if P̂ ≥ 0.50, predict Survived (1); if P̂ < 0.50, predict Fell (0).</p>' +
+
+    '<div style="overflow-x:auto">' +
+    '<table class="data-table">' +
+    '<tr><th>#</th><th>Warrior</th><th>P̂ (Survival)</th><th>Predicted</th><th>Actual</th><th>Correct?</th></tr>' +
+    warriors.map(function(w, i) {
+      var pred = predClass[i];
+      var correct = pred === Surv[i];
+      var correctIcon = correct ? '<span class="hl-green">✓</span>' : '<span class="hl-red">✗</span>';
+      return '<tr><td>' + (i+1) + '</td><td style="text-align:left">' + w + '</td><td>' + rf(pHat[i], 4) + '</td><td>' + pred + '</td><td>' + Surv[i] + '</td><td>' + correctIcon + '</td></tr>';
+    }).join('') +
+    '</table>' +
+    '</div>' +
+
+    '<div class="step-subtitle">Confusion Matrix</div>' +
+
+    '<div class="visual-container">' + buildConfusionMatrixSVG() + '</div>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">Sensitivity (Recall)</h4>' +
+        '<p>TP / (TP + FN) = ' + TP + ' / ' + (TP + FN) + ' = <strong>' + rf(sensitivity * 100, 1) + '%</strong><br>Of those who survived, how many did we correctly identify?</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Specificity</h4>' +
+        '<p>TN / (TN + FP) = ' + TN + ' / ' + (TN + FP) + ' = <strong>' + rf(specificity * 100, 1) + '%</strong><br>Of those who fell, how many did we correctly identify?</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">Accuracy</h4>' +
+        '<p>(TP + TN) / N = ' + (TP + TN) + ' / ' + n + ' = <strong>' + rf(accuracy * 100, 1) + '%</strong><br>Overall percentage of correct classifications.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">Cutoff Choice</h4>' +
+        '<p>0.50 is the default but not always optimal. The choice depends on the <strong>cost of errors</strong>: is a false negative (missing a survivor) worse than a false positive?</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Accuracy can be misleading with imbalanced classes. If 90% of warriors survive, a model that predicts "survived" for everyone achieves 90% accuracy but is useless. Always report sensitivity and specificity alongside accuracy, and consider the <strong>ROC curve</strong> (Area Under the Curve) for a threshold-independent measure.');
+}
+
+function step10() {
+  return '<div class="step-title">Step 10: Assumptions \x96 What Logistic Regression Requires</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Logistic regression has fewer assumptions than OLS, but the ones it has are critical. Let\x27s review each one.') +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">① Binary DV</h4>' +
+        '<p>The dependent variable must be <strong>binary</strong> (0/1). For ordered categories, use ordinal logistic regression. For 3+ unordered categories, use multinomial.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">② Independence</h4>' +
+        '<p>Observations must be <strong>independent</strong>. No repeated measures, no clustering without correction (use multilevel logistic if needed).</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">③ No Multicollinearity</h4>' +
+        '<p>Predictors should not be highly correlated. Check <strong>VIF < 10</strong> (same rule as OLS). High multicollinearity inflates SE of coefficients.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">④ Linearity of Logit</h4>' +
+        '<p>The relationship between continuous predictors and the <strong>log-odds</strong> must be linear. Tested via the <strong>Box-Tidwell test</strong>: add X·ln(X) to the model. If significant, the assumption is violated.</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ Sample Size: Events Per Variable (EPV)</div>' +
+      '<p>The minimum recommended sample size depends on the number of events (whichever outcome is rarer). The classic rule: <strong>EPV ≥ 10</strong> (at least 10 events per predictor variable). Some researchers suggest EPV ≥ 20 for stable estimates.</p>' +
+      '<p style="margin-top:8px">Our data: ' + sum(Surv) + ' events (survived), 4 predictors → EPV = ' + rf(sum(Surv) / 4, 1) + '. ' + (sum(Surv) / 4 >= 10 ? '<span class="hl-green">Adequate.</span>' : '<span class="hl-red">Below threshold! Results are illustrative only.</span>') + '</p>' +
+    '</div>' +
+
+    '<div class="correct-box">' +
+      '<div class="correct-title">✓ What Logistic Regression Does NOT Require</div>' +
+      '<p><strong>No normality of residuals.</strong> Binary outcomes produce binary residuals \x96 normality doesn\x27t apply.</p>' +
+      '<p style="margin-top:6px"><strong>No homoscedasticity.</strong> Variance is inherently heterogeneous: Var = p(1\x96p).</p>' +
+      '<p style="margin-top:6px"><strong>No linear relationship between X and Y.</strong> The relationship is with the log-odds of Y, not Y itself.</p>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Box-Tidwell test for linearity of logit:</strong> For each continuous predictor X, add X·ln(X) as an additional term. If the interaction is significant (p < .05), the linearity assumption is violated. Remedy: transform the predictor (log, square root) or add polynomial terms.') +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Also watch out for <strong>complete separation</strong> \x96 when a predictor perfectly predicts the outcome. If all warriors with Training ≥ 7 survived and all with Training < 7 fell, the MLE algorithm will try to push the coefficient to infinity. Your software will either warn you or give absurdly large coefficients with huge SE. The remedy: Firth\x27s penalized likelihood or exact logistic regression.');
+}
+
+function step11() {
+  return '<div class="step-title">Step 11: Lesson of the Ravens</div>' +
+
+    '<div class="licao-box">' +
+      '<div class="licao-title">🐦‍⬛ Lesson of the Ravens: Logistic Regression</div>' +
+
+      dialogue('corvo', '🐦‍⬛ Muninn recalls:', '<strong>Key points to remember:</strong><br>' +
+        '• Logistic regression predicts the <strong>probability</strong> of a binary outcome (0/1)<br>' +
+        '• The model predicts <strong>log-odds</strong>, which are converted to probabilities via the sigmoid function<br>' +
+        '• Coefficients represent changes in <strong>log-odds</strong>, not probabilities<br>' +
+        '• <strong>Odds Ratios</strong> (OR = e<sup>b</sup>) are the primary interpretive tool<br>' +
+        '• MLE is used instead of OLS \x96 we maximize the likelihood of the observed data<br>' +
+        '• Model fit uses deviance, pseudo-R² (Nagelkerke), AIC, and Hosmer-Lemeshow<br>' +
+        '• Classification uses a cutoff (default 0.50) to create a confusion matrix<br>' +
+        '• Key assumptions: binary DV, independence, no multicollinearity, linearity of logit, EPV ≥ 10') +
+
+      dialogue('corvo', '🐦‍⬛ Huginn challenges:', '<strong>Challenges for reflection:</strong><br>' +
+        '• Why can\x27t we interpret logistic coefficients the same way as OLS coefficients?<br>' +
+        '• When is OR ≈ Relative Risk, and when does this approximation fail?<br>' +
+        '• How would you choose a cutoff if false negatives are 5× more costly than false positives?<br>' +
+        '• What happens to the model if you add a predictor that perfectly separates the groups?<br>' +
+        '• Why is accuracy misleading with imbalanced classes?') +
+    '</div>' +
+
+    '<div class="apa-box">' +
+      '<div class="apa-label">📋 APA-style Reporting</div>' +
+      '<p>A logistic regression was performed to predict warrior survival from training, armor quality, shield use, and battle experience. The model was statistically significant, χ²(4) = ' + rf(nullDeviance - deviance, 2) + ', p < .001, Nagelkerke R² = ' + rf(nagelkerkeR2, 2) + '. The model correctly classified ' + rf(accuracy * 100, 1) + '% of cases. Battle experience was a significant predictor (OR = ' + rf(OR4, 2) + ', 95% CI [lower, upper], p < .05).</p>' +
+    '</div>' +
+
+    '<div class="trap-grid">' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Trap 1: Interpreting b as Probability</h4>' +
+        '<p>Coefficients are in <strong>log-odds</strong> units. To get probability effects, you must compute marginal effects at specific predictor values.</p>' +
+      '</div>' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Trap 2: Small Samples</h4>' +
+        '<p>With EPV < 10, coefficient estimates are <strong>biased</strong> and confidence intervals are unreliable. Use Firth\x27s correction or reduce predictors.</p>' +
+      '</div>' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Trap 3: Imbalanced Classes</h4>' +
+        '<p>If 95% of cases are Y=1, the model learns to predict "1" always. Consider oversampling, undersampling, or adjusting the cutoff.</p>' +
+      '</div>' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Trap 4: Overfitting</h4>' +
+        '<p>Too many predictors relative to sample size inflates apparent accuracy. Use <strong>cross-validation</strong> or the Hosmer-Lemeshow test to check.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'You now hold the logistic key to Valhalla\x27s gates. Remember: the model speaks in odds, not probabilities. Translate wisely, and the Valkyries will guide the worthy home.') +
+
+    '<p style="text-align:center; margin-top:30px; font-family:Permanent Marker; color:var(--gold); font-size:1.2rem">⚔️ The Gates of Valhalla stand judged. Onward to the next realm! ⚔️</p>';
+}
+
+
+// ===== STEP REGISTRY =====
+var stepFunctions = [step0, step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11];
+
+var stepNames = [
+  'Introduction',
+  'Why Not Linear?',
+  'The Logistic Function',
+  'The Data',
+  'Odds & Log-Odds',
+  'The Logistic Model',
+  'Odds Ratios',
+  'Maximum Likelihood',
+  'Model Evaluation',
+  'Classification',
+  'Assumptions',
+  'Lesson of the Ravens'
+];
+
+var totalSteps = 12;
+var currentStep = 0;
+
+// ===== NAVIGATION =====
+function renderStep() {
+  var content = document.getElementById('stepContent');
+  content.innerHTML = stepFunctions[currentStep]();
+  content.style.animation = 'none';
+  content.offsetHeight;
+  content.style.animation = 'fadeIn 0.4s ease';
+
+  document.getElementById('progressLabel').textContent = 'Step ' + currentStep + ' of ' + (totalSteps - 1) + ' \x96 ' + stepNames[currentStep];
+  document.getElementById('progressFill').style.width = (currentStep / (totalSteps - 1) * 100) + '%';
+
+  document.getElementById('btnBack').disabled = currentStep === 0;
+  document.getElementById('btnNext').textContent = currentStep === totalSteps - 1 ? 'Restart ↻' : 'Next ▶';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNext() {
+  if (currentStep >= totalSteps - 1) {
+    currentStep = 0;
+  } else {
+    currentStep++;
+  }
+  renderStep();
+}
+
+function goBack() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goBack(); }
+});
+
+// Initialize
+renderStep();
+</script>
+</body>
+</html>

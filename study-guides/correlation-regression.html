@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Correlation & Simple Linear Regression — Step by Step | Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --bg-panel: #1c2333;
+  --odin-blue: #58a6ff;
+  --thor-red: #f85149;
+  --corvo-purple: #bc8cff;
+  --gold: #f0c040;
+  --silver: #8b949e;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --success: #3fb950;
+  --border: #30363d;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 18px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-dark);
+  padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-panel);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* STEP CONTENT */
+.step-content {
+  min-height: 60vh;
+  padding: 30px 0;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+  font-family: 'Bangers', cursive;
+  font-size: 2.2rem;
+  color: var(--gold);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.step-subtitle {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.3rem;
+  color: var(--odin-blue);
+  margin-bottom: 15px;
+}
+
+/* DIALOGUE BOXES */
+.dialogue-box {
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  border-left: 4px solid;
+  position: relative;
+}
+
+.dialogue-box.odin {
+  background: rgba(88,166,255,0.08);
+  border-left-color: var(--odin-blue);
+}
+.dialogue-box.thor {
+  background: rgba(248,81,73,0.08);
+  border-left-color: var(--thor-red);
+}
+.dialogue-box.corvo {
+  background: rgba(188,140,255,0.08);
+  border-left-color: var(--corvo-purple);
+}
+
+.char-name {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+
+.dialogue-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* DATA TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 1rem;
+}
+
+.data-table th, .data-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.data-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+}
+
+.data-table td {
+  background: var(--bg-card);
+  transition: background 0.2s;
+}
+
+.data-table tr:hover td {
+  background: rgba(88,166,255,0.1);
+}
+
+/* CALC TABLE */
+.calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 0.95rem;
+}
+
+.calc-table th, .calc-table td {
+  padding: 8px 10px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.calc-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.calc-table td {
+  background: var(--bg-card);
+}
+
+/* FORMULA */
+.formula {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-size: 1.15rem;
+  text-align: center;
+  font-family: 'Patrick Hand', cursive;
+  color: var(--gold);
+}
+
+.formula-label {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+/* SVG VISUALS */
+.visual-container {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.visual-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* CONCEPT GRID */
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.concept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.concept-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+/* COMPARISON GRID */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.comparison-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.comparison-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.comparison-result {
+  font-size: 1.4rem;
+  font-family: 'Bangers', cursive;
+}
+
+/* APA BOX */
+.apa-box {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 20px 0;
+  font-style: italic;
+  line-height: 1.7;
+}
+
+.apa-label {
+  font-family: 'Bangers', cursive;
+  color: var(--gold);
+  font-style: normal;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+/* WARNING BOX */
+.warning-box {
+  background: rgba(248,81,73,0.06);
+  border: 2px solid var(--thor-red);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.warning-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--thor-red);
+  margin-bottom: 12px;
+}
+
+/* CORRECT BOX */
+.correct-box {
+  background: rgba(63,185,80,0.06);
+  border: 2px solid var(--success);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.correct-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--success);
+  margin-bottom: 12px;
+}
+
+/* RAVENS LESSON */
+.licao-box {
+  background: rgba(188,140,255,0.06);
+  border: 2px solid var(--corvo-purple);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.licao-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--corvo-purple);
+  margin-bottom: 12px;
+}
+
+/* TRAP GRID */
+.trap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.trap-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.trap-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  color: var(--thor-red);
+  margin-bottom: 8px;
+}
+
+/* NAVIGATION */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 40px;
+  gap: 12px;
+}
+
+.nav-btn {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover {
+  border-color: var(--odin-blue);
+  background: rgba(88,166,255,0.1);
+}
+
+.nav-btn.primary {
+  background: var(--odin-blue);
+  color: var(--bg-dark);
+  border-color: var(--odin-blue);
+}
+
+.nav-btn.primary:hover {
+  background: #79bbff;
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* SIGNATURE */
+.signature {
+  text-align: center;
+  padding: 30px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* HIGHLIGHTS */
+.hl-gold { color: var(--gold); font-weight: bold; }
+.hl-blue { color: var(--odin-blue); }
+.hl-red { color: var(--thor-red); }
+.hl-green { color: var(--success); }
+.hl-purple { color: var(--corvo-purple); }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container { padding: 12px; }
+  .step-title { font-size: 1.6rem; }
+  .concept-grid, .comparison-grid, .trap-grid { grid-template-columns: 1fr; }
+  .nav-btn { padding: 10px 18px; font-size: 0.95rem; }
+  body { font-size: 16px; }
+}
+
+.fade-in { animation: fadeIn 0.6s ease both; }
+.fade-in-delay { animation: fadeIn 0.6s ease 0.3s both; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="progress-bar-container">
+    <div class="progress-label" id="progressLabel">Step 0 of 11</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="step-content" id="stepContent"></div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" id="btnBack" onclick="goBack()" disabled>&#9664; Back</button>
+    <button class="nav-btn primary" id="btnNext" onclick="goNext()">Next &#9654;</button>
+  </div>
+
+  <div class="signature">
+    Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+// Merchant guild data: 8 trade posts
+const posts = ['Birka','Hedeby','Kaupang','Ribe','Jorvik','Sigtuna','Visby','Roskilde'];
+const X = [12, 18, 8, 25, 30, 15, 22, 10]; // Distance (leagues)
+const Y = [45, 38, 52, 30, 25, 42, 33, 48]; // Mead barrels sold
+const n = X.length;
+
+// ===== STATS HELPERS =====
+function sum(arr) { return arr.reduce((a,b) => a+b, 0); }
+function mean(arr) { return sum(arr) / arr.length; }
+function r(v, d) { return Number(v).toFixed(d === undefined ? 2 : d); }
+function r4(v) { return Number(v).toFixed(4); }
+
+// ===== MEANS =====
+const meanX = mean(X);
+const meanY = mean(Y);
+
+// ===== DEVIATIONS =====
+const dx = X.map(x => x - meanX);
+const dy = Y.map(y => y - meanY);
+const dxdy = dx.map((v,i) => v * dy[i]);
+const dx2 = dx.map(v => v * v);
+const dy2 = dy.map(v => v * v);
+
+const sumDxDy = sum(dxdy);
+const sumDx2 = sum(dx2);
+const sumDy2 = sum(dy2);
+
+// ===== PEARSON r =====
+const rPearson = sumDxDy / Math.sqrt(sumDx2 * sumDy2);
+const r2 = rPearson * rPearson;
+
+// ===== SIGNIFICANCE TEST FOR r =====
+const t_r = rPearson * Math.sqrt((n - 2) / (1 - r2));
+const df_r = n - 2;
+
+// ===== SPEARMAN =====
+function rankArray(arr) {
+  const sorted = arr.map((v,i) => ({v, i})).sort((a,b) => a.v - b.v);
+  const ranks = new Array(arr.length);
+  let i = 0;
+  while (i < sorted.length) {
+    let j = i;
+    while (j < sorted.length && sorted[j].v === sorted[i].v) j++;
+    const avgRank = (i + 1 + j) / 2;
+    for (let k = i; k < j; k++) ranks[sorted[k].i] = avgRank;
+    i = j;
+  }
+  return ranks;
+}
+
+const rankX = rankArray(X);
+const rankY = rankArray(Y);
+const dRank = rankX.map((v,i) => v - rankY[i]);
+const dRank2 = dRank.map(v => v * v);
+const sumDRank2 = sum(dRank2);
+const rhoSpearman = 1 - (6 * sumDRank2) / (n * (n * n - 1));
+
+// ===== REGRESSION =====
+const b1 = sumDxDy / sumDx2;
+const b0 = meanY - b1 * meanX;
+
+// ===== PREDICTED VALUES & RESIDUALS =====
+const Yhat = X.map(x => b0 + b1 * x);
+const residuals = Y.map((y,i) => y - Yhat[i]);
+
+// ===== SST, SSR, SSE =====
+const SST = sumDy2;
+const SSR = Yhat.map(yh => Math.pow(yh - meanY, 2)).reduce((a,b) => a+b, 0);
+const SSE = residuals.map(e => e * e).reduce((a,b) => a+b, 0);
+const R2 = SSR / SST;
+
+// ===== P-VALUE APPROXIMATION =====
+function gammln(x) {
+  const c = [76.18009172947146,-86.50532032941677,24.01409824083091,
+    -1.231739572450155,0.001208650973866179,-0.000005395239384953];
+  let y = x, tmp = x + 5.5;
+  tmp -= (x+0.5)*Math.log(tmp);
+  let ser = 1.000000000190015;
+  for(let j=0;j<6;j++) ser += c[j]/(++y);
+  return -tmp + Math.log(2.5066282746310005*ser/x);
+}
+
+function tPDF(x, df) {
+  const coeff = Math.exp(gammln((df+1)/2) - gammln(df/2)) / Math.sqrt(df * Math.PI);
+  return coeff * Math.pow(1 + x*x/df, -(df+1)/2);
+}
+
+function tCDF(t, df) {
+  const lower = -30;
+  const steps = 4000;
+  const h = (t - lower) / steps;
+  let s = tPDF(lower, df) + tPDF(t, df);
+  for (let i = 1; i < steps; i++) {
+    const xi = lower + i * h;
+    s += (i % 2 === 0 ? 2 : 4) * tPDF(xi, df);
+  }
+  return Math.max(0, Math.min(1, (h/3) * s));
+}
+
+function pValueTwoTailed(t, df) {
+  const cdf = tCDF(Math.abs(t), df);
+  return 2 * (1 - cdf);
+}
+
+const p_r = pValueTwoTailed(t_r, df_r);
+
+// ===== DIALOGUE HELPER =====
+function dialogue(character, name, text) {
+  return '<div class="dialogue-box ' + character + '">' +
+    '<div class="char-name ' + character + '">' + name + '</div>' +
+    '<div class="dialogue-text">' + text + '</div>' +
+  '</div>';
+}
+
+// ===== SCATTERPLOT SVG BUILDER =====
+function buildScatterplot(opts) {
+  const w = opts.width || 680;
+  const h = opts.height || 400;
+  const pad = { top: 30, right: 30, bottom: 50, left: 60 };
+  const pw = w - pad.left - pad.right;
+  const ph = h - pad.top - pad.bottom;
+
+  const xMin = 0, xMax = 35;
+  const yMin = 15, yMax = 60;
+  function sx(v) { return pad.left + (v - xMin) / (xMax - xMin) * pw; }
+  function sy(v) { return pad.top + ph - (v - yMin) / (yMax - yMin) * ph; }
+
+  let svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+
+  // Grid lines
+  for (let gx = 5; gx <= 30; gx += 5) {
+    svg += '<line x1="' + sx(gx) + '" y1="' + pad.top + '" x2="' + sx(gx) + '" y2="' + (pad.top + ph) + '" stroke="' + '#30363d' + '" stroke-width="0.5" opacity="0.5"/>';
+  }
+  for (let gy = 20; gy <= 55; gy += 5) {
+    svg += '<line x1="' + pad.left + '" y1="' + sy(gy) + '" x2="' + (pad.left + pw) + '" y2="' + sy(gy) + '" stroke="' + '#30363d' + '" stroke-width="0.5" opacity="0.5"/>';
+  }
+
+  // Axes
+  svg += '<line x1="' + pad.left + '" y1="' + (pad.top + ph) + '" x2="' + (pad.left + pw) + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+  svg += '<line x1="' + pad.left + '" y1="' + pad.top + '" x2="' + pad.left + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+
+  // Tick labels X
+  for (let gx = 5; gx <= 30; gx += 5) {
+    svg += '<text x="' + sx(gx) + '" y="' + (pad.top + ph + 20) + '" fill="#8b949e" font-size="12" text-anchor="middle" font-family="Patrick Hand">' + gx + '</text>';
+  }
+  // Tick labels Y
+  for (let gy = 20; gy <= 55; gy += 10) {
+    svg += '<text x="' + (pad.left - 10) + '" y="' + (sy(gy) + 4) + '" fill="#8b949e" font-size="12" text-anchor="end" font-family="Patrick Hand">' + gy + '</text>';
+  }
+
+  // Axis labels
+  svg += '<text x="' + (pad.left + pw/2) + '" y="' + (h - 5) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker">' + (opts.xLabel || 'Distance (leagues)') + '</text>';
+  svg += '<text x="15" y="' + (pad.top + ph/2) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker" transform="rotate(-90,15,' + (pad.top + ph/2) + ')">' + (opts.yLabel || 'Mead Barrels') + '</text>';
+
+  // Regression line (if requested)
+  if (opts.showLine) {
+    const lx1 = xMin + 1, lx2 = xMax - 1;
+    const ly1 = b0 + b1 * lx1, ly2 = b0 + b1 * lx2;
+    svg += '<line x1="' + sx(lx1) + '" y1="' + sy(ly1) + '" x2="' + sx(lx2) + '" y2="' + sy(ly2) + '" stroke="#f0c040" stroke-width="2.5" stroke-dasharray="8,4" opacity="0.9"/>';
+    svg += '<text x="' + sx(lx2) + '" y="' + (sy(ly2) - 8) + '" fill="#f0c040" font-size="11" text-anchor="end" font-family="Permanent Marker">ŷ = ' + r(b0,1) + (b1 < 0 ? ' ' : ' + ') + r(b1,2) + 'x</text>';
+  }
+
+  // Residual lines (if requested)
+  if (opts.showResiduals) {
+    for (let i = 0; i < n; i++) {
+      svg += '<line x1="' + sx(X[i]) + '" y1="' + sy(Y[i]) + '" x2="' + sx(X[i]) + '" y2="' + sy(Yhat[i]) + '" stroke="#f85149" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.7"/>';
+    }
+  }
+
+  // Mean lines (if requested)
+  if (opts.showMeans) {
+    svg += '<line x1="' + sx(meanX) + '" y1="' + pad.top + '" x2="' + sx(meanX) + '" y2="' + (pad.top + ph) + '" stroke="#58a6ff" stroke-width="1" stroke-dasharray="4" opacity="0.5"/>';
+    svg += '<line x1="' + pad.left + '" y1="' + sy(meanY) + '" x2="' + (pad.left + pw) + '" y2="' + sy(meanY) + '" stroke="#58a6ff" stroke-width="1" stroke-dasharray="4" opacity="0.5"/>';
+    svg += '<text x="' + (sx(meanX) + 4) + '" y="' + (pad.top + 12) + '" fill="#58a6ff" font-size="10" font-family="Permanent Marker">̄X=' + r(meanX,1) + '</text>';
+    svg += '<text x="' + (pad.left + pw - 2) + '" y="' + (sy(meanY) - 4) + '" fill="#58a6ff" font-size="10" text-anchor="end" font-family="Permanent Marker">̄Y=' + r(meanY,1) + '</text>';
+  }
+
+  // Data points
+  for (let i = 0; i < n; i++) {
+    svg += '<circle cx="' + sx(X[i]) + '" cy="' + sy(Y[i]) + '" r="6" fill="#58a6ff" stroke="#0d1117" stroke-width="1.5" opacity="0.9"/>';
+    if (opts.showLabels) {
+      svg += '<text x="' + (sx(X[i]) + 9) + '" y="' + (sy(Y[i]) - 8) + '" fill="#e6edf3" font-size="10" font-family="Patrick Hand">' + posts[i] + '</text>';
+    }
+  }
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ===== NORMAL CURVE SVG =====
+function buildNormalCurve(opts) {
+  const w = opts.width || 680;
+  const h = opts.height || 140;
+  const mu = opts.mu || 0;
+  const sigma = opts.sigma || 1;
+  const lo = mu - 3.5 * sigma;
+  const hi = mu + 3.5 * sigma;
+  const pad = 30;
+  function sx(x) { return pad + (x - lo) / (hi - lo) * (w - 2 * pad); }
+  function normalPDF(x) {
+    return (1/(sigma*Math.sqrt(2*Math.PI))) * Math.exp(-0.5*Math.pow((x-mu)/sigma, 2));
+  }
+  const peak = normalPDF(mu);
+  function sy(p) { return h - pad - (p / peak) * (h - 2 * pad); }
+
+  let path = 'M';
+  for (let x = lo; x <= hi; x += (hi-lo)/200) {
+    path += ' ' + sx(x).toFixed(1) + ',' + sy(normalPDF(x)).toFixed(1);
+  }
+
+  let svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+  svg += '<path d="' + path + '" fill="none" stroke="' + (opts.color || '#58a6ff') + '" stroke-width="2.5"/>';
+  svg += '<line x1="' + pad + '" y1="' + (h - pad) + '" x2="' + (w - pad) + '" y2="' + (h - pad) + '" stroke="#30363d" stroke-width="1"/>';
+
+  if (opts.markValue !== undefined) {
+    const mx = sx(opts.markValue);
+    svg += '<line x1="' + mx + '" y1="' + (h - pad) + '" x2="' + mx + '" y2="' + sy(normalPDF(opts.markValue < lo ? lo : opts.markValue > hi ? hi : opts.markValue)).toFixed(1) + '" stroke="' + (opts.markColor || '#f85149') + '" stroke-width="2" stroke-dasharray="4"/>';
+    svg += '<text x="' + mx + '" y="' + (h - 5) + '" fill="' + (opts.markColor || '#f85149') + '" font-size="11" text-anchor="middle" font-family="Permanent Marker">' + (opts.markLabel || '') + '</text>';
+  }
+  svg += '</svg>';
+  return svg;
+}
+
+// ===== STEP FUNCTIONS =====
+const totalSteps = 12; // 0..11
+let currentStep = 0;
+
+// ===== STEP 0: INTRODUCTION =====
+function step0() {
+  return '<div class="step-title">The Map of Midgard: Charting the Relationship Between Variables</div>' +
+
+    '<p>In the merchant halls of Midgard, the Guild Master has a question that keeps him up at night: do trade posts further from the capital city sell fewer barrels of mead? He unrolls a parchment with data from <span class="hl-gold">8 trade posts</span> across the Nine Realms.</p>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Two variables, one question: is there a <strong>systematic relationship</strong> between Distance and Mead Sales? This realm covers two mighty tools \x96 <span class="hl-blue">Correlation</span> (strength and direction of the link) and <span class="hl-gold">Simple Linear Regression</span> (predicting one variable from the other).') +
+
+    dialogue('thor', '⚡ Thorment', 'Pfff, just eyeball the numbers! Farther post = fewer barrels. Done!') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Correlation</strong> measures the strength and direction of a linear association between two quantitative variables. <strong>Regression</strong> goes further: it fits a line that lets us <em>predict</em> one variable from the other. Both were pioneered by Sir Francis Galton in the 1880s and refined by Karl Pearson.') +
+
+    '<p style="margin-top:18px">Here is the guild\x27s parchment:</p>' +
+
+    '<table class="data-table">' +
+    '<tr><th>Trade Post</th><th>Distance (leagues)</th><th>Mead Barrels Sold</th></tr>' +
+    '<tr><td>Birka</td><td>12</td><td>45</td></tr>' +
+    '<tr><td>Hedeby</td><td>18</td><td>38</td></tr>' +
+    '<tr><td>Kaupang</td><td>8</td><td>52</td></tr>' +
+    '<tr><td>Ribe</td><td>25</td><td>30</td></tr>' +
+    '<tr><td>Jorvik</td><td>30</td><td>25</td></tr>' +
+    '<tr><td>Sigtuna</td><td>15</td><td>42</td></tr>' +
+    '<tr><td>Visby</td><td>22</td><td>33</td></tr>' +
+    '<tr><td>Roskilde</td><td>10</td><td>48</td></tr>' +
+    '</table>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Before we crunch a single number \x96 what do you <em>expect</em> to find? A positive, negative, or zero correlation? Think about <em>why</em>, not just the numbers.');
+}
+
+// ===== STEP 1: SCATTERPLOT =====
+function step1() {
+  return '<div class="step-title">Step 1: The Scatterplot \x96 Mapping the Terrain</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'The first commandment of correlation: <strong>always plot your data</strong>. A scatterplot reveals the shape, direction, and potential outliers that numbers alone may hide.') +
+
+    '<p>Each trade post becomes a point: the <span class="hl-blue">x-axis</span> is Distance, the <span class="hl-gold">y-axis</span> is Mead Barrels Sold.</p>' +
+
+    '<div class="visual-container">' +
+      buildScatterplot({ showLabels: true, showMeans: true, xLabel: 'Distance (leagues)', yLabel: 'Mead Barrels Sold' }) +
+    '</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Look at the pattern: as distance <em>increases</em>, mead sales <em>decrease</em>. The points form a roughly linear cloud sloping <strong>downward</strong>. That suggests a <span class="hl-red">negative correlation</span>.') +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">What to check</h4>' +
+        '<p>Is the cloud roughly <strong>linear</strong>? Or does it curve?</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Direction</h4>' +
+        '<p><strong>Upward</strong> = positive r. <strong>Downward</strong> = negative r.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">Tightness</h4>' +
+        '<p>The tighter the points cluster around an imaginary line, the stronger the correlation.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--thor-red)">Outliers</h4>' +
+        '<p>One rogue point can drastically change r. Always inspect visually first.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'Scatterplot? Waste of time. I already told you the answer \x96 just compute the number!') +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Anscombe\x27s Quartet: four datasets with the <em>same</em> r = 0.816 but wildly different shapes. Without a plot, you\x27d never know one is curved, one has an outlier, and one is a vertical line. <strong>Plot first. Always.</strong>');
+}
+
+// ===== STEP 2: PEARSON'S r =====
+function step2() {
+  return '<div class="step-title">Step 2: Pearson\x27s r \x96 The Correlation Coefficient</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Pearson\x27s <em>r</em> quantifies the <strong>linear</strong> relationship between two variables. It ranges from \x961 (perfect negative) to +1 (perfect positive). Zero means no linear association.') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Pearson\x27s r</div>' +
+      'r = &Sigma;(x<sub>i</sub> \x96 ̄x)(y<sub>i</sub> \x96 ̄y) / &radic;[&Sigma;(x<sub>i</sub> \x96 ̄x)&sup2; &middot; &Sigma;(y<sub>i</sub> \x96 ̄y)&sup2;]' +
+    '</div>' +
+
+    '<p class="step-subtitle">Step-by-step calculation</p>' +
+
+    '<p><strong>Means:</strong> ̄X = ' + r(meanX,2) + ' leagues &nbsp;|&nbsp; ̄Y = ' + r(meanY,2) + ' barrels</p>' +
+
+    '<table class="calc-table">' +
+    '<tr><th>Post</th><th>x</th><th>y</th><th>x\x96̄x</th><th>y\x96̄y</th><th>(x\x96̄x)(y\x96̄y)</th><th>(x\x96̄x)&sup2;</th><th>(y\x96̄y)&sup2;</th></tr>' +
+    (function() {
+      var rows = '';
+      for (var i = 0; i < n; i++) {
+        rows += '<tr><td>' + posts[i] + '</td><td>' + X[i] + '</td><td>' + Y[i] + '</td><td>' + r(dx[i],2) + '</td><td>' + r(dy[i],2) + '</td><td>' + r(dxdy[i],2) + '</td><td>' + r(dx2[i],2) + '</td><td>' + r(dy2[i],2) + '</td></tr>';
+      }
+      return rows;
+    })() +
+    '<tr style="font-weight:bold;background:var(--bg-panel)"><td colspan="5" style="text-align:right">Sums &rarr;</td><td style="color:var(--gold)">' + r(sumDxDy,2) + '</td><td style="color:var(--odin-blue)">' + r(sumDx2,2) + '</td><td style="color:var(--odin-blue)">' + r(sumDy2,2) + '</td></tr>' +
+    '</table>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Plugging in</div>' +
+      'r = <span class="hl-gold">' + r(sumDxDy,2) + '</span> / &radic;(<span class="hl-blue">' + r(sumDx2,2) + '</span> &times; <span class="hl-blue">' + r(sumDy2,2) + '</span>) = ' + r(sumDxDy,2) + ' / &radic;(' + r(sumDx2 * sumDy2,2) + ') = ' + r(sumDxDy,2) + ' / ' + r(Math.sqrt(sumDx2 * sumDy2),2) + ' = <span class="hl-gold">' + r4(rPearson) + '</span>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The numerator captures <em>covariation</em> \x96 do x and y deviate from their means in the <em>same</em> direction? The denominator standardizes, forcing r into the [\x961, +1] range. Negative products = negative r.');
+}
+
+// ===== STEP 3: INTERPRETING r =====
+function step3() {
+  return '<div class="step-title">Step 3: Interpreting r \x96 Size, Direction, and the Causation Trap</div>' +
+
+    '<p>Our computed <span class="hl-gold">r = ' + r4(rPearson) + '</span>. What does that <em>mean</em>?</p>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Three things to evaluate: (1) <strong>Direction</strong> \x96 negative, so distance and mead sales move in opposite directions. (2) <strong>Magnitude</strong> \x96 how strong? (3) <strong>Causation</strong> \x96 does distance <em>cause</em> lower sales? Not necessarily!') +
+
+    '<p class="step-subtitle">Cohen\x27s benchmarks (1988)</p>' +
+
+    '<table class="data-table">' +
+    '<tr><th>|r|</th><th>Strength</th><th>Our r</th></tr>' +
+    '<tr><td>0.10 \x96 0.29</td><td style="color:var(--success)">Small</td><td rowspan="3" style="vertical-align:middle;font-family:Bangers;font-size:1.4rem;color:var(--gold)">' + r4(rPearson) + '<br><span style="font-family:Permanent Marker;font-size:0.9rem;color:var(--thor-red)">Large!</span></td></tr>' +
+    '<tr><td>0.30 \x96 0.49</td><td style="color:var(--gold)">Medium</td></tr>' +
+    '<tr><td>0.50+</td><td style="color:var(--thor-red)">Large</td></tr>' +
+    '</table>' +
+
+    '<p>|r| = ' + r(Math.abs(rPearson),4) + ' exceeds the .50 threshold, indicating a <span class="hl-red">large negative</span> linear association.</p>' +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ Thorment\x27s Trap: Correlation = Causation?</div>' +
+      dialogue('thor', '⚡ Thorment', 'Case closed! Distance <em>causes</em> lower sales. Let\x27s relocate all posts closer to the capital!') +
+      dialogue('odin', '🧙‍♂️ Odinfather', '<strong>No.</strong> Correlation tells us the variables <em>co-vary</em>. But a third variable \x96 population density, local competition, climate \x96 could be driving both. Correlation is <em>necessary</em> for causation but never <em>sufficient</em>.') +
+    '</div>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--thor-red)">Confound</h4>' +
+        '<p>A hidden variable (Z) drives both X and Y, creating a spurious correlation.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">Reverse causation</h4>' +
+        '<p>Maybe posts with low sales <em>chose</em> to be further away (cheaper land), not the other way around.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Cohen\x27s benchmarks are <em>guidelines</em>, not laws. In some fields, r = .30 is huge (personality psychology). In others, r = .80 is routine (test-retest reliability). Always interpret in context.');
+}
+
+// ===== STEP 4: r-SQUARED =====
+function step4() {
+  return '<div class="step-title">Step 4: The Coefficient of Determination (r&sup2;)</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Pearson\x27s r tells us <em>direction</em> and <em>strength</em>. But r&sup2; tells us something even more intuitive: the <strong>proportion of variance</strong> in Y that is explained by X.') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Coefficient of Determination</div>' +
+      'r&sup2; = (' + r4(rPearson) + ')&sup2; = <span class="hl-gold">' + r4(r2) + '</span>' +
+    '</div>' +
+
+    '<p>This means <span class="hl-gold">' + r(r2 * 100, 1) + '%</span> of the variance in Mead Sales can be accounted for by Distance. The remaining <span class="hl-blue">' + r((1 - r2) * 100, 1) + '%</span> is due to other factors.</p>' +
+
+    '<div class="visual-container">' +
+      '<svg viewBox="0 0 400 50" xmlns="http://www.w3.org/2000/svg">' +
+        '<rect x="10" y="10" width="380" height="30" rx="6" fill="#1c2333" stroke="#30363d"/>' +
+        '<rect x="10" y="10" width="' + (380 * r2).toFixed(0) + '" height="30" rx="6" fill="#f0c040" opacity="0.8"/>' +
+        '<text x="' + (10 + 380 * r2 / 2).toFixed(0) + '" y="30" fill="#0d1117" font-size="12" text-anchor="middle" font-family="Permanent Marker">Explained: ' + r(r2 * 100, 1) + '%</text>' +
+        '<text x="' + (10 + 380 * r2 + (380 * (1-r2)) / 2).toFixed(0) + '" y="30" fill="#8b949e" font-size="12" text-anchor="middle" font-family="Permanent Marker">Unexplained: ' + r((1-r2) * 100, 1) + '%</text>' +
+      '</svg>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'Wait, so nearly ' + r((1-r2)*100,0) + '% is unexplained? Your precious correlation can\x27t explain everything!') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Correct \x96 and that\x27s the point. We have <em>one</em> predictor. Multiple regression (a later realm) can add more predictors to explain more variance. But never expect 100% \x96 the world is noisy.') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Key insight: a "large" r of .50 means r&sup2; = .25 \x96 only 25% of variance explained. Squaring r is a humbling exercise. The label "strong correlation" often masks a lot of unexplained variability.');
+}
+
+// ===== STEP 5: SIGNIFICANCE TEST FOR r =====
+function step5() {
+  return '<div class="step-title">Step 5: Is r Statistically Significant?</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'We found r = ' + r4(rPearson) + '. But could this be a fluke? With only n = 8, even a moderate correlation could arise by chance. We test H₀: ρ = 0 (no correlation in the population).') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Test statistic for r</div>' +
+      't = r &middot; &radic;(n \x96 2) / &radic;(1 \x96 r&sup2;)' +
+    '</div>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Plugging in</div>' +
+      't = ' + r4(rPearson) + ' &middot; &radic;(' + n + ' \x96 2) / &radic;(1 \x96 ' + r4(r2) + ')' +
+      '<br>t = ' + r4(rPearson) + ' &middot; &radic;(' + df_r + ') / &radic;(' + r4(1 - r2) + ')' +
+      '<br>t = ' + r4(rPearson) + ' &middot; ' + r(Math.sqrt(df_r),4) + ' / ' + r(Math.sqrt(1 - r2),4) +
+      '<br><span class="hl-gold">t = ' + r(t_r,4) + '</span>, df = ' + df_r +
+    '</div>' +
+
+    '<p>With df = ' + df_r + ' and α = .05 (two-tailed), the critical t ≈ 2.447. Our |t| = ' + r(Math.abs(t_r),2) + ' ' + (Math.abs(t_r) > 2.447 ? '<span class="hl-green">exceeds</span>' : '<span class="hl-red">does not exceed</span>') + ' the critical value.</p>' +
+
+    '<p>Approximate <span class="hl-gold">p = ' + (p_r < 0.001 ? '< .001' : r(p_r, 4)) + '</span></p>' +
+
+    (Math.abs(t_r) > 2.447 ?
+      '<div class="correct-box"><div class="correct-title">✅ Reject H₀</div><p>The correlation is statistically significant at α = .05. There is evidence of a linear relationship between distance and mead sales in the population.</p></div>' :
+      '<div class="warning-box"><div class="warning-title">⚠️ Fail to Reject H₀</div><p>The correlation is not statistically significant at α = .05.</p></div>'
+    ) +
+
+    dialogue('thor', '⚡ Thorment', 'Ha! p < .05, so the correlation is real and important!') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Statistical significance ≠ practical importance. With large n, even a tiny r = .08 can be "significant." Always report the <strong>effect size</strong> (r itself) and the <strong>confidence interval</strong>, not just p.') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'With small samples (like n = 8), the significance test has low <strong>power</strong>. A non-significant result does not prove ρ = 0 \x96 it may just mean we lacked the power to detect it.');
+}
+
+// ===== STEP 6: SPEARMAN'S RHO =====
+function step6() {
+  return '<div class="step-title">Step 6: Spearman\x27s ρ \x96 The Rank-Based Alternative</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Pearson\x27s r measures <em>linear</em> association and assumes both variables are roughly normal. When data are <strong>ordinal</strong>, have <strong>outliers</strong>, or show a <strong>monotonic but non-linear</strong> pattern, we turn to Spearman\x27s ρ (rho).') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Spearman\x27s ρ</div>' +
+      'ρ<sub>s</sub> = 1 \x96 [6 &middot; &Sigma;d<sub>i</sub>&sup2;] / [n(n&sup2; \x96 1)]' +
+    '</div>' +
+
+    '<p class="step-subtitle">Step-by-step: rank, then compute</p>' +
+
+    '<table class="calc-table">' +
+    '<tr><th>Post</th><th>Distance</th><th>Rank(X)</th><th>Mead</th><th>Rank(Y)</th><th>d = R(X)\x96R(Y)</th><th>d&sup2;</th></tr>' +
+    (function() {
+      var rows = '';
+      for (var i = 0; i < n; i++) {
+        rows += '<tr><td>' + posts[i] + '</td><td>' + X[i] + '</td><td>' + r(rankX[i],1) + '</td><td>' + Y[i] + '</td><td>' + r(rankY[i],1) + '</td><td>' + r(dRank[i],1) + '</td><td>' + r(dRank2[i],2) + '</td></tr>';
+      }
+      return rows;
+    })() +
+    '<tr style="font-weight:bold;background:var(--bg-panel)"><td colspan="6" style="text-align:right">&Sigma;d&sup2; =</td><td style="color:var(--gold)">' + r(sumDRank2,2) + '</td></tr>' +
+    '</table>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Plugging in</div>' +
+      'ρ<sub>s</sub> = 1 \x96 [6 &times; ' + r(sumDRank2,2) + '] / [' + n + '(' + (n*n) + ' \x96 1)] = 1 \x96 ' + r(6*sumDRank2,2) + ' / ' + (n*(n*n-1)) + ' = <span class="hl-gold">' + r4(rhoSpearman) + '</span>' +
+    '</div>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">When Pearson</h4>' +
+        '<p>Both variables continuous, roughly normal, linear relationship expected.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">When Spearman</h4>' +
+        '<p>Ordinal data, outliers, skewed distributions, or monotonic non-linear patterns.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Notice our Pearson r = ' + r4(rPearson) + ' and Spearman ρ = ' + r4(rhoSpearman) + '. They\x27re close because our data is fairly linear with no major outliers. When they diverge, investigate why \x96 it usually means non-linearity or outlier influence.');
+}
+
+// ===== STEP 7: SIMPLE LINEAR REGRESSION =====
+function step7() {
+  return '<div class="step-title">Step 7: Simple Linear Regression \x96 The Prediction Line</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Correlation told us there\x27s a strong negative link. Now regression lets us <strong>predict</strong>: given a distance, how many barrels can we expect? We fit a straight line through the cloud of points.') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Regression equation</div>' +
+      'ŷ = b₀ + b₁ &middot; x' +
+    '</div>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">ŷ (y-hat)</h4>' +
+        '<p>The <strong>predicted</strong> value of Y for a given X. Not the actual Y \x96 the line\x27s best guess.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">b₁ (slope)</h4>' +
+        '<p>For every 1-unit increase in X, Y changes by b₁ units. Positive = uphill; negative = downhill.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">b₀ (intercept)</h4>' +
+        '<p>The predicted Y when X = 0. Sometimes meaningful, sometimes just a mathematical anchor.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--thor-red)">Least Squares</h4>' +
+        '<p>The method finds the line that <strong>minimizes the sum of squared residuals</strong> \x96 the vertical distances between points and line.</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="visual-container">' +
+      buildScatterplot({ showLabels: false, showLine: true, showResiduals: true, xLabel: 'Distance (leagues)', yLabel: 'Mead Barrels Sold' }) +
+    '</div>' +
+
+    '<p>The <span class="hl-gold">gold dashed line</span> is the regression line. The <span class="hl-red">red dashed segments</span> are the residuals \x96 the errors the line makes for each point.</p>' +
+
+    dialogue('thor', '⚡ Thorment', 'Why not just connect the dots? That\x27d pass through every point \x96 zero error!') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Because connecting dots <em>overfits</em> the sample. The regression line captures the <strong>trend</strong>, not the noise. It generalizes to new data; a connect-the-dots approach does not.');
+}
+
+// ===== STEP 8: CALCULATING b1 AND b0 =====
+function step8() {
+  return '<div class="step-title">Step 8: Calculating the Slope (b₁) and Intercept (b₀)</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Time to forge the regression line. We already computed the key sums in Step 2. Now we use them.') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Slope (b₁)</div>' +
+      'b₁ = &Sigma;(x<sub>i</sub> \x96 ̄x)(y<sub>i</sub> \x96 ̄y) / &Sigma;(x<sub>i</sub> \x96 ̄x)&sup2;' +
+    '</div>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Plugging in</div>' +
+      'b₁ = <span class="hl-gold">' + r(sumDxDy,2) + '</span> / <span class="hl-blue">' + r(sumDx2,2) + '</span> = <span class="hl-gold">' + r4(b1) + '</span>' +
+    '</div>' +
+
+    '<p>Interpretation: for every additional league of distance, the trade post sells approximately <span class="hl-gold">' + r(Math.abs(b1),2) + ' fewer</span> barrels of mead.</p>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Intercept (b₀)</div>' +
+      'b₀ = ̄Y \x96 b₁ &middot; ̄X' +
+    '</div>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Plugging in</div>' +
+      'b₀ = ' + r(meanY,2) + ' \x96 (' + r4(b1) + ' &times; ' + r(meanX,2) + ') = ' + r(meanY,2) + ' \x96 (' + r(b1 * meanX,2) + ') = <span class="hl-gold">' + r4(b0) + '</span>' +
+    '</div>' +
+
+    '<div class="formula" style="font-size:1.3rem;border-color:var(--gold)">' +
+      '<div class="formula-label" style="color:var(--gold)">Final Regression Equation</div>' +
+      'ŷ = ' + r(b0,2) + ' + (' + r(b1,2) + ') &middot; x' +
+    '</div>' +
+
+    '<p class="step-subtitle">Prediction example</p>' +
+    '<p>A new trade post at 20 leagues: ŷ = ' + r(b0,2) + ' + (' + r(b1,2) + ' &times; 20) = ' + r(b0,2) + ' + (' + r(b1 * 20,2) + ') = <span class="hl-gold">' + r(b0 + b1 * 20,1) + ' barrels</span></p>' +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The intercept b₀ = ' + r(b0,2) + ' is the predicted sales at distance zero. While no real post sits at 0 leagues, it anchors the line mathematically. Be cautious interpreting intercepts outside the data range.') +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'What if someone asks you to predict sales at 50 leagues? That\x27s <strong>extrapolation</strong> \x96 predicting beyond the observed range (8\x9630 leagues). The linear trend may not hold that far. <em>Never extrapolate blindly.</em>');
+}
+
+// ===== STEP 9: RESIDUALS AND R-SQUARED =====
+function step9() {
+  return '<div class="step-title">Step 9: Residuals, SST, SSR, SSE, and R&sup2;</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'How good is our line? We decompose the <strong>total variation</strong> in Y into two parts: what the line <em>explains</em> and what it <em>misses</em>.') +
+
+    '<table class="calc-table">' +
+    '<tr><th>Post</th><th>x</th><th>y</th><th>ŷ</th><th>Residual (y \x96 ŷ)</th><th>(y \x96 ŷ)&sup2;</th><th>(ŷ \x96 ̄y)&sup2;</th></tr>' +
+    (function() {
+      var rows = '';
+      for (var i = 0; i < n; i++) {
+        rows += '<tr><td>' + posts[i] + '</td><td>' + X[i] + '</td><td>' + Y[i] + '</td><td>' + r(Yhat[i],2) + '</td><td>' + r(residuals[i],2) + '</td><td>' + r(residuals[i]*residuals[i],2) + '</td><td>' + r(Math.pow(Yhat[i]-meanY,2),2) + '</td></tr>';
+      }
+      return rows;
+    })() +
+    '</table>' +
+
+    '<div class="comparison-grid">' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--gold)">SST (Total)</div>' +
+        '<div class="comparison-result" style="color:var(--gold)">' + r(SST,2) + '</div>' +
+        '<div style="font-size:0.85rem;color:var(--text-dim)">&Sigma;(y<sub>i</sub> \x96 ̄y)&sup2;</div>' +
+      '</div>' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--success)">SSR (Regression)</div>' +
+        '<div class="comparison-result" style="color:var(--success)">' + r(SSR,2) + '</div>' +
+        '<div style="font-size:0.85rem;color:var(--text-dim)">&Sigma;(ŷ<sub>i</sub> \x96 ̄y)&sup2;</div>' +
+      '</div>' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--thor-red)">SSE (Error)</div>' +
+        '<div class="comparison-result" style="color:var(--thor-red)">' + r(SSE,2) + '</div>' +
+        '<div style="font-size:0.85rem;color:var(--text-dim)">&Sigma;(y<sub>i</sub> \x96 ŷ<sub>i</sub>)&sup2;</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">SST = SSR + SSE</div>' +
+      r(SST,2) + ' = ' + r(SSR,2) + ' + ' + r(SSE,2) + ' &nbsp; ✓' +
+    '</div>' +
+
+    '<div class="formula" style="border-color:var(--gold)">' +
+      '<div class="formula-label" style="color:var(--gold)">R&sup2; = SSR / SST</div>' +
+      'R&sup2; = ' + r(SSR,2) + ' / ' + r(SST,2) + ' = <span class="hl-gold">' + r4(R2) + '</span>' +
+    '</div>' +
+
+    '<p>R&sup2; = ' + r4(R2) + ' matches r&sup2; = (' + r4(rPearson) + ')&sup2; = ' + r4(r2) + '. In simple regression, <span class="hl-gold">R&sup2; = r&sup2;</span> always. This identity breaks in multiple regression.</p>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'The residuals are the <em>footprint of everything the model missed</em>. If they show a pattern (curve, fan shape), the model is wrong. Random scatter = good fit. We\x27ll check that next.');
+}
+
+// ===== STEP 10: ASSUMPTIONS =====
+function step10() {
+  return '<div class="step-title">Step 10: Assumptions \x96 The Four Pillars</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Regression is powerful but fragile. It stands on four pillars. If any pillar crumbles, the inferences may be flawed.') +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card" style="border-color:var(--odin-blue)">' +
+        '<h4 style="color:var(--odin-blue)">1. Linearity</h4>' +
+        '<p>The relationship between X and Y must be <strong>linear</strong>. Check the scatterplot and residual plot for curvature.</p>' +
+      '</div>' +
+      '<div class="concept-card" style="border-color:var(--corvo-purple)">' +
+        '<h4 style="color:var(--corvo-purple)">2. Normality of Residuals</h4>' +
+        '<p>The residuals should follow a <strong>normal distribution</strong>. Check with a Q-Q plot or Shapiro-Wilk test. Less critical with large n (CLT helps).</p>' +
+      '</div>' +
+      '<div class="concept-card" style="border-color:var(--gold)">' +
+        '<h4 style="color:var(--gold)">3. Homoscedasticity</h4>' +
+        '<p>The <strong>spread of residuals</strong> should be constant across all values of X. A "fan shape" in the residual plot signals heteroscedasticity.</p>' +
+      '</div>' +
+      '<div class="concept-card" style="border-color:var(--success)">' +
+        '<h4 style="color:var(--success)">4. Independence</h4>' +
+        '<p>Observations must be <strong>independent</strong> of each other. Violated in time series, clustered, or repeated-measures data.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'Four assumptions? Just run the regression and hope for the best!') +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ What happens when assumptions fail</div>' +
+      '<table class="data-table">' +
+      '<tr><th>Violation</th><th>Consequence</th><th>Remedy</th></tr>' +
+      '<tr><td>Non-linearity</td><td>Biased estimates, poor predictions</td><td>Transform variables, use polynomial or non-linear regression</td></tr>' +
+      '<tr><td>Non-normal residuals</td><td>Invalid p-values and CIs (small n)</td><td>Transform DV, use bootstrap, or non-parametric methods</td></tr>' +
+      '<tr><td>Heteroscedasticity</td><td>Inefficient estimates, wrong SEs</td><td>Weighted least squares, robust SEs (HC3)</td></tr>' +
+      '<tr><td>Non-independence</td><td>Inflated Type I error, biased SEs</td><td>Multilevel models, GEE, time-series methods</td></tr>' +
+      '</table>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>L-I-N-E</strong> \x96 Linearity, Independence, Normality (of residuals), Equal variance. A mnemonic to remember the four pillars.') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'With our 8 data points, formal diagnostic tests have limited power. Visual inspection is key: the scatterplot looks reasonably linear, and residuals appear random. For a thesis, you\x27d want n > 30 and formal diagnostics.');
+}
+
+// ===== STEP 11: LESSON OF THE RAVENS =====
+function step11() {
+  return '<div class="step-title">Step 11: Lesson of the Ravens</div>' +
+
+    '<div class="licao-box">' +
+      '<div class="licao-title">🐦‍⬛ Lesson of the Ravens: Correlation & Simple Regression</div>' +
+
+      dialogue('corvo', '🐦‍⬛ Muninn (Memory) summarizes:', '<strong>Key takeaways from this realm:</strong>' +
+        '<ul style="margin-top:8px;padding-left:20px">' +
+        '<li><strong>Scatterplot first</strong> \x96 always visualize before computing.</li>' +
+        '<li><strong>Pearson\x27s r</strong> measures strength and direction of a <em>linear</em> association (\x961 to +1).</li>' +
+        '<li><strong>r&sup2;</strong> = proportion of variance in Y explained by X.</li>' +
+        '<li><strong>Spearman\x27s ρ</strong> is the rank-based alternative for ordinal data or non-linear monotonic patterns.</li>' +
+        '<li><strong>Simple regression</strong>: ŷ = b₀ + b₁x predicts Y from X using least squares.</li>' +
+        '<li><strong>b₁</strong> = slope = change in Y per unit change in X.</li>' +
+        '<li><strong>R&sup2; = SSR/SST</strong> = fraction of total variance captured by the model.</li>' +
+        '<li><strong>Assumptions (LINE)</strong>: Linearity, Independence, Normality of residuals, Equal variance.</li>' +
+        '</ul>') +
+
+      dialogue('corvo', '🐦‍⬛ Huginn (Thought) challenges:', '<strong>Never forget:</strong>' +
+        '<ul style="margin-top:8px;padding-left:20px">' +
+        '<li>Correlation ≠ causation. Period.</li>' +
+        '<li>Cohen\x27s benchmarks are guidelines, not laws.</li>' +
+        '<li>A "significant" r with tiny r&sup2; means almost nothing explained.</li>' +
+        '<li>Never extrapolate beyond the observed range of X.</li>' +
+        '<li>Check residuals \x96 patterns mean the model is wrong.</li>' +
+        '</ul>') +
+    '</div>' +
+
+    '<p class="step-subtitle">APA Reporting Format</p>' +
+
+    '<div class="apa-box">' +
+      '<div class="apa-label">📝 APA Format: Correlation</div>' +
+      '<p>There was a strong negative correlation between trade post distance and mead barrels sold, <em>r</em>(' + df_r + ') = ' + r(rPearson,2) + ', <em>p</em> ' + (p_r < .001 ? '< .001' : '= ' + r(p_r,3)) + ', <em>r</em>&sup2; = ' + r(r2,2) + '.</p>' +
+    '</div>' +
+
+    '<div class="apa-box">' +
+      '<div class="apa-label">📝 APA Format: Simple Linear Regression</div>' +
+      '<p>A simple linear regression was conducted to predict mead barrels sold from distance. Distance significantly predicted mead sales, <em>b</em> = ' + r(b1,2) + ', <em>t</em>(' + df_r + ') = ' + r(t_r,2) + ', <em>p</em> ' + (p_r < .001 ? '< .001' : '= ' + r(p_r,3)) + '. Distance explained ' + r(R2 * 100,1) + '% of the variance in mead sales (<em>R</em>&sup2; = ' + r(R2,2) + '). The regression equation was: Predicted Mead = ' + r(b0,2) + ' + (' + r(b1,2) + ' &times; Distance).</p>' +
+    '</div>' +
+
+    '<p class="step-subtitle">Common Traps</p>' +
+
+    '<div class="trap-grid">' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Correlation = Causation</h4>' +
+        '<p>The most common trap. Correlation identifies association, not causal direction. Third variables and reverse causation lurk everywhere.</p>' +
+      '</div>' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Ignoring outliers</h4>' +
+        '<p>A single outlier can inflate or destroy r. Always inspect the scatterplot and consider robust alternatives.</p>' +
+      '</div>' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Extrapolation</h4>' +
+        '<p>Predicting beyond the observed range of X assumes the linear trend continues forever. It rarely does.</p>' +
+      '</div>' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Restriction of range</h4>' +
+        '<p>If your sample covers a narrow range of X, r will be artificially low. Full range = full picture.</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="comparison-grid" style="margin-top:24px">' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--odin-blue)">Pearson r</div>' +
+        '<div class="comparison-result" style="color:var(--odin-blue)">' + r4(rPearson) + '</div>' +
+      '</div>' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--corvo-purple)">Spearman ρ</div>' +
+        '<div class="comparison-result" style="color:var(--corvo-purple)">' + r4(rhoSpearman) + '</div>' +
+      '</div>' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--gold)">R&sup2;</div>' +
+        '<div class="comparison-result" style="color:var(--gold)">' + r4(R2) + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'The merchant guild now knows: distance and sales are strongly linked, with each league costing about ' + r(Math.abs(b1),1) + ' barrels. But they are wise enough to know this is association \x96 not proof that moving a post closer will boost sales. For that, they\x27d need an experiment. On to the next realm!');
+}
+
+// ===== STEP REGISTRY =====
+const stepFunctions = [step0, step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11];
+
+const stepNames = [
+  'Introduction',
+  'Scatterplot',
+  'Pearson\x27s r',
+  'Interpreting r',
+  'r-Squared',
+  'Significance Test',
+  'Spearman\x27s ρ',
+  'Simple Regression',
+  'Slope & Intercept',
+  'Residuals & R²',
+  'Assumptions',
+  'Lesson of the Ravens'
+];
+
+// ===== NAVIGATION =====
+function renderStep() {
+  var content = document.getElementById('stepContent');
+  content.innerHTML = stepFunctions[currentStep]();
+  content.style.animation = 'none';
+  content.offsetHeight;
+  content.style.animation = 'fadeIn 0.4s ease';
+
+  document.getElementById('progressLabel').textContent = 'Step ' + currentStep + ' of ' + (totalSteps - 1) + ' — ' + stepNames[currentStep];
+  document.getElementById('progressFill').style.width = (currentStep / (totalSteps - 1) * 100) + '%';
+
+  document.getElementById('btnBack').disabled = currentStep === 0;
+  document.getElementById('btnNext').textContent = currentStep === totalSteps - 1 ? 'Restart ↻' : 'Next ▶';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNext() {
+  if (currentStep >= totalSteps - 1) {
+    currentStep = 0;
+  } else {
+    currentStep++;
+  }
+  renderStep();
+}
+
+function goBack() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goBack(); }
+});
+
+// Initialize
+renderStep();
+</script>
+</body>
+</html>

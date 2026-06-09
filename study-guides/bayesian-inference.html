@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction to Bayesian Inference — Step by Step | Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --bg-panel: #1c2333;
+  --odin-blue: #58a6ff;
+  --thor-red: #f85149;
+  --corvo-purple: #bc8cff;
+  --gold: #f0c040;
+  --silver: #8b949e;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --success: #3fb950;
+  --border: #30363d;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 18px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-dark);
+  padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-panel);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* STEP CONTENT */
+.step-content {
+  min-height: 60vh;
+  padding: 30px 0;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+  font-family: 'Bangers', cursive;
+  font-size: 2.2rem;
+  color: var(--gold);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.step-subtitle {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.3rem;
+  color: var(--odin-blue);
+  margin-bottom: 15px;
+}
+
+/* DIALOGUE BOXES */
+.dialogue-box {
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  border-left: 4px solid;
+  position: relative;
+}
+
+.dialogue-box.odin {
+  background: rgba(88,166,255,0.08);
+  border-left-color: var(--odin-blue);
+}
+.dialogue-box.thor {
+  background: rgba(248,81,73,0.08);
+  border-left-color: var(--thor-red);
+}
+.dialogue-box.corvo {
+  background: rgba(188,140,255,0.08);
+  border-left-color: var(--corvo-purple);
+}
+
+.char-name {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+
+.dialogue-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* DATA TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 1rem;
+}
+
+.data-table th, .data-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.data-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+}
+
+.data-table td {
+  background: var(--bg-card);
+  transition: background 0.2s;
+}
+
+.data-table tr:hover td {
+  background: rgba(88,166,255,0.1);
+}
+
+/* CALC TABLE */
+.calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 0.95rem;
+}
+
+.calc-table th, .calc-table td {
+  padding: 8px 10px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.calc-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.calc-table td {
+  background: var(--bg-card);
+}
+
+/* FORMULA */
+.formula {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-size: 1.15rem;
+  text-align: center;
+  font-family: 'Patrick Hand', cursive;
+  color: var(--gold);
+}
+
+.formula-label {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+/* SVG VISUALS */
+.visual-container {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.visual-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* CONCEPT GRID */
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.concept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.concept-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+/* COMPARISON GRID */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.comparison-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.comparison-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.comparison-result {
+  font-size: 1.4rem;
+  font-family: 'Bangers', cursive;
+}
+
+/* APA BOX */
+.apa-box {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 20px 0;
+  font-style: italic;
+  line-height: 1.7;
+}
+
+.apa-label {
+  font-family: 'Bangers', cursive;
+  color: var(--gold);
+  font-style: normal;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+/* WARNING BOX */
+.warning-box {
+  background: rgba(248,81,73,0.06);
+  border: 2px solid var(--thor-red);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.warning-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--thor-red);
+  margin-bottom: 12px;
+}
+
+/* CORRECT BOX */
+.correct-box {
+  background: rgba(63,185,80,0.06);
+  border: 2px solid var(--success);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.correct-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--success);
+  margin-bottom: 12px;
+}
+
+/* RAVENS LESSON */
+.licao-box {
+  background: rgba(188,140,255,0.06);
+  border: 2px solid var(--corvo-purple);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.licao-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--corvo-purple);
+  margin-bottom: 12px;
+}
+
+/* TRAP GRID */
+.trap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.trap-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.trap-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  color: var(--thor-red);
+  margin-bottom: 8px;
+}
+
+/* NAVIGATION */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 40px;
+  gap: 12px;
+}
+
+.nav-btn {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover {
+  border-color: var(--odin-blue);
+  background: rgba(88,166,255,0.1);
+}
+
+.nav-btn.primary {
+  background: var(--odin-blue);
+  color: var(--bg-dark);
+  border-color: var(--odin-blue);
+}
+
+.nav-btn.primary:hover {
+  background: #79bbff;
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* SIGNATURE */
+.signature {
+  text-align: center;
+  padding: 30px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* HIGHLIGHTS */
+.hl-gold { color: var(--gold); font-weight: bold; }
+.hl-blue { color: var(--odin-blue); }
+.hl-red { color: var(--thor-red); }
+.hl-green { color: var(--success); }
+.hl-purple { color: var(--corvo-purple); }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container { padding: 12px; }
+  .step-title { font-size: 1.6rem; }
+  .concept-grid, .comparison-grid, .trap-grid { grid-template-columns: 1fr; }
+  .nav-btn { padding: 10px 18px; font-size: 0.95rem; }
+  body { font-size: 16px; }
+}
+
+.fade-in { animation: fadeIn 0.6s ease both; }
+.fade-in-delay { animation: fadeIn 0.6s ease 0.3s both; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="progress-bar-container">
+    <div class="progress-label" id="progressLabel">Step 0 of 11</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="step-content" id="stepContent"></div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" id="btnBack" onclick="goBack()" disabled>&#9664; Back</button>
+    <button class="nav-btn primary" id="btnNext" onclick="goNext()">Next &#9654;</button>
+  </div>
+
+  <div class="signature">
+    Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026
+  </div>
+</div>
+
+<script>
+// ===== HELPERS =====
+function rf(v, d) { return Number(v).toFixed(d === undefined ? 2 : d); }
+
+function dialogue(character, name, text) {
+  return '<div class="dialogue-box ' + character + '">' +
+    '<div class="char-name ' + character + '">' + name + '</div>' +
+    '<div class="dialogue-text">' + text + '</div>' +
+  '</div>';
+}
+
+// ===== SVG: PRIOR TO POSTERIOR =====
+function buildPriorPosteriorSVG() {
+  var w = 700, h = 360;
+  var pad = { top: 40, right: 30, bottom: 55, left: 50 };
+  var pw = w - pad.left - pad.right;
+  var ph = h - pad.top - pad.bottom;
+
+  function sx(v) { return pad.left + v * pw; }
+  function sy(v) { return pad.top + ph - v * ph; }
+
+  // Beta-like distributions
+  function betaPDF(x, a, b) {
+    if (x <= 0 || x >= 1) return 0;
+    var logB = lgamma(a) + lgamma(b) - lgamma(a + b);
+    return Math.exp((a - 1) * Math.log(x) + (b - 1) * Math.log(1 - x) - logB);
+  }
+  function lgamma(z) {
+    var c = [76.18009172947146, -86.50532032941677, 24.01409824083091,
+             -1.231739572450155, 0.001208650973866179, -0.000005395239384953];
+    var s = 1.000000000190015;
+    var t = z + 5.5;
+    t -= (z + 0.5) * Math.log(t);
+    for (var j = 0; j < 6; j++) s += c[j] / (z + j + 1);
+    return -t + Math.log(2.5066282746310005 * s / z);
+  }
+
+  // Prior: Beta(2, 18) -> mean ~0.10
+  // Posterior: Beta(2+3, 18+0) but adjusted for mixed: approximate Beta(5, 10)
+  var priorA = 2, priorB = 18;
+  var postA = 5.5, postB = 9.5;
+
+  // Find max y for scaling
+  var maxY = 0;
+  for (var i = 0; i <= 100; i++) {
+    var x = i / 100;
+    var yPri = betaPDF(x, priorA, priorB);
+    var yPos = betaPDF(x, postA, postB);
+    if (yPri > maxY) maxY = yPri;
+    if (yPos > maxY) maxY = yPos;
+  }
+  maxY *= 1.15;
+
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+
+  // Title
+  svg += '<text x="' + (w/2) + '" y="22" fill="#f0c040" font-size="16" text-anchor="middle" font-family="Bangers">Prior → Data → Posterior</text>';
+
+  // Grid
+  for (var gy = 0; gy <= 4; gy++) {
+    var yVal = gy / 4 * maxY;
+    var yy = sy(gy / 4);
+    svg += '<line x1="' + pad.left + '" y1="' + yy + '" x2="' + (pad.left + pw) + '" y2="' + yy + '" stroke="#30363d" stroke-width="0.5" opacity="0.4"/>';
+  }
+
+  // Axes
+  svg += '<line x1="' + pad.left + '" y1="' + (pad.top + ph) + '" x2="' + (pad.left + pw) + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+  svg += '<line x1="' + pad.left + '" y1="' + pad.top + '" x2="' + pad.left + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+
+  // X ticks
+  for (var gx = 0; gx <= 10; gx += 2) {
+    var xVal = gx / 10;
+    svg += '<text x="' + sx(xVal) + '" y="' + (pad.top + ph + 20) + '" fill="#8b949e" font-size="11" text-anchor="middle" font-family="Patrick Hand">' + rf(xVal, 1) + '</text>';
+  }
+  svg += '<text x="' + (w/2) + '" y="' + (h - 5) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker">θ (probability oracle is genuine)</text>';
+  svg += '<text x="15" y="' + (pad.top + ph/2) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker" transform="rotate(-90,15,' + (pad.top + ph/2) + ')">Density</text>';
+
+  // Prior curve (blue dashed)
+  var pathPri = '';
+  for (var i2 = 0; i2 <= 100; i2++) {
+    var xx = i2 / 100;
+    var yy2 = betaPDF(xx, priorA, priorB) / maxY;
+    if (yy2 > 1) yy2 = 1;
+    pathPri += (i2 === 0 ? 'M' : ' L') + rf(sx(xx), 1) + ' ' + rf(sy(yy2), 1);
+  }
+  svg += '<path d="' + pathPri + '" fill="none" stroke="#58a6ff" stroke-width="2.5" stroke-dasharray="8,4" opacity="0.9"/>';
+
+  // Posterior curve (gold solid)
+  var pathPos = '';
+  for (var i3 = 0; i3 <= 100; i3++) {
+    var xx2 = i3 / 100;
+    var yy3 = betaPDF(xx2, postA, postB) / maxY;
+    if (yy3 > 1) yy3 = 1;
+    pathPos += (i3 === 0 ? 'M' : ' L') + rf(sx(xx2), 1) + ' ' + rf(sy(yy3), 1);
+  }
+  svg += '<path d="' + pathPos + '" fill="none" stroke="#f0c040" stroke-width="3"/>';
+
+  // Arrow from prior peak to posterior peak
+  var priPeakX = (priorA - 1) / (priorA + priorB - 2);
+  var posPeakX = (postA - 1) / (postA + postB - 2);
+  var arrY = sy(0.75);
+  svg += '<line x1="' + sx(priPeakX + 0.03) + '" y1="' + arrY + '" x2="' + sx(posPeakX - 0.03) + '" y2="' + arrY + '" stroke="#3fb950" stroke-width="2" marker-end="url(#arrowG)"/>';
+  svg += '<defs><marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#3fb950"/></marker></defs>';
+  svg += '<text x="' + sx((priPeakX + posPeakX) / 2) + '" y="' + (arrY - 8) + '" fill="#3fb950" font-size="12" text-anchor="middle" font-family="Permanent Marker">Data shifts belief</text>';
+
+  // Legend
+  svg += '<line x1="' + (w - 220) + '" y1="' + (pad.top + 10) + '" x2="' + (w - 190) + '" y2="' + (pad.top + 10) + '" stroke="#58a6ff" stroke-width="2.5" stroke-dasharray="8,4"/>';
+  svg += '<text x="' + (w - 185) + '" y="' + (pad.top + 14) + '" fill="#58a6ff" font-size="12" font-family="Patrick Hand">Prior</text>';
+  svg += '<line x1="' + (w - 220) + '" y1="' + (pad.top + 30) + '" x2="' + (w - 190) + '" y2="' + (pad.top + 30) + '" stroke="#f0c040" stroke-width="3"/>';
+  svg += '<text x="' + (w - 185) + '" y="' + (pad.top + 34) + '" fill="#f0c040" font-size="12" font-family="Patrick Hand">Posterior</text>';
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ===== SVG: SEQUENTIAL UPDATING =====
+function buildSequentialSVG() {
+  var w = 700, h = 380;
+  var pad = { top: 40, right: 30, bottom: 55, left: 50 };
+  var pw = w - pad.left - pad.right;
+  var ph = h - pad.top - pad.bottom;
+
+  function sx(v) { return pad.left + v * pw; }
+  function sy(v) { return pad.top + ph - v * ph; }
+
+  function betaPDF(x, a, b) {
+    if (x <= 0 || x >= 1) return 0;
+    var logB = lgamma2(a) + lgamma2(b) - lgamma2(a + b);
+    return Math.exp((a - 1) * Math.log(x) + (b - 1) * Math.log(1 - x) - logB);
+  }
+  function lgamma2(z) {
+    var c = [76.18009172947146, -86.50532032941677, 24.01409824083091,
+             -1.231739572450155, 0.001208650973866179, -0.000005395239384953];
+    var s = 1.000000000190015;
+    var t = z + 5.5;
+    t -= (z + 0.5) * Math.log(t);
+    for (var j = 0; j < 6; j++) s += c[j] / (z + j + 1);
+    return -t + Math.log(2.5066282746310005 * s / z);
+  }
+
+  // Round 0: Prior Beta(2,18) -> mean 0.10
+  // Round 1: after 1 correct prediction -> Beta(2+1, 18+0) = Beta(3,18) mean ~0.143
+  // Round 2: after 2 correct -> Beta(4,18) mean ~0.182
+  // Round 3: after 3 correct -> Beta(5,18) mean ~0.217
+  var rounds = [
+    { a: 2, b: 18, color: '#8b949e', dash: '6,4', label: 'Prior (no data)', lw: 1.5 },
+    { a: 3, b: 18, color: '#58a6ff', dash: '4,3', label: 'After 1 correct', lw: 2 },
+    { a: 4, b: 18, color: '#bc8cff', dash: '', label: 'After 2 correct', lw: 2.5 },
+    { a: 5, b: 18, color: '#f0c040', dash: '', label: 'After 3 correct', lw: 3 }
+  ];
+
+  var maxY = 0;
+  for (var r = 0; r < rounds.length; r++) {
+    for (var i = 0; i <= 100; i++) {
+      var yy = betaPDF(i/100, rounds[r].a, rounds[r].b);
+      if (yy > maxY) maxY = yy;
+    }
+  }
+  maxY *= 1.15;
+
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+  svg += '<text x="' + (w/2) + '" y="22" fill="#f0c040" font-size="16" text-anchor="middle" font-family="Bangers">Sequential Bayesian Updating</text>';
+
+  // Axes
+  svg += '<line x1="' + pad.left + '" y1="' + (pad.top + ph) + '" x2="' + (pad.left + pw) + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+  svg += '<line x1="' + pad.left + '" y1="' + pad.top + '" x2="' + pad.left + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+
+  for (var gx = 0; gx <= 10; gx += 2) {
+    svg += '<text x="' + sx(gx/10) + '" y="' + (pad.top + ph + 20) + '" fill="#8b949e" font-size="11" text-anchor="middle" font-family="Patrick Hand">' + rf(gx/10, 1) + '</text>';
+  }
+  svg += '<text x="' + (w/2) + '" y="' + (h - 5) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker">θ</text>';
+
+  // Draw curves
+  for (var r2 = 0; r2 < rounds.length; r2++) {
+    var rd = rounds[r2];
+    var path = '';
+    for (var i2 = 0; i2 <= 100; i2++) {
+      var xx = i2 / 100;
+      var yy2 = betaPDF(xx, rd.a, rd.b) / maxY;
+      if (yy2 > 1) yy2 = 1;
+      path += (i2 === 0 ? 'M' : ' L') + rf(sx(xx), 1) + ' ' + rf(sy(yy2), 1);
+    }
+    var dashAttr = rd.dash ? ' stroke-dasharray="' + rd.dash + '"' : '';
+    svg += '<path d="' + path + '" fill="none" stroke="' + rd.color + '" stroke-width="' + rd.lw + '"' + dashAttr + '/>';
+  }
+
+  // Legend
+  for (var r3 = 0; r3 < rounds.length; r3++) {
+    var ly = pad.top + 8 + r3 * 22;
+    var dashA = rounds[r3].dash ? ' stroke-dasharray="' + rounds[r3].dash + '"' : '';
+    svg += '<line x1="' + (w - 230) + '" y1="' + ly + '" x2="' + (w - 200) + '" y2="' + ly + '" stroke="' + rounds[r3].color + '" stroke-width="' + rounds[r3].lw + '"' + dashA + '/>';
+    svg += '<text x="' + (w - 195) + '" y="' + (ly + 4) + '" fill="' + rounds[r3].color + '" font-size="12" font-family="Patrick Hand">' + rounds[r3].label + '</text>';
+  }
+
+  // Arrow showing rightward shift
+  svg += '<defs><marker id="arrowSeq" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#3fb950"/></marker></defs>';
+  svg += '<line x1="' + sx(0.08) + '" y1="' + sy(0.15) + '" x2="' + sx(0.22) + '" y2="' + sy(0.15) + '" stroke="#3fb950" stroke-width="2" marker-end="url(#arrowSeq)"/>';
+  svg += '<text x="' + sx(0.15) + '" y="' + (sy(0.15) - 8) + '" fill="#3fb950" font-size="11" text-anchor="middle" font-family="Patrick Hand">Belief shifts right with each success</text>';
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ===== SVG: BAYES FACTOR SCALE =====
+function buildBayesFactorSVG() {
+  var w = 700, h = 180;
+  var pad = { left: 40, right: 40, top: 45, bottom: 40 };
+  var barW = w - pad.left - pad.right;
+  var barH = 36;
+  var barY = pad.top + 10;
+
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+  svg += '<text x="' + (w/2) + '" y="22" fill="#f0c040" font-size="16" text-anchor="middle" font-family="Bangers">Jeffreys\x27 Bayes Factor Interpretation Scale</text>';
+
+  // Segments: [start%, end%, color, label, BFrange]
+  var segments = [
+    { s: 0.00, e: 0.20, col: '#8b949e', label: 'Anecdotal', range: '1–3' },
+    { s: 0.20, e: 0.40, col: '#58a6ff', label: 'Moderate', range: '3–10' },
+    { s: 0.40, e: 0.60, col: '#bc8cff', label: 'Strong', range: '10–30' },
+    { s: 0.60, e: 0.80, col: '#f0c040', label: 'Very Strong', range: '30–100' },
+    { s: 0.80, e: 1.00, col: '#f85149', label: 'Extreme', range: '>100' }
+  ];
+
+  for (var i = 0; i < segments.length; i++) {
+    var seg = segments[i];
+    var x1 = pad.left + seg.s * barW;
+    var x2 = pad.left + seg.e * barW;
+    var sw = x2 - x1;
+    svg += '<rect x="' + x1 + '" y="' + barY + '" width="' + sw + '" height="' + barH + '" fill="' + seg.col + '" opacity="0.25" rx="' + (i === 0 ? '6' : '0') + '"/>';
+    svg += '<rect x="' + x1 + '" y="' + barY + '" width="' + sw + '" height="' + barH + '" fill="none" stroke="' + seg.col + '" stroke-width="1.5" rx="' + (i === 0 ? '6' : '0') + '"/>';
+    var cx = (x1 + x2) / 2;
+    svg += '<text x="' + cx + '" y="' + (barY + barH/2 + 5) + '" fill="' + seg.col + '" font-size="13" text-anchor="middle" font-family="Permanent Marker">' + seg.label + '</text>';
+    svg += '<text x="' + cx + '" y="' + (barY + barH + 20) + '" fill="#8b949e" font-size="11" text-anchor="middle" font-family="Patrick Hand">BF₁₀ = ' + seg.range + '</text>';
+  }
+
+  // Arrow below
+  svg += '<defs><marker id="arrowBF" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#3fb950"/></marker></defs>';
+  svg += '<line x1="' + (pad.left + 10) + '" y1="' + (barY + barH + 38) + '" x2="' + (pad.left + barW - 10) + '" y2="' + (barY + barH + 38) + '" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrowBF)"/>';
+  svg += '<text x="' + (w/2) + '" y="' + (barY + barH + 55) + '" fill="#3fb950" font-size="11" text-anchor="middle" font-family="Patrick Hand">Increasing evidence for H₁ over H₀</text>';
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ===== SVG: CREDIBLE vs CONFIDENCE INTERVAL =====
+function buildCrIvsCISVG() {
+  var w = 700, h = 300;
+  var pad = { top: 35, right: 30, bottom: 30, left: 30 };
+
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+  svg += '<text x="' + (w/2) + '" y="22" fill="#f0c040" font-size="16" text-anchor="middle" font-family="Bangers">Credible Interval vs. Confidence Interval</text>';
+
+  // CI box (left)
+  var boxW = 290, boxH = 220;
+  var lx = pad.left + 20, rx = w - pad.right - boxW - 20;
+  var by = pad.top + 20;
+
+  // Frequentist CI
+  svg += '<rect x="' + lx + '" y="' + by + '" width="' + boxW + '" height="' + boxH + '" fill="#161b22" stroke="#58a6ff" stroke-width="1.5" rx="10"/>';
+  svg += '<text x="' + (lx + boxW/2) + '" y="' + (by + 25) + '" fill="#58a6ff" font-size="14" text-anchor="middle" font-family="Permanent Marker">95% Confidence Interval</text>';
+  svg += '<text x="' + (lx + boxW/2) + '" y="' + (by + 55) + '" fill="#e6edf3" font-size="12" text-anchor="middle" font-family="Patrick Hand">"If we repeated this experiment</text>';
+  svg += '<text x="' + (lx + boxW/2) + '" y="' + (by + 73) + '" fill="#e6edf3" font-size="12" text-anchor="middle" font-family="Patrick Hand">many times, 95% of CIs</text>';
+  svg += '<text x="' + (lx + boxW/2) + '" y="' + (by + 91) + '" fill="#e6edf3" font-size="12" text-anchor="middle" font-family="Patrick Hand">would contain the true value."</text>';
+
+  // CI bars (multiple intervals, some miss)
+  var ciBaseY = by + 110;
+  var ciVals = [
+    { lo: 0.30, hi: 0.55, hit: true },
+    { lo: 0.35, hi: 0.60, hit: true },
+    { lo: 0.15, hi: 0.38, hit: false },
+    { lo: 0.32, hi: 0.58, hit: true },
+    { lo: 0.28, hi: 0.52, hit: true }
+  ];
+  var trueVal = 0.42;
+  var ciW = boxW - 40;
+  for (var ci = 0; ci < ciVals.length; ci++) {
+    var yy = ciBaseY + ci * 18;
+    var x1 = lx + 20 + ciVals[ci].lo * ciW;
+    var x2 = lx + 20 + ciVals[ci].hi * ciW;
+    var col = ciVals[ci].hit ? '#58a6ff' : '#f85149';
+    svg += '<line x1="' + x1 + '" y1="' + yy + '" x2="' + x2 + '" y2="' + yy + '" stroke="' + col + '" stroke-width="3" opacity="0.8"/>';
+    svg += '<circle cx="' + x1 + '" cy="' + yy + '" r="3" fill="' + col + '"/>';
+    svg += '<circle cx="' + x2 + '" cy="' + yy + '" r="3" fill="' + col + '"/>';
+  }
+  // True value line
+  var tvx = lx + 20 + trueVal * ciW;
+  svg += '<line x1="' + tvx + '" y1="' + (ciBaseY - 8) + '" x2="' + tvx + '" y2="' + (ciBaseY + 4 * 18 + 8) + '" stroke="#f0c040" stroke-width="1.5" stroke-dasharray="4,3"/>';
+  svg += '<text x="' + tvx + '" y="' + (ciBaseY - 12) + '" fill="#f0c040" font-size="10" text-anchor="middle" font-family="Patrick Hand">True θ</text>';
+
+  // Bayesian CrI (right)
+  var rx2 = lx + boxW + 40;
+  svg += '<rect x="' + rx2 + '" y="' + by + '" width="' + boxW + '" height="' + boxH + '" fill="#161b22" stroke="#f0c040" stroke-width="1.5" rx="10"/>';
+  svg += '<text x="' + (rx2 + boxW/2) + '" y="' + (by + 25) + '" fill="#f0c040" font-size="14" text-anchor="middle" font-family="Permanent Marker">95% Credible Interval</text>';
+  svg += '<text x="' + (rx2 + boxW/2) + '" y="' + (by + 55) + '" fill="#e6edf3" font-size="12" text-anchor="middle" font-family="Patrick Hand">"There is a 95% probability</text>';
+  svg += '<text x="' + (rx2 + boxW/2) + '" y="' + (by + 73) + '" fill="#e6edf3" font-size="12" text-anchor="middle" font-family="Patrick Hand">that the true parameter</text>';
+  svg += '<text x="' + (rx2 + boxW/2) + '" y="' + (by + 91) + '" fill="#e6edf3" font-size="12" text-anchor="middle" font-family="Patrick Hand">lies within this interval."</text>';
+
+  // Posterior curve with shaded region
+  var curveY = by + 115;
+  var curveH = 80;
+  var curveW = boxW - 40;
+  var cx = rx2 + 20;
+  // Simple bell-like shape
+  var pathTop = 'M' + cx + ' ' + (curveY + curveH);
+  for (var k = 0; k <= 50; k++) {
+    var t = k / 50;
+    var xp = cx + t * curveW;
+    var bell = Math.exp(-0.5 * Math.pow((t - 0.45) / 0.15, 2));
+    var yp = curveY + curveH - bell * curveH * 0.9;
+    pathTop += ' L' + rf(xp, 1) + ' ' + rf(yp, 1);
+  }
+  pathTop += ' L' + (cx + curveW) + ' ' + (curveY + curveH);
+  svg += '<path d="' + pathTop + '" fill="none" stroke="#f0c040" stroke-width="2"/>';
+
+  // Shaded 95% region
+  var shadePath = '';
+  var started = false;
+  for (var k2 = 0; k2 <= 50; k2++) {
+    var t2 = k2 / 50;
+    if (t2 >= 0.15 && t2 <= 0.75) {
+      var xp2 = cx + t2 * curveW;
+      var bell2 = Math.exp(-0.5 * Math.pow((t2 - 0.45) / 0.15, 2));
+      var yp2 = curveY + curveH - bell2 * curveH * 0.9;
+      if (!started) { shadePath = 'M' + rf(xp2, 1) + ' ' + (curveY + curveH); started = true; }
+      shadePath += ' L' + rf(xp2, 1) + ' ' + rf(yp2, 1);
+    }
+  }
+  shadePath += ' L' + rf(cx + 0.75 * curveW, 1) + ' ' + (curveY + curveH) + ' Z';
+  svg += '<path d="' + shadePath + '" fill="#f0c040" opacity="0.15"/>';
+  svg += '<text x="' + (cx + 0.45 * curveW) + '" y="' + (curveY + curveH + 15) + '" fill="#f0c040" font-size="10" text-anchor="middle" font-family="Patrick Hand">95% of posterior mass</text>';
+
+  svg += '</svg>';
+  return svg;
+}
+
+
+// ===== STEP 0: INTRODUCTION =====
+function step0() {
+  return '<div class="step-title">Step 0: The Oracle of the Norns</div>' +
+
+  '<p style="font-size:1.1rem; margin-bottom:18px;">At the roots of Yggdrasil, the three Norns \x96 <span class="hl-gold">Urd</span> (the past), <span class="hl-blue">Verdandi</span> (the present), and <span class="hl-purple">Skuld</span> (the future) \x96 weave the threads of fate. But even the Norns do not weave blindly. They carry <strong>prior knowledge</strong> about each thread, and as new events unfold, they <strong>update</strong> their tapestry.</p>' +
+
+  '<p>This is the essence of <span class="hl-gold">Bayesian inference</span>: start with what you believe, observe new evidence, and update your belief accordingly.</p>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'Welcome to Realm 18, apprentice. Today we learn the ancient art of the Norns \x96 how to weave prior belief and evidence into a tapestry of updated knowledge. This is <strong>Bayesian thinking</strong>, and it changes everything you thought you knew about probability.') +
+
+  dialogue('thor', '🔨 Thorment', 'Bah! I don\x27t need priors. I smash my data with a p-value hammer and call it a day. Why complicate things?') +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'Because your hammer only tells you how <em>surprising</em> the data would be if the null were true. The Norns\x27 loom tells you how <em>probable</em> your hypothesis is, given what you\x27ve actually seen. That\x27s a very different question.') +
+
+  '<div class="concept-grid">' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--odin-blue)">🎯 Prior Belief</h4>' +
+      '<p>What you know <em>before</em> seeing data. Your starting point on the tapestry.</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--gold)">🔭 Evidence (Data)</h4>' +
+      '<p>New observations that inform and shift your belief.</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--success)">⚙️ Updating Rule</h4>' +
+      '<p>Bayes\x27 theorem: the mathematical loom that combines prior + data.</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--corvo-purple)">🌟 Posterior Belief</h4>' +
+      '<p>Your <em>updated</em> belief after seeing the evidence. The new tapestry.</p>' +
+    '</div>' +
+  '</div>' +
+
+  dialogue('corvo', '🪶 Muninn remembers:', 'The Reverend Thomas Bayes (1701\x961761) never published his theorem. It was found in his papers after death and published by Richard Price in 1763. Pierre-Simon Laplace independently developed it further. The Norns work in mysterious ways.') +
+
+  '<p>By the end of this realm, you will be able to:</p>' +
+  '<ul style="margin:10px 0 10px 24px;">' +
+    '<li>Explain the difference between <strong>frequentist</strong> and <strong>Bayesian</strong> probability</li>' +
+    '<li>Apply <strong>Bayes\x27 theorem</strong> to real problems</li>' +
+    '<li>Understand <strong>priors, likelihoods, and posteriors</strong></li>' +
+    '<li>Interpret <strong>credible intervals</strong> and <strong>Bayes factors</strong></li>' +
+    '<li>Know when Bayesian methods have a clear advantage</li>' +
+  '</ul>';
+}
+
+
+// ===== STEP 1: FREQUENTIST VS. BAYESIAN =====
+function step1() {
+  return '<div class="step-title">Step 1: Two Philosophies of Probability</div>' +
+
+  '<p>Before we touch the loom, we must understand a fundamental divide in statistics. Two camps have debated the <em>meaning</em> of probability for centuries:</p>' +
+
+  '<div class="step-subtitle">🎲 Frequentist: Probability as Long-Run Frequency</div>' +
+  '<p>For a frequentist, probability is the <strong>relative frequency</strong> of an event over infinite repetitions. Saying "the probability of heads is 0.5" means: <em>if you flipped this coin forever, half would be heads</em>. Parameters are fixed but unknown; data are random.</p>' +
+
+  '<div class="step-subtitle">🧠 Bayesian: Probability as Degree of Belief</div>' +
+  '<p>For a Bayesian, probability expresses <strong>uncertainty</strong> about unknown quantities. Saying "the probability this oracle is genuine is 0.39" means: <em>given what I\x27ve seen, I\x27m 39% confident she\x27s real</em>. Parameters have distributions; data are fixed once observed.</p>' +
+
+  dialogue('thor', '🔨 Thorment', 'Degree of belief?! That sounds like <em>opinion</em> dressed up in math. At least frequencies are objective!') +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'And yet your "objective" p-value can\x27t tell you P(H|data) \x96 the probability of your hypothesis given the data. Only Bayes can do that. Objectivity is a noble goal, but answering the <em>right question</em> matters more.') +
+
+  '<table class="data-table">' +
+    '<tr>' +
+      '<th>Dimension</th>' +
+      '<th style="color:var(--odin-blue)">Frequentist</th>' +
+      '<th style="color:var(--gold)">Bayesian</th>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Probability means</td>' +
+      '<td>Long-run frequency</td>' +
+      '<td>Degree of belief / uncertainty</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Parameters are</td>' +
+      '<td>Fixed (unknown constants)</td>' +
+      '<td>Random variables with distributions</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Data are</td>' +
+      '<td>Random (could vary on replication)</td>' +
+      '<td>Fixed (once observed)</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Prior information</td>' +
+      '<td>Not formally used</td>' +
+      '<td>Explicitly incorporated</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Main tool</td>' +
+      '<td>P-value, confidence interval</td>' +
+      '<td>Posterior distribution, credible interval</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Answers the question</td>' +
+      '<td>P(data | H₀)</td>' +
+      '<td>P(H | data)</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Multiple comparisons</td>' +
+      '<td>Requires adjustment</td>' +
+      '<td>Handled naturally via hierarchy</td>' +
+    '</tr>' +
+  '</table>' +
+
+  dialogue('corvo', '🪶 Huginn challenges:', 'Neither philosophy is "better" in all situations. The real question is: which one answers <em>your</em> research question more directly? If you want to know "how probable is my hypothesis?" you need the Bayesian loom. If you want "how surprising is this data under the null?" the frequentist hammer will do.') +
+
+  '<div class="warning-box">' +
+    '<div class="warning-title">⚠️ Thorment\x27s Trap: The Inverse Probability Fallacy</div>' +
+    '<p>Many researchers <em>interpret</em> frequentist results as if they were Bayesian: "there\x27s a 95% chance the true mean is in this CI." That\x27s <strong>wrong</strong> in frequentist terms! Only the Bayesian credible interval gives you that direct probabilistic statement.</p>' +
+  '</div>';
+}
+
+
+// ===== STEP 2: BAYES' THEOREM =====
+function step2() {
+  return '<div class="step-title">Step 2: Bayes\x27 Theorem \x96 The Loom\x27s Formula</div>' +
+
+  '<p>The engine of Bayesian inference fits in a single, elegant equation. Every thread of the Norns\x27 tapestry follows this rule:</p>' +
+
+  '<div class="formula">' +
+    '<div class="formula-label">Bayes\x27 Theorem</div>' +
+    'P(H | D) = P(D | H) × P(H) / P(D)' +
+  '</div>' +
+
+  '<p>Let\x27s label each piece:</p>' +
+
+  '<div class="concept-grid">' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--gold)">P(H | D) \x96 Posterior</h4>' +
+      '<p>Probability of the hypothesis <em>after</em> seeing the data. This is what we want.</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--success)">P(D | H) \x96 Likelihood</h4>' +
+      '<p>Probability of observing the data <em>if</em> the hypothesis is true. How well does H predict D?</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--odin-blue)">P(H) \x96 Prior</h4>' +
+      '<p>Probability of the hypothesis <em>before</em> seeing data. Your starting belief.</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--corvo-purple)">P(D) \x96 Evidence</h4>' +
+      '<p>Total probability of the data under <em>all</em> hypotheses. The normalizing constant.</p>' +
+    '</div>' +
+  '</div>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'Think of it this way: the <span class="hl-blue">Prior</span> is where you start. The <span class="hl-green">Likelihood</span> is the bridge between your hypothesis and the data. The <span class="hl-purple">Evidence</span> makes sure everything sums to 1. And the <span class="hl-gold">Posterior</span> is your destination \x96 updated belief.') +
+
+  '<p>P(D), the evidence, can be expanded using the <strong>law of total probability</strong>:</p>' +
+
+  '<div class="formula">' +
+    '<div class="formula-label">Law of Total Probability (binary case)</div>' +
+    'P(D) = P(D | H) × P(H) + P(D | ¬H) × P(¬H)' +
+  '</div>' +
+
+  '<p>So P(D) accounts for <em>all possible ways</em> the data could arise \x96 under H and under not-H. This ensures the posterior is a proper probability.</p>' +
+
+  dialogue('thor', '🔨 Thorment', 'Fine, a fraction. Numerator times prior, denominator sums everything up. How hard can it be?') +
+
+  dialogue('corvo', '🪶 Huginn challenges:', 'Harder than it looks, Thorment. The real difficulty is in <em>choosing the prior</em> and <em>computing P(D)</em> for complex models. That\x27s why Bayesian methods needed 250 years and modern computers to become practical.') +
+
+  '<div class="correct-box">' +
+    '<div class="correct-title">✅ The Proportionality Shortcut</div>' +
+    '<p>Since P(D) is just a constant (it doesn\x27t depend on H), many Bayesian analyses write:</p>' +
+    '<p style="text-align:center; font-size:1.15rem; color:var(--gold); margin:10px 0;"><strong>Posterior ∝ Likelihood × Prior</strong></p>' +
+    '<p>The ∝ symbol means "proportional to." The shape of the posterior is entirely determined by the likelihood and the prior. P(D) just rescales it to sum to 1.</p>' +
+  '</div>';
+}
+
+
+// ===== STEP 3: A NORSE EXAMPLE =====
+function step3() {
+  return '<div class="step-title">Step 3: The Norn Oracle \x96 A Worked Example</div>' +
+
+  '<p>Let\x27s put Bayes\x27 theorem to work with a concrete problem from the Nine Realms.</p>' +
+
+  '<div class="apa-box">' +
+    '<div class="apa-label">🔮 The Problem</div>' +
+    '<p style="font-style:normal;">A Norn oracle in Midgard claims she can predict battle outcomes. You want to know: <strong>is she genuinely gifted, or merely guessing?</strong></p>' +
+    '<ul style="margin:10px 0 0 20px; font-style:normal;">' +
+      '<li><strong>Prior:</strong> Only 10% of self-proclaimed oracles are genuine. P(Genuine) = 0.10</li>' +
+      '<li><strong>Genuine oracles</strong> predict battles correctly 90% of the time. P(Correct | Genuine) = 0.90</li>' +
+      '<li><strong>False oracles</strong> predict correctly 50% of the time (coin flip). P(Correct | False) = 0.50</li>' +
+      '<li><strong>Observation:</strong> She predicted 3 out of 3 battles correctly.</li>' +
+    '</ul>' +
+  '</div>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'Let\x27s define our terms. H = "the oracle is genuine." D = "3 correct predictions in 3 trials." We need P(H | D).') +
+
+  '<div class="step-subtitle">Step-by-Step Calculation</div>' +
+
+  '<p><strong>1. Define the prior:</strong></p>' +
+  '<div class="formula">' +
+    '<div class="formula-label">Prior</div>' +
+    'P(H) = 0.10 &nbsp;&nbsp;&nbsp; P(¬H) = 0.90' +
+  '</div>' +
+
+  '<p><strong>2. Calculate the likelihood (probability of 3/3 correct):</strong></p>' +
+  '<div class="formula">' +
+    '<div class="formula-label">Likelihood if Genuine</div>' +
+    'P(D | H) = 0.90³ = 0.729' +
+  '</div>' +
+  '<div class="formula">' +
+    '<div class="formula-label">Likelihood if False</div>' +
+    'P(D | ¬H) = 0.50³ = 0.125' +
+  '</div>' +
+
+  '<p><strong>3. Calculate the total evidence P(D):</strong></p>' +
+  '<div class="formula">' +
+    '<div class="formula-label">Total Evidence</div>' +
+    'P(D) = P(D|H) × P(H) + P(D|¬H) × P(¬H)<br>' +
+    'P(D) = 0.729 × 0.10 + 0.125 × 0.90<br>' +
+    'P(D) = 0.0729 + 0.1125 = <span class="hl-gold">0.1854</span>' +
+  '</div>' +
+
+  '<p><strong>4. Apply Bayes\x27 theorem:</strong></p>' +
+  '<div class="formula">' +
+    '<div class="formula-label">Posterior</div>' +
+    'P(H | D) = P(D|H) × P(H) / P(D)<br>' +
+    'P(H | D) = 0.729 × 0.10 / 0.1854<br>' +
+    'P(H | D) = 0.0729 / 0.1854 ≈ <span class="hl-gold" style="font-size:1.3rem">0.393</span>' +
+  '</div>' +
+
+  '<table class="data-table">' +
+    '<tr><th>Component</th><th>Symbol</th><th>Value</th><th>Meaning</th></tr>' +
+    '<tr><td>Prior</td><td>P(H)</td><td class="hl-blue">0.100</td><td>10% believed genuine before data</td></tr>' +
+    '<tr><td>Likelihood (H)</td><td>P(D|H)</td><td class="hl-green">0.729</td><td>Genuine oracle: 72.9% chance of 3/3</td></tr>' +
+    '<tr><td>Likelihood (¬H)</td><td>P(D|¬H)</td><td class="hl-red">0.125</td><td>Fake oracle: 12.5% chance of 3/3</td></tr>' +
+    '<tr><td>Evidence</td><td>P(D)</td><td class="hl-purple">0.1854</td><td>Overall chance of seeing 3/3</td></tr>' +
+    '<tr><td>Posterior</td><td>P(H|D)</td><td class="hl-gold">0.393</td><td>39.3% believed genuine after data</td></tr>' +
+  '</table>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'Look at the power of updating: we started at <span class="hl-blue">10%</span> and jumped to <span class="hl-gold">39.3%</span> after just three observations. The data nearly quadrupled our confidence. But we\x27re still <em>not</em> convinced \x96 the prior was very skeptical, and three trials are few.') +
+
+  dialogue('thor', '🔨 Thorment', 'Only 39%? She got 3 out of 3 right! I\x27d hire her on the spot.') +
+
+  dialogue('corvo', '🪶 Huginn challenges:', 'And that\x27s exactly why you keep losing bets, Thorment. 3/3 is also achievable by chance \x96 a coin flipper has a 12.5% chance of that. The prior tells us most self-proclaimed oracles are fakes. Bayes balances <em>both</em> pieces of information.');
+}
+
+
+// ===== STEP 4: PRIOR DISTRIBUTIONS =====
+function step4() {
+  return '<div class="step-title">Step 4: Prior Distributions \x96 Choosing Your Starting Thread</div>' +
+
+  '<p>The prior is the most debated element of Bayesian inference. It encodes what you know (or assume) <em>before</em> seeing data. Choosing wisely is both an art and a science.</p>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'The prior is not a weakness \x96 it\x27s a feature. It lets you formally incorporate existing knowledge. The key is to be <strong>transparent</strong> about your choice and test its influence.') +
+
+  '<div class="concept-grid">' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--text-dim)">Flat / Uniform Prior</h4>' +
+      '<p>"I know nothing." Every value is equally likely. Sounds objective, but can be <strong>surprisingly informative</strong> in disguise.</p>' +
+      '<p style="font-size:0.9rem; color:var(--text-dim)">Example: Uniform(0, 1) for a probability parameter</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--odin-blue)">Weakly Informative Prior</h4>' +
+      '<p>"I have a rough sense of the scale." Regularizes extreme values without dominating the data. <strong>Recommended default.</strong></p>' +
+      '<p style="font-size:0.9rem; color:var(--text-dim)">Example: Normal(0, 10) for a regression coefficient</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--gold)">Informative Prior</h4>' +
+      '<p>"Previous research tells me the effect is around here." Uses published results or expert knowledge. Powerful when justified.</p>' +
+      '<p style="font-size:0.9rem; color:var(--text-dim)">Example: Normal(0.5, 0.2) based on a meta-analysis</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--thor-red)">Skeptical Prior</h4>' +
+      '<p>"I doubt this effect exists." Centers on zero/null. Used to be <em>conservative</em> \x96 an effect must overcome skepticism to survive.</p>' +
+      '<p style="font-size:0.9rem; color:var(--text-dim)">Example: Normal(0, 0.5) centered at no effect</p>' +
+    '</div>' +
+  '</div>' +
+
+  dialogue('thor', '🔨 Thorment', 'So you just pick whatever prior makes your result look good? This is why I don\x27t trust Bayesians!') +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'No. You <strong>declare</strong> your prior transparently, <strong>justify</strong> it, and run a <strong>sensitivity analysis</strong> to show your conclusions hold across reasonable alternatives. If the posterior changes drastically with different priors, the data are not informative enough \x96 and that\x27s important to know.') +
+
+  '<div class="correct-box">' +
+    '<div class="correct-title">✅ Prior Sensitivity Analysis</div>' +
+    '<p>A good Bayesian analysis always asks: "Would my conclusions change if I used a different prior?" Run the analysis with at least 2\x963 different priors (e.g., flat, weakly informative, skeptical). If the posterior is robust, the data are speaking loudly. If it\x27s fragile, report that honestly.</p>' +
+  '</div>' +
+
+  dialogue('corvo', '🪶 Muninn remembers:', 'As sample size grows, the likelihood dominates the prior. With enough data, two analysts with <em>wildly different</em> priors will converge to nearly the same posterior. This is the <strong>Bayesian consistency theorem</strong> \x96 the data eventually overwhelm any reasonable prior.') +
+
+  '<div class="warning-box">' +
+    '<div class="warning-title">⚠️ Thorment\x27s Trap: The "Non-Informative" Illusion</div>' +
+    '<p>A flat prior on an unbounded parameter (like a mean) is <strong>improper</strong> \x96 it doesn\x27t integrate to 1. It can sometimes produce valid posteriors, but can also cause problems. And a "flat" prior on one scale (e.g., probability) is <em>not</em> flat on a transformed scale (e.g., log-odds). True non-informativeness is harder than it seems.</p>' +
+  '</div>';
+}
+
+
+// ===== STEP 5: LIKELIHOOD =====
+function step5() {
+  return '<div class="step-title">Step 5: Likelihood \x96 The Bridge Between Worlds</div>' +
+
+  '<p>The <span class="hl-green">likelihood function</span> P(D | θ) is the bridge connecting your hypothesized parameter value θ to the observed data D. It asks: <em>if θ were the true value, how probable is the data I actually saw?</em></p>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'The likelihood is not a probability distribution over θ \x96 it\x27s a function of θ that tells you how well each possible value <em>explains</em> the data. The same function appears in frequentist maximum likelihood estimation. Bayesians just multiply it by the prior.') +
+
+  '<div class="step-subtitle">🔗 Likelihood in the Oracle Example</div>' +
+
+  '<p>Suppose θ = probability the oracle predicts correctly. We observed 3 correct out of 3 trials. The likelihood is:</p>' +
+
+  '<div class="formula">' +
+    '<div class="formula-label">Binomial Likelihood</div>' +
+    'L(θ) = P(3 correct | θ) = θ³' +
+  '</div>' +
+
+  '<table class="data-table">' +
+    '<tr><th>θ</th><th>L(θ) = θ³</th><th>Interpretation</th></tr>' +
+    '<tr><td>0.10</td><td>0.001</td><td>Very unlikely to get 3/3 if θ=0.10</td></tr>' +
+    '<tr><td>0.30</td><td>0.027</td><td>Still quite unlikely</td></tr>' +
+    '<tr><td>0.50</td><td>0.125</td><td>Possible (coin flip)</td></tr>' +
+    '<tr><td>0.70</td><td>0.343</td><td>Reasonably likely</td></tr>' +
+    '<tr><td>0.90</td><td>0.729</td><td>Very likely</td></tr>' +
+    '<tr><td>1.00</td><td>1.000</td><td>Certain (but is θ=1 realistic?)</td></tr>' +
+  '</table>' +
+
+  '<p>The likelihood peaks at θ = 1.0 (the <strong>maximum likelihood estimate</strong>). But the prior tempers this \x96 Bayes doesn\x27t just go with the data\x27s favorite value; it weighs it against what\x27s plausible <em>a priori</em>.</p>' +
+
+  dialogue('thor', '🔨 Thorment', 'So the MLE says she\x27s perfect! I\x27d go with θ=1 all day.') +
+
+  dialogue('corvo', '🪶 Huginn challenges:', 'With only 3 trials? The MLE is maximally overconfident here. With n=3, the MLE of a coin that landed 3 heads is "always heads." That\x27s absurd. The prior rescues us from small-sample overreaction.') +
+
+  '<div class="correct-box">' +
+    '<div class="correct-title">✅ Key Insight: Likelihood × Prior = Posterior Shape</div>' +
+    '<p>Where both the likelihood and the prior are high, the posterior will be high. Where either is near zero, the posterior drops. The posterior is a <strong>compromise</strong> between what the data say (likelihood) and what you expected (prior). With more data, the compromise tilts toward the likelihood.</p>' +
+  '</div>';
+}
+
+
+// ===== STEP 6: POSTERIOR DISTRIBUTION =====
+function step6() {
+  return '<div class="step-title">Step 6: The Posterior \x96 Your Updated Tapestry</div>' +
+
+  '<p>The <span class="hl-gold">posterior distribution</span> P(θ | D) is the crown jewel of Bayesian analysis. It represents your <em>complete updated knowledge</em> about the parameter after seeing data. Not a single number \x96 an entire distribution.</p>' +
+
+  '<div class="formula">' +
+    '<div class="formula-label">The Bayesian Update</div>' +
+    'Posterior ∝ Likelihood × Prior' +
+  '</div>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'The posterior is not just a point estimate. It tells you the most likely value, <em>and</em> how uncertain you are about it, <em>and</em> the full shape of your updated belief. It\x27s the entire tapestry, not just one thread.') +
+
+  '<div class="visual-container">' + buildPriorPosteriorSVG() + '</div>' +
+
+  '<p>The visualization above shows how the data shift the distribution. The <span class="hl-blue">dashed blue curve</span> is the prior (concentrated near low values of θ, reflecting skepticism about oracles). The <span class="hl-gold">solid gold curve</span> is the posterior \x96 shifted rightward by the evidence of three correct predictions.</p>' +
+
+  '<div class="concept-grid">' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--odin-blue)">Strong Prior, Weak Data</h4>' +
+      '<p>If the prior is very informative and data are few, the posterior stays close to the prior. The prior dominates.</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--gold)">Weak Prior, Strong Data</h4>' +
+      '<p>With a vague prior and lots of data, the posterior is driven by the likelihood. Data dominate.</p>' +
+    '</div>' +
+  '</div>' +
+
+  dialogue('thor', '🔨 Thorment', 'So the answer is always "somewhere in between?" That\x27s wishy-washy. I want a single number!') +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'You can extract point estimates from the posterior: the <strong>posterior mean</strong>, <strong>posterior median</strong>, or <strong>MAP</strong> (maximum a posteriori \x96 the peak). But the full distribution carries richer information than any single number ever could.') +
+
+  dialogue('corvo', '🪶 Muninn remembers:', 'For <strong>conjugate</strong> prior-likelihood pairs, the posterior has a known closed-form distribution. Beta-Binomial is the classic: Beta prior + Binomial likelihood = Beta posterior. For complex models, we use <strong>MCMC</strong> (Markov Chain Monte Carlo) to sample from the posterior numerically.');
+}
+
+
+// ===== STEP 7: SEQUENTIAL UPDATING =====
+function step7() {
+  return '<div class="step-title">Step 7: Sequential Updating \x96 The Ever-Weaving Loom</div>' +
+
+  '<p>One of the most elegant features of Bayesian inference: <span class="hl-gold">today\x27s posterior becomes tomorrow\x27s prior</span>. As new data arrive, you simply update again. The Norns never stop weaving.</p>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'This is sequential updating, and it\x27s mathematically equivalent to using all the data at once. Whether you process observations one at a time or all together, you reach the same posterior. That\x27s a beautiful property.') +
+
+  '<div class="step-subtitle">🔄 The Oracle, Round by Round</div>' +
+
+  '<p>Let\x27s watch the Norn oracle example unfold one prediction at a time. We start with P(Genuine) = 0.10.</p>' +
+
+  '<table class="data-table">' +
+    '<tr>' +
+      '<th>Round</th>' +
+      '<th>Observation</th>' +
+      '<th>Prior P(H)</th>' +
+      '<th>Likelihood Ratio</th>' +
+      '<th>Posterior P(H|D)</th>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>0</td>' +
+      '<td>\x96 (no data yet)</td>' +
+      '<td class="hl-blue">0.100</td>' +
+      '<td>\x96</td>' +
+      '<td class="hl-blue">0.100</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>1</td>' +
+      '<td>✅ Correct</td>' +
+      '<td>0.100</td>' +
+      '<td>0.90 / 0.50 = 1.80</td>' +
+      '<td class="hl-gold">0.167</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>2</td>' +
+      '<td>✅ Correct</td>' +
+      '<td>0.167</td>' +
+      '<td>0.90 / 0.50 = 1.80</td>' +
+      '<td class="hl-gold">0.265</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>3</td>' +
+      '<td>✅ Correct</td>' +
+      '<td>0.265</td>' +
+      '<td>0.90 / 0.50 = 1.80</td>' +
+      '<td class="hl-gold">0.393</td>' +
+    '</tr>' +
+  '</table>' +
+
+  '<p>Each correct prediction multiplies the <strong>prior odds</strong> by the <strong>likelihood ratio</strong> (0.90/0.50 = 1.80). After three rounds, we reach the same 0.393 we computed earlier \x96 confirming that sequential updating and batch updating are equivalent.</p>' +
+
+  '<div class="visual-container">' + buildSequentialSVG() + '</div>' +
+
+  '<p>The distributions above show the belief curve shifting rightward with each new piece of evidence. Notice how the curves also become <em>narrower</em> \x96 as more data accumulate, uncertainty decreases.</p>' +
+
+  dialogue('thor', '🔨 Thorment', 'Wait \x96 if I can just keep updating, does that mean I can stop collecting data whenever the result looks good?') +
+
+  dialogue('corvo', '🪶 Huginn challenges:', 'Actually, Bayesian sequential updating does <strong>not</strong> inflate Type I error the way optional stopping does in frequentist NHST. The posterior is valid at any stopping point. <em>However</em>, this doesn\x27t mean you should stop when results favor you \x96 that\x27s still scientifically dubious. Pre-registering your stopping rule remains good practice.') +
+
+  '<div class="correct-box">' +
+    '<div class="correct-title">✅ Practical Implication</div>' +
+    '<p>Sequential updating is why Bayesian methods excel in:</p>' +
+    '<ul style="margin:8px 0 0 20px">' +
+      '<li><strong>Clinical trials</strong> \x96 update as patients enroll, stop when evidence is sufficient</li>' +
+      '<li><strong>A/B testing</strong> \x96 monitor results continuously without peeking penalties</li>' +
+      '<li><strong>Sensor data</strong> \x96 real-time updating of estimates as readings arrive</li>' +
+    '</ul>' +
+  '</div>';
+}
+
+
+// ===== STEP 8: CREDIBLE VS CONFIDENCE INTERVALS =====
+function step8() {
+  return '<div class="step-title">Step 8: Credible Intervals vs. Confidence Intervals</div>' +
+
+  '<p>Here lies one of the most important (and most confused) distinctions in all of statistics. Both give you a range of plausible values, but they mean <em>fundamentally different things</em>.</p>' +
+
+  '<div class="visual-container">' + buildCrIvsCISVG() + '</div>' +
+
+  '<table class="data-table">' +
+    '<tr>' +
+      '<th>Feature</th>' +
+      '<th style="color:var(--odin-blue)">95% Confidence Interval</th>' +
+      '<th style="color:var(--gold)">95% Credible Interval</th>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Interpretation</td>' +
+      '<td>95% of CIs from repeated experiments would contain θ</td>' +
+      '<td>95% probability that θ is in this interval</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Probability statement about θ?</td>' +
+      '<td class="hl-red">No (θ is fixed)</td>' +
+      '<td class="hl-green">Yes (θ has a distribution)</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Depends on prior?</td>' +
+      '<td>No</td>' +
+      '<td>Yes</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>With flat prior</td>' +
+      '<td>n/a</td>' +
+      '<td>Numerically similar to CI</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Can I say "95% chance θ is here"?</td>' +
+      '<td class="hl-red">No!</td>' +
+      '<td class="hl-green">Yes!</td>' +
+    '</tr>' +
+  '</table>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'The Bayesian <span class="hl-gold">95% credible interval</span> (CrI) gives you what most researchers <em>think</em> a confidence interval means: "there is a 95% probability the parameter lies in this range." The CI technically only says something about the long-run procedure, not <em>this specific</em> interval.') +
+
+  dialogue('thor', '🔨 Thorment', 'Everyone interprets CIs as credible intervals anyway. What\x27s the practical difference?') +
+
+  dialogue('corvo', '🪶 Huginn challenges:', 'When the sample is large and the prior is weak, they often give similar numbers. But the conceptual difference is huge: the CrI makes a direct probability statement about the parameter. That\x27s the question researchers actually want answered.') +
+
+  '<div class="step-subtitle">🎯 Highest Density Interval (HDI)</div>' +
+  '<p>The most common Bayesian interval is the <strong>HDI</strong> (Highest Density Interval): the shortest interval that contains 95% of the posterior mass. Every point inside the HDI has higher posterior density than any point outside it.</p>' +
+
+  '<div class="warning-box">' +
+    '<div class="warning-title">⚠️ Thorment\x27s Trap: Misinterpreting the CI</div>' +
+    '<p>Saying "there is a 95% probability the true mean is between 2.3 and 5.1" about a <em>frequentist</em> CI is incorrect. The true mean is either in the interval or not \x96 you just don\x27t know. The 95% refers to the <em>method\x27s</em> hit rate, not this particular interval.</p>' +
+  '</div>';
+}
+
+
+// ===== STEP 9: BAYES FACTOR =====
+function step9() {
+  return '<div class="step-title">Step 9: The Bayes Factor \x96 Weighing Evidence Between Hypotheses</div>' +
+
+  '<p>While the posterior distribution tells you about parameter values, the <span class="hl-gold">Bayes Factor</span> (BF) tells you how much the data support one <em>model</em> (or hypothesis) over another.</p>' +
+
+  '<div class="formula">' +
+    '<div class="formula-label">Bayes Factor</div>' +
+    'BF₁₀ = P(D | H₁) / P(D | H₀)' +
+  '</div>' +
+
+  '<p>BF₁₀ = 5 means: "the data are <strong>5 times more likely</strong> under H₁ than under H₀." Unlike p-values, the BF can provide evidence <em>for</em> the null hypothesis (when BF < 1).</p>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'This is a critical advantage. A p-value can only reject or fail to reject H₀. A Bayes Factor can quantify evidence <em>in favor of</em> H₀. In our oracle example:') +
+
+  '<div class="formula">' +
+    '<div class="formula-label">Oracle Example</div>' +
+    'BF₁₀ = P(D | Genuine) / P(D | Fake) = 0.729 / 0.125 = <span class="hl-gold" style="font-size:1.3rem">5.83</span>' +
+  '</div>' +
+
+  '<p>The data are 5.83 times more likely if the oracle is genuine than if she\x27s a fake. That\x27s <strong>moderate evidence</strong> according to Jeffreys\x27 scale:</p>' +
+
+  '<div class="visual-container">' + buildBayesFactorSVG() + '</div>' +
+
+  '<table class="data-table">' +
+    '<tr><th>BF₁₀ Range</th><th>Evidence Category</th><th>Interpretation</th></tr>' +
+    '<tr><td>1 \x96 3</td><td style="color:var(--text-dim)">Anecdotal</td><td>Barely worth mentioning</td></tr>' +
+    '<tr><td>3 \x96 10</td><td style="color:var(--odin-blue)">Moderate</td><td>Noticeable but not decisive</td></tr>' +
+    '<tr><td>10 \x96 30</td><td style="color:var(--corvo-purple)">Strong</td><td>Compelling evidence</td></tr>' +
+    '<tr><td>30 \x96 100</td><td style="color:var(--gold)">Very Strong</td><td>Hard to dispute</td></tr>' +
+    '<tr><td>> 100</td><td style="color:var(--thor-red)">Extreme</td><td>Decisive, overwhelming</td></tr>' +
+  '</table>' +
+
+  dialogue('thor', '🔨 Thorment', 'So BF = 5.83 is just "moderate"? With my p-value hammer I\x27d get p < 0.05 and call it significant!') +
+
+  dialogue('corvo', '🪶 Huginn challenges:', 'Exactly the problem, Thorment. The BF is more honest about the strength of evidence. "Moderate" is often all we have. And notice: BF₁₀ < 1 (e.g., BF = 0.2) means the data favor H₀. You can report BF₀₁ = 1/0.2 = 5 for evidence <em>supporting</em> the null. P-values can\x27t do this.') +
+
+  '<div class="correct-box">' +
+    '<div class="correct-title">✅ BF and Posterior Odds</div>' +
+    '<p>The Bayes Factor connects prior odds to posterior odds:</p>' +
+    '<p style="text-align:center; font-size:1.1rem; color:var(--gold); margin:8px 0;"><strong>Posterior Odds = BF × Prior Odds</strong></p>' +
+    '<p>In our oracle example: Prior odds = 0.10/0.90 = 0.111. Posterior odds = 5.83 × 0.111 = 0.648. Posterior probability = 0.648 / (1 + 0.648) = 0.393. Same answer as before!</p>' +
+  '</div>';
+}
+
+
+// ===== STEP 10: PRACTICAL APPLICATIONS =====
+function step10() {
+  return '<div class="step-title">Step 10: When to Reach for the Bayesian Loom</div>' +
+
+  '<p>Bayesian methods are not always necessary \x96 but in certain situations, they offer clear advantages. Here\x27s when the Norns\x27 loom outperforms the frequentist hammer.</p>' +
+
+  '<div class="concept-grid">' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--gold)">📊 Small Samples</h4>' +
+      '<p>With n < 30, frequentist methods lose power and CIs become wide. Bayesian priors can <strong>regularize</strong> estimates and yield more stable inference.</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--odin-blue)">🔄 Sequential Data</h4>' +
+      '<p>Data arriving over time? Bayesian updating processes each observation naturally. No need for correction due to multiple looks.</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--success)">🧠 Incorporating Prior Knowledge</h4>' +
+      '<p>When previous studies or expert opinion exist, ignoring them is wasteful. Bayesian methods use priors to <strong>accumulate knowledge</strong> formally.</p>' +
+    '</div>' +
+    '<div class="concept-card">' +
+      '<h4 style="color:var(--corvo-purple)">🏗️ Complex Hierarchical Models</h4>' +
+      '<p>Multi-level models, latent variables, missing data \x96 Bayesian computation (MCMC) handles these naturally, often more flexibly than MLE.</p>' +
+    '</div>' +
+  '</div>' +
+
+  '<div class="step-subtitle">⚖️ Head-to-Head Comparison</div>' +
+
+  '<table class="data-table">' +
+    '<tr>' +
+      '<th>Scenario</th>' +
+      '<th style="color:var(--odin-blue)">NHST / Frequentist</th>' +
+      '<th style="color:var(--gold)">Bayesian</th>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Large sample, simple model</td>' +
+      '<td class="hl-green">Fast, well-understood</td>' +
+      '<td>Comparable results, more computation</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Small sample</td>' +
+      '<td class="hl-red">Low power, unstable</td>' +
+      '<td class="hl-green">Prior stabilizes estimates</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Evidence for H₀</td>' +
+      '<td class="hl-red">Cannot quantify</td>' +
+      '<td class="hl-green">Bayes Factor < 1</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Sequential monitoring</td>' +
+      '<td class="hl-red">Requires correction (alpha spending)</td>' +
+      '<td class="hl-green">Natural, no penalty</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Hierarchical/multilevel</td>' +
+      '<td>Possible but rigid</td>' +
+      '<td class="hl-green">Flexible, natural shrinkage</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Prior knowledge exists</td>' +
+      '<td class="hl-red">Ignored formally</td>' +
+      '<td class="hl-green">Formally incorporated</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Computational cost</td>' +
+      '<td class="hl-green">Usually fast</td>' +
+      '<td class="hl-red">MCMC can be slow</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td>Ease of communication</td>' +
+      '<td>P-values are (mis)understood</td>' +
+      '<td>Posteriors are intuitive once explained</td>' +
+    '</tr>' +
+  '</table>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'In practice, many researchers use both. Report the p-value and the Bayes Factor. Show the CI <em>and</em> the credible interval. Transparency builds trust, and multiple perspectives strengthen conclusions.') +
+
+  dialogue('thor', '🔨 Thorment', 'Fine, I\x27ll admit Bayes is useful sometimes. But I still like my hammer for quick-and-dirty ANOVA.') +
+
+  dialogue('corvo', '🪶 Huginn challenges:', 'Quick-and-dirty is how you end up in the replication crisis, Thorment. But yes \x96 for routine, large-sample, simple-model analyses, the frequentist approach works fine. Use the right tool for the right job.') +
+
+  '<div class="apa-box">' +
+    '<div class="apa-label">📝 Reporting Bayesian Results (APA-Style)</div>' +
+    '<p style="font-style:normal;">The posterior median was 0.39, 95% CrI [0.14, 0.68]. The Bayes Factor was BF₁₀ = 5.83, indicating moderate evidence for the genuine-oracle hypothesis over the null. A sensitivity analysis with a flat prior yielded similar results (posterior median = 0.41, 95% CrI [0.16, 0.71]).</p>' +
+  '</div>';
+}
+
+
+// ===== STEP 11: LESSON OF THE RAVENS =====
+function step11() {
+  return '<div class="step-title">Step 11: Lesson of the Ravens</div>' +
+
+  '<div class="licao-box">' +
+    '<div class="licao-title">🪶 Muninn Remembers \x96 Key Takeaways</div>' +
+    '<ul style="margin:8px 0 0 16px;">' +
+      '<li><strong>Bayes\x27 theorem</strong> updates prior beliefs with data to produce a posterior: P(H|D) ∝ P(D|H) × P(H)</li>' +
+      '<li><strong>Prior distributions</strong> encode existing knowledge; sensitivity analysis checks robustness</li>' +
+      '<li><strong>The posterior</strong> is a full distribution, not just a point estimate</li>' +
+      '<li><strong>Sequential updating</strong> is mathematically equivalent to batch analysis</li>' +
+      '<li><strong>Credible intervals</strong> allow direct probability statements about parameters</li>' +
+      '<li><strong>Bayes Factors</strong> quantify evidence between competing hypotheses \x96 including evidence <em>for</em> the null</li>' +
+      '<li><strong>With enough data</strong>, the prior washes out and the posterior converges</li>' +
+    '</ul>' +
+  '</div>' +
+
+  '<div class="licao-box">' +
+    '<div class="licao-title">🪶 Huginn Challenges \x96 Think Deeper</div>' +
+    '<ul style="margin:8px 0 0 16px;">' +
+      '<li>If the prior "washes out" with enough data, why does choosing it matter at all?</li>' +
+      '<li>Can a Bayesian analysis with a very strong prior ever lead you <em>more</em> astray than a frequentist analysis?</li>' +
+      '<li>If BF₁₀ = 1.5, what should you conclude? What would a p-value tell you?</li>' +
+      '<li>Why is computing P(D) \x96 the marginal likelihood \x96 so difficult for complex models?</li>' +
+      '<li>When does the Bayesian posterior and the frequentist CI give <em>exactly</em> the same answer?</li>' +
+    '</ul>' +
+  '</div>' +
+
+  '<div class="trap-grid">' +
+    '<div class="trap-card">' +
+      '<h4>⚠️ Trap 1: Prior Dominance</h4>' +
+      '<p>A very strong prior can overwhelm small datasets. Always run a <strong>sensitivity analysis</strong> to verify your conclusions aren\x27t driven by the prior alone.</p>' +
+    '</div>' +
+    '<div class="trap-card">' +
+      '<h4>⚠️ Trap 2: Computational Complexity</h4>' +
+      '<p>For complex models, MCMC can be slow, fail to converge, or get stuck. Diagnostics (R-hat, effective sample size, trace plots) are <strong>mandatory</strong>.</p>' +
+    '</div>' +
+    '<div class="trap-card">' +
+      '<h4>⚠️ Trap 3: "Bayesian = Always Better"</h4>' +
+      '<p>Bayesian methods are powerful but not magic. With large samples and simple models, frequentist methods give essentially the same answer with less computation.</p>' +
+    '</div>' +
+    '<div class="trap-card">' +
+      '<h4>⚠️ Trap 4: Ignoring the Prior Choice</h4>' +
+      '<p>Saying "I used a non-informative prior" is not a free pass. All priors carry assumptions. <strong>Justify and report</strong> your prior in every Bayesian analysis.</p>' +
+    '</div>' +
+  '</div>' +
+
+  dialogue('odin', '🧙‍♂️ Odinfather', 'You have learned the art of the Norns, apprentice. The loom of Bayes weaves prior knowledge into data to create a tapestry of updated belief. Use it wisely \x96 declare your priors, check your sensitivity, and let the data speak through the posterior. The frequentist hammer and the Bayesian loom are both worthy tools. A master knows when to reach for each.') +
+
+  dialogue('thor', '🔨 Thorment', 'I still prefer smashing things. But... I\x27ll admit the posterior is a pretty elegant tapestry. Just don\x27t expect me to write MCMC code.') +
+
+  dialogue('corvo', '🪶 Huginn challenges:', 'One more thing: as you advance in research, explore <strong>JAGS</strong>, <strong>Stan</strong>, and <strong>brms</strong> (in R). These tools make Bayesian analysis accessible even for complex models. The computational barrier is lower than ever.') +
+
+  '<p style="text-align:center; margin-top:30px; font-family:Permanent Marker; color:var(--gold); font-size:1.2rem">⚔️ The Norns\x27 Loom stands threaded. Onward to the next realm! ⚔️</p>';
+}
+
+
+// ===== STEP REGISTRY =====
+var stepFunctions = [step0, step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11];
+
+var stepNames = [
+  'Introduction',
+  'Frequentist vs. Bayesian',
+  'Bayes\x27 Theorem',
+  'A Norse Example',
+  'Prior Distributions',
+  'Likelihood',
+  'Posterior Distribution',
+  'Sequential Updating',
+  'Credible vs. Confidence',
+  'Bayes Factor',
+  'Practical Applications',
+  'Lesson of the Ravens'
+];
+
+var totalSteps = 12;
+var currentStep = 0;
+
+// ===== NAVIGATION =====
+function renderStep() {
+  var content = document.getElementById('stepContent');
+  content.innerHTML = stepFunctions[currentStep]();
+  content.style.animation = 'none';
+  content.offsetHeight;
+  content.style.animation = 'fadeIn 0.4s ease';
+
+  document.getElementById('progressLabel').textContent = 'Step ' + currentStep + ' of ' + (totalSteps - 1) + ' \x96 ' + stepNames[currentStep];
+  document.getElementById('progressFill').style.width = (currentStep / (totalSteps - 1) * 100) + '%';
+
+  document.getElementById('btnBack').disabled = currentStep === 0;
+  document.getElementById('btnNext').textContent = currentStep === totalSteps - 1 ? 'Restart ↻' : 'Next ▶';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNext() {
+  if (currentStep >= totalSteps - 1) {
+    currentStep = 0;
+  } else {
+    currentStep++;
+  }
+  renderStep();
+}
+
+function goBack() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goBack(); }
+});
+
+// Initialize
+renderStep();
+</script>
+</body>
+</html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Statistical Saga of Odinfather — Realm 16: Multiple Linear Regression</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg-dark:#0d1117;--bg-card:#161b22;--bg-panel:#1c2333;--odin-blue:#58a6ff;--thor-red:#f85149;--corvo-purple:#bc8cff;--gold:#f0c040;--silver:#8b949e;--text:#e6edf3;--text-dim:#8b949e;--success:#3fb950;--border:#30363d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-dark);color:var(--text);font-family:'Patrick Hand',cursive;font-size:18px;min-height:100vh;overflow-x:hidden}
+#game-container{max-width:800px;margin:0 auto;padding:20px;min-height:100vh}
+.title-screen{text-align:center;padding:60px 20px;animation:fadeIn 1s ease}
+.title-screen h1{font-family:'Bangers',cursive;font-size:2.8em;color:var(--gold);text-shadow:2px 2px 8px rgba(240,192,64,.3);line-height:1.1;margin-bottom:8px}
+.title-screen h2{font-family:'Permanent Marker',cursive;font-size:1.5em;color:var(--odin-blue);margin-bottom:30px}
+.title-screen .subtitle{color:var(--text-dim);font-size:1.1em;margin-bottom:40px}
+.reino-badge{display:inline-block;background:linear-gradient(135deg,var(--odin-blue),var(--corvo-purple));padding:6px 20px;border-radius:20px;font-family:'Bangers',cursive;font-size:1em;color:#fff;margin-bottom:16px}
+.difficulty-select{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.diff-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Bangers',cursive;font-size:1.2em;padding:16px 32px;border-radius:12px;cursor:pointer;transition:all .3s;min-width:180px}
+.diff-btn:hover{border-color:var(--odin-blue);transform:translateY(-2px)}
+.diff-btn .diff-label{font-size:1.3em}.diff-btn .diff-desc{font-family:'Patrick Hand',cursive;font-size:.65em;color:var(--text-dim);margin-top:4px}
+.scene{animation:slideIn .5s ease;padding:10px 0}
+.dialogue-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative}
+.dialogue-box.odin{border-left:4px solid var(--odin-blue)}.dialogue-box.thor{border-left:4px solid var(--thor-red)}.dialogue-box.corvo{border-left:4px solid var(--corvo-purple)}.dialogue-box.narrator{border-left:4px solid var(--gold)}
+.char-name{font-family:'Bangers',cursive;font-size:1.1em;margin-bottom:6px}
+.char-name.odin{color:var(--odin-blue)}.char-name.thor{color:var(--thor-red)}.char-name.corvo{color:var(--corvo-purple)}.char-name.narrator{color:var(--gold)}
+.dialogue-text{line-height:1.5;font-size:1.05em}.dialogue-text em{color:var(--gold);font-style:normal;font-weight:bold}
+.challenge-box{background:var(--bg-panel);border:2px solid var(--gold);border-radius:12px;padding:24px;margin:20px 0;animation:pulse-border 2s ease infinite}
+@keyframes pulse-border{0%,100%{border-color:var(--gold);box-shadow:0 0 8px rgba(240,192,64,.15)}50%{border-color:#f0c040cc;box-shadow:0 0 16px rgba(240,192,64,.3)}}
+.challenge-title{font-family:'Bangers',cursive;font-size:1.4em;color:var(--gold);margin-bottom:12px;text-align:center}
+.challenge-question{margin-bottom:16px;line-height:1.5}
+.data-display{background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:'Courier New',monospace;font-size:1em;color:var(--odin-blue);text-align:center;letter-spacing:1px;line-height:1.6}
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.option-btn{background:var(--bg-card);border:2px solid var(--border);color:var(--text);font-family:'Patrick Hand',cursive;font-size:1.05em;padding:14px 18px;border-radius:10px;cursor:pointer;text-align:left;transition:all .25s;line-height:1.4}
+.option-btn:hover:not(.disabled){border-color:var(--odin-blue);background:#1a2233}
+.option-btn.correct{border-color:var(--success);background:#0d2818;color:var(--success)}
+.option-btn.wrong{border-color:var(--thor-red);background:#2d1116;color:var(--thor-red)}
+.option-btn.disabled{cursor:default;opacity:.7}
+.feedback-box{border-radius:10px;padding:16px 20px;margin:16px 0;animation:fadeIn .4s ease;line-height:1.5}
+.feedback-box.correct{background:#0d2818;border:1px solid var(--success);color:var(--success)}
+.feedback-box.wrong{background:#2d1116;border:1px solid var(--thor-red);color:var(--thor-red)}
+.xp-badge{display:inline-block;background:var(--gold);color:var(--bg-dark);font-family:'Bangers',cursive;padding:2px 10px;border-radius:6px;font-size:.9em;margin-left:6px}
+.xp-bar-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.xp-label{font-family:'Bangers',cursive;color:var(--gold);font-size:1em;white-space:nowrap}
+.xp-bar-bg{flex:1;height:14px;background:var(--bg-dark);border-radius:7px;overflow:hidden}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--odin-blue),var(--gold));border-radius:7px;transition:width .6s ease}
+.xp-count{font-family:'Bangers',cursive;color:var(--text);font-size:1em;min-width:60px;text-align:right}
+.continue-btn{display:block;margin:20px auto 0;background:transparent;border:2px solid var(--odin-blue);color:var(--odin-blue);font-family:'Bangers',cursive;font-size:1.15em;padding:12px 36px;border-radius:10px;cursor:pointer;transition:all .25s}
+.continue-btn:hover{background:var(--odin-blue);color:var(--bg-dark)}
+.result-screen{text-align:center;padding:40px 20px;animation:fadeIn .8s ease}
+.result-screen h2{font-family:'Bangers',cursive;font-size:2.2em;color:var(--gold);margin-bottom:8px}
+.result-rank{font-family:'Permanent Marker',cursive;font-size:1.5em;margin:16px 0}
+.result-stats{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:20px 0;text-align:left}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text-dim)}.stat-value{font-family:'Bangers',cursive;color:var(--odin-blue)}
+.hint-box{background:#1a1530;border:1px solid var(--corvo-purple);border-radius:10px;padding:14px 18px;margin:12px 0;font-size:.95em;color:var(--corvo-purple);animation:fadeIn .5s ease}
+.hint-box .hint-label{font-family:'Bangers',cursive;font-size:1em;margin-bottom:4px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.title-screen h1{font-size:2em}.title-screen h2{font-size:1.2em}.difficulty-select{flex-direction:column;align-items:center}#game-container{padding:12px}.challenge-box{padding:16px}}
+
+/* ── ARMOR SYSTEM ── */
+.armor-panel{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.viking-mini{position:relative;width:120px;height:180px;flex-shrink:0}
+.vm-head{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:#d4a574;border:1.5px solid #b8956a;z-index:5}
+.vm-torso{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:44px;height:58px;background:#8b7355;border-radius:7px 7px 4px 4px;z-index:3}
+.vm-arm-l{position:absolute;top:59px;left:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-arm-r{position:absolute;top:59px;right:18px;width:14px;height:34px;background:#8b7355;border-radius:5px;z-index:2}
+.vm-leg-l{position:absolute;top:111px;left:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-leg-r{position:absolute;top:111px;right:40px;width:16px;height:42px;background:#6b5b43;border-radius:0 0 4px 4px;z-index:2}
+.vm-slot{position:absolute;opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1);transform:scale(.3)}
+.vm-slot.on{opacity:1;transform:scale(1)}
+.vm-helm{top:16px;left:50%;transform:translateX(-50%) scale(.3);z-index:8}.vm-helm.on{transform:translateX(-50%) scale(1)}
+.vm-mail{top:57px;left:50%;transform:translateX(-50%) scale(.3);z-index:4}.vm-mail.on{transform:translateX(-50%) scale(1)}
+.vm-cape{top:53px;left:50%;transform:translateX(-50%) scale(.3);z-index:1}.vm-cape.on{transform:translateX(-50%) scale(1)}
+.vm-left{top:66px;left:0;z-index:7}.vm-right{top:56px;right:0;z-index:7}
+.vm-boots{bottom:4px;left:50%;transform:translateX(-50%) scale(.3);z-index:7;display:flex;gap:10px}.vm-boots.on{transform:translateX(-50%) scale(1)}
+.gear-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.gp-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;font-size:.8em;color:var(--text-dim);transition:all .3s}
+.gp-row.earned{color:var(--success);font-weight:bold}
+.gp-row .gp-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .3s;flex-shrink:0}
+.gp-row.earned .gp-dot{background:var(--success);border-color:var(--success)}
+.vm-sparks{position:absolute;pointer-events:none;z-index:20}
+.vm-spark{position:absolute;border-radius:50%;animation:vmSp .6s ease-out forwards}
+@keyframes vmSp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+.vm-flash{animation:vmFl .4s ease}
+@keyframes vmFl{0%{filter:brightness(1)}30%{filter:brightness(1.8) drop-shadow(0 0 12px rgba(240,180,40,.6))}100%{filter:brightness(1)}}
+.result-viking{position:relative;width:160px;height:240px;margin:16px auto}
+.rv-head{position:absolute;top:36px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#d4a574;border:2px solid #b8956a;z-index:5}
+.rv-torso{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:56px;height:74px;background:#8b7355;border-radius:9px 9px 5px 5px;z-index:3}
+.rv-arm-l{position:absolute;top:77px;left:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-arm-r{position:absolute;top:77px;right:22px;width:18px;height:44px;background:#8b7355;border-radius:6px;z-index:2}
+.rv-leg-l{position:absolute;top:144px;left:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-leg-r{position:absolute;top:144px;right:52px;width:20px;height:54px;background:#6b5b43;border-radius:0 0 5px 5px;z-index:2}
+.rv-slot{position:absolute}
+.rv-helm{top:20px;left:50%;transform:translateX(-50%);z-index:8}
+.rv-mail{top:74px;left:50%;transform:translateX(-50%);z-index:4}
+.rv-cape{top:69px;left:50%;transform:translateX(-50%);z-index:1}
+.rv-left{top:86px;left:4px;z-index:7}.rv-right{top:72px;right:4px;z-index:7}
+.rv-boots{bottom:4px;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:14px}
+@media(max-width:600px){.armor-panel{flex-direction:column;align-items:center}.viking-mini{width:100px;height:160px}}
+footer{text-align:center;padding:24px 12px;color:var(--text-dim);font-size:.85em;border-top:1px solid var(--border);margin-top:40px}
+footer a{color:var(--odin-blue);text-decoration:none}footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div id="game-container"><div id="game-content"></div></div>
+<footer>
+  <a href="index.html">Return to Realm Hub</a><br>
+  Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026
+</footer>
+<script>
+// ════════════════════════════════════════════════════
+// THE STATISTICAL SAGA OF ODINFATHER — REALM 16
+// MULTIPLE LINEAR REGRESSION
+// ════════════════════════════════════════════════════
+const GAME={difficulty:null,xp:0,maxXP:0,hits:0,total:0,currentScene:0,scenes:[]};
+const content=()=>document.getElementById('game-content');
+function dialogue(c,t){
+  const cls={odin:'odin',thor:'thor',muninn:'corvo',huginn:'corvo',narrator:'narrator'};
+  const nm={odin:'Odinfather \u{1F9D9}\x27‍♂️',thor:'Thorment ⚡',muninn:'Muninn \u{1F426}‍⬛',huginn:'Huginn \u{1F426}',narrator:'\u{1F4DC} Narrator'};
+  return `<div class="dialogue-box ${cls[c]||'narrator'}"><div class="char-name ${cls[c]||'narrator'}">${nm[c]||c}</div><div class="dialogue-text">${t}</div></div>`;
+}
+function hintBox(t){return `<div class="hint-box"><div class="hint-label">\u{1F426}‍⬛ Muninn\x27s Hint</div>${t}</div>`;}
+function xpBar(){
+  const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;
+  return armorPanelHTML()+`<div class="xp-bar-container"><div class="xp-label">⚡ XP</div><div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${p}%"></div></div><div class="xp-count">${GAME.xp} / ${GAME.maxXP}</div></div>`;
+}
+function updateXPBar(){
+  const b=document.querySelector('.xp-bar-fill'),c=document.querySelector('.xp-count');
+  if(b&&c){const p=GAME.maxXP>0?Math.round((GAME.xp/GAME.maxXP)*100):0;b.style.width=p+'%';c.textContent=`${GAME.xp} / ${GAME.maxXP}`;}
+}
+function showTitleScreen(){
+  content().innerHTML=`
+  <div class="title-screen">
+    <div class="reino-badge">REALM 16</div>
+    <h1>The Statistical Saga of Odinfather</h1>
+    <h2>The Great Hall of Predictors</h2>
+    <p class="subtitle">In the Great Hall of Asgard, multiple factors conspire to predict battle outcomes. Odinfather reveals the art of combining predictors — and the dangers Thorment brings when throwing variables in blindly.</p>
+    <div class="difficulty-select">
+      <button class="diff-btn" onclick="startGame(\x27aprendiz\x27)"><div class="diff-label">\u{1F6E1}️ Apprentice</div><div class="diff-desc">Undergraduate — with Muninn\x27s hints</div></button>
+      <button class="diff-btn" onclick="startGame(\x27mestre\x27)"><div class="diff-label">⚔️ Master</div><div class="diff-desc">Graduate — no hints, extra challenges</div></button>
+    </div>
+  </div>`;
+}
+function startGame(d){
+  GAME.difficulty=d;GAME.xp=0;GAME.hits=0;GAME.total=0;GAME.currentScene=0;gearEarned=0;
+  buildScenes();GAME.maxXP=countMaxXP();renderScene();
+}
+
+// ════════════════════════════════════════════════════
+function buildScenes(){
+  GAME.scenes=[];
+
+  // ━━ SCENE 1: Arrival at the Great Hall ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('narrator','The doors of the <em>Great Hall of Predictors</em> swing open with a thunderous crash. Battle maps cover the walls, each with dozens of factors connected by golden threads — training hours, weapon quality, troop morale, distance traveled. In Midgard, a single predictor is never enough. Victory depends on <em>multiple forces combined</em>.')}
+      ${dialogue('odin','In simple regression, we had Y = b₀ + b₁X + ε — one predictor, one slope. Now, we add <em>multiple predictors</em>. Multiple regression models reality with greater precision, because a single variable rarely explains everything.')}
+      ${dialogue('thor','Easy! Throw all the variables into the model and done!')}
+      ${dialogue('odin','That\x27s exactly the mistake Thorment would love you to make. Adding predictors without justification creates <em>multicollinearity</em>, inflates R² without improving real prediction, and violates assumptions. Every predictor needs <em>theoretical justification</em>.')}
+      <button class="continue-btn" onclick="nextScene()">Enter the Hall →</button>
+    </div>`});
+
+  // ━━ SCENE 2: The Multiple Model ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${dialogue('odin','The multiple linear regression model:')}
+      <div class="data-display">
+        Y = b₀ + b₁X₁ + b₂X₂ + ... + bₖXₖ + ε<br><br>
+        Each bᵢ = effect of Xᵢ on Y<br>
+        <strong>holding other variables constant</strong>
+      </div>
+      ${dialogue('odin','Interpretation is crucial: b₁ = 2.3 for "training hours" means that, <em>holding all other variables constant</em>, each additional training hour increases Y by 2.3 units. This is called the <em>partial effect</em>.')}
+      ${dialogue('muninn','In simple regression, b₁ captures the total effect of X on Y. In multiple regression, b₁ captures only the <em>unique</em> effect of X₁, after removing what the other variables explain. That\x27s why coefficients change when you add or remove predictors!')}
+      ${dialogue('huginn','Caution: "holding constant" is a mathematical abstraction, not an experimental reality. If X₁ and X₂ are highly correlated, that "control" can be artificial.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 3: CHALLENGE 1 — Interpret Coefficient ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('"Holding others constant" is the key. The coefficient shows the partial effect — how much Y changes per unit of X₁, controlling for X₂ and X₃.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 1: The Voice of the Coefficient</div>
+        <div class="challenge-question">Model: Battle outcome = 12.5 + 2.3(Training) + 1.8(Morale) − 0.9(Distance). What does b₁ = 2.3 mean?</div>
+        <div class="data-display">
+          Y = 12.5 + 2.3X₁ + 1.8X₂ − 0.9X₃<br>
+          X₁ = Training hours
+        </div>
+        ${hint}
+        <div class="options-grid" id="q1-opts">
+          <button class="option-btn" onclick="checkQ(1,this,\x27a\x27)">Each training hour increases the outcome by 2.3, regardless of everything else in the model — the coefficient captures the total effect of training, not a partial one</button>
+          <button class="option-btn" onclick="checkQ(1,this,\x27b\x27)">The correlation between training and outcome is 0.23 — divide the regression coefficient by 10 to convert b to the Pearson correlation scale</button>
+          <button class="option-btn" onclick="checkQ(1,this,\x27c\x27)">Training explains 2.3% of the variance — the unstandardized coefficient directly represents the percentage of variance attributable to that predictor</button>
+          <button class="option-btn" onclick="checkQ(1,this,\x27d\x27)">Holding morale and distance constant, each additional training hour increases the outcome by 2.3 units (partial effect)</button>
+        </div>
+        <div id="q1-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 4: R² vs Adjusted R² ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','<em>R²</em> always increases when you add a variable — even a useless one. Here\x27s the problem: a model with 50 random predictors will have high R² but terrible prediction. That\x27s why <em>Adjusted R²</em> exists.')}
+      <div class="data-display">
+        R² = 1 − SS_res / SS_total<br><br>
+        Adjusted R² = 1 − [(1 − R²)(n − 1)] / [n − k − 1]<br><br>
+        k = number of predictors
+      </div>
+      ${dialogue('muninn','Adjusted R² <em>penalizes</em> adding useless predictors. If you add a variable that doesn\x27t contribute, R² goes up but Adjusted R² <em>drops</em>. That\x27s the crucial difference.')}
+      ${dialogue('thor','So I can\x27t just throw everything in?')}
+      ${dialogue('odin','Each added predictor costs degrees of freedom. Adjusted R² is the fair arbiter: it only rises when the predictor truly contributes.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 5: CHALLENGE 2 — Compare Models ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Adjusted R² penalizes useless predictors. Compare the Adjusted R² values: .64 vs .62. Which model generalizes better?'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 2: The Duel of Models</div>
+        <div class="challenge-question">Two models predict grain production across villages. Which is preferable and why?</div>
+        <div class="data-display">
+          Model A: R² = .68, Adj R² = .64, 3 predictors<br>
+          Model B: R² = .71, Adj R² = .62, 7 predictors
+        </div>
+        ${hint}
+        <div class="options-grid" id="q2-opts">
+          <button class="option-btn" onclick="checkQ(2,this,\x27a\x27)">Model B — higher R² (.71 > .68) is always the better choice because R² measures overall model quality. More variance explained means better prediction</button>
+          <button class="option-btn" onclick="checkQ(2,this,\x27b\x27)">Model A — higher Adjusted R² (.64 > .62), more parsimonious (3 vs 7 predictors). The 4 extra predictors in B don\x27t compensate for the loss in generalization</button>
+          <button class="option-btn" onclick="checkQ(2,this,\x27c\x27)">Both are equivalent — the difference in R² (.03) and Adjusted R² (.02) is trivial and within sampling error, so neither model is statistically superior to the other</button>
+          <button class="option-btn" onclick="checkQ(2,this,\x27d\x27)">Model B — more predictors is always better because each added variable captures unique variance. Seven predictors give a more complete picture of reality than three</button>
+        </div>
+        <div id="q2-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 6: Multicollinearity ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','<em>Multicollinearity</em> occurs when predictors are highly correlated with each other. Imagine measuring "sword training hours" and "total training hours" — they\x27re nearly the same thing! The model can\x27t separate their individual effects.')}
+      <div class="data-display">
+        VIF = 1 / (1 − R²ᵢ)<br><br>
+        R²ᵢ = R² of Xᵢ regressed on the other Xs<br><br>
+        VIF > 10 = serious problem<br>
+        VIF > 5 = warning sign (conservative criterion)<br>
+        Tolerance = 1/VIF
+      </div>
+      ${dialogue('muninn','Consequences: unstable coefficients (they change sign or magnitude when you remove a variable), inflated standard errors, non-significant t-tests even with a significant overall F-test.')}
+      ${dialogue('odin','Solutions: remove one of the correlated predictors, create a composite index, or use principal component analysis.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 7: CHALLENGE 3 — VIF ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('VIF > 10 = severe multicollinearity. VIF > 5 = warning sign. Which variables exceed these thresholds?'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 3: The VIF Detector</div>
+        <div class="challenge-question">Three predictors have the following VIF values. Which show multicollinearity problems?</div>
+        <div class="data-display">
+          X₁ (Sword training): VIF = 1.2<br>
+          X₂ (Total training): VIF = 8.7<br>
+          X₃ (Combat hours): VIF = 12.4
+        </div>
+        ${hint}
+        <div class="options-grid" id="q3-opts">
+          <button class="option-btn" onclick="checkQ(3,this,\x27a\x27)">Only X₃ — only VIF above 10 is problematic. The threshold of 5 is overly conservative and not widely accepted. X₂ at 8.7 is well within the safe range for regression</button>
+          <button class="option-btn" onclick="checkQ(3,this,\x27b\x27)">All have problems — VIF should be 0 for perfectly independent predictors. Any VIF above 0 signals that the predictor shares variance with others, which biases the coefficients</button>
+          <button class="option-btn" onclick="checkQ(3,this,\x27c\x27)">X₂ (VIF = 8.7, above the conservative threshold of 5) and X₃ (VIF = 12.4, above the critical threshold of 10). X₁ is safe (VIF = 1.2). Likely X₂ and X₃ measure overlapping constructs</button>
+          <button class="option-btn" onclick="checkQ(3,this,\x27d\x27)">None — VIF only matters above 20 in modern statistics. The old thresholds of 5 and 10 have been revised upward by recent simulation studies that show regression is robust to high VIF</button>
+        </div>
+        <div id="q3-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 8: Residual Diagnostics ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','The assumptions of multiple regression are the same as simple regression, applied to <em>residuals</em>:<br><br>• <em>Independence</em>: uncorrelated residuals (Durbin-Watson ≈ 2)<br>• <em>Normality</em>: normally distributed residuals (Shapiro-Wilk, Q-Q plot)<br>• <em>Homoscedasticity</em>: constant residual variance (Breusch-Pagan, residuals vs fitted plot)')}
+      ${dialogue('muninn','Attention: these assumptions apply to <em>RESIDUALS</em>, not to the Y or X variables directly! A classic mistake is testing normality of Y instead of the residuals.')}
+      ${dialogue('huginn','For multiple regression, we also need: absence of <em>multicollinearity</em> (VIF) and <em>linearity</em> of the relationship between each Xᵢ and Y. Violations can completely invalidate your inferences.')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 9: CHALLENGE 4 — Fan Shape ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('A funnel (fan shape) = residual variance increases with fitted values. Which assumption does this violate?'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 4: The Treacherous Funnel</div>
+        <div class="challenge-question">The residuals vs fitted values plot shows a clear fan shape (widening to the right). Which assumption is violated and what can you do?</div>
+        <div class="data-display">
+          Plot: Residuals vs Fitted<br>
+          Pattern: fan shape<br>
+          Breusch-Pagan: p = .003
+        </div>
+        ${hint}
+        <div class="options-grid" id="q4-opts">
+          <button class="option-btn" onclick="checkQ(4,this,\x27a\x27)">Homoscedasticity violated (heteroscedasticity). The residual variance is not constant. Solutions: transform Y (log, square root), robust standard errors (HC), or weighted least squares (WLS)</button>
+          <button class="option-btn" onclick="checkQ(4,this,\x27b\x27)">Normality violated — the fan-shaped pattern in residuals vs. fitted values is caused by non-normal residuals. A log-transformation of Y will fix both the shape and the Breusch-Pagan result</button>
+          <button class="option-btn" onclick="checkQ(4,this,\x27c\x27)">Independence violated — the widening funnel pattern occurs when consecutive residuals are correlated with each other. Use Durbin-Watson to confirm, then apply Newey-West standard errors</button>
+          <button class="option-btn" onclick="checkQ(4,this,\x27d\x27)">Linearity violated — the fan shape indicates a curvilinear relationship between X and Y. Adding quadratic terms (X²) to the model will straighten the residual pattern</button>
+        </div>
+        <div id="q4-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 10: CHALLENGE 5 — Q-Q Plot ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('Heavy tails in the Q-Q plot mean the extreme residual values are larger than a normal distribution would predict. Which assumption?'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 5: The Ravens\x27 Q-Q</div>
+        <div class="challenge-question">The Q-Q plot of residuals shows heavy tails (points deviate from the diagonal at the extremes). What does this suggest?</div>
+        <div class="data-display">
+          Q-Q Plot: heavy tails<br>
+          Points deviate from diagonal at extremes<br>
+          Shapiro-Wilk: p = .01
+        </div>
+        ${hint}
+        <div class="options-grid" id="q5-opts">
+          <button class="option-btn" onclick="checkQ(5,this,\x27a\x27)">Heteroscedasticity — heavy tails in the Q-Q plot mean the residual variance changes across fitted values. This is a variance problem, not a distributional one. Use Breusch-Pagan to confirm heteroscedasticity</button>
+          <button class="option-btn" onclick="checkQ(5,this,\x27b\x27)">Autocorrelation in the residuals — when points deviate from the diagonal at the Q-Q extremes, it means consecutive residuals are correlated with each other. Check Durbin-Watson to confirm the violation</button>
+          <button class="option-btn" onclick="checkQ(5,this,\x27c\x27)">The model is fine — minor deviations at the tails are normal and expected in any Q-Q plot. Shapiro-Wilk p = .01 is still borderline, so the normality assumption holds for practical purposes</button>
+          <button class="option-btn" onclick="checkQ(5,this,\x27d\x27)">Residual normality violated — leptokurtic distribution (heavier tails than normal). May indicate influential outliers. Solutions: investigate outliers, transformation, or bootstrap for robust inference</button>
+        </div>
+        <div id="q5-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 11: Variable Selection ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('odin','How do you choose which predictors to include? Two approaches:<br><br>• <em>Theory-driven</em>: variables are selected based on theory and literature. This is the preferred approach.<br>• <em>Data-driven</em>: stepwise (forward, backward, or both). The algorithm chooses for you based on statistical criteria.')}
+      ${dialogue('thor','Stepwise is beautiful! The computer does everything!')}
+      ${dialogue('odin','Stepwise has serious problems: capitalization on chance, biased p-values, models that don\x27t replicate. Use it as <em>exploratory</em>, never as confirmatory. Theory should guide selection.')}
+      ${dialogue('huginn','Thorment\x27s classic trap: throw 30 variables into stepwise and report the final model as if it were planned. That\x27s p-hacking in disguise!')}
+      <button class="continue-btn" onclick="nextScene()">Continue →</button>
+    </div>`});
+
+  // ━━ SCENE 12: CHALLENGE 6 — Variable Selection ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('The ideal approach combines theory for selecting candidates and statistics for confirmation. Pure stepwise has serious problems with capitalization on chance.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 6: Choosing the Predictors</div>
+        <div class="challenge-question">A researcher has 15 possible predictors for warrior performance. What is the best approach for selection?</div>
+        <div class="data-display">
+          15 candidate variables &nbsp;|&nbsp; n = 120<br>
+          Goal: parsimonious predictive model
+        </div>
+        ${hint}
+        <div class="options-grid" id="q6-opts">
+          <button class="option-btn" onclick="checkQ(6,this,\x27a\x27)">Forward stepwise with all 15 — the algorithm objectively picks the best subset based on statistical criteria (p-value entry threshold). This removes researcher bias from the selection process</button>
+          <button class="option-btn" onclick="checkQ(6,this,\x27b\x27)">Select candidates based on theory and literature (5-7 variables), check VIF, and use Adjusted R² and partial F-test to evaluate each predictor\x27s incremental contribution</button>
+          <button class="option-btn" onclick="checkQ(6,this,\x27c\x27)">Include all 15 — more variables means a more complete model. With n = 120, you have enough observations for 15 predictors (the rule is n > k, which is clearly satisfied here)</button>
+          <button class="option-btn" onclick="checkQ(6,this,\x27d\x27)">Bivariate correlation with Y — include only the significant ones (p < .05). Variables that are not individually correlated with Y cannot contribute to the multiple regression model</button>
+        </div>
+        <div id="q6-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ SCENE 13: CHALLENGE 7 — APA Reporting ━━
+  GAME.scenes.push({type:'challenge',html:()=>{
+    const hint=GAME.difficulty==='aprendiz'?hintBox('APA format for multiple regression requires: overall F, df, p, R², Adjusted R², and individual coefficients with b, SE, β, t, p, and CI.'):'';
+    return `
+    <div class="scene">
+      ${xpBar()}
+      <div class="challenge-box">
+        <div class="challenge-title">⚔️ Challenge 7: The Report Scroll</div>
+        <div class="challenge-question">Which APA report is correct for this output?</div>
+        <div class="data-display">
+          F(3, 96) = 18.42, p < .001<br>
+          R² = .37, Adjusted R² = .35<br>
+          b₁ = 2.3, SE = 0.8, β = .31, t = 2.88, p = .005
+        </div>
+        ${hint}
+        <div class="options-grid" id="q7-opts">
+          <button class="option-btn" onclick="checkQ(7,this,\x27a\x27)">The model was significant, F(3, 96) = 18.42, p < .001, R² = .37, Adjusted R² = .35. Training hours was a significant predictor, b = 2.30, SE = 0.80, β = .31, t(96) = 2.88, p = .005, 95% CI [0.72, 3.88]</button>
+          <button class="option-btn" onclick="checkQ(7,this,\x27b\x27)">R² = .37, so 37% of the variance is explained. Training is significant. This covers the key information — APA does not require degrees of freedom, standard errors, or confidence intervals for regression</button>
+          <button class="option-btn" onclick="checkQ(7,this,\x27c\x27)">F = 18.42 and p < .001, so the model works. b = 2.3 for training. Reporting F and the coefficient is sufficient — standardized β and CI are optional extras, not APA requirements</button>
+          <button class="option-btn" onclick="checkQ(7,this,\x27d\x27)">The regression was significant with high R² — stating significance and the general direction of the effect is all APA requires for regression results in the text</button>
+        </div>
+        <div id="q7-fb"></div>
+      </div>
+    </div>`;}});
+
+  // ━━ MASTER CHALLENGES ━━
+  if(GAME.difficulty==='mestre'){
+    // CHALLENGE 8: Identify All Issues
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge 8: The Model Audit</div>
+          <div class="challenge-question">Analyze the output below and identify ALL the problems.</div>
+          <div class="data-display">
+            F(5, 44) = 9.2, p < .001, R² = .51, Adj R² = .45<br>
+            VIF: X₁ = 1.3, X₂ = 11.2, X₃ = 9.8, X₄ = 2.1, X₅ = 1.5<br>
+            Durbin-Watson = 0.8<br>
+            Breusch-Pagan: p = .02 | Shapiro-Wilk res.: p = .04<br>
+            X₂: b = 3.1, p = .42 | X₃: b = −2.8, p = .38
+          </div>
+          <div class="options-grid" id="q8-opts">
+            <button class="option-btn" onclick="checkQ(8,this,\x27a\x27)">Only multicollinearity (X₂ VIF = 11.2 and X₃ VIF = 9.8). The other diagnostics are fine — DW = 0.8 is acceptable, BP p = .02 is borderline, and SW p = .04 still passes at the .01 level</button>
+            <button class="option-btn" onclick="checkQ(8,this,\x27b\x27)">Only heteroscedasticity (Breusch-Pagan p = .02). The VIF values are below the modern threshold of 15, DW = 0.8 is within range, and SW p = .04 is not significant at α = .01</button>
+            <button class="option-btn" onclick="checkQ(8,this,\x27c\x27)">Multiple problems: (1) Multicollinearity: X₂ VIF=11.2, X₃ VIF=9.8. (2) Autocorrelation: DW=0.8, far from 2. (3) Heteroscedasticity: BP p=.02. (4) Non-normality: SW p=.04. (5) Large R²−Adj gap (.51 vs .45) suggests overfitting</button>
+            <button class="option-btn" onclick="checkQ(8,this,\x27d\x27)">The model is significant (p < .001), so everything is fine — a significant F-test validates the entire model including its assumptions. If the model predicts well, assumption checks are unnecessary</button>
+          </div>
+          <div id="q8-fb"></div>
+        </div>
+      </div>`});
+
+    // CHALLENGE 9: Complete Strategy
+    GAME.scenes.push({type:'challenge',html:()=>`
+      <div class="scene">
+        ${xpBar()}
+        <div class="challenge-box">
+          <div class="challenge-title">⚔️ Master Challenge 9: The Battle Plan</div>
+          <div class="challenge-question">You need to predict mead production for 80 villages with 8 candidate predictors. Design the complete analysis strategy.</div>
+          <div class="data-display">
+            n = 80 villages &nbsp;|&nbsp; 8 candidate variables<br>
+            Y = mead production (continuous)
+          </div>
+          <div class="options-grid" id="q9-opts">
+            <button class="option-btn" onclick="checkQ(9,this,\x27a\x27)">Throw everything in the model, run it, report R² — with 8 predictors and n = 80, you have 10 observations per variable, which is the standard minimum. Let the data speak for themselves</button>
+            <button class="option-btn" onclick="checkQ(9,this,\x27b\x27)">(1) Select predictors by theory. (2) Check correlations and VIF. (3) Fit model. (4) Check assumptions: DW, Shapiro-Wilk, Breusch-Pagan on residuals. (5) Compare Adjusted R² across models. (6) Report APA with F, R², Adj R², coefficients, β, CI</button>
+            <button class="option-btn" onclick="checkQ(9,this,\x27c\x27)">Backward stepwise with all 8 variables and report the final model as if it were theory-driven. The algorithm removes non-significant predictors automatically, which is more objective than researcher judgment</button>
+            <button class="option-btn" onclick="checkQ(9,this,\x27d\x27)">Pearson correlation with Y for each variable, include only those with r > .30. Variables uncorrelated with Y at the bivariate level cannot become significant in a multiple regression, so this pre-screening saves time</button>
+          </div>
+          <div id="q9-fb"></div>
+        </div>
+      </div>`});
+  }
+
+  // ━━ FINAL SCENE: Ravens' Lesson ━━
+  GAME.scenes.push({type:'narrative',html:()=>`
+    <div class="scene">
+      ${xpBar()}
+      ${dialogue('narrator','The maps of the Great Hall glow with new connections. The student now understands that prediction isn\x27t about stacking variables — it\x27s about choosing wisely, verifying assumptions, and interpreting with rigor.')}
+      ${dialogue('odin','You have conquered the <em>Great Hall of Predictors</em>! Multiple regression is one of the most powerful tools in statistics — but only when used with discipline.')}
+      ${dialogue('thor','Fine, I admit it... throwing everything into the model doesn\x27t work. But I still like stepwise!')}
+      ${dialogue('muninn','<strong>Ravens\x27 Lesson — Muninn summarizes:</strong><br>• Y = b₀ + b₁X₁ + ... + bₖXₖ + ε<br>• Coefficients = partial effects ("holding constant")<br>• Adjusted R² > R² for comparing models<br>• VIF > 10 = severe multicollinearity<br>• Assumptions: independent, normal, homoscedastic residuals<br>• Variable selection guided by theory')}
+      ${dialogue('huginn','<strong>Ravens\x27 Lesson — Huginn challenges:</strong><br>• NEVER interpret R² without looking at Adjusted R²<br>• Assumptions apply to RESIDUALS, not to Y<br>• Stepwise is exploratory, not confirmatory<br>• Multicollinearity inflates standard errors and destabilizes coefficients<br>• Full APA report: F, df, p, R², Adj R², b, SE, β, t, CI')}
+      <button class="continue-btn" onclick="showResults()">See Final Result ⚔️</button>
+    </div>`});
+}
+
+// ════════════════════════════════════════════════════
+const ANSWERS={1:'d',2:'b',3:'c',4:'a',5:'d',6:'b',7:'a',8:'c',9:'b'};
+const EXPLANATIONS={
+  1:{
+    correct:'✅ Perfect! b₁ = 2.3 means that, <em>holding morale and distance constant</em>, each additional training hour increases the outcome by 2.3 units. That\x27s the partial effect — the essence of multiple regression.',
+    wrong:'❌ In multiple regression, each coefficient represents the partial effect: <em>holding other variables constant</em>. b₁ = 2.3 for training means +2.3 in Y per extra hour, controlling for morale and distance.',
+    charC:'odin',charW:'thor'
+  },
+  2:{
+    correct:'✅ Excellent! Model A has <em>higher Adjusted R²</em> (.64 > .62) and is more parsimonious (3 vs 7 predictors). The 4 extra predictors in B increase R² but don\x27t compensate for the penalty. Parsimony wins!',
+    wrong:'❌ R² always rises with more predictors, but <em>Adjusted R²</em> penalizes useless ones. Model A (Adj R² = .64) is superior to B (Adj R² = .62) and more parsimonious.',
+    charC:'muninn',charW:'thor'
+  },
+  3:{
+    correct:'✅ Correct! X₂ (VIF = 8.7) is above the conservative criterion (5) and X₃ (VIF = 12.4) exceeds the critical threshold (10). They likely measure overlapping constructs. X₁ (VIF = 1.2) is safe. Solution: remove one or create a composite index.',
+    wrong:'❌ VIF > 10 = severe multicollinearity (X₃ = 12.4). VIF > 5 = warning (X₂ = 8.7). X₁ = 1.2 is fine. Both X₂ and X₃ need attention.',
+    charC:'odin',charW:'thor'
+  },
+  4:{
+    correct:'✅ Brilliant! Fan shape = <em>heteroscedasticity</em> (residual variance is not constant). Breusch-Pagan p = .003 confirms it. Solutions: transform Y, robust standard errors (HC), or WLS.',
+    wrong:'❌ Fan shape in residuals vs fitted = <em>heteroscedasticity</em>. Residual variance increases with predicted values. Breusch-Pagan confirms (p = .003). Solutions: transformation, robust SEs, WLS.',
+    charC:'muninn',charW:'thor'
+  },
+  5:{
+    correct:'✅ Perfect! Heavy tails in the Q-Q plot indicate <em>residual normality violated</em> — leptokurtic distribution. Shapiro-Wilk p = .01 confirms it. May indicate influential outliers. Solutions: investigate outliers, transformation, or bootstrap.',
+    wrong:'❌ Heavy tails in the Q-Q plot = <em>residual non-normality</em> (leptokurtic distribution). Shapiro-Wilk p = .01 confirms. Investigate outliers and consider bootstrap.',
+    charC:'odin',charW:'thor'
+  },
+  6:{
+    correct:'✅ Impeccable strategy! Theory-driven selection first, check VIF for multicollinearity, and use Adjusted R² and partial F-test to evaluate incremental contribution. Theory + statistics = solid science.',
+    wrong:'❌ The ideal approach: (1) theory-driven candidate selection, (2) check VIF, (3) evaluate contribution via Adjusted R² and partial F-test. Pure stepwise capitalizes on chance.',
+    charC:'huginn',charW:'thor'
+  },
+  7:{
+    correct:'✅ Complete and exemplary APA report! Includes F with df, p, R² and Adjusted R², plus individual coefficients with b, SE, β, t, p, and confidence interval. That\x27s how you report multiple regression!',
+    wrong:'❌ A complete APA report requires: F(df1, df2), p, R², Adjusted R², and for each predictor: b, SE, standardized β, t(df), p, and 95% CI.',
+    charC:'odin',charW:'thor'
+  },
+  8:{
+    correct:'✅ Masterful audit! Five problems identified: (1) Multicollinearity (VIF X₂=11.2, X₃=9.8). (2) Autocorrelation (DW=0.8). (3) Heteroscedasticity (BP p=.02). (4) Non-normality (SW p=.04). (5) Overfitting (R² vs Adj gap). A significant model does NOT guarantee assumptions are met!',
+    wrong:'❌ Five problems: multicollinearity (VIF), autocorrelation (DW=0.8), heteroscedasticity (BP p=.02), non-normality (SW p=.04), and overfitting (R² gap). Significant F doesn\x27t save violated assumptions.',
+    charC:'huginn',charW:'thor'
+  },
+  9:{
+    correct:'✅ Complete battle plan! (1) Theory-driven selection. (2) VIF. (3) Fit. (4) Residual diagnostics. (5) Compare models via Adjusted R². (6) Full APA report. That\x27s the sequence of a disciplined researcher!',
+    wrong:'❌ The correct strategy: theory-driven selection → VIF → fit → residual diagnostics → compare models (Adj R²) → full APA report.',
+    charC:'odin',charW:'thor'
+  }
+};
+
+function checkQ(q,btn,ans){
+  const opts=document.querySelectorAll(`#q${q}-opts .option-btn`);
+  opts.forEach(b=>{b.classList.add('disabled');b.onclick=null;});
+  const fb=document.getElementById(`q${q}-fb`),cor=ANSWERS[q],exp=EXPLANATIONS[q];
+  GAME.total++;
+  if(ans===cor){
+    btn.classList.add('correct');GAME.hits++;GAME.xp+=20;updateXPBar();earnGear();
+    fb.innerHTML=`<div class="feedback-box correct">${dialogue(exp.charC,exp.correct+' <span class="xp-badge">+20 XP</span>')}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }else{
+    btn.classList.add('wrong');
+    const ci=['a','b','c','d'].indexOf(cor);if(opts[ci])opts[ci].classList.add('correct');
+    fb.innerHTML=`<div class="feedback-box wrong">${dialogue(exp.charW,exp.wrong)}<button class="continue-btn" onclick="nextScene()">Continue →</button></div>`;
+  }
+}
+
+function countMaxXP(){return (GAME.difficulty==='mestre'?9:7)*20;}
+function renderScene(){if(GAME.currentScene<GAME.scenes.length){content().innerHTML=GAME.scenes[GAME.currentScene].html();restoreGear();window.scrollTo({top:0,behavior:'smooth'});}}
+function nextScene(){GAME.currentScene++;renderScene();}
+
+function showResults(){
+  const pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  let rank,rc;
+  if(pct>=90){rank='\u{1F3C6} Master of Multiple Predictors';rc='#f0c040';}
+  else if(pct>=70){rank='\u{1F4DC} Regent of Adjusted R²';rc='#58a6ff';}
+  else if(pct>=50){rank='\u{1F6E1}️ Regression Apprentice';rc='#8b949e';}
+  else{rank='⛓️ Servant of Overfitting';rc='#f85149';}
+  content().innerHTML=`
+  <div class="result-screen">
+    <div class="reino-badge">REALM 16 — COMPLETE</div>
+    <h2>Adventure Result</h2>
+    ${resultVikingHTML()}
+    <div class="result-rank" style="color:${rc}">${rank}</div>
+    <div class="result-stats">
+      <div class="stat-row"><span class="stat-label">Difficulty</span><span class="stat-value">${GAME.difficulty==='mestre'?'⚔️ Master':'\u{1F6E1}️ Apprentice'}</span></div>
+      <div class="stat-row"><span class="stat-label">Correct Challenges</span><span class="stat-value">${GAME.hits} / ${GAME.total}</span></div>
+      <div class="stat-row"><span class="stat-label">Accuracy</span><span class="stat-value">${pct}%</span></div>
+      <div class="stat-row"><span class="stat-label">XP Earned</span><span class="stat-value">${GAME.xp} / ${GAME.maxXP}</span></div>
+    </div>
+    ${dialogue('odin',pct>=70
+      ?'The Great Hall of Predictors recognizes your wisdom! You\x27ve mastered partial coefficients, Adjusted R², VIF, residual diagnostics, and APA reporting. Go forth and build models with discipline!'
+      :'The Great Hall demands more study... Review: interpreting partial coefficients, R² vs Adjusted R², VIF and multicollinearity, residual assumptions, and variable selection. The predictors await your second attempt!'
+    )}
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+      <button class="continue-btn" onclick="showTitleScreen()">\u{1F504} Play Again</button>
+    </div>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+// ════════════════════════════════════════════════════
+// ARMOR SYSTEM
+// ════════════════════════════════════════════════════
+var GEAR_ITEMS=[
+  {s:'boots',n:'Predictor Boots',h:'<div style="display:flex;gap:14px"><div style="background:linear-gradient(#8b6914,#5a4510);width:16px;height:12px;border-radius:3px 3px 2px 2px;border:1.5px solid #4a3a0e;position:relative"><span style="position:absolute;top:1px;left:2px;font-size:6px;color:#f0c040;font-weight:bold">X₁</span></div><div style="background:linear-gradient(#8b6914,#5a4510);width:16px;height:12px;border-radius:3px 3px 2px 2px;border:1.5px solid #4a3a0e;position:relative"><span style="position:absolute;top:1px;left:2px;font-size:6px;color:#f0c040;font-weight:bold">X₂</span></div></div>'},
+  {s:'mail',n:'Multivariate Chainmail',h:'<div style="width:46px;height:42px;background:linear-gradient(135deg,#6a6a7a,#4a4a5a);clip-path:polygon(50% 0%,100% 30%,100% 100%,0 100%,0 30%);border:1.5px solid #8a8a9a;position:relative"><div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:1px;align-items:center"><div style="display:flex;gap:1px"><span style="font-size:4px;color:#58a6ff">[</span><span style="font-size:4px;color:#f0c040">1</span><span style="font-size:4px;color:#f0c040">0</span><span style="font-size:4px;color:#58a6ff">]</span></div><div style="display:flex;gap:1px"><span style="font-size:4px;color:#58a6ff">[</span><span style="font-size:4px;color:#f0c040">0</span><span style="font-size:4px;color:#f0c040">1</span><span style="font-size:4px;color:#58a6ff">]</span></div></div></div>'},
+  {s:'right',n:'VIF Detector Sword',h:'<div style="display:flex;flex-direction:column;align-items:center"><div style="width:12px;height:4px;background:linear-gradient(#c0c0c0,#808080);border-radius:2px"></div><div style="width:3px;height:32px;background:linear-gradient(#e0e0e0,#a0a0a0);border:1px solid #707070;position:relative"><span style="position:absolute;top:6px;left:-6px;font-size:6px;color:#f85149;font-weight:bold">VIF</span></div><div style="width:10px;height:6px;background:#5a3a1a;border-radius:1px;border:1px solid #3a2a10"></div></div>'},
+  {s:'left',n:'Adjusted R² Shield',h:'<div style="width:28px;height:32px;background:radial-gradient(circle,#4a6a8a,#2a3a5a);border-radius:50% 50% 50% 50% / 45% 45% 55% 55%;border:2px solid #6a8aaa;position:relative"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8px;color:#f0c040;font-weight:bold;font-family:monospace">R²a</div></div>'},
+  {s:'cape',n:'Assumption Cape',h:'<div style="width:58px;height:52px;background:linear-gradient(180deg,#2a2a3a,#1a1a2a);clip-path:polygon(15% 0%,85% 0%,100% 100%,0% 100%);opacity:.85;position:relative"><div style="position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:2px;align-items:center"><span style="font-size:8px;color:#3fb950">ε ✓</span><span style="font-size:8px;color:#3fb950">ε ✓</span></div></div>'},
+  {s:'helm',n:'Regression Helm',h:'<div style="width:38px;height:22px;background:linear-gradient(#6a6a7a,#4a4a5a);clip-path:polygon(5% 100%,15% 30%,50% 0%,85% 30%,95% 100%);border-bottom:3px solid #8a8a9a;position:relative"><div style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:8px;color:#f0c040;font-weight:bold;font-family:serif">β̂</div></div>'}
+];
+var gearEarned=0;
+function armorPanelHTML(){
+  var rows='';
+  for(var i=0;i<GEAR_ITEMS.length;i++){rows+='<div class="gp-row'+(i<gearEarned?' earned':'')+'" id="gprow'+i+'"><span class="gp-dot"></span><span>'+GEAR_ITEMS[i].n+'</span></div>';}
+  var sl='<div class="vm-sparks" id="vmsparks"></div>';
+  sl+='<div class="vm-slot vm-cape" id="vmslot-cape"></div>';
+  sl+='<div class="vm-head"></div><div class="vm-arm-l"></div><div class="vm-arm-r"></div><div class="vm-torso"></div><div class="vm-leg-l"></div><div class="vm-leg-r"></div>';
+  sl+='<div class="vm-slot vm-boots" id="vmslot-boots"></div><div class="vm-slot vm-mail" id="vmslot-mail"></div>';
+  sl+='<div class="vm-slot vm-left" id="vmslot-left"></div><div class="vm-slot vm-right" id="vmslot-right"></div>';
+  sl+='<div class="vm-slot vm-helm" id="vmslot-helm"></div>';
+  return '<div class="armor-panel"><div class="viking-mini" id="vmini">'+sl+'</div><div class="gear-progress">'+rows+'</div></div>';
+}
+function restoreGear(){for(var i=0;i<gearEarned&&i<GEAR_ITEMS.length;i++){var g=GEAR_ITEMS[i],el=document.getElementById('vmslot-'+g.s);if(el){el.innerHTML=g.h;el.classList.add('on');}}}
+function earnGear(){
+  if(gearEarned>=GEAR_ITEMS.length)return;
+  var g=GEAR_ITEMS[gearEarned],el=document.getElementById('vmslot-'+g.s);
+  if(el){el.innerHTML=g.h;el.classList.add('on','vm-flash');setTimeout(function(){el.classList.remove('vm-flash')},500);spawnVMSparks(el);}
+  var row=document.getElementById('gprow'+gearEarned);if(row)row.classList.add('earned');
+  gearEarned++;
+}
+function spawnVMSparks(el){
+  var sc=document.getElementById('vmsparks');if(!sc||!el)return;
+  var r=el.getBoundingClientRect(),sr=document.getElementById('vmini').getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height/2;
+  var cols=['#f0c040','#f08030','#f0e080','#ff6040','#ffd060'];
+  for(var i=0;i<10;i++){var s=document.createElement('div');s.className='vm-spark';
+    var a=Math.random()*Math.PI*2,d=20+Math.random()*30;
+    s.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+cols[Math.floor(Math.random()*5)]+';--sx:'+(Math.cos(a)*d)+'px;--sy:'+(Math.sin(a)*d)+'px;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px';
+    sc.appendChild(s);setTimeout(function(x){x.remove()},700,s);}
+}
+function resultVikingHTML(){
+  var pct=GAME.total>0?Math.round((GAME.hits/GAME.total)*100):0;
+  var ti=[];if(pct>=90)ti=GEAR_ITEMS;else if(pct>=70)ti=GEAR_ITEMS.slice(0,5);else if(pct>=50)ti=GEAR_ITEMS.slice(0,2);
+  var html='<div class="result-viking">';
+  html+='<div class="rv-slot rv-cape" id="rvs-cape"></div>';
+  html+='<div class="rv-head"></div><div class="rv-arm-l"></div><div class="rv-arm-r"></div><div class="rv-torso"></div><div class="rv-leg-l"></div><div class="rv-leg-r"></div>';
+  html+='<div class="rv-slot rv-boots" id="rvs-boots"></div><div class="rv-slot rv-mail" id="rvs-mail"></div>';
+  html+='<div class="rv-slot rv-left" id="rvs-left"></div><div class="rv-slot rv-right" id="rvs-right"></div>';
+  html+='<div class="rv-slot rv-helm" id="rvs-helm"></div></div>';
+  setTimeout(function(){ti.forEach(function(g){var e=document.getElementById('rvs-'+g.s);if(e)e.innerHTML=g.h;});},100);
+  return html;
+}
+
+showTitleScreen();
+</script>
+</body>
+</html>

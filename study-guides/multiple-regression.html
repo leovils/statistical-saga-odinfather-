@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multiple Linear Regression — Step by Step | Odinfather</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --bg-panel: #1c2333;
+  --odin-blue: #58a6ff;
+  --thor-red: #f85149;
+  --corvo-purple: #bc8cff;
+  --gold: #f0c040;
+  --silver: #8b949e;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --success: #3fb950;
+  --border: #30363d;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 18px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-dark);
+  padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-panel);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--odin-blue), var(--gold));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* STEP CONTENT */
+.step-content {
+  min-height: 60vh;
+  padding: 30px 0;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+  font-family: 'Bangers', cursive;
+  font-size: 2.2rem;
+  color: var(--gold);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.step-subtitle {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.3rem;
+  color: var(--odin-blue);
+  margin-bottom: 15px;
+}
+
+/* DIALOGUE BOXES */
+.dialogue-box {
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  border-left: 4px solid;
+  position: relative;
+}
+
+.dialogue-box.odin {
+  background: rgba(88,166,255,0.08);
+  border-left-color: var(--odin-blue);
+}
+.dialogue-box.thor {
+  background: rgba(248,81,73,0.08);
+  border-left-color: var(--thor-red);
+}
+.dialogue-box.corvo {
+  background: rgba(188,140,255,0.08);
+  border-left-color: var(--corvo-purple);
+}
+
+.char-name {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.char-name.odin { color: var(--odin-blue); }
+.char-name.thor { color: var(--thor-red); }
+.char-name.corvo { color: var(--corvo-purple); }
+
+.dialogue-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* DATA TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 1rem;
+}
+
+.data-table th, .data-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.data-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+}
+
+.data-table td {
+  background: var(--bg-card);
+  transition: background 0.2s;
+}
+
+.data-table tr:hover td {
+  background: rgba(88,166,255,0.1);
+}
+
+/* CALC TABLE */
+.calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 0.95rem;
+}
+
+.calc-table th, .calc-table td {
+  padding: 8px 10px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.calc-table th {
+  background: var(--bg-panel);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.calc-table td {
+  background: var(--bg-card);
+}
+
+/* FORMULA */
+.formula {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-size: 1.15rem;
+  text-align: center;
+  font-family: 'Patrick Hand', cursive;
+  color: var(--gold);
+}
+
+.formula-label {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+/* SVG VISUALS */
+.visual-container {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.visual-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* CONCEPT GRID */
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.concept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.concept-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+/* COMPARISON GRID */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.comparison-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.comparison-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.comparison-result {
+  font-size: 1.4rem;
+  font-family: 'Bangers', cursive;
+}
+
+/* APA BOX */
+.apa-box {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 20px 0;
+  font-style: italic;
+  line-height: 1.7;
+}
+
+.apa-label {
+  font-family: 'Bangers', cursive;
+  color: var(--gold);
+  font-style: normal;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+/* WARNING BOX */
+.warning-box {
+  background: rgba(248,81,73,0.06);
+  border: 2px solid var(--thor-red);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.warning-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--thor-red);
+  margin-bottom: 12px;
+}
+
+/* CORRECT BOX */
+.correct-box {
+  background: rgba(63,185,80,0.06);
+  border: 2px solid var(--success);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.correct-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--success);
+  margin-bottom: 12px;
+}
+
+/* RAVENS LESSON */
+.licao-box {
+  background: rgba(188,140,255,0.06);
+  border: 2px solid var(--corvo-purple);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.licao-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: var(--corvo-purple);
+  margin-bottom: 12px;
+}
+
+/* TRAP GRID */
+.trap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.trap-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.trap-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 0.95rem;
+  color: var(--thor-red);
+  margin-bottom: 8px;
+}
+
+/* NAVIGATION */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 40px;
+  gap: 12px;
+}
+
+.nav-btn {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover {
+  border-color: var(--odin-blue);
+  background: rgba(88,166,255,0.1);
+}
+
+.nav-btn.primary {
+  background: var(--odin-blue);
+  color: var(--bg-dark);
+  border-color: var(--odin-blue);
+}
+
+.nav-btn.primary:hover {
+  background: #79bbff;
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* SIGNATURE */
+.signature {
+  text-align: center;
+  padding: 30px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* HIGHLIGHTS */
+.hl-gold { color: var(--gold); font-weight: bold; }
+.hl-blue { color: var(--odin-blue); }
+.hl-red { color: var(--thor-red); }
+.hl-green { color: var(--success); }
+.hl-purple { color: var(--corvo-purple); }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container { padding: 12px; }
+  .step-title { font-size: 1.6rem; }
+  .concept-grid, .comparison-grid, .trap-grid { grid-template-columns: 1fr; }
+  .nav-btn { padding: 10px 18px; font-size: 0.95rem; }
+  body { font-size: 16px; }
+}
+
+.fade-in { animation: fadeIn 0.6s ease both; }
+.fade-in-delay { animation: fadeIn 0.6s ease 0.3s both; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="progress-bar-container">
+    <div class="progress-label" id="progressLabel">Step 0 of 11</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="step-content" id="stepContent"></div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" id="btnBack" onclick="goBack()" disabled>&#9664; Back</button>
+    <button class="nav-btn primary" id="btnNext" onclick="goNext()">Next &#9654;</button>
+  </div>
+
+  <div class="signature">
+    Prof. Dr. Leonardo Vils &middot; PPGA &middot; UNINOVE &middot; MTPQI &middot; 2026
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+// Battle outcomes from 12 campaigns across the Nine Realms
+var battles = ['Siege of Birka','Raid on Hedeby','March to Kaupang','Fall of Ribe','Shield Wall at Jorvik','Charge of Sigtuna','Defense of Visby','Storm of Roskilde','Ambush at Uppsala','Crossing of Lindisfarne','Assault on Trondheim','Sack of Novgorod'];
+var X1 = [120, 85, 200, 150, 95, 180, 110, 60, 140, 75, 220, 165]; // Warriors
+var X2 = [80, 45, 90, 70, 55, 85, 75, 30, 65, 40, 95, 60];        // Provisions (barrels)
+var X3 = [7, 4, 8, 6, 9, 5, 8, 3, 6, 5, 9, 7];                    // Terrain Score (1-10)
+var X4 = [8, 6, 9, 5, 7, 8, 7, 4, 6, 5, 9, 7];                    // Morale (1-10)
+var Y  = [82, 55, 91, 62, 74, 78, 80, 35, 68, 48, 95, 72];        // Victory Score (0-100)
+var n = X1.length;
+var k = 4; // number of predictors
+
+// ===== HELPERS =====
+function sum(arr) { return arr.reduce(function(a,b){return a+b;},0); }
+function mean(arr) { return sum(arr) / arr.length; }
+function rf(v, d) { return Number(v).toFixed(d === undefined ? 2 : d); }
+function r4(v) { return Number(v).toFixed(4); }
+
+// ===== MEANS =====
+var mX1 = mean(X1), mX2 = mean(X2), mX3 = mean(X3), mX4 = mean(X4), mY = mean(Y);
+
+// ===== MATRIX OPERATIONS (for OLS) =====
+// Build X matrix (with intercept column)
+function buildDesignMatrix() {
+  var Xm = [];
+  for (var i = 0; i < n; i++) {
+    Xm.push([1, X1[i], X2[i], X3[i], X4[i]]);
+  }
+  return Xm;
+}
+
+function transpose(M) {
+  var rows = M.length, cols = M[0].length;
+  var T = [];
+  for (var j = 0; j < cols; j++) {
+    T[j] = [];
+    for (var i = 0; i < rows; i++) {
+      T[j][i] = M[i][j];
+    }
+  }
+  return T;
+}
+
+function matMul(A, B) {
+  var rA = A.length, cA = A[0].length, cB = B[0].length;
+  var C = [];
+  for (var i = 0; i < rA; i++) {
+    C[i] = [];
+    for (var j = 0; j < cB; j++) {
+      var s = 0;
+      for (var m = 0; m < cA; m++) s += A[i][m] * B[m][j];
+      C[i][j] = s;
+    }
+  }
+  return C;
+}
+
+function matVecMul(A, v) {
+  var result = [];
+  for (var i = 0; i < A.length; i++) {
+    var s = 0;
+    for (var j = 0; j < v.length; j++) s += A[i][j] * v[j];
+    result[i] = s;
+  }
+  return result;
+}
+
+function invertMatrix(M) {
+  var sz = M.length;
+  var aug = [];
+  for (var i = 0; i < sz; i++) {
+    aug[i] = [];
+    for (var j = 0; j < sz; j++) aug[i][j] = M[i][j];
+    for (var j2 = 0; j2 < sz; j2++) aug[i][sz + j2] = (i === j2) ? 1 : 0;
+  }
+  for (var col = 0; col < sz; col++) {
+    var maxRow = col;
+    for (var row = col + 1; row < sz; row++) {
+      if (Math.abs(aug[row][col]) > Math.abs(aug[maxRow][col])) maxRow = row;
+    }
+    var tmp = aug[col]; aug[col] = aug[maxRow]; aug[maxRow] = tmp;
+    var pivot = aug[col][col];
+    if (Math.abs(pivot) < 1e-12) return null;
+    for (var j3 = 0; j3 < 2 * sz; j3++) aug[col][j3] /= pivot;
+    for (var row2 = 0; row2 < sz; row2++) {
+      if (row2 !== col) {
+        var factor = aug[row2][col];
+        for (var j4 = 0; j4 < 2 * sz; j4++) aug[row2][j4] -= factor * aug[col][j4];
+      }
+    }
+  }
+  var inv = [];
+  for (var i2 = 0; i2 < sz; i2++) {
+    inv[i2] = [];
+    for (var j5 = 0; j5 < sz; j5++) inv[i2][j5] = aug[i2][sz + j5];
+  }
+  return inv;
+}
+
+// ===== OLS ESTIMATION: b = (X'X)^-1 X'Y =====
+var Xmat = buildDesignMatrix();
+var Xt = transpose(Xmat);
+var XtX = matMul(Xt, Xmat);
+var XtXinv = invertMatrix(XtX);
+var Yvec = Y.map(function(v){ return [v]; });
+var XtY = matVecMul(Xt, Y);
+var betas = matVecMul(XtXinv, XtY);
+
+var b0 = betas[0], b1 = betas[1], b2 = betas[2], b3 = betas[3], b4 = betas[4];
+
+// ===== PREDICTED & RESIDUALS =====
+var Yhat = [];
+var residuals = [];
+for (var i = 0; i < n; i++) {
+  Yhat[i] = b0 + b1*X1[i] + b2*X2[i] + b3*X3[i] + b4*X4[i];
+  residuals[i] = Y[i] - Yhat[i];
+}
+
+// ===== SST, SSR, SSE =====
+var SST = 0, SSR = 0, SSE = 0;
+for (var i2 = 0; i2 < n; i2++) {
+  SST += Math.pow(Y[i2] - mY, 2);
+  SSR += Math.pow(Yhat[i2] - mY, 2);
+  SSE += Math.pow(residuals[i2], 2);
+}
+
+var R2 = SSR / SST;
+var R2adj = 1 - ((1 - R2) * (n - 1)) / (n - k - 1);
+
+// ===== F-TEST =====
+var MSR = SSR / k;
+var MSE = SSE / (n - k - 1);
+var Fstat = MSR / MSE;
+
+// ===== STANDARD ERRORS & t-tests for each beta =====
+var seBetas = [];
+for (var j = 0; j < (k + 1); j++) {
+  seBetas[j] = Math.sqrt(MSE * XtXinv[j][j]);
+}
+var tBetas = [];
+for (var j2b = 0; j2b < (k + 1); j2b++) {
+  tBetas[j2b] = betas[j2b] / seBetas[j2b];
+}
+
+// ===== STANDARDIZED BETAS =====
+function stdev(arr) {
+  var m = mean(arr);
+  var ss = 0;
+  for (var i = 0; i < arr.length; i++) ss += Math.pow(arr[i] - m, 2);
+  return Math.sqrt(ss / (arr.length - 1));
+}
+var sdX1 = stdev(X1), sdX2 = stdev(X2), sdX3 = stdev(X3), sdX4 = stdev(X4), sdY = stdev(Y);
+var betaStd1 = b1 * sdX1 / sdY;
+var betaStd2 = b2 * sdX2 / sdY;
+var betaStd3 = b3 * sdX3 / sdY;
+var betaStd4 = b4 * sdX4 / sdY;
+
+// ===== CORRELATION MATRIX (for VIF) =====
+function pearsonR(a, b) {
+  var ma = mean(a), mb = mean(b);
+  var num = 0, da2 = 0, db2 = 0;
+  for (var i = 0; i < a.length; i++) {
+    var da = a[i] - ma, db = b[i] - mb;
+    num += da * db;
+    da2 += da * da;
+    db2 += db * db;
+  }
+  return num / Math.sqrt(da2 * db2);
+}
+
+var r12 = pearsonR(X1, X2);
+var r13 = pearsonR(X1, X3);
+var r14 = pearsonR(X1, X4);
+var r23 = pearsonR(X2, X3);
+var r24 = pearsonR(X2, X4);
+var r34 = pearsonR(X3, X4);
+
+// Approximate VIF via auxiliary regressions
+function calcVIF(target, others) {
+  // Simple: regress target on others, get R2, VIF = 1/(1-R2)
+  var nt = target.length;
+  var Xa = [];
+  for (var i = 0; i < nt; i++) {
+    Xa[i] = [1];
+    for (var j = 0; j < others.length; j++) Xa[i].push(others[j][i]);
+  }
+  var Xat = transpose(Xa);
+  var XatXa = matMul(Xat, Xa);
+  var XatXaInv = invertMatrix(XatXa);
+  if (!XatXaInv) return 999;
+  var XatYa = matVecMul(Xat, target);
+  var ba = matVecMul(XatXaInv, XatYa);
+  var yHat = [];
+  var mt = mean(target);
+  var sst = 0, sse = 0;
+  for (var i2 = 0; i2 < nt; i2++) {
+    var pred = 0;
+    for (var j2 = 0; j2 < ba.length; j2++) pred += ba[j2] * Xa[i2][j2];
+    yHat[i2] = pred;
+    sst += Math.pow(target[i2] - mt, 2);
+    sse += Math.pow(target[i2] - pred, 2);
+  }
+  var r2a = 1 - sse / sst;
+  return 1 / (1 - r2a);
+}
+
+var VIF1 = calcVIF(X1, [X2, X3, X4]);
+var VIF2 = calcVIF(X2, [X1, X3, X4]);
+var VIF3 = calcVIF(X3, [X1, X2, X4]);
+var VIF4 = calcVIF(X4, [X1, X2, X3]);
+
+// ===== P-VALUE APPROXIMATION =====
+function gammln(x) {
+  var c = [76.18009172947146,-86.50532032941677,24.01409824083091,
+    -1.231739572450155,0.001208650973866179,-0.000005395239384953];
+  var y = x, tmp2 = x + 5.5;
+  tmp2 -= (x+0.5)*Math.log(tmp2);
+  var ser = 1.000000000190015;
+  for(var j=0;j<6;j++) ser += c[j]/(++y);
+  return -tmp2 + Math.log(2.5066282746310005*ser/x);
+}
+
+function tPDF(x, df) {
+  var coeff = Math.exp(gammln((df+1)/2) - gammln(df/2)) / Math.sqrt(df * Math.PI);
+  return coeff * Math.pow(1 + x*x/df, -(df+1)/2);
+}
+
+function tCDF(t, df) {
+  var lower = -30;
+  var steps = 4000;
+  var h = (t - lower) / steps;
+  var s = tPDF(lower, df) + tPDF(t, df);
+  for (var i = 1; i < steps; i++) {
+    var xi = lower + i * h;
+    s += (i % 2 === 0 ? 2 : 4) * tPDF(xi, df);
+  }
+  return Math.max(0, Math.min(1, (h/3) * s));
+}
+
+function pValueTwoTailed(t, df) {
+  var cdf = tCDF(Math.abs(t), df);
+  return 2 * (1 - cdf);
+}
+
+// F-distribution p-value approximation
+function fPDF(x, d1, d2) {
+  if (x <= 0) return 0;
+  var num = Math.pow(d1 * x, d1) * Math.pow(d2, d2);
+  var den = Math.pow(d1 * x + d2, d1 + d2);
+  var ratio = Math.sqrt(num / den);
+  var beta = Math.exp(gammln(d1/2) + gammln(d2/2) - gammln((d1+d2)/2));
+  return ratio / (x * beta);
+}
+
+function fCDF(f, d1, d2) {
+  if (f <= 0) return 0;
+  var steps = 5000;
+  var h = f / steps;
+  var s = fPDF(0.0001, d1, d2) + fPDF(f, d1, d2);
+  for (var i = 1; i < steps; i++) {
+    var xi = 0.0001 + i * h;
+    s += (i % 2 === 0 ? 2 : 4) * fPDF(xi, d1, d2);
+  }
+  return Math.max(0, Math.min(1, (h/3) * s));
+}
+
+var pF = 1 - fCDF(Fstat, k, n - k - 1);
+var dfBetas = n - k - 1;
+var pBetas = [];
+for (var jP = 0; jP < (k+1); jP++) {
+  pBetas[jP] = pValueTwoTailed(tBetas[jP], dfBetas);
+}
+
+// ===== DIALOGUE HELPER =====
+function dialogue(character, name, text) {
+  return '<div class="dialogue-box ' + character + '">' +
+    '<div class="char-name ' + character + '">' + name + '</div>' +
+    '<div class="dialogue-text">' + text + '</div>' +
+  '</div>';
+}
+
+// ===== RESIDUAL PLOT SVG =====
+function buildResidualPlot() {
+  var w = 680, h = 320;
+  var pad = { top: 30, right: 30, bottom: 50, left: 60 };
+  var pw = w - pad.left - pad.right;
+  var ph = h - pad.top - pad.bottom;
+
+  var yMin = -15, yMax = 15;
+  var xMin2 = 30, xMax2 = 100;
+  function sx(v) { return pad.left + (v - xMin2) / (xMax2 - xMin2) * pw; }
+  function sy(v) { return pad.top + ph - (v - yMin) / (yMax - yMin) * ph; }
+
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+
+  // Grid
+  for (var gy = -10; gy <= 10; gy += 5) {
+    svg += '<line x1="' + pad.left + '" y1="' + sy(gy) + '" x2="' + (pad.left + pw) + '" y2="' + sy(gy) + '" stroke="#30363d" stroke-width="0.5" opacity="0.5"/>';
+  }
+
+  // Zero line
+  svg += '<line x1="' + pad.left + '" y1="' + sy(0) + '" x2="' + (pad.left + pw) + '" y2="' + sy(0) + '" stroke="#f0c040" stroke-width="1.5" stroke-dasharray="6,4"/>';
+
+  // Axes
+  svg += '<line x1="' + pad.left + '" y1="' + (pad.top + ph) + '" x2="' + (pad.left + pw) + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+  svg += '<line x1="' + pad.left + '" y1="' + pad.top + '" x2="' + pad.left + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1.5"/>';
+
+  // Labels
+  svg += '<text x="' + (pad.left + pw/2) + '" y="' + (h - 5) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker">Predicted (Y-hat)</text>';
+  svg += '<text x="15" y="' + (pad.top + ph/2) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker" transform="rotate(-90,15,' + (pad.top + ph/2) + ')">Residual</text>';
+
+  // Tick labels
+  for (var gx = 40; gx <= 90; gx += 10) {
+    svg += '<text x="' + sx(gx) + '" y="' + (pad.top + ph + 20) + '" fill="#8b949e" font-size="11" text-anchor="middle" font-family="Patrick Hand">' + gx + '</text>';
+  }
+  for (var gy2 = -10; gy2 <= 10; gy2 += 5) {
+    svg += '<text x="' + (pad.left - 10) + '" y="' + (sy(gy2) + 4) + '" fill="#8b949e" font-size="11" text-anchor="end" font-family="Patrick Hand">' + gy2 + '</text>';
+  }
+
+  // Points
+  for (var i = 0; i < n; i++) {
+    svg += '<circle cx="' + sx(Yhat[i]) + '" cy="' + sy(residuals[i]) + '" r="6" fill="#58a6ff" stroke="#0d1117" stroke-width="1.5" opacity="0.9"/>';
+  }
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ===== VENN DIAGRAM SVG =====
+function buildVennDiagram() {
+  var w = 680, h = 380;
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+
+  // Y circle (large, center)
+  svg += '<circle cx="340" cy="190" r="140" fill="none" stroke="#f0c040" stroke-width="2.5" stroke-dasharray="6,3"/>';
+  svg += '<text x="340" y="50" fill="#f0c040" font-size="16" text-anchor="middle" font-family="Permanent Marker">Y (Victory Score)</text>';
+
+  // X1 circle
+  svg += '<circle cx="260" cy="170" r="90" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="2"/>';
+  svg += '<text x="185" y="120" fill="#58a6ff" font-size="13" text-anchor="middle" font-family="Permanent Marker">X1</text>';
+  svg += '<text x="185" y="136" fill="#58a6ff" font-size="11" text-anchor="middle" font-family="Patrick Hand">Warriors</text>';
+
+  // X2 circle
+  svg += '<circle cx="420" cy="170" r="85" fill="rgba(63,185,80,0.12)" stroke="#3fb950" stroke-width="2"/>';
+  svg += '<text x="495" y="120" fill="#3fb950" font-size="13" text-anchor="middle" font-family="Permanent Marker">X2</text>';
+  svg += '<text x="495" y="136" fill="#3fb950" font-size="11" text-anchor="middle" font-family="Patrick Hand">Provisions</text>';
+
+  // X3 circle
+  svg += '<circle cx="300" cy="250" r="80" fill="rgba(188,140,255,0.12)" stroke="#bc8cff" stroke-width="2"/>';
+  svg += '<text x="225" y="310" fill="#bc8cff" font-size="13" text-anchor="middle" font-family="Permanent Marker">X3</text>';
+  svg += '<text x="225" y="326" fill="#bc8cff" font-size="11" text-anchor="middle" font-family="Patrick Hand">Terrain</text>';
+
+  // X4 circle
+  svg += '<circle cx="380" cy="250" r="80" fill="rgba(248,81,73,0.12)" stroke="#f85149" stroke-width="2"/>';
+  svg += '<text x="455" y="310" fill="#f85149" font-size="13" text-anchor="middle" font-family="Permanent Marker">X4</text>';
+  svg += '<text x="455" y="326" fill="#f85149" font-size="11" text-anchor="middle" font-family="Patrick Hand">Morale</text>';
+
+  // Shared region label
+  svg += '<text x="340" y="195" fill="#f0c040" font-size="14" text-anchor="middle" font-family="Bangers">Shared Variance</text>';
+  svg += '<text x="340" y="215" fill="#f0c040" font-size="12" text-anchor="middle" font-family="Patrick Hand">(overlap = multicollinearity)</text>';
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ===== VIF BAR CHART SVG =====
+function buildVIFChart() {
+  var w = 680, h = 260;
+  var pad = { top: 30, right: 30, bottom: 50, left: 80 };
+  var pw = w - pad.left - pad.right;
+  var ph = h - pad.top - pad.bottom;
+
+  var vifs = [VIF1, VIF2, VIF3, VIF4];
+  var labels = ['Warriors', 'Provisions', 'Terrain', 'Morale'];
+  var colors = ['#58a6ff', '#3fb950', '#bc8cff', '#f85149'];
+  var barH = ph / 5;
+  var maxVIF = Math.max(10, Math.max.apply(null, vifs) * 1.2);
+
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+
+  // Danger zone
+  var dangerX = pad.left + (10 / maxVIF) * pw;
+  svg += '<rect x="' + dangerX + '" y="' + pad.top + '" width="' + (pad.left + pw - dangerX) + '" height="' + ph + '" fill="rgba(248,81,73,0.06)" />';
+  svg += '<line x1="' + dangerX + '" y1="' + pad.top + '" x2="' + dangerX + '" y2="' + (pad.top + ph) + '" stroke="#f85149" stroke-width="1.5" stroke-dasharray="6,3"/>';
+  svg += '<text x="' + (dangerX + 5) + '" y="' + (pad.top + 15) + '" fill="#f85149" font-size="11" font-family="Permanent Marker">VIF = 10 (Danger!)</text>';
+
+  // Bars
+  for (var i = 0; i < 4; i++) {
+    var by = pad.top + i * barH + barH * 0.2;
+    var bw = (vifs[i] / maxVIF) * pw;
+    var bh = barH * 0.6;
+    svg += '<rect x="' + pad.left + '" y="' + by + '" width="' + bw + '" height="' + bh + '" fill="' + colors[i] + '" opacity="0.8" rx="4"/>';
+    svg += '<text x="' + (pad.left - 8) + '" y="' + (by + bh/2 + 5) + '" fill="' + colors[i] + '" font-size="12" text-anchor="end" font-family="Permanent Marker">' + labels[i] + '</text>';
+    svg += '<text x="' + (pad.left + bw + 6) + '" y="' + (by + bh/2 + 5) + '" fill="' + colors[i] + '" font-size="13" font-family="Bangers">' + rf(vifs[i], 2) + '</text>';
+  }
+
+  // X-axis
+  svg += '<line x1="' + pad.left + '" y1="' + (pad.top + ph) + '" x2="' + (pad.left + pw) + '" y2="' + (pad.top + ph) + '" stroke="#8b949e" stroke-width="1"/>';
+  for (var gx = 2; gx <= maxVIF; gx += 2) {
+    var xp = pad.left + (gx / maxVIF) * pw;
+    svg += '<text x="' + xp + '" y="' + (pad.top + ph + 18) + '" fill="#8b949e" font-size="11" text-anchor="middle" font-family="Patrick Hand">' + gx + '</text>';
+  }
+  svg += '<text x="' + (pad.left + pw/2) + '" y="' + (h - 5) + '" fill="#8b949e" font-size="13" text-anchor="middle" font-family="Permanent Marker">VIF</text>';
+
+  svg += '</svg>';
+  return svg;
+}
+
+
+// =============================================
+// STEP FUNCTIONS
+// =============================================
+
+function step0() {
+  return '<div class="step-title">The War Council of Asgard: Predicting Battle Outcomes</div>' +
+
+    '<p>In the great hall of Valhalla, Odin Allfather convenes his war council. Twelve campaigns across the Nine Realms are recorded on ancient parchment. The question: which factors truly determine <span class="hl-gold">victory</span>? Is it the number of <span class="hl-blue">warriors</span>, the <span class="hl-green">provisions</span> stockpiled, the <span class="hl-purple">terrain advantage</span>, or the <span class="hl-red">morale</span> of the troops?</p>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'In simple regression, we predicted Y from <em>one</em> variable. But reality is rarely that simple. Battle outcomes depend on <strong>multiple factors simultaneously</strong>. Multiple linear regression lets us weigh them all at once \x96 and figure out which ones actually matter while controlling for the rest.') +
+
+    dialogue('thor', '⚡ Thorment', 'Multiple predictors? Just throw everything in and let the computer sort it out! More variables = better model, right?') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'That\x27s exactly the reckless thinking that gets armies destroyed, Thorment. More variables can mean more noise, multicollinearity, and overfitting. We need strategy, not brute force.') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', '<strong>Multiple Linear Regression (MLR)</strong> extends simple regression to include two or more predictor variables. It estimates the effect of each predictor <em>while holding all others constant</em>. The technique was formalized by R.A. Fisher and extended by econometricians in the early 20th century.') +
+
+    '<p style="margin-top:18px">Here is the war council\x27s parchment \x96 data from <span class="hl-gold">12 campaigns</span>:</p>' +
+
+    '<div style="overflow-x:auto">' +
+    '<table class="data-table">' +
+    '<tr><th>Battle</th><th>Warriors (X₁)</th><th>Provisions (X₂)</th><th>Terrain (X₃)</th><th>Morale (X₄)</th><th>Victory (Y)</th></tr>' +
+    battles.map(function(b, i) {
+      return '<tr><td>' + b + '</td><td>' + X1[i] + '</td><td>' + X2[i] + '</td><td>' + X3[i] + '</td><td>' + X4[i] + '</td><td>' + Y[i] + '</td></tr>';
+    }).join('') +
+    '</table>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Before we begin: look at the data. Do you see variables that seem to move together? If warriors and provisions are highly correlated, that\x27s going to create trouble down the road. Keep your eyes open.');
+}
+
+function step1() {
+  return '<div class="step-title">Step 1: From Simple to Multiple \x96 The Extended Equation</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'In simple regression, the equation had one predictor: <em>ŷ = b₀ + b₁x₁</em>. Now we add more predictors, each with its own coefficient.') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Multiple Linear Regression Equation</div>' +
+      'ŷ = b₀ + b₁x₁ + b₂x₂ + b₃x₃ + ... + bₖxₖ' +
+    '</div>' +
+
+    '<p>For our battle data with <span class="hl-gold">k = 4</span> predictors:</p>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Our Model</div>' +
+      'Victory = b₀ + b₁(Warriors) + b₂(Provisions) + b₃(Terrain) + b₄(Morale)' +
+    '</div>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">b₀ (Intercept)</h4>' +
+        '<p>Predicted Y when all X\x27s = 0. Often has no practical meaning in MLR.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">b₁, b₂, ... bₖ</h4>' +
+        '<p><strong>Partial regression coefficients</strong> \x96 the effect of each X holding all others constant.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">k (Predictors)</h4>' +
+        '<p>Number of predictor variables in the model. Here k = 4.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">OLS</h4>' +
+        '<p>Ordinary Least Squares minimizes the sum of squared residuals, just like simple regression.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'So each b tells me how much Y changes per unit of X? Easy!') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Almost. Each bⱼ tells you the change in Y per unit of Xⱼ, <strong>holding all other predictors constant</strong>. That "holding constant" part is the key difference from simple regression. The coefficient can change dramatically when you add or remove other variables.') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'In matrix form, the OLS solution is <strong>b = (X\x27X)⁻¹X\x27Y</strong>. The math is more complex than simple regression, but the logic is the same: find the coefficients that minimize the total squared prediction error.');
+}
+
+function step2() {
+  return '<div class="step-title">Step 2: The Data \x96 Odin\x27s Battle Archives</div>' +
+
+    '<p>Let\x27s examine the descriptive statistics of our four predictors and the outcome variable:</p>' +
+
+    '<table class="data-table">' +
+    '<tr><th>Variable</th><th>Mean</th><th>SD</th><th>Min</th><th>Max</th></tr>' +
+    '<tr><td>Warriors (X₁)</td><td>' + rf(mX1,1) + '</td><td>' + rf(sdX1,1) + '</td><td>' + Math.min.apply(null,X1) + '</td><td>' + Math.max.apply(null,X1) + '</td></tr>' +
+    '<tr><td>Provisions (X₂)</td><td>' + rf(mX2,1) + '</td><td>' + rf(sdX2,1) + '</td><td>' + Math.min.apply(null,X2) + '</td><td>' + Math.max.apply(null,X2) + '</td></tr>' +
+    '<tr><td>Terrain (X₃)</td><td>' + rf(mX3,1) + '</td><td>' + rf(sdX3,1) + '</td><td>' + Math.min.apply(null,X3) + '</td><td>' + Math.max.apply(null,X3) + '</td></tr>' +
+    '<tr><td>Morale (X₄)</td><td>' + rf(mX4,1) + '</td><td>' + rf(sdX4,1) + '</td><td>' + Math.min.apply(null,X4) + '</td><td>' + Math.max.apply(null,X4) + '</td></tr>' +
+    '<tr><td style="color:var(--gold)">Victory (Y)</td><td>' + rf(mY,1) + '</td><td>' + rf(sdY,1) + '</td><td>' + Math.min.apply(null,Y) + '</td><td>' + Math.max.apply(null,Y) + '</td></tr>' +
+    '</table>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Notice the predictors are on very different scales. Warriors range from 60 to 220, while Terrain is 3 to 9. This means the <em>unstandardized</em> coefficients won\x27t be directly comparable. We\x27ll need standardized betas later.') +
+
+    '<p class="step-subtitle">Correlation Matrix (Bivariate)</p>' +
+
+    '<table class="data-table">' +
+    '<tr><th></th><th>X₁</th><th>X₂</th><th>X₃</th><th>X₄</th><th>Y</th></tr>' +
+    '<tr><td><strong>X₁ Warriors</strong></td><td>1.00</td><td>' + rf(r12,2) + '</td><td>' + rf(r13,2) + '</td><td>' + rf(r14,2) + '</td><td>' + rf(pearsonR(X1,Y),2) + '</td></tr>' +
+    '<tr><td><strong>X₂ Provisions</strong></td><td>' + rf(r12,2) + '</td><td>1.00</td><td>' + rf(r23,2) + '</td><td>' + rf(r24,2) + '</td><td>' + rf(pearsonR(X2,Y),2) + '</td></tr>' +
+    '<tr><td><strong>X₃ Terrain</strong></td><td>' + rf(r13,2) + '</td><td>' + rf(r23,2) + '</td><td>1.00</td><td>' + rf(r34,2) + '</td><td>' + rf(pearsonR(X3,Y),2) + '</td></tr>' +
+    '<tr><td><strong>X₄ Morale</strong></td><td>' + rf(r14,2) + '</td><td>' + rf(r24,2) + '</td><td>' + rf(r34,2) + '</td><td>1.00</td><td>' + rf(pearsonR(X4,Y),2) + '</td></tr>' +
+    '</table>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Check those inter-predictor correlations. If two predictors share too much variance, their individual effects become difficult to untangle. The correlation between Warriors and Provisions is r = ' + rf(r12,2) + ' \x96 is that a concern? We\x27ll return to this when we cover multicollinearity.') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The correlation matrix is the starting point for any regression analysis. It reveals the bivariate relationships <em>and</em> potential multicollinearity problems before you even run the model.');
+}
+
+function step3() {
+  return '<div class="step-title">Step 3: Partial Regression Coefficients \x96 Each Factor\x27s Unique Contribution</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'The OLS solution gives us the best-fitting coefficients. Let\x27s see our regression equation:') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Fitted Model</div>' +
+      'ŷ = ' + rf(b0,2) + (b1 >= 0 ? ' + ' : ' ') + rf(b1,4) + '(Warriors) ' + (b2 >= 0 ? '+ ' : '') + rf(b2,4) + '(Provisions) ' + (b3 >= 0 ? '+ ' : '') + rf(b3,4) + '(Terrain) ' + (b4 >= 0 ? '+ ' : '') + rf(b4,4) + '(Morale)' +
+    '</div>' +
+
+    '<table class="data-table">' +
+    '<tr><th>Predictor</th><th>b (Unstandardized)</th><th>β (Standardized)</th><th>SE</th><th>t</th></tr>' +
+    '<tr><td>Intercept (b₀)</td><td>' + rf(b0,3) + '</td><td>\x96</td><td>' + rf(seBetas[0],3) + '</td><td>' + rf(tBetas[0],2) + '</td></tr>' +
+    '<tr><td>Warriors (b₁)</td><td>' + rf(b1,4) + '</td><td>' + rf(betaStd1,3) + '</td><td>' + rf(seBetas[1],4) + '</td><td>' + rf(tBetas[1],2) + '</td></tr>' +
+    '<tr><td>Provisions (b₂)</td><td>' + rf(b2,4) + '</td><td>' + rf(betaStd2,3) + '</td><td>' + rf(seBetas[2],4) + '</td><td>' + rf(tBetas[2],2) + '</td></tr>' +
+    '<tr><td>Terrain (b₃)</td><td>' + rf(b3,4) + '</td><td>' + rf(betaStd3,3) + '</td><td>' + rf(seBetas[3],4) + '</td><td>' + rf(tBetas[3],2) + '</td></tr>' +
+    '<tr><td>Morale (b₄)</td><td>' + rf(b4,4) + '</td><td>' + rf(betaStd4,3) + '</td><td>' + rf(seBetas[4],4) + '</td><td>' + rf(tBetas[4],2) + '</td></tr>' +
+    '</table>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', '<strong>How to interpret b₁:</strong> For each additional warrior, the Victory Score increases by ' + rf(b1,3) + ' points, <em>holding provisions, terrain, and morale constant</em>. The "holding constant" clause is everything.') +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Unstandardized b</h4>' +
+        '<p>In the original units of X and Y. Not comparable across predictors with different scales.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">Standardized β</h4>' +
+        '<p>β = b × (SDₓ / SDᵧ). Comparable across predictors: larger |β| = stronger effect.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'So I just compare the b values to know which predictor is strongest?') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'NO! Warriors range 60\x9620, but Morale ranges 4\x9610. You <strong>must compare standardized betas (β)</strong> to see which predictor has the most impact on the same scale.') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'The largest |β| indicates the predictor with the strongest <em>unique</em> contribution to explaining Y, after partialing out all other predictors. Check the standardized column above to find the strongest factor.');
+}
+
+function step4() {
+  return '<div class="step-title">Step 4: R² and Adjusted R² \x96 How Much Variance Is Explained?</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', '<strong>R²</strong> tells us what proportion of the total variance in Y is explained by <em>all predictors combined</em>. But beware: R² always increases when you add more predictors, even useless ones.') +
+
+    '<div class="comparison-grid">' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--odin-blue)">R²</div>' +
+        '<div class="comparison-result" style="color:var(--odin-blue)">' + rf(R2,4) + '</div>' +
+        '<p style="font-size:0.85rem;margin-top:6px">' + rf(R2*100,1) + '% variance explained</p>' +
+      '</div>' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--gold)">Adjusted R²</div>' +
+        '<div class="comparison-result" style="color:var(--gold)">' + rf(R2adj,4) + '</div>' +
+        '<p style="font-size:0.85rem;margin-top:6px">Penalized for k = ' + k + ' predictors</p>' +
+      '</div>' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--thor-red)">Shrinkage</div>' +
+        '<div class="comparison-result" style="color:var(--thor-red)">' + rf((R2 - R2adj)*100,1) + '%</div>' +
+        '<p style="font-size:0.85rem;margin-top:6px">R² \x96 R²adj</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Adjusted R² Formula</div>' +
+      'R²<sub>adj</sub> = 1 \x96 [(1 \x96 R²)(n \x96 1) / (n \x96 k \x96 1)]' +
+    '</div>' +
+
+    '<p>Plugging in: R²<sub>adj</sub> = 1 \x96 [(1 \x96 ' + rf(R2,4) + ')(' + n + ' \x96 1) / (' + n + ' \x96 ' + k + ' \x96 1)] = 1 \x96 [' + rf(1-R2,4) + ' × ' + (n-1) + ' / ' + (n-k-1) + '] = <span class="hl-gold">' + rf(R2adj,4) + '</span></p>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Adjusted R² penalizes for the number of predictors. If a predictor adds noise instead of signal, Adjusted R² can actually <em>decrease</em> when you include it. That\x27s why we report both.') +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ Thorment\x27s Trap: R² Inflation</div>' +
+      '<p>Adding any predictor \x96 even a random number generator \x96 will increase R². With n = 12 and k = 4, the difference between R² and Adjusted R² is ' + rf((R2 - R2adj)*100,1) + ' percentage points. With small samples and many predictors, this gap can be enormous. <strong>Always report Adjusted R².</strong></p>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'R² of ' + rf(R2,2) + ' sounds impressive. But with only ' + n + ' observations and ' + k + ' predictors, we\x27re dangerously close to overfitting. A general rule: you want at least 10\x9615 observations per predictor. We have ' + n + '/' + k + ' = ' + rf(n/k,0) + '. That\x27s tight.');
+}
+
+function step5() {
+  return '<div class="step-title">Step 5: F-test \x96 Is the Overall Model Significant?</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Before examining individual predictors, we ask: does this model, <em>as a whole</em>, explain significantly more variance than a model with no predictors at all? That\x27s the F-test.') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">F-test Formula</div>' +
+      'F = (R² / k) / [(1 \x96 R²) / (n \x96 k \x96 1)] = MSR / MSE' +
+    '</div>' +
+
+    '<table class="data-table">' +
+    '<tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F</th></tr>' +
+    '<tr><td>Regression (SSR)</td><td>' + rf(SSR,2) + '</td><td>' + k + '</td><td>' + rf(MSR,2) + '</td><td rowspan="2" style="font-size:1.3rem;color:var(--gold)">' + rf(Fstat,2) + '</td></tr>' +
+    '<tr><td>Residual (SSE)</td><td>' + rf(SSE,2) + '</td><td>' + (n-k-1) + '</td><td>' + rf(MSE,2) + '</td></tr>' +
+    '<tr><td>Total (SST)</td><td>' + rf(SST,2) + '</td><td>' + (n-1) + '</td><td>\x96</td><td>\x96</td></tr>' +
+    '</table>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Calculation</div>' +
+      'F(' + k + ', ' + (n-k-1) + ') = ' + rf(MSR,2) + ' / ' + rf(MSE,2) + ' = <span style="color:var(--gold);font-size:1.3rem">' + rf(Fstat,2) + '</span>, p ' + (pF < .001 ? '< .001' : '= ' + rf(pF,3)) +
+    '</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'The null hypothesis is H₀: β₁ = β₂ = β₃ = β₄ = 0 (no predictor is related to Y). With F = ' + rf(Fstat,2) + ' and p ' + (pF < .001 ? '< .001' : '= ' + rf(pF,3)) + ', we reject H₀. The model is significant: <strong>at least one predictor</strong> is related to Victory Score.') +
+
+    dialogue('thor', '⚡ Thorment', 'Great! So all four predictors are significant?') +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'No! The F-test says the <em>model as a whole</em> is significant. Individual predictors are tested separately with t-tests. A significant F with non-significant individual predictors is perfectly possible \x96 it often signals multicollinearity.') +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'Think of the F-test as a bouncer at the gate: it tells you whether <em>anyone</em> in the group is important. But it won\x27t point fingers at specific individuals. For that, we need Step 6.');
+}
+
+function step6() {
+  return '<div class="step-title">Step 6: t-tests for Individual Predictors \x96 Who Matters?</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Now we test each coefficient individually. The t-test for each bⱼ asks: is this predictor\x27s unique contribution significantly different from zero, after accounting for all other predictors?') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">t-test for Individual Coefficients</div>' +
+      't = bⱼ / SE(bⱼ), &emsp; df = n \x96 k \x96 1 = ' + (n-k-1) +
+    '</div>' +
+
+    '<table class="data-table">' +
+    '<tr><th>Predictor</th><th>b</th><th>SE</th><th>t(' + (n-k-1) + ')</th><th>p</th><th>Significant?</th></tr>' +
+    '<tr><td>Warriors (b₁)</td><td>' + rf(b1,4) + '</td><td>' + rf(seBetas[1],4) + '</td><td>' + rf(tBetas[1],2) + '</td><td>' + (pBetas[1] < .001 ? '< .001' : rf(pBetas[1],3)) + '</td><td>' + (pBetas[1] < .05 ? '<span class="hl-green">✓ Yes</span>' : '<span class="hl-red">✗ No</span>') + '</td></tr>' +
+    '<tr><td>Provisions (b₂)</td><td>' + rf(b2,4) + '</td><td>' + rf(seBetas[2],4) + '</td><td>' + rf(tBetas[2],2) + '</td><td>' + (pBetas[2] < .001 ? '< .001' : rf(pBetas[2],3)) + '</td><td>' + (pBetas[2] < .05 ? '<span class="hl-green">✓ Yes</span>' : '<span class="hl-red">✗ No</span>') + '</td></tr>' +
+    '<tr><td>Terrain (b₃)</td><td>' + rf(b3,4) + '</td><td>' + rf(seBetas[3],4) + '</td><td>' + rf(tBetas[3],2) + '</td><td>' + (pBetas[3] < .001 ? '< .001' : rf(pBetas[3],3)) + '</td><td>' + (pBetas[3] < .05 ? '<span class="hl-green">✓ Yes</span>' : '<span class="hl-red">✗ No</span>') + '</td></tr>' +
+    '<tr><td>Morale (b₄)</td><td>' + rf(b4,4) + '</td><td>' + rf(seBetas[4],4) + '</td><td>' + rf(tBetas[4],2) + '</td><td>' + (pBetas[4] < .001 ? '< .001' : rf(pBetas[4],3)) + '</td><td>' + (pBetas[4] < .05 ? '<span class="hl-green">✓ Yes</span>' : '<span class="hl-red">✗ No</span>') + '</td></tr>' +
+    '</table>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'A predictor can be <em>significantly correlated with Y</em> in a bivariate analysis but become <em>non-significant</em> in the full model. Why? Because its contribution overlaps with other predictors. The t-test here measures only the <strong>unique</strong> variance explained.') +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ Thorment\x27s Trap: Suppressor Effects</div>' +
+      dialogue('thor', '⚡ Thorment', 'If a predictor isn\x27t significant, throw it out!') +
+      '<p>Not so fast. Sometimes a variable that has low correlation with Y can still be significant in the model because it suppresses irrelevant variance in another predictor. Removing it blindly can make the model <em>worse</em>. Statistical significance is not the only criterion for keeping a variable \x96 theory matters.</p>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Remember: with only ' + (n-k-1) + ' degrees of freedom for error, we have very low power. A non-significant result does <em>not</em> mean the predictor is unimportant \x96 it may mean we don\x27t have enough data to detect its effect.');
+}
+
+function step7() {
+  return '<div class="step-title">Step 7: Multicollinearity \x96 When Predictors Are Too Close</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Multicollinearity occurs when two or more predictors are <strong>highly correlated</strong> with each other. The regression still works mathematically, but the coefficients become unstable, standard errors inflate, and interpretation breaks down.') +
+
+    '<div class="visual-container">' +
+      buildVennDiagram() +
+    '</div>' +
+
+    '<p>When predictors overlap heavily, it becomes impossible to assign credit to any single one. The model explains Y well collectively, but the individual b\x27s can flip sign, change magnitude, or become non-significant.</p>' +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Variance Inflation Factor (VIF)</div>' +
+      'VIFⱼ = 1 / (1 \x96 R²ⱼ), where R²ⱼ is R² from regressing Xⱼ on all other predictors' +
+    '</div>' +
+
+    '<div class="visual-container">' +
+      buildVIFChart() +
+    '</div>' +
+
+    '<table class="data-table">' +
+    '<tr><th>Predictor</th><th>VIF</th><th>Tolerance (1/VIF)</th><th>Status</th></tr>' +
+    '<tr><td>Warriors</td><td>' + rf(VIF1,2) + '</td><td>' + rf(1/VIF1,3) + '</td><td>' + (VIF1 > 10 ? '<span class="hl-red">⚠ Danger</span>' : VIF1 > 5 ? '<span class="hl-gold">⚠ Caution</span>' : '<span class="hl-green">✓ OK</span>') + '</td></tr>' +
+    '<tr><td>Provisions</td><td>' + rf(VIF2,2) + '</td><td>' + rf(1/VIF2,3) + '</td><td>' + (VIF2 > 10 ? '<span class="hl-red">⚠ Danger</span>' : VIF2 > 5 ? '<span class="hl-gold">⚠ Caution</span>' : '<span class="hl-green">✓ OK</span>') + '</td></tr>' +
+    '<tr><td>Terrain</td><td>' + rf(VIF3,2) + '</td><td>' + rf(1/VIF3,3) + '</td><td>' + (VIF3 > 10 ? '<span class="hl-red">⚠ Danger</span>' : VIF3 > 5 ? '<span class="hl-gold">⚠ Caution</span>' : '<span class="hl-green">✓ OK</span>') + '</td></tr>' +
+    '<tr><td>Morale</td><td>' + rf(VIF4,2) + '</td><td>' + rf(1/VIF4,3) + '</td><td>' + (VIF4 > 10 ? '<span class="hl-red">⚠ Danger</span>' : VIF4 > 5 ? '<span class="hl-gold">⚠ Caution</span>' : '<span class="hl-green">✓ OK</span>') + '</td></tr>' +
+    '</table>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">VIF < 5</h4>' +
+        '<p>Generally acceptable. Coefficients are stable.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">VIF 5\x9610</h4>' +
+        '<p>Moderate concern. Investigate and consider remedies.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--thor-red)">VIF > 10</h4>' +
+        '<p>Serious problem. Coefficients are unreliable. Action needed.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">Remedies</h4>' +
+        '<p>Remove a redundant predictor, combine collinear predictors, or use ridge regression.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'Why not just throw everything in and see what sticks?') +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Because with multicollinearity, what "sticks" changes from sample to sample. The b\x27s become a weather vane: a slightly different sample might reverse their signs entirely. Stability is the goal, not just significance.');
+}
+
+function step8() {
+  return '<div class="step-title">Step 8: Variable Selection \x96 Enter, Stepwise, or Hierarchical?</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'How do we decide which predictors to include? There are three major approaches, and each has philosophical implications.') +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Enter (Forced Entry)</h4>' +
+        '<p>All predictors are entered simultaneously. The researcher decides which variables to include based on <strong>theory</strong>.</p>' +
+        '<p style="margin-top:8px;color:var(--success)"><strong>Pros:</strong> Theory-driven, transparent, reproducible.</p>' +
+        '<p style="color:var(--thor-red)"><strong>Cons:</strong> May include irrelevant variables.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">Stepwise (Forward/Backward)</h4>' +
+        '<p>Variables are added or removed automatically based on statistical criteria (F-to-enter, F-to-remove).</p>' +
+        '<p style="margin-top:8px;color:var(--success)"><strong>Pros:</strong> Parsimonious, automated.</p>' +
+        '<p style="color:var(--thor-red)"><strong>Cons:</strong> Capitalizes on chance, inflates Type I error, results may not replicate.</p>' +
+      '</div>' +
+      '<div class="concept-card" style="grid-column:1/-1">' +
+        '<h4 style="color:var(--corvo-purple)">Hierarchical (Sequential)</h4>' +
+        '<p>Predictors are entered in <strong>blocks</strong>, ordered by theoretical priority. Block 1 might be demographics, Block 2 the key variables of interest. The change in R² at each block tells you the <em>incremental</em> contribution.</p>' +
+        '<p style="margin-top:8px;color:var(--success)"><strong>Pros:</strong> Tests theoretical questions about incremental prediction.</p>' +
+        '<p style="color:var(--thor-red)"><strong>Cons:</strong> Order of entry matters \x96 the researcher must justify it.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'Stepwise sounds great! Let the computer pick the best model for me!') +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ Thorment\x27s Trap: Stepwise Delusion</div>' +
+      '<p>Stepwise regression is widely criticized in modern statistics:</p>' +
+      '<ul style="margin-top:8px;padding-left:20px">' +
+      '<li>It exploits sampling error: the "best" variables in one sample may not be best in another.</li>' +
+      '<li>R² values are inflated because the procedure searches for the best fit.</li>' +
+      '<li>p-values are no longer valid because they assume pre-specified hypotheses.</li>' +
+      '<li>Frank Harrell: "<em>Stepwise regression is one of the worst things you can do.</em>"</li>' +
+      '</ul>' +
+    '</div>' +
+
+    '<div class="correct-box">' +
+      '<div class="correct-title">✅ Best Practice</div>' +
+      '<p>Use <strong>forced entry</strong> guided by theory. If you must explore, use hierarchical entry to test meaningful blocks. Reserve stepwise only for exploratory studies with explicit cross-validation. <strong>Always report which method you used and why.</strong></p>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'In our battle example, theory says all four factors matter. We use forced entry (Enter method) to include all four simultaneously and let the t-tests sort out significance.');
+}
+
+function step9() {
+  return '<div class="step-title">Step 9: Assumptions \x96 The LINE Protocol + No Multicollinearity</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'Multiple regression inherits the LINE assumptions from simple regression, plus an additional one about multicollinearity. Violate these, and your coefficients, p-values, and confidence intervals all become untrustworthy.') +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">L \x96 Linearity</h4>' +
+        '<p>The relationship between each X and Y (given other X\x27s) must be linear. Check partial regression plots (each X vs. residuals from the other predictors).</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">I \x96 Independence</h4>' +
+        '<p>Residuals must be independent of each other. Violated in time-series, clustered, or repeated-measures data. Check Durbin-Watson statistic (≈ 2 is ideal).</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">N \x96 Normality of Residuals</h4>' +
+        '<p>Residuals should be approximately normally distributed. Check Q-Q plots and Shapiro-Wilk test. Robust with large n (≥ 30).</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">E \x96 Equal Variance (Homoscedasticity)</h4>' +
+        '<p>The spread of residuals should be constant across predicted values. A funnel shape = heteroscedasticity. Check residuals vs. predicted plot.</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<p class="step-subtitle">Residuals vs. Predicted Values Plot</p>' +
+
+    '<div class="visual-container">' +
+      buildResidualPlot() +
+    '</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'We want a <strong>random scatter</strong> around zero \x96 no patterns, no funnels, no curves. If the points form a curve, the linearity assumption fails. If they fan out, homoscedasticity fails.') +
+
+    '<p class="step-subtitle">Additional Diagnostics</p>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--thor-red)">Cook\x27s Distance</h4>' +
+        '<p>Measures the influence of each observation on the regression. Values > 1 (or > 4/n = ' + rf(4/n,2) + ') flag influential cases.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">Leverage (hᵢᵢ)</h4>' +
+        '<p>How far an observation\x27s X-values are from the centroid. High leverage + large residual = high influence.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Studentized Residuals</h4>' +
+        '<p>Residuals divided by their estimated SE. Values > |3| are potential outliers.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">Multicollinearity (VIF)</h4>' +
+        '<p>Already covered in Step 7. VIF < 10 for all predictors. This is the "extra" assumption beyond LINE.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Huginn challenges:', 'Assumption checking is not optional. It\x27s the difference between science and sorcery. How many published papers report a regression without a single diagnostic plot? Too many. Don\x27t be one of them.');
+}
+
+function step10() {
+  return '<div class="step-title">Step 10: Dummy Variables \x96 Encoding Categorical Predictors</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'What if one of our predictors is <em>categorical</em> rather than continuous? For example, <strong>terrain type</strong>: Plains, Forest, or Mountains. We can\x27t just code them as 1, 2, 3 \x96 that implies an order and equal spacing that doesn\x27t exist.') +
+
+    '<div class="formula">' +
+      '<div class="formula-label">Dummy Coding (k \x96 1 dummies for k categories)</div>' +
+      'For 3 terrain types, create 2 dummy variables:' +
+    '</div>' +
+
+    '<table class="data-table">' +
+    '<tr><th>Terrain Type</th><th>D₁ (Forest)</th><th>D₂ (Mountains)</th></tr>' +
+    '<tr><td><strong>Plains</strong> (reference)</td><td>0</td><td>0</td></tr>' +
+    '<tr><td><strong>Forest</strong></td><td>1</td><td>0</td></tr>' +
+    '<tr><td><strong>Mountains</strong></td><td>0</td><td>1</td></tr>' +
+    '</table>' +
+
+    '<p>The regression becomes:</p>' +
+
+    '<div class="formula">' +
+      'ŷ = b₀ + b₁(Warriors) + b₂(D₁<sub>Forest</sub>) + b₃(D₂<sub>Mountains</sub>) + ...' +
+    '</div>' +
+
+    '<div class="concept-grid">' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--odin-blue)">Reference Category</h4>' +
+        '<p>The category coded as all zeros. All comparisons are <em>relative to this group</em>. Here, Plains is the reference.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--gold)">b for a Dummy</h4>' +
+        '<p>The coefficient of D₁ = the difference in mean Y between Forest and Plains, controlling for other predictors.</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--success)">Number of Dummies</h4>' +
+        '<p>Always <strong>k \x96 1</strong> dummies for k categories. Including all k creates perfect multicollinearity (the "dummy variable trap").</p>' +
+      '</div>' +
+      '<div class="concept-card">' +
+        '<h4 style="color:var(--corvo-purple)">Other Coding Schemes</h4>' +
+        '<p><strong>Effect coding</strong> (\x961, 0, 1): compares each group to the grand mean. <strong>Contrast coding</strong>: tests specific hypotheses.</p>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('thor', '⚡ Thorment', 'Why not just code Plains = 1, Forest = 2, Mountains = 3 and be done with it?') +
+
+    '<div class="warning-box">' +
+      '<div class="warning-title">⚠️ Thorment\x27s Trap: Numeric Coding of Categories</div>' +
+      '<p>Coding categories as 1/2/3 implies that the difference between Plains and Forest is the same as between Forest and Mountains, <em>and</em> that Mountains is "three times" Plains. This is nonsensical for nominal variables. <strong>Always use dummy (or effect) coding for categorical predictors.</strong></p>' +
+    '</div>' +
+
+    dialogue('corvo', '🐦‍⬛ Muninn whispers:', 'To test the <em>overall</em> effect of a categorical variable with k categories, use the F-change test when adding all k\x961 dummies as a block. The individual dummy t-tests only compare each category to the reference.');
+}
+
+function step11() {
+  return '<div class="step-title">Step 11: Lesson of the Ravens</div>' +
+
+    '<div class="licao-box">' +
+      '<div class="licao-title">🐦‍⬛ Lesson of the Ravens: Multiple Linear Regression</div>' +
+
+      dialogue('corvo', '🐦‍⬛ Muninn (Memory) summarizes:', '<strong>Key takeaways from this realm:</strong>' +
+        '<ul style="margin-top:8px;padding-left:20px">' +
+        '<li><strong>MLR extends simple regression</strong> to multiple predictors: ŷ = b₀ + b₁x₁ + ... + bₖxₖ.</li>' +
+        '<li><strong>Partial coefficients (bⱼ)</strong> measure the effect of Xⱼ holding all other predictors constant.</li>' +
+        '<li><strong>Standardized betas (β)</strong> allow comparison of relative importance across predictors.</li>' +
+        '<li><strong>R²</strong> = total variance explained. <strong>Adjusted R²</strong> penalizes for number of predictors.</li>' +
+        '<li><strong>F-test</strong> evaluates the overall model. <strong>t-tests</strong> evaluate individual predictors.</li>' +
+        '<li><strong>VIF > 10</strong> signals dangerous multicollinearity. Check VIF before interpreting b\x27s.</li>' +
+        '<li><strong>Dummy variables</strong> encode categorical predictors using k\x961 binary indicators.</li>' +
+        '<li><strong>Assumptions</strong>: LINE + no multicollinearity. Always check residual plots.</li>' +
+        '</ul>') +
+
+      dialogue('corvo', '🐦‍⬛ Huginn (Thought) challenges:', '<strong>Never forget:</strong>' +
+        '<ul style="margin-top:8px;padding-left:20px">' +
+        '<li>A significant F with non-significant t\x27s usually means multicollinearity.</li>' +
+        '<li>Stepwise regression is a trap \x96 use theory-driven entry methods.</li>' +
+        '<li>Sample size matters: aim for at least 10\x9615 observations per predictor.</li>' +
+        '<li>R² always increases with more predictors \x96 Adjusted R² is the honest metric.</li>' +
+        '<li>Check Cook\x27s distance for influential observations \x96 one bad case can change everything.</li>' +
+        '</ul>') +
+    '</div>' +
+
+    '<p class="step-subtitle">APA Reporting Format</p>' +
+
+    '<div class="apa-box">' +
+      '<div class="apa-label">📝 APA Format: Multiple Linear Regression</div>' +
+      '<p>A multiple linear regression was conducted to predict battle victory scores from number of warriors, provisions, terrain score, and morale. The overall model was significant, <em>F</em>(' + k + ', ' + (n-k-1) + ') = ' + rf(Fstat,2) + ', <em>p</em> ' + (pF < .001 ? '< .001' : '= ' + rf(pF,3)) + ', <em>R</em>² = ' + rf(R2,2) + ', <em>R</em>²<sub>adj</sub> = ' + rf(R2adj,2) + '. The model explained ' + rf(R2adj*100,1) + '% of the variance in victory scores (adjusted). ' +
+      'Warriors (β = ' + rf(betaStd1,2) + ', <em>p</em> ' + (pBetas[1] < .05 ? (pBetas[1] < .001 ? '< .001' : '= ' + rf(pBetas[1],3)) : '= ' + rf(pBetas[1],3)) + '), ' +
+      'Provisions (β = ' + rf(betaStd2,2) + ', <em>p</em> ' + (pBetas[2] < .05 ? (pBetas[2] < .001 ? '< .001' : '= ' + rf(pBetas[2],3)) : '= ' + rf(pBetas[2],3)) + '), ' +
+      'Terrain (β = ' + rf(betaStd3,2) + ', <em>p</em> ' + (pBetas[3] < .05 ? (pBetas[3] < .001 ? '< .001' : '= ' + rf(pBetas[3],3)) : '= ' + rf(pBetas[3],3)) + '), and ' +
+      'Morale (β = ' + rf(betaStd4,2) + ', <em>p</em> ' + (pBetas[4] < .05 ? (pBetas[4] < .001 ? '< .001' : '= ' + rf(pBetas[4],3)) : '= ' + rf(pBetas[4],3)) + ') were examined as individual predictors. All VIFs were below 10, indicating acceptable multicollinearity levels.</p>' +
+    '</div>' +
+
+    '<p class="step-subtitle">Common Traps</p>' +
+
+    '<div class="trap-grid">' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Confusing b and β</h4>' +
+        '<p>Comparing unstandardized b\x27s across predictors with different scales is meaningless. Use standardized β for relative importance.</p>' +
+      '</div>' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Ignoring multicollinearity</h4>' +
+        '<p>High inter-predictor correlations inflate standard errors and can flip signs. Always report VIF.</p>' +
+      '</div>' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Stepwise blindness</h4>' +
+        '<p>Letting the computer pick variables capitalizes on sampling error. Results rarely replicate. Use theory.</p>' +
+      '</div>' +
+      '<div class="trap-card">' +
+        '<h4>⚠️ Overfitting with small n</h4>' +
+        '<p>With n/' + k + ' = ' + rf(n/k,0) + ', the model may fit noise. Cross-validate or collect more data.</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="comparison-grid" style="margin-top:24px">' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--odin-blue)">R²</div>' +
+        '<div class="comparison-result" style="color:var(--odin-blue)">' + rf(R2,4) + '</div>' +
+      '</div>' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--gold)">Adj. R²</div>' +
+        '<div class="comparison-result" style="color:var(--gold)">' + rf(R2adj,4) + '</div>' +
+      '</div>' +
+      '<div class="comparison-card">' +
+        '<div class="comparison-title" style="color:var(--success)">F(' + k + ',' + (n-k-1) + ')</div>' +
+        '<div class="comparison-result" style="color:var(--success)">' + rf(Fstat,2) + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    dialogue('odin', '🧙‍♂️ Odinfather', 'The war council now sees: victory is not determined by a single factor. Multiple forces shape the outcome, and understanding their <em>unique</em> contributions \x96 while accounting for their overlap \x96 is the power of multiple regression. Onward to the next realm!');
+}
+
+// ===== STEP REGISTRY =====
+var stepFunctions = [step0, step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11];
+
+var stepNames = [
+  'Introduction',
+  'Simple to Multiple',
+  'The Data',
+  'Partial Coefficients',
+  'R² & Adjusted R²',
+  'F-test (Overall)',
+  't-tests (Individual)',
+  'Multicollinearity',
+  'Variable Selection',
+  'Assumptions (LINE)',
+  'Dummy Variables',
+  'Lesson of the Ravens'
+];
+
+var totalSteps = 12;
+var currentStep = 0;
+
+// ===== NAVIGATION =====
+function renderStep() {
+  var content = document.getElementById('stepContent');
+  content.innerHTML = stepFunctions[currentStep]();
+  content.style.animation = 'none';
+  content.offsetHeight;
+  content.style.animation = 'fadeIn 0.4s ease';
+
+  document.getElementById('progressLabel').textContent = 'Step ' + currentStep + ' of ' + (totalSteps - 1) + ' — ' + stepNames[currentStep];
+  document.getElementById('progressFill').style.width = (currentStep / (totalSteps - 1) * 100) + '%';
+
+  document.getElementById('btnBack').disabled = currentStep === 0;
+  document.getElementById('btnNext').textContent = currentStep === totalSteps - 1 ? 'Restart ↻' : 'Next ▶';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNext() {
+  if (currentStep >= totalSteps - 1) {
+    currentStep = 0;
+  } else {
+    currentStep++;
+  }
+  renderStep();
+}
+
+function goBack() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goBack(); }
+});
+
+// Initialize
+renderStep();
+</script>
+</body>
+</html>
